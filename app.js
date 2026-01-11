@@ -65,7 +65,8 @@ const CONFIG = {
     { id: 'Carlingford', name: 'Carlingford', lat: 54.0442, lon: -6.1883, region: 'North of Ireland', live: false }
   ],
   API_KEYS: {
-    streetView: 'DEMO_KEY_PLACEHOLDER' // Replace with valid Google Maps API Key
+    streetView: 'DEMO_KEY_PLACEHOLDER', // Replace with valid Google Maps API Key
+    stripePublishable: 'pk_live_51PWJQERsc2tHXy0gV05ejlWaH6mwy4Xfqvfa7cSqUTdZaK6eFr4oEFYlXsZyeutnrlKzOmsRW7VDZkAQ4yO0XVu7004MBj4h9Q'
   },
   // Admin emails - users with these emails get admin access
   ADMIN_EMAILS: ['admin@irishtides.ie', 'support@irishtides.ie'],
@@ -239,6 +240,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Verify Pro subscription status on app load (runs once daily)
   verifySubscriptionStatus();
 
+  // Check for Stripe redirect results
+  checkPaymentStatus();
+
   updateAuthUI();
   showPage('home');
 
@@ -248,6 +252,37 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loader) loader.classList.add('hidden');
   }, 6500); // 1s delay + 5s fill animation
 });
+
+/**
+ * Handle Stripe redirect parameters (success/cancel)
+ */
+function checkPaymentStatus() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const paymentStatus = urlParams.get('payment');
+
+  if (paymentStatus === 'success') {
+    if (state.user) {
+      state.user.plan = 'pro';
+      const now = Date.now();
+      state.user.proStartDate = state.user.proStartDate || now;
+      state.user.subscriptionCycleStart = now;
+      state.user.lastVerifiedDate = now;
+      state.user.subscriptionExpired = false;
+
+      persistUserData();
+      updateAuthUI();
+
+      // Clean up URL parameters without reloading
+      window.history.replaceState({}, document.title, window.location.pathname);
+
+      alert('Welcome to Ireland Tides Pro! Your payment was successful.');
+      showPage('community');
+    }
+  } else if (paymentStatus === 'cancel') {
+    window.history.replaceState({}, document.title, window.location.pathname);
+    alert('Payment cancelled. You can upgrade anytime from your profile.');
+  }
+}
 
 // ============================================
 // Main Map Functions
@@ -1240,37 +1275,36 @@ window.closeStripeCheckout = () => {
   document.getElementById('stripe-checkout-modal').classList.remove('active');
 };
 
-window.processStripePayment = () => {
+window.processStripePayment = async () => {
   const payBtn = document.getElementById('stripe-pay-btn');
   const spinner = document.getElementById('stripe-pay-spinner');
   const btnText = payBtn.querySelector('.btn-text');
 
   payBtn.disabled = true;
-  btnText.innerText = '';
-  spinner.classList.remove('hidden');
+  if (btnText) btnText.innerText = '';
+  if (spinner) spinner.classList.remove('hidden');
 
-  // Simulate Stripe processing time
-  setTimeout(() => {
-    const now = Date.now();
+  try {
+    const response = await fetch('http://localhost:3000/create-checkout-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: state.user.email })
+    });
 
-    // Success! Update user status
-    state.user.plan = 'pro';
-    state.user.proStartDate = state.user.proStartDate || now;
-    state.user.subscriptionCycleStart = now;
-    state.user.lastVerifiedDate = now;
-    state.user.subscriptionExpired = false;
-
-    persistUserData();
-    updateAuthUI();
-    closeStripeCheckout();
-
-    if (document.getElementById('profile-modal').classList.contains('active')) {
-      openProfileModal(); // Refresh profile modal
+    const session = await response.json();
+    if (session.url) {
+      window.location.href = session.url;
+    } else {
+      throw new Error(session.error || 'Checkout session failed');
     }
+  } catch (error) {
+    console.error('Stripe Error:', error);
+    alert('Secure connection failed. Please ensure your backend server is running on port 3000.');
 
-    alert('Payment successful! Your Pro subscription is now active.');
-    showPage('community');
-  }, 2000);
+    payBtn.disabled = false;
+    if (btnText) btnText.innerText = state.user.plan === 'pro' ? 'Update Subscription' : 'Subscribe';
+    if (spinner) spinner.classList.add('hidden');
+  }
 };
 
 window.likeCatch = (id) => {
