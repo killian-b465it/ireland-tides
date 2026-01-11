@@ -42,5 +42,30 @@ app.post('/create-checkout-session', async (req, res) => {
     }
 });
 
+// Create a Customer Portal Session
+app.post('/create-portal-session', async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        // In a real app, you would look up the stripeCustomerId from your database
+        // For this demo, we'll search for the customer by email
+        const customers = await stripe.customers.list({ email, limit: 1 });
+
+        if (customers.data.length === 0) {
+            return res.status(404).json({ error: 'Customer not found' });
+        }
+
+        const session = await stripe.billingPortal.sessions.create({
+            customer: customers.data[0].id,
+            return_url: process.env.SUCCESS_URL, // Return to app
+        });
+
+        res.json({ url: session.url });
+    } catch (error) {
+        console.error('Error creating portal session:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Secure Stripe server running on port ${PORT}`));

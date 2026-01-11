@@ -1112,7 +1112,7 @@ function updateAuthUI() {
     if (state.user.plan === 'pro') {
       label.innerHTML += ' <span style="font-size:0.65rem; color:#ffab00">[PRO]</span>';
       // Add a small manage sub link next to it
-      label.innerHTML += ' <a href="#" onclick="openStripeCheckout()" style="font-size:0.65rem; color:var(--text-muted); margin-left:5px; text-decoration:none">Manage</a>';
+      label.innerHTML += ' <a href="#" onclick="manageStripeSubscription()" style="font-size:0.65rem; color:var(--text-muted); margin-left:5px; text-decoration:none">Manage</a>';
     }
     // Show admin nav if admin
     if (isAdmin()) {
@@ -1176,7 +1176,7 @@ window.openProfileModal = () => {
     badge.classList.add('pro');
     upgradeBtn.innerText = 'Manage Subscription';
     upgradeBtn.classList.add('btn-outline');
-    upgradeBtn.onclick = () => openStripeCheckout();
+    upgradeBtn.onclick = () => manageStripeSubscription();
     upgradeBtn.style.display = 'inline-block';
   } else {
     badge.classList.remove('pro');
@@ -1304,6 +1304,28 @@ window.processStripePayment = async () => {
     payBtn.disabled = false;
     if (btnText) btnText.innerText = state.user.plan === 'pro' ? 'Update Subscription' : 'Subscribe';
     if (spinner) spinner.classList.add('hidden');
+  }
+};
+
+window.manageStripeSubscription = async () => {
+  if (!state.user || state.user.plan !== 'pro') return;
+
+  try {
+    const response = await fetch('http://localhost:3000/create-portal-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: state.user.email })
+    });
+
+    const portal = await response.json();
+    if (portal.url) {
+      window.location.href = portal.url;
+    } else {
+      throw new Error(portal.error || 'Portal session failed');
+    }
+  } catch (error) {
+    console.error('Portal Error:', error);
+    alert('Subscription management is currently unavailable. Please ensure your backend server is running.');
   }
 };
 
