@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Real-time tide data for fishing around Ireland's coast. View current water levels, high/low tide times, and fishing conditions for all Irish coastal locations.">
+  <title>Ireland Tides - Real-Time Fishing Tide Data</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+
+  <!-- App Styles -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <div class="loading-content">
+      <h1 class="welcome-text">Welcome</h1>
+      <h2 class="sub-welcome-text">Irish Fishing Hub</h2>
+      <div class="loading-logo-wrapper">
+        <div class="water-wave">🌊</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation bar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-links">
+        <a href="#" class="nav-link active" id="nav-home" onclick="showPage('home')">Dashboard</a>
+        <a href="#" class="nav-link" id="nav-community" onclick="showPage('community')">Community</a>
+        <a href="#" class="nav-link" id="nav-directory" onclick="showPage('directory')">Shop Directory</a>
+      </div>
+
+      <div class="nav-brand">
+        <span class="nav-logo">🌊</span>
+        <span class="nav-title">Irish Fishing Hub</span>
+      </div>
+
+      <div class="nav-right">
+        <div class="nav-auth">
+          <button class="btn btn-sm btn-outline" id="login-btn" onclick="openAuthModal()">Login</button>
+          <div id="user-display" style="display: none;" onclick="openProfileModal()">
+            <span id="user-name-label">User</span>
+            <div class="user-avatar">👤</div>
+          </div>
+        </div>
+        <div class="nav-live">
+          <div class="live-indicator">
+            <span class="live-dot"></span>
+            <span>LIVE</span>
+          </div>
+          <span id="current-time"></span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Home Page (Dashboard) -->
+  <main class="page active" id="page-home">
+    <div class="app-container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <!-- Location Info -->
+        <div class="card fade-in" id="location-card">
+          <div class="card-header">
+            <span class="card-title">📍 Selected Location</span>
+          </div>
+          <div id="location-info">
+            <div class="empty-state">
+              <div class="empty-state-icon">🗺️</div>
+              <p>Select a tide station on the map</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Current Tide -->
+        <div class="card fade-in" id="tide-card" style="display: none;">
+          <div class="card-header">
+            <span class="card-title">🌊 Current Tide</span>
+          </div>
+          <div class="tide-current" id="tide-current">
+            <div class="loading">
+              <div class="loading-spinner"></div>
+              <span>Loading tide data...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Weather Conditions -->
+        <div class="card fade-in" id="weather-card" style="display: none;">
+          <div class="card-header">
+            <span class="card-title">🌦️ Local Weather</span>
+          </div>
+          <div class="weather-display" id="weather-display">
+            <div class="loading">
+              <div class="loading-spinner"></div>
+              <span>Fetching weather...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Today's Tides -->
+        <div class="card fade-in" id="tide-times-card" style="display: none;">
+          <div class="card-header">
+            <span class="card-title">⏰ Today's Tides</span>
+          </div>
+          <div class="tide-times" id="tide-times">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Fishing Conditions -->
+        <div class="card fade-in" id="fishing-card" style="display: none;">
+          <div class="card-header">
+            <span class="card-title">🎣 Fishing Conditions</span>
+          </div>
+          <div class="fishing-score" id="fishing-score">
+            <!-- Populated by JS -->
+          </div>
+          <div class="moon-phase" id="moon-phase" style="margin-top: var(--space-md);">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Nearby Shops -->
+        <div class="card fade-in" id="shops-card" style="display: none;">
+          <div class="card-header">
+            <span class="card-title">📍 Nearby Fishing Shops</span>
+          </div>
+          <div class="shop-list" id="shop-list">
+            <div class="loading">
+              <div class="loading-spinner"></div>
+              <span>Searching for shops...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tide Chart -->
+        <div class="card fade-in" id="chart-card" style="display: none;">
+          <div class="card-header">
+            <span class="card-title">📈 Tide Chart (24h)</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="tide-chart"></canvas>
+          </div>
+        </div>
+
+        <!-- Station List -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📋 All Stations</span>
+          </div>
+          <div class="station-list" id="station-list">
+            <div class="loading">
+              <div class="loading-spinner"></div>
+              <span>Loading stations...</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Map -->
+      <section class="map-container">
+        <div id="map"></div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Community Page (Social) -->
+  <main class="page" id="page-community" style="display: none;">
+    <div class="app-container">
+      <aside class="sidebar">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📸 Community Catches</span>
+          </div>
+          <div class="catch-feed" id="catch-feed">
+            <div class="empty-state">
+              <p>No catches shared yet. Be the first!</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+      <section class="map-container">
+        <div id="community-gating-overlay" class="premium-overlay" style="display: none;">
+          <div class="overlay-content">
+            <div class="premium-badge">🏆 PREMIUM</div>
+            <h2>Join the Crew!</h2>
+            <p>The Community Hub is exclusive to Pro members. See live catches, share your own spots, and interact with
+              other anglers across Ireland.</p>
+            <div class="premium-price">Only €10 / month</div>
+            <button class="btn btn-primary btn-lg" onclick="openPremiumModal()">Upgrade to Pro</button>
+            <p class="premium-footer">Join 500+ pros on the water today 🎣</p>
+          </div>
+        </div>
+        <div id="social-map"></div>
+        <div class="map-overlay">
+          <p>Click anywhere on the map to mark a new fishing spot!</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Directory Page (National Shop List) -->
+  <main class="page" id="page-directory" style="display: none;">
+    <div class="directory-container">
+      <div class="directory-hero">
+        <h1>🇮🇪 National Tackle Store Directory</h1>
+        <p>Find the best fishing gear across every county in Ireland</p>
+      </div>
+      <div class="county-directory" id="county-directory">
+        <div class="loading">
+          <div class="loading-spinner"></div>
+          <span>Loading national directory...</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Custom Catch Modal -->
+  <div id="catch-modal" class="modal">
+    <div class="modal-content">
+      <h3>🎣 Share Your Catch</h3>
+      <div class="form-group">
+        <label>What did you catch?</label>
+        <input type="text" id="catch-species" placeholder="e.g., Sea Bass, Mackerel">
+      </div>
+      <div class="form-group">
+        <label>Details</label>
+        <textarea id="catch-details" placeholder="How was the fight? What bait did you use?"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Add a Photo</label>
+        <div class="file-input-wrapper">
+          <input type="file" id="catch-photo" accept="image/*" onchange="previewImage(this)">
+          <div id="image-preview" class="image-preview" style="display: none;">
+            <img id="preview-img" src="" alt="Preview">
+            <button class="remove-image" onclick="removeImage()">✕</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="submitCatch()">Post Spot</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth Modal -->
+  <div class="modal" id="auth-modal">
+    <div class="modal-content">
+      <h2 id="auth-title">Welcome Back</h2>
+      <p id="auth-sub">Log in to your account</p>
+      <div class="auth-form-container">
+        <input type="email" id="auth-email" placeholder="Email Address" class="auth-input">
+        <input type="password" id="auth-password" placeholder="Password" class="auth-input">
+        <label class="auth-remember"
+          style="display:flex; align-items:center; gap:8px; margin: 10px 0; font-size: 0.9rem; cursor: pointer;">
+          <input type="checkbox" id="auth-remember" checked>
+          <span>Remember me</span>
+        </label>
+        <button class="btn btn-primary" onclick="handleAuthSubmit()">Continue</button>
+        <p class="auth-switch">Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign up</a></p>
+      </div>
+      <button class="modal-close-btn" onclick="closeAuthModal()">✕</button>
+    </div>
+  </div>
+
+  <!-- Premium Upgrade Modal -->
+  <div class="modal" id="premium-modal">
+    <div class="modal-content modal-large">
+      <div class="premium-modal-grid">
+        <div class="premium-modal-info">
+          <div class="premium-badge">🏆 PRO PLAN</div>
+          <h2>Unlock the Hub</h2>
+          <ul class="premium-benefits">
+            <li>✅ Post catches to the Community Feed</li>
+            <li>✅ Detailed catch coordinates & spots</li>
+            <li>✅ Like & Comment on others posts</li>
+            <li>✅ Exclusive pro angler insights</li>
+            <li>✅ Support the development of Irish Tides</li>
+          </ul>
+        </div>
+        <div class="premium-modal-cta">
+          <div class="price-bubble">
+            <span class="currency">€</span><span class="amount">10</span><span class="freq">/mo</span>
+          </div>
+          <p>Cancel any time. No contracts.</p>
+          <button class="btn btn-success btn-lg" onclick="upgradeToPremium()">Start Pro Session</button>
+          <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 10px;">Secure checkout via Stripe</p>
+        </div>
+      </div>
+      <button class="modal-close-btn" onclick="closePremiumModal()">✕</button>
+    </div>
+  </div>
+
+  <!-- Shop Details Modal -->
+  <div class="modal" id="shop-details-modal">
+    <div class="modal-content modal-large">
+      <div id="shop-details-hero" class="street-view-container">
+        <div class="loading-overlay" id="sv-loading">
+          <div class="loading-spinner"></div>
+        </div>
+        <img id="street-view-image" src="" alt="Shop Exterior" style="display: none;"
+          onload="this.style.display='block'; document.getElementById('sv-loading').style.display='none';">
+        <div class="no-image-placeholder" id="sv-fallback" style="display: none;">
+          <span>🏙️ No street view available</span>
+        </div>
+      </div>
+
+      <div class="shop-details-body">
+        <h2 id="shop-details-name">Shop Name</h2>
+        <div class="shop-meta-large">
+          <p id="shop-details-address"><span class="icon">📍</span> Loading address...</p>
+          <p id="shop-details-phone"><span class="icon">📞</span> Loading phone...</p>
+          <p id="shop-details-email"><span class="icon">📧</span> Loading email...</p>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn" onclick="closeShopDetails()">Close</button>
+          <button id="shop-details-directions-btn" class="btn btn-primary">Get Directions</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Modal -->
+  <div class="modal" id="profile-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>👤 Your Profile</h2>
+        <button class="modal-close-btn-inline" onclick="closeProfileModal()">✕</button>
+      </div>
+
+      <div class="profile-header-section">
+        <div class="avatar-upload-wrapper">
+          <img id="profile-avatar-preview" src="" alt="Profile">
+          <label for="avatar-input" class="avatar-edit-btn">📷</label>
+          <input type="file" id="avatar-input" accept="image/*" style="display: none;"
+            onchange="handleAvatarSelect(this)">
+        </div>
+        <div class="profile-status">
+          <span id="profile-plan-badge" class="plan-badge">FREE PLAN</span>
+          <button class="btn btn-sm btn-outline" id="profile-upgrade-btn" onclick="openPremiumModal()">Upgrade</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Display Name</label>
+        <input type="text" id="profile-name" class="auth-input">
+      </div>
+
+      <div class="form-group">
+        <label>Bio</label>
+        <textarea id="profile-bio" class="auth-input" rows="3"
+          placeholder="Tell us about your fishing experience..."></textarea>
+      </div>
+
+      <div class="modal-actions" style="justify-content: space-between; margin-top: 20px;">
+        <button class="btn btn-danger btn-outline" onclick="logout()">Log Out</button>
+        <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.min.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>
