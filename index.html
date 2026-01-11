@@ -41,6 +41,8 @@
         <a href="#" class="nav-link active" id="nav-home" onclick="showPage('home')">Dashboard</a>
         <a href="#" class="nav-link" id="nav-community" onclick="showPage('community')">Community</a>
         <a href="#" class="nav-link" id="nav-directory" onclick="showPage('directory')">Shop Directory</a>
+        <a href="#" class="nav-link admin-only" id="nav-admin" onclick="showPage('admin')" style="display: none;">🛡️
+          Admin</a>
       </div>
 
       <div class="nav-brand">
@@ -53,7 +55,10 @@
           <button class="btn btn-sm btn-outline" id="login-btn" onclick="openAuthModal()">Login</button>
           <div id="user-display" style="display: none;" onclick="openProfileModal()">
             <span id="user-name-label">User</span>
-            <div class="user-avatar">👤</div>
+            <div class="user-avatar-wrapper">
+              <div class="user-avatar">👤</div>
+              <span class="notification-badge" id="notification-badge" style="display: none;">0</span>
+            </div>
           </div>
         </div>
         <div class="nav-live">
@@ -63,7 +68,22 @@
           </div>
           <span id="current-time"></span>
         </div>
+        <!-- Mobile Menu Button -->
+        <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileMenu()">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
       </div>
+    </div>
+    <!-- Mobile Dropdown Menu -->
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="#" class="mobile-menu-link" onclick="showPage('home'); closeMobileMenu()">Dashboard</a>
+      <a href="#" class="mobile-menu-link" onclick="showPage('community'); closeMobileMenu()">Community</a>
+      <a href="#" class="mobile-menu-link" onclick="showPage('directory'); closeMobileMenu()">Shop Directory</a>
+      <a href="#" class="mobile-menu-link admin-only" id="mobile-nav-admin"
+        onclick="showPage('admin'); closeMobileMenu()" style="display: none;">🛡️ Admin</a>
+      <a href="#" class="mobile-menu-link" onclick="openTermsModal(); closeMobileMenu()">⚖️ Terms & Conditions</a>
     </div>
   </nav>
 
@@ -169,6 +189,10 @@
             </div>
           </div>
         </div>
+        <div class="sidebar-footer">
+          <a href="#" onclick="openTermsModal()">Terms & Conditions</a>
+          <span>&copy; 2026 Irish Fishing Hub</span>
+        </div>
       </aside>
 
       <!-- Map -->
@@ -191,6 +215,10 @@
               <p>No catches shared yet. Be the first!</p>
             </div>
           </div>
+        </div>
+        <div class="sidebar-footer">
+          <a href="#" onclick="openTermsModal()">Terms & Conditions</a>
+          <span>&copy; 2026 Irish Fishing Hub</span>
         </div>
       </aside>
       <section class="map-container">
@@ -298,11 +326,82 @@
             <span class="currency">€</span><span class="amount">10</span><span class="freq">/mo</span>
           </div>
           <p>Cancel any time. No contracts.</p>
-          <button class="btn btn-success btn-lg" onclick="upgradeToPremium()">Start Pro Session</button>
-          <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 10px;">Secure checkout via Stripe</p>
+          <button class="btn btn-success btn-lg" onclick="openStripeCheckout()">Start Pro Membership</button>
+          <div class="stripe-badge-container">
+            <svg class="stripe-svg" viewBox="0 0 60 25" xmlns="http://www.w3.org/2000/svg">
+              <path fill="currentColor"
+                d="M59.64 14.28h-8.06c.19 1.93 1.6 2.55 3.27 2.55 1.63 0 2.91-.44 3.82-1l.73 2.15c-1.12.77-2.85 1.34-4.88 1.34-3.51 0-5.73-2.22-5.73-6.24 0-3.66 2.04-6.3 5.42-6.3 3.32 0 5.14 2.51 5.14 5.74 0 .42-.03.82-.07 1.05.01-.15.01-.15.36-.29zm-7.98-2.15h5.1c-.13-1.63-1.42-2.3-2.52-2.3-1.39 0-2.34.84-2.58 2.3zM45.72 8.28c-1.36 0-2.23.63-2.73 1.25V8.5h-2.8v13.52c0 .28-.01.55.02.82l2.8-.2v-6.35c.57.57 1.41 1.01 2.52 1.01 2.36 0 4.38-2.11 4.38-5.51 0-3.48-2.01-5.51-4.19-5.51zm-.81 5.4c-1.07 0-1.74-.63-1.92-1.06v-2.09c.18-.43.85-1.06 1.92-1.06 1.15 0 1.65 1.08 1.65 2.11 0 1.02-.5 2.1-1.65 2.1zM34.78 6.55c-1.11 0-2.07.45-2.61.94V3.13l-3.04.64v13.52c0 .28-.01.55.02.82l2.8-.2V9.92c.51-.55 1.38-1.08 2.3-1.08.66 0 .97.31.97.99V18.1c0 .28-.01.55.02.82l2.8-.2v-9.5c.01-1.57-.96-2.67-3.26-2.67zM24.78 18.25l-.01.1L24.78 19.1c.21 0 .28-.01.28-.31V8.5h-2.8v1.3c-.53-.8-1.47-1.52-3.04-1.52-2.45 0-4.59 2.18-4.59 5.51 0 3.33 2.14 5.51 4.59 5.51 1.57 0 2.51-.72 3.04-1.52v.87c.01 0-.01.01-.1.1zM19.46 13.68c0-1.03.5-2.11 1.65-2.11 1.07 0 1.74.63 1.92 1.06v2.09c-.18.43-.85 1.06-1.92 1.06-1.15 0-1.65-1.08-1.65-2.11zM11.66 4.3c-.22 0-.46.03-.7.09l.48 2.6c.15-.04.31-.06.39-.06.74 0 1.19.43 1.19 1.19v.42H10.1v2.73h2.92v6.83c0 .28-.01.55.02.82l2.8-.2V11.27h1.99V8.54h-1.99V7.93c0-2.31-1.13-3.63-4.18-3.63zM1.02 11.27l1.37.58c1.39.59 2.05 1 2.05 1.98 0 .86-.71 1.33-1.89 1.33-1.51 0-3.13-.57-4.22-1.28L-2 16.51c1.36.85 3.35 1.51 5.37 1.51 3.55 0 5.4-1.74 5.4-4.29 0-3.37-2.32-4.11-4.73-5.11l-1.37-.58c-.97-.41-1.64-.78-1.64-1.51 0-.61.54-1.02 1.52-1.02 1.2 0 2.56.45 3.51.98l1.01-2.52C5.74 3.06 4.19 2.5 2.6 2.5.01 2.5-2.1 3.99-2.1 6.51c0 3.05 2.14 3.93 4.49 4.91z" />
+            </svg>
+            <span class="stripe-secure-text">Secure 256-bit SSL encrypted payment</span>
+          </div>
         </div>
       </div>
       <button class="modal-close-btn" onclick="closePremiumModal()">✕</button>
+    </div>
+  </div>
+
+  <!-- Stripe Checkout Modal -->
+  <div class="modal" id="stripe-checkout-modal">
+    <div class="modal-content stripe-checkout-container">
+      <div class="stripe-header">
+        <div class="stripe-logo">
+          <svg viewBox="0 0 60 25" xmlns="http://www.w3.org/2000/svg">
+            <path fill="currentColor"
+              d="M59.64 14.28h-8.06c.19 1.93 1.6 2.55 3.27 2.55 1.63 0 2.91-.44 3.82-1l.73 2.15c-1.12.77-2.85 1.34-4.88 1.34-3.51 0-5.73-2.22-5.73-6.24 0-3.66 2.04-6.3 5.42-6.3 3.32 0 5.14 2.51 5.14 5.74 0 .42-.03.82-.07 1.05.01-.15.01-.15.36-.29zm-7.98-2.15h5.1c-.13-1.63-1.42-2.3-2.52-2.3-1.39 0-2.34.84-2.58 2.3zM45.72 8.28c-1.36 0-2.23.63-2.73 1.25V8.5h-2.8v13.52c0 .28-.01.55.02.82l2.8-.2v-6.35c.57.57 1.41 1.01 2.52 1.01 2.36 0 4.38-2.11 4.38-5.51 0-3.48-2.01-5.51-4.19-5.51zm-.81 5.4c-1.07 0-1.74-.63-1.92-1.06v-2.09c.18-.43.85-1.06 1.92-1.06 1.15 0 1.65 1.08 1.65 2.11 0 1.02-.5 2.1-1.65 2.1zM34.78 6.55c-1.11 0-2.07.45-2.61.94V3.13l-3.04.64v13.52c0 .28-.01.55.02.82l2.8-.2V9.92c.51-.55 1.38-1.08 2.3-1.08.66 0 .97.31.97.99V18.1c0 .28-.01.55.02.82l2.8-.2v-9.5c.01-1.57-.96-2.67-3.26-2.67zM24.78 18.25l-.01.1L24.78 19.1c.21 0 .28-.01.28-.31V8.5h-2.8v1.3c-.53-.8-1.47-1.52-3.04-1.52-2.45 0-4.59 2.18-4.59 5.51 0 3.33 2.14 5.51 4.59 5.51 1.57 0 2.51-.72 3.04-1.52v.87c.01 0-.01.01-.1.1zM19.46 13.68c0-1.03.5-2.11 1.65-2.11 1.07 0 1.74.63 1.92 1.06v2.09c-.18.43-.85 1.06-1.92 1.06-1.15 0-1.65-1.08-1.65-2.11zM11.66 4.3c-.22 0-.46.03-.7.09l.48 2.6c.15-.04.31-.06.39-.06.74 0 1.19.43 1.19 1.19v.42H10.1v2.73h2.92v6.83c0 .28-.01.55.02.82l2.8-.2V11.27h1.99V8.54h-1.99V7.93c0-2.31-1.13-3.63-4.18-3.63zM1.02 11.27l1.37.58c1.39.59 2.05 1 2.05 1.98 0 .86-.71 1.33-1.89 1.33-1.51 0-3.13-.57-4.22-1.28L-2 16.51c1.36.85 3.35 1.51 5.37 1.51 3.55 0 5.4-1.74 5.4-4.29 0-3.37-2.32-4.11-4.73-5.11l-1.37-.58c-.97-.41-1.64-.78-1.64-1.51 0-.61.54-1.02 1.52-1.02 1.2 0 2.56.45 3.51.98l1.01-2.52C5.74 3.06 4.19 2.5 2.6 2.5.01 2.5-2.1 3.99-2.1 6.51c0 3.05 2.14 3.93 4.49 4.91z" />
+          </svg>
+        </div>
+        <button class="modal-close-btn-inline" onclick="closeStripeCheckout()">✕</button>
+      </div>
+
+      <div class="stripe-body">
+        <div class="checkout-summary">
+          <p class="product-name">Irish Fishing Hub Pro</p>
+          <div class="product-price">€10.00 <span class="price-period">per month</span></div>
+        </div>
+
+        <div class="stripe-form">
+          <div class="form-group stripe-field">
+            <label>Card Information</label>
+            <div class="card-input-container">
+              <input type="text" id="stripe-card-number" placeholder="1234 5678 1234 5678" maxlength="19">
+              <div class="card-meta">
+                <input type="text" id="stripe-card-expiry" placeholder="MM / YY" maxlength="7">
+                <input type="text" id="stripe-card-cvc" placeholder="CVC" maxlength="3">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group stripe-field">
+            <label>Cardholder Name</label>
+            <input type="text" id="stripe-card-name" placeholder="John Doe">
+          </div>
+
+          <div class="form-group stripe-field">
+            <label>Country or region</label>
+            <select id="stripe-country">
+              <option value="IE">Ireland</option>
+              <option value="UK">United Kingdom</option>
+              <option value="US">United States</option>
+            </select>
+          </div>
+
+          <button class="stripe-pay-btn" id="stripe-pay-btn" onclick="processStripePayment()">
+            <span class="btn-text">Subscribe</span>
+            <div class="stripe-spinner hidden" id="stripe-pay-spinner"></div>
+          </button>
+
+          <p class="stripe-disclaimer">By confirming your subscription, you allow Irish Fishing Hub to charge your card
+            for this payment and future payments in accordance with their terms.</p>
+        </div>
+      </div>
+
+      <div class="stripe-footer">
+        <span class="powered-by">Powered by <strong>Stripe</strong></span>
+        <div class="footer-links">
+          <span>Terms</span>
+          <span>Privacy</span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -370,7 +469,167 @@
 
       <div class="modal-actions" style="justify-content: space-between; margin-top: 20px;">
         <button class="btn btn-danger btn-outline" onclick="logout()">Log Out</button>
-        <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn btn-outline" onclick="openSupportModal()">💬 Contact Support</button>
+          <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Dashboard Page -->
+  <main class="page" id="page-admin" style="display: none;">
+    <div class="admin-container">
+      <div class="admin-header">
+        <h1>🛡️ Admin Dashboard</h1>
+        <p>Manage users, view insights, and respond to support messages</p>
+      </div>
+
+      <div class="admin-grid">
+        <!-- Station Insights -->
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>📊 Tidal Station Insights</h3>
+          </div>
+          <div class="admin-card-body" id="admin-station-insights">
+            <div class="insight-grid">
+              <div class="insight-item">
+                <span class="insight-value" id="total-stations">0</span>
+                <span class="insight-label">Total Stations</span>
+              </div>
+              <div class="insight-item">
+                <span class="insight-value" id="active-stations">0</span>
+                <span class="insight-label">Active</span>
+              </div>
+              <div class="insight-item">
+                <span class="insight-value" id="offline-stations">0</span>
+                <span class="insight-label">Offline</span>
+              </div>
+            </div>
+            <div class="station-status-list" id="admin-station-list">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- User Accounts -->
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>👥 User Accounts</h3>
+            <span class="badge" id="total-users-badge">0 users</span>
+          </div>
+          <div class="admin-card-body">
+            <div class="admin-table-wrapper">
+              <table class="admin-table" id="users-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Plan</th>
+                    <th>Joined</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="users-table-body">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Support Messages -->
+        <div class="admin-card admin-card-full">
+          <div class="admin-card-header">
+            <h3>💬 Support Messages</h3>
+            <span class="badge" id="unread-messages-badge">0 unread</span>
+          </div>
+          <div class="admin-card-body">
+            <div class="messages-list" id="admin-messages-list">
+              <div class="empty-state">
+                <p>No support messages yet</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Contact Support Modal -->
+  <div class="modal" id="support-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>💬 Contact Support</h2>
+        <button class="modal-close-btn-inline" onclick="closeSupportModal()">✕</button>
+      </div>
+
+      <div class="support-thread" id="support-thread">
+        <div class="empty-state">
+          <p>No messages yet. Send us a message below!</p>
+        </div>
+      </div>
+
+      <div class="support-compose">
+        <textarea id="support-message-input" placeholder="Type your message here..." rows="3"></textarea>
+        <button class="btn btn-primary" onclick="sendSupportMessage()">Send Message</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Reply Modal -->
+  <div class="modal" id="admin-reply-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📩 Reply to <span id="reply-to-user">User</span></h2>
+        <button class="modal-close-btn-inline" onclick="closeAdminReplyModal()">✕</button>
+      </div>
+
+      <div class="support-thread" id="admin-reply-thread">
+        <!-- Shows conversation history -->
+      </div>
+
+      <div class="support-compose">
+        <textarea id="admin-reply-input" placeholder="Type your reply..." rows="3"></textarea>
+        <button class="btn btn-primary" onclick="sendAdminReply()">Send Reply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Terms & Conditions Modal -->
+  <div class="modal" id="terms-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>⚖️ Terms & Conditions</h2>
+        <button class="modal-close-btn-inline" onclick="closeTermsModal()">✕</button>
+      </div>
+      <div class="modal-body terms-content">
+        <p>Last updated: January 11, 2026</p>
+
+        <h3>1. Acceptance of Terms</h3>
+        <p>By accessing the Irish Fishing Hub, you agree to be bound by these Terms and Conditions and all applicable
+          laws and regulations in Ireland.</p>
+
+        <h3>2. Use of Data</h3>
+        <p>Tidal and weather data provided by this application is for informational and recreational fishing purposes
+          only. Do not rely on this data for maritime navigation or safety-critical decisions. Always consult official
+          Marine Institute (Ireland) notices and local harbor master reports.</p>
+
+        <h3>3. Real-Time Data Accuracy</h3>
+        <p>While we strive to provide real-time data from the Marine Institute sensor network, we cannot guarantee 100%
+          uptime or accuracy. Data may be delayed or estimated during sensor maintenance or network outages.</p>
+
+        <h3>4. Pro Subscription</h3>
+        <p>Pro features are provided on a monthly subscription basis. Subscriptions can be cancelled at any time through
+          the user profile menu.</p>
+
+        <h3>5. Limitation of Liability</h3>
+        <p>Irish Fishing Hub shall not be held liable for any loss, damage, or injury resulting from the use of data
+          provided through this service.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="closeTermsModal()">I Understand</button>
       </div>
     </div>
   </div>
