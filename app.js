@@ -4,6 +4,33 @@
  */
 
 // ============================================
+// Firebase Configuration (Cross-Device User Sync)
+// ============================================
+const firebaseConfig = {
+  apiKey: "AIzaSyDemoKeyForIrishFishingHub",
+  authDomain: "irish-fishing-hub.firebaseapp.com",
+  databaseURL: "https://irish-fishing-hub-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "irish-fishing-hub",
+  storageBucket: "irish-fishing-hub.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abc123"
+};
+
+// Initialize Firebase
+let firebaseApp = null;
+let firebaseDB = null;
+
+try {
+  if (typeof firebase !== 'undefined') {
+    firebaseApp = firebase.initializeApp(firebaseConfig);
+    firebaseDB = firebase.database();
+    console.log('Firebase initialized for user sync');
+  }
+} catch (e) {
+  console.warn('Firebase initialization skipped:', e.message);
+}
+
+// ============================================
 // Configuration
 // ============================================
 const CONFIG = {
@@ -374,6 +401,55 @@ function persistUserData() {
   } else {
     sessionStorage.setItem('fishing_user', JSON.stringify(state.user));
   }
+
+  // Sync to Firebase for cross-device visibility
+  syncUserToFirebase(state.user);
+}
+
+// ============================================
+// Firebase User Sync Functions
+// ============================================
+function syncUserToFirebase(user) {
+  if (!firebaseDB || !user || !user.id) return;
+
+  try {
+    const userRef = firebaseDB.ref('users/' + user.id);
+    userRef.set({
+      id: user.id,
+      email: user.email,
+      name: user.name || user.email.split('@')[0],
+      plan: user.plan || 'free',
+      joinDate: user.joinDate || Date.now(),
+      betaProUser: user.betaProUser || false,
+      lastActive: Date.now()
+    });
+  } catch (e) {
+    console.warn('Firebase sync failed:', e.message);
+  }
+}
+
+function loadUsersFromFirebase(callback) {
+  if (!firebaseDB) {
+    callback([]);
+    return;
+  }
+
+  try {
+    const usersRef = firebaseDB.ref('users');
+    usersRef.once('value', (snapshot) => {
+      const users = [];
+      snapshot.forEach((childSnapshot) => {
+        users.push(childSnapshot.val());
+      });
+      callback(users);
+    }, (error) => {
+      console.warn('Firebase load failed:', error.message);
+      callback([]);
+    });
+  } catch (e) {
+    console.warn('Firebase load error:', e.message);
+    callback([]);
+  }
 }
 
 // ============================================
@@ -394,6 +470,11 @@ document.addEventListener('DOMContentLoaded', () => {
     state.user.plan = 'pro';
     state.user.betaProUser = true; // Mark as beta user for later tracking
     persistUserData();
+  }
+
+  // Sync current user to Firebase on load
+  if (state.user) {
+    syncUserToFirebase(state.user);
   }
 
   // Verify Pro subscription status on app load (runs once daily)
