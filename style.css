@@ -2442,3 +2442,101 @@ body {
   font-size: 0.7rem;
   color: var(--text-muted);
 }
+
+/* ============================================
+   Map Filter Panel
+   ============================================ */
+.map-filter-panel {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  z-index: 1000;
+  display: flex;
+  gap: 8px;
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border-glass);
+  box-shadow: var(--shadow-lg);
+}
+
+.filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--border-glass);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.filter-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+}
+
+.filter-btn.active {
+  background: rgba(0, 212, 255, 0.15);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.filter-btn:not(.active) {
+  opacity: 0.6;
+}
+
+@media (max-width: 768px) {
+  .map-filter-panel {
+    flex-wrap: wrap;
+    max-width: calc(100% - 30px);
+  }
+
+  .filter-label {
+    display: none;
+  }
+
+  .filter-btn {
+    padding: 8px 10px;
+  }
+}
+
+/* Pier & Boat Ramp Markers */
+.pier-marker-wrapper,
+.ramp-marker-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pier-marker,
+.ramp-marker {
+  font-size: 1.3rem;
+  background: var(--glass);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--accent-primary);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.pier-marker:hover,
+.ramp-marker:hover {
+  transform: scale(1.15);
+}
+
+.pier-marker {
+  border-color: #00ff88;
+}
+
+.ramp-marker {
+  border-color: #ffab00;
+}

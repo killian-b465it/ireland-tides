@@ -75,6 +75,48 @@ const CONFIG = {
 };
 
 // ============================================
+// Piers Data (Popular Fishing Piers)
+// ============================================
+const PIERS = [
+  { name: 'Dun Laoghaire Pier', lat: 53.2946, lon: -6.1349 },
+  { name: 'Howth West Pier', lat: 53.3905, lon: -6.0672 },
+  { name: 'Bray Pier', lat: 53.2021, lon: -6.0908 },
+  { name: 'Skerries Pier', lat: 53.5805, lon: -6.1089 },
+  { name: 'Greystones Pier', lat: 53.1433, lon: -6.0639 },
+  { name: 'Cobh Pier', lat: 51.8503, lon: -8.2967 },
+  { name: 'Kinsale Pier', lat: 51.7058, lon: -8.5222 },
+  { name: 'Galway Docks', lat: 53.2707, lon: -9.0568 },
+  { name: 'Kilmore Quay Pier', lat: 52.1726, lon: -6.5857 },
+  { name: 'Dunmore East Pier', lat: 52.1522, lon: -6.9944 },
+  { name: 'Fenit Pier', lat: 52.2711, lon: -9.8667 },
+  { name: 'Dingle Pier', lat: 52.1408, lon: -10.2686 },
+  { name: 'Clifden Pier', lat: 53.4880, lon: -10.0217 },
+  { name: 'Killybegs Pier', lat: 54.6347, lon: -8.4389 },
+  { name: 'Portrush Pier', lat: 55.2064, lon: -6.6561 }
+];
+
+// ============================================
+// Boat Ramps Data (Public Slipways)
+// ============================================
+const BOAT_RAMPS = [
+  { name: 'Malahide Slipway', lat: 53.4503, lon: -6.1519 },
+  { name: 'Skerries Slipway', lat: 53.5824, lon: -6.1064 },
+  { name: 'Balbriggan Slipway', lat: 53.6103, lon: -6.1833 },
+  { name: 'Howth Slipway', lat: 53.3875, lon: -6.0681 },
+  { name: 'Dun Laoghaire Slipway', lat: 53.2897, lon: -6.1289 },
+  { name: 'Arklow Slipway', lat: 52.7978, lon: -6.1419 },
+  { name: 'Wexford Slipway', lat: 52.3336, lon: -6.4575 },
+  { name: 'Dunmore East Slipway', lat: 52.1500, lon: -6.9933 },
+  { name: 'Cobh Slipway', lat: 51.8489, lon: -8.2978 },
+  { name: 'Kinsale Slipway', lat: 51.7050, lon: -8.5233 },
+  { name: 'Fenit Slipway', lat: 52.2700, lon: -9.8656 },
+  { name: 'Galway Slipway', lat: 53.2700, lon: -9.0600 },
+  { name: 'Clifden Slipway', lat: 53.4889, lon: -10.0200 },
+  { name: 'Killybegs Slipway', lat: 54.6339, lon: -8.4400 },
+  { name: 'Malin Head Slipway', lat: 55.3757, lon: -7.3906 }
+];
+
+// ============================================
 // State
 // ============================================
 let state = {
@@ -84,6 +126,9 @@ let state = {
   selectedStation: null,
   markers: {},
   shopMarkers: null,
+  pierMarkers: null,
+  rampMarkers: null,
+  activeFilters: { stations: true, shops: true, piers: true, ramps: true },
   tideData: {},
   isLoading: false,
   catches: JSON.parse(localStorage.getItem('fishing_catches') || '[]'),
@@ -315,12 +360,86 @@ function initMap() {
     maxZoom: 19
   }).addTo(state.map);
 
+  // Create layer groups
   state.shopMarkers = L.layerGroup().addTo(state.map);
+  state.pierMarkers = L.layerGroup().addTo(state.map);
+  state.rampMarkers = L.layerGroup().addTo(state.map);
 
+  // Add station markers
   CONFIG.stations.forEach(station => {
     addStationMarker(station);
   });
+
+  // Add pier markers
+  PIERS.forEach(pier => {
+    const icon = L.divIcon({
+      className: 'pier-marker-wrapper',
+      html: `<div class="pier-marker" title="${pier.name}">🎣</div>`,
+      iconSize: [28, 28],
+      iconAnchor: [14, 14]
+    });
+    const marker = L.marker([pier.lat, pier.lon], { icon })
+      .bindPopup(`<strong>${pier.name}</strong><br>Fishing Pier`);
+    state.pierMarkers.addLayer(marker);
+  });
+
+  // Add boat ramp markers
+  BOAT_RAMPS.forEach(ramp => {
+    const icon = L.divIcon({
+      className: 'ramp-marker-wrapper',
+      html: `<div class="ramp-marker" title="${ramp.name}">🚤</div>`,
+      iconSize: [28, 28],
+      iconAnchor: [14, 14]
+    });
+    const marker = L.marker([ramp.lat, ramp.lon], { icon })
+      .bindPopup(`<strong>${ramp.name}</strong><br>Boat Ramp / Slipway`);
+    state.rampMarkers.addLayer(marker);
+  });
 }
+
+// Toggle map filter layers
+window.toggleMapFilter = (layerName) => {
+  const btn = document.querySelector(`.filter-btn[data-layer="${layerName}"]`);
+  state.activeFilters[layerName] = !state.activeFilters[layerName];
+
+  if (btn) {
+    btn.classList.toggle('active', state.activeFilters[layerName]);
+  }
+
+  switch (layerName) {
+    case 'stations':
+      Object.values(state.markers).forEach(marker => {
+        if (state.activeFilters.stations) {
+          marker.addTo(state.map);
+        } else {
+          state.map.removeLayer(marker);
+        }
+      });
+      break;
+    case 'shops':
+      if (state.activeFilters.shops) {
+        state.shopMarkers.addTo(state.map);
+      } else {
+        state.map.removeLayer(state.shopMarkers);
+      }
+      break;
+    case 'piers':
+      if (state.activeFilters.piers) {
+        state.pierMarkers.addTo(state.map);
+      } else {
+        state.map.removeLayer(state.pierMarkers);
+      }
+      break;
+    case 'ramps':
+      if (state.activeFilters.ramps) {
+        state.rampMarkers.addTo(state.map);
+      } else {
+        state.map.removeLayer(state.rampMarkers);
+      }
+      break;
+  }
+};
+
 
 function addStationMarker(station) {
   const icon = L.divIcon({

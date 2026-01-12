@@ -197,6 +197,22 @@
 
       <!-- Map -->
       <section class="map-container">
+        <!-- Map Filter Panel -->
+        <div class="map-filter-panel" id="map-filter-panel">
+          <button class="filter-btn active" data-layer="stations" onclick="toggleMapFilter('stations')"
+            title="Tidal Stations">
+            🌊 <span class="filter-label">Stations</span>
+          </button>
+          <button class="filter-btn active" data-layer="shops" onclick="toggleMapFilter('shops')" title="Tackle Shops">
+            🏪 <span class="filter-label">Shops</span>
+          </button>
+          <button class="filter-btn active" data-layer="piers" onclick="toggleMapFilter('piers')" title="Fishing Piers">
+            🎣 <span class="filter-label">Piers</span>
+          </button>
+          <button class="filter-btn active" data-layer="ramps" onclick="toggleMapFilter('ramps')" title="Boat Ramps">
+            🚤 <span class="filter-label">Ramps</span>
+          </button>
+        </div>
         <div id="map"></div>
       </section>
     </div>
