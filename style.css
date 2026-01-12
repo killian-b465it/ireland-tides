@@ -140,20 +140,27 @@ body.has-beta-banner .beta-banner {
   align-items: center;
   justify-content: space-between;
   position: relative;
+  gap: var(--space-md);
+}
+
+.nav-links {
+  display: flex;
+  gap: var(--space-md);
+  flex-shrink: 0;
 }
 
 .nav-right {
   display: flex;
   align-items: center;
-  gap: var(--space-xl);
+  gap: var(--space-md);
+  flex-shrink: 0;
 }
 
 /* Auth Buttons */
 .nav-auth {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
-  margin-right: var(--space-sm);
+  gap: var(--space-sm);
 }
 
 .btn-outline {
@@ -2517,73 +2524,208 @@ body.has-beta-banner .beta-banner {
 }
 
 /* ============================================
-   Map Filter Panel
+   Collapsible Filter Sidebar
    ============================================ */
 .map-container {
   position: relative;
+  overflow: hidden;
+  max-height: calc(100vh - 180px);
 }
 
-.map-filter-panel {
+#map {
+  height: 100%;
+  min-height: 400px;
+  max-height: calc(100vh - 180px);
+}
+
+
+/* Toggle Button */
+.filter-toggle-btn {
   position: absolute;
   top: 15px;
   left: 15px;
-  z-index: 1000;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  background: var(--glass);
-  backdrop-filter: blur(12px);
-  padding: 8px 10px;
-  border-radius: 12px;
-  border: 1px solid var(--border-glass);
-  box-shadow: var(--shadow-lg);
-  max-width: 420px;
-}
-
-
-.filter-btn {
+  z-index: 1001;
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 10px;
+  gap: 6px;
+  padding: 10px 14px;
+  background: var(--glass);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--border-glass);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-secondary);
-  font-size: 0.8rem;
+  border-radius: 10px;
+  color: var(--text-main);
+  font-size: 0.9rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all var(--transition-normal);
-  white-space: nowrap;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-lg);
 }
 
+.filter-toggle-btn:hover {
+  background: rgba(0, 212, 255, 0.15);
+  border-color: var(--accent-primary);
+}
 
-.filter-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+.filter-toggle-icon {
+  font-size: 1.1rem;
+}
+
+/* Filter Sidebar */
+.filter-sidebar {
+  position: absolute;
+  top: 0;
+  left: -280px;
+  width: 260px;
+  height: 100%;
+  z-index: 1002;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border-glass);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: left 0.3s ease;
+  box-shadow: 5px 0 25px rgba(0, 0, 0, 0.4);
+}
+
+.filter-sidebar.open {
+  left: 0;
+}
+
+.filter-sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.filter-sidebar-header h3 {
+  font-size: 1.1rem;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.filter-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.filter-close-btn:hover {
+  color: var(--accent-danger);
+}
+
+/* Filter Options */
+.filter-options {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-glass);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
   color: var(--text-main);
 }
 
-.filter-btn.active {
-  background: rgba(0, 212, 255, 0.15);
+.filter-option:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.filter-option input[type="checkbox"] {
+  display: none;
+}
+
+.filter-checkbox {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--text-muted);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.filter-option input:checked+.filter-checkbox {
+  background: var(--accent-primary);
   border-color: var(--accent-primary);
-  color: var(--accent-primary);
 }
 
-.filter-btn:not(.active) {
-  opacity: 0.6;
+.filter-option input:checked+.filter-checkbox::after {
+  content: '✓';
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
 }
 
-@media (max-width: 768px) {
-  .map-filter-panel {
-    flex-wrap: wrap;
-    max-width: calc(100% - 30px);
-  }
+.filter-emoji {
+  font-size: 1.2rem;
+}
 
-  .filter-label {
+/* Apply Button */
+.filter-apply-btn {
+  padding: 14px;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-apply-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+}
+
+/* Overlay */
+.filter-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1001;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.filter-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (max-width: 600px) {
+  .filter-toggle-text {
     display: none;
   }
 
-  .filter-btn {
-    padding: 8px 10px;
+  .filter-toggle-btn {
+    padding: 10px;
+  }
+
+  .filter-sidebar {
+    width: 100%;
+    left: -100%;
   }
 }
 

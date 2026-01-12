@@ -554,6 +554,81 @@ window.getDirections = (lat, lon) => {
   window.open(url, '_blank');
 };
 
+// ============================================
+// Collapsible Filter Panel Functions
+// ============================================
+window.toggleFilterPanel = () => {
+  const sidebar = document.getElementById('filter-sidebar');
+  const overlay = document.getElementById('filter-overlay');
+
+  if (sidebar && overlay) {
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('active');
+  }
+};
+
+window.closeFilterPanel = () => {
+  const sidebar = document.getElementById('filter-sidebar');
+  const overlay = document.getElementById('filter-overlay');
+
+  if (sidebar) sidebar.classList.remove('open');
+  if (overlay) overlay.classList.remove('active');
+};
+
+window.applyFilters = () => {
+  // Read checkbox states
+  const filters = {
+    stations: document.getElementById('filter-stations')?.checked ?? true,
+    shops: document.getElementById('filter-shops')?.checked ?? true,
+    piers: document.getElementById('filter-piers')?.checked ?? true,
+    ramps: document.getElementById('filter-ramps')?.checked ?? true,
+    harbours: document.getElementById('filter-harbours')?.checked ?? true
+  };
+
+  // Apply stations filter
+  Object.values(state.markers).forEach(marker => {
+    if (filters.stations) {
+      marker.addTo(state.map);
+    } else {
+      state.map.removeLayer(marker);
+    }
+  });
+
+  // Apply shops filter
+  if (filters.shops) {
+    state.shopMarkers.addTo(state.map);
+  } else {
+    state.map.removeLayer(state.shopMarkers);
+  }
+
+  // Apply piers filter
+  if (filters.piers) {
+    state.pierMarkers.addTo(state.map);
+  } else {
+    state.map.removeLayer(state.pierMarkers);
+  }
+
+  // Apply ramps filter
+  if (filters.ramps) {
+    state.rampMarkers.addTo(state.map);
+  } else {
+    state.map.removeLayer(state.rampMarkers);
+  }
+
+  // Apply harbours filter
+  if (filters.harbours) {
+    state.harbourMarkers.addTo(state.map);
+  } else {
+    state.map.removeLayer(state.harbourMarkers);
+  }
+
+  // Update state
+  state.activeFilters = filters;
+
+  // Close the panel
+  closeFilterPanel();
+};
+
 // Toggle map filter layers
 window.toggleMapFilter = (layerName) => {
   const btn = document.querySelector(`.filter-btn[data-layer="${layerName}"]`);
