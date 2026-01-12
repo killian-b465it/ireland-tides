@@ -1899,7 +1899,7 @@ function updateAuthUI() {
     // Show admin nav if admin
     if (isAdmin()) {
       label.innerHTML += ' <span style="font-size:0.65rem; color:#ff4d4d">[ADMIN]</span>';
-      if (adminNav) adminNav.style.display = 'inline-block';
+      if (adminNav) adminNav.style.display = 'block';
     } else {
       if (adminNav) adminNav.style.display = 'none';
     }
