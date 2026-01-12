@@ -117,6 +117,27 @@ const BOAT_RAMPS = [
 ];
 
 // ============================================
+// Harbours Data (Major Harbours)
+// ============================================
+const HARBOURS = [
+  { name: 'Dublin Port', lat: 53.3478, lon: -6.2044 },
+  { name: 'Cork Harbour', lat: 51.8503, lon: -8.2967 },
+  { name: 'Galway Harbour', lat: 53.2707, lon: -9.0568 },
+  { name: 'Waterford Harbour', lat: 52.2633, lon: -7.0911 },
+  { name: 'Limerick Harbour', lat: 52.6639, lon: -8.6308 },
+  { name: 'Drogheda Port', lat: 53.7189, lon: -6.3475 },
+  { name: 'Rosslare Harbour', lat: 52.2536, lon: -6.3394 },
+  { name: 'Dun Laoghaire Harbour', lat: 53.2946, lon: -6.1349 },
+  { name: 'Howth Harbour', lat: 53.3905, lon: -6.0672 },
+  { name: 'Killybegs Harbour', lat: 54.6347, lon: -8.4389 },
+  { name: 'Greencastle Harbour', lat: 55.1997, lon: -6.9836 },
+  { name: 'Castletownbere Harbour', lat: 51.6508, lon: -9.9106 },
+  { name: 'Bantry Harbour', lat: 51.6839, lon: -9.4522 },
+  { name: 'Schull Harbour', lat: 51.5286, lon: -9.5417 },
+  { name: 'Baltimore Harbour', lat: 51.4828, lon: -9.3722 }
+];
+
+// ============================================
 // State
 // ============================================
 let state = {
@@ -128,7 +149,8 @@ let state = {
   shopMarkers: null,
   pierMarkers: null,
   rampMarkers: null,
-  activeFilters: { stations: true, shops: true, piers: true, ramps: true },
+  harbourMarkers: null,
+  activeFilters: { stations: true, shops: true, piers: true, ramps: true, harbours: true },
   tideData: {},
   isLoading: false,
   catches: JSON.parse(localStorage.getItem('fishing_catches') || '[]'),
@@ -395,6 +417,20 @@ function initMap() {
       .bindPopup(`<strong>${ramp.name}</strong><br>Boat Ramp / Slipway`);
     state.rampMarkers.addLayer(marker);
   });
+
+  // Add harbour markers
+  state.harbourMarkers = L.layerGroup().addTo(state.map);
+  HARBOURS.forEach(harbour => {
+    const icon = L.divIcon({
+      className: 'harbour-marker-wrapper',
+      html: `<div class="harbour-marker" title="${harbour.name}">⚓</div>`,
+      iconSize: [30, 30],
+      iconAnchor: [15, 15]
+    });
+    const marker = L.marker([harbour.lat, harbour.lon], { icon })
+      .bindPopup(`<strong>${harbour.name}</strong><br>Harbour`);
+    state.harbourMarkers.addLayer(marker);
+  });
 }
 
 // Toggle map filter layers
@@ -435,6 +471,13 @@ window.toggleMapFilter = (layerName) => {
         state.rampMarkers.addTo(state.map);
       } else {
         state.map.removeLayer(state.rampMarkers);
+      }
+      break;
+    case 'harbours':
+      if (state.activeFilters.harbours) {
+        state.harbourMarkers.addTo(state.map);
+      } else {
+        state.map.removeLayer(state.harbourMarkers);
       }
       break;
   }
