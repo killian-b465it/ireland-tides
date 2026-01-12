@@ -380,11 +380,21 @@ function persistUserData() {
 // Initialization
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
+  // Initialize beta banner
+  initBetaBanner();
+
   updateClock();
   setInterval(updateClock, 1000);
   initMap();
   loadStationList();
   startAutoUpdate();
+
+  // Auto-grant Pro status during beta (free for all users)
+  if (state.user && state.user.plan !== 'pro') {
+    state.user.plan = 'pro';
+    state.user.betaProUser = true; // Mark as beta user for later tracking
+    persistUserData();
+  }
 
   // Verify Pro subscription status on app load (runs once daily)
   verifySubscriptionStatus();
@@ -401,6 +411,27 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loader) loader.classList.add('hidden');
   }, 6500); // 1s delay + 5s fill animation
 });
+
+// Beta Banner Functions
+function initBetaBanner() {
+  const banner = document.getElementById('beta-banner');
+  const dismissed = sessionStorage.getItem('beta_banner_dismissed');
+
+  if (dismissed) {
+    if (banner) banner.classList.add('hidden');
+  } else {
+    document.body.classList.add('has-beta-banner');
+  }
+}
+
+window.closeBetaBanner = () => {
+  const banner = document.getElementById('beta-banner');
+  if (banner) {
+    banner.classList.add('hidden');
+    document.body.classList.remove('has-beta-banner');
+    sessionStorage.setItem('beta_banner_dismissed', 'true');
+  }
+};
 
 /**
  * Handle Stripe redirect parameters (success/cancel)
