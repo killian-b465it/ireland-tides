@@ -2343,6 +2343,8 @@ function loadAdminDashboard() {
   // Load users from Firebase for the admin table
   loadUsersFromFirebase((users) => {
     state.allUsers = users;
+    // Auto-cleanup old deactivated users
+    cleanupDeactivatedUsers();
     loadUsersTable();
   });
 
@@ -2442,6 +2444,12 @@ window.toggleUserStatus = (userId) => {
   if (!user) return;
 
   user.active = user.active === false ? true : false;
+  // Timestamp for auto-deletion logic
+  if (user.active === false) {
+    user.deactivationDate = Date.now();
+  } else {
+    delete user.deactivationDate;
+  }
 
   // Sync changes locally and globally
   localStorage.setItem('fishing_all_users', JSON.stringify(state.allUsers));
@@ -2465,6 +2473,33 @@ window.toggleUserStatus = (userId) => {
 
   loadUsersTable();
 };
+
+/**
+ * Checks for users deactivated > 30 days and removes them
+ */
+function cleanupDeactivatedUsers() {
+  const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+  const now = Date.now();
+  const usersToDelete = state.allUsers.filter(u =>
+    u.active === false &&
+    u.deactivationDate &&
+    (now - u.deactivationDate > thirtyDaysMs)
+  );
+
+  if (usersToDelete.length > 0) {
+    console.log(`Auto-cleaning ${usersToDelete.length} deactivated users...`);
+    usersToDelete.forEach(u => {
+      // Remove from Firebase
+      if (firebaseDB) {
+        firebaseDB.ref('users/' + u.id).remove().catch(err => console.error('Cleanup failed:', err));
+      }
+      // Remove from local state
+      state.allUsers = state.allUsers.filter(user => user.id !== u.id);
+    });
+    // Update local storage
+    localStorage.setItem('fishing_all_users', JSON.stringify(state.allUsers));
+  }
+}
 
 function loadAdminMessages() {
   const messages = state.supportMessages;
