@@ -180,11 +180,22 @@ body.has-beta-banner .beta-banner {
   align-items: center;
   gap: var(--space-sm);
   background: rgba(255, 255, 255, 0.05);
-  padding: 6px 12px;
-  border-radius: 20px;
+  padding: 6px 6px;
+  /* Compact padding */
+  border-radius: 50%;
+  /* Circle shape since mostly icon */
   cursor: pointer;
   transition: var(--transition-normal);
   border: 1px solid var(--border-glass);
+}
+
+/* Hide name and text badges globall for compact view */
+#user-name-label {
+  display: none !important;
+}
+
+#user-display .badge {
+  display: none !important;
 }
 
 #user-display:hover {
