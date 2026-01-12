@@ -2598,6 +2598,7 @@ body.has-beta-banner .beta-banner {
   align-items: center;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--border-glass);
+  flex-shrink: 0;
 }
 
 .filter-sidebar-header h3 {
@@ -2626,6 +2627,9 @@ body.has-beta-banner .beta-banner {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  overflow-y: auto;
+  padding-right: 5px;
+  max-height: calc(100% - 140px);
 }
 
 .filter-option {
@@ -2688,6 +2692,8 @@ body.has-beta-banner .beta-banner {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  flex-shrink: 0;
+  margin-top: auto;
 }
 
 .filter-apply-btn:hover {
@@ -2724,8 +2730,20 @@ body.has-beta-banner .beta-banner {
   }
 
   .filter-sidebar {
-    width: 100%;
+    width: 85%;
+    max-width: 300px;
     left: -100%;
+    max-height: 80vh;
+    top: 10vh;
+    border-radius: 0 12px 12px 0;
+  }
+
+  .filter-sidebar.open {
+    left: 0;
+  }
+
+  .filter-options {
+    max-height: calc(80vh - 180px);
   }
 }
 
