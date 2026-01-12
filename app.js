@@ -248,7 +248,7 @@ let state = {
   activeFilters: { stations: true, shops: true, piers: true, ramps: true, harbours: true },
   tideData: {},
   isLoading: false,
-  catches: JSON.parse(localStorage.getItem('fishing_catches') || '[]'),
+  catches: [], // Will be loaded from Firebase
   currentModalLatLng: null,
   user: JSON.parse(localStorage.getItem('fishing_user') || sessionStorage.getItem('fishing_user') || 'null'),
   authMode: 'login', // 'login' or 'signup'
@@ -256,6 +256,89 @@ let state = {
   supportMessages: JSON.parse(localStorage.getItem('fishing_support_messages') || '[]'),
   currentReplyUserId: null
 };
+
+// ============================================
+// Firebase Community Sync Functions
+// ============================================
+function syncCatchToFirebase(catchData) {
+  if (!firebaseDB || !catchData || !catchData.id) return;
+
+  try {
+    const catchRef = firebaseDB.ref('catches/' + catchData.id);
+    catchRef.set(catchData);
+  } catch (e) {
+    console.warn('Firebase catch sync failed:', e.message);
+  }
+}
+
+function loadCatchesFromFirebase() {
+  if (!firebaseDB) {
+    // Fallback to localStorage if Firebase not available
+    state.catches = JSON.parse(localStorage.getItem('fishing_catches') || '[]');
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve) => {
+    try {
+      const catchesRef = firebaseDB.ref('catches');
+      catchesRef.orderByChild('id').once('value', (snapshot) => {
+        const catches = [];
+        snapshot.forEach((childSnapshot) => {
+          catches.push(childSnapshot.val());
+        });
+        // Sort by newest first
+        state.catches = catches.sort((a, b) => b.id - a.id);
+        resolve();
+      }, (error) => {
+        console.warn('Firebase catches load failed:', error.message);
+        state.catches = JSON.parse(localStorage.getItem('fishing_catches') || '[]');
+        resolve();
+      });
+    } catch (e) {
+      console.warn('Firebase catches load error:', e.message);
+      state.catches = JSON.parse(localStorage.getItem('fishing_catches') || '[]');
+      resolve();
+    }
+  });
+}
+
+function updateCatchInFirebase(catchId, updates) {
+  if (!firebaseDB) return;
+
+  try {
+    const catchRef = firebaseDB.ref('catches/' + catchId);
+    catchRef.update(updates);
+  } catch (e) {
+    console.warn('Firebase catch update failed:', e.message);
+  }
+}
+
+function syncUserToFirebase(user) {
+  if (!firebaseDB || !user || !user.id) return;
+  try {
+    // Sanitize user object for Firebase (remove session specific flags if any)
+    const data = { ...user };
+    delete data.remember; // Don't sync remember me preference
+    firebaseDB.ref('users/' + user.id).set(data);
+  } catch (e) {
+    console.warn('Firebase user sync failed:', e.message);
+  }
+}
+
+function loadUsersFromFirebase(callback) {
+  if (!firebaseDB) return;
+  try {
+    firebaseDB.ref('users').once('value', (snapshot) => {
+      const users = [];
+      snapshot.forEach((childSnapshot) => {
+        users.push(childSnapshot.val());
+      });
+      if (callback) callback(users);
+    });
+  } catch (e) {
+    console.warn('Firebase users load failed:', e.message);
+  }
+}
 
 // ============================================
 // Navigation Logic
@@ -1420,16 +1503,18 @@ window.submitCatch = () => {
       lng: state.currentModalLatLng.lng,
       date: new Date().toLocaleDateString('en-GB'),
       author: state.user.name,
+      authorId: state.user.id,
       photo: photoData,
       likes: 0,
       likedBy: [],
       comments: []
     };
-    state.catches.unshift(c);
-    localStorage.setItem('fishing_catches', JSON.stringify(state.catches));
-    addCommunityMarker(c);
-    renderCatchFeed();
+
+    // Sync to Firebase for cross-device visibility
+    syncCatchToFirebase(c);
+
     closeModal();
+    // Note: renderCatchFeed and markers will be updated by the ref.on('value') listener automatically
   };
 
   if (photoInput.files && photoInput.files[0]) {
@@ -1441,14 +1526,64 @@ window.submitCatch = () => {
   }
 };
 
+// Layer group for community markers
+let communityMarkerGroup = null;
+
+
 function loadCommunityCatches() {
-  state.catches.forEach(addCommunityMarker);
-  renderCatchFeed();
+  if (!firebaseDB) {
+    // Fallback if Firebase fails
+    state.catches = JSON.parse(localStorage.getItem('fishing_catches') || '[]');
+    state.catches.forEach(addCommunityMarker);
+    renderCatchFeed();
+    return;
+  }
+
+  // Clear existing feed and markers if any
+  if (communityMarkerGroup) {
+    communityMarkerGroup.clearLayers();
+  } else if (state.communityMap) {
+    communityMarkerGroup = L.layerGroup().addTo(state.communityMap);
+  }
+
+  // Real-time listener for catches
+  const catchesRef = firebaseDB.ref('catches');
+  catchesRef.on('value', (snapshot) => {
+    const catches = [];
+    snapshot.forEach((childSnapshot) => {
+      catches.push(childSnapshot.val());
+    });
+
+    // Update local state with latest data and sort by newest
+    state.catches = catches.sort((a, b) => b.id - a.id);
+
+    // Also update backup localStorage
+    localStorage.setItem('fishing_catches', JSON.stringify(state.catches));
+
+    // Refresh UI
+    if (communityMarkerGroup) {
+      communityMarkerGroup.clearLayers();
+    }
+
+    state.catches.forEach(addCommunityMarker);
+    renderCatchFeed();
+  });
 }
 
 function addCommunityMarker(c) {
-  const icon = L.divIcon({ className: 'social-marker', html: '📸', iconSize: [24, 24] });
-  L.marker([c.lat, c.lng], { icon }).bindPopup(`<strong>${c.species}</strong><br>${c.date}<br>${c.details}`).addTo(state.communityMap);
+  if (!state.communityMap || !communityMarkerGroup) return;
+
+  const icon = L.divIcon({
+    className: 'social-marker',
+    html: '📸',
+    iconSize: [24, 24],
+    iconAnchor: [12, 12]
+  });
+
+  const marker = L.marker([c.lat, c.lng], { icon })
+    .bindPopup(`<strong>${c.species}</strong><br>${c.date}<br>${c.details}`);
+
+  communityMarkerGroup.addLayer(marker);
 }
 
 function renderCatchFeed() {
@@ -1520,12 +1655,18 @@ window.postComment = (id) => {
     if (!targetCatch.comments) targetCatch.comments = [];
     targetCatch.comments.push({
       author: state.user.name,
+      authorId: state.user.id,
       text: text,
       date: new Date().toLocaleDateString('en-GB')
     });
 
-    // Persist
+    // Sync to Firebase for cross-device visibility
+    updateCatchInFirebase(id, { comments: targetCatch.comments });
+
+    // Also save to localStorage as backup
     localStorage.setItem('fishing_catches', JSON.stringify(state.catches));
+
+    input.value = '';
     renderCatchFeed();
 
     // Re-open comments for this item so user sees their comment
@@ -1535,6 +1676,7 @@ window.postComment = (id) => {
     }, 50);
   }
 };
+
 
 
 // ============================================
@@ -1830,22 +1972,26 @@ window.saveProfile = () => {
   state.user.bio = bio;
 
   // Only save avatar if it's data URI (new upload) or existing. 
-  // Check if it's not the SVG placeholder which is usually long, but let's just save src logic
   if (imgSrc.startsWith('data:image')) {
     state.user.avatar = imgSrc;
   }
 
-  // Persist
+  // Persist locally
   if (state.user.remember || localStorage.getItem('fishing_user')) {
     localStorage.setItem('fishing_user', JSON.stringify(state.user));
   } else {
     sessionStorage.setItem('fishing_user', JSON.stringify(state.user));
   }
 
+  // Sync to Firebase and update system-wide user registry
+  syncUserToFirebase(state.user);
+  registerUserInSystem(state.user);
+
   updateAuthUI();
   closeProfileModal();
   alert('Profile saved!');
 };
+
 
 window.logout = () => {
   state.user = null;
@@ -1963,6 +2109,12 @@ window.likeCatch = (id) => {
     c.likedBy.splice(idx, 1);
     c.likes = Math.max(0, (c.likes || 1) - 1);
   }
+
+  // Global sync
+  updateCatchInFirebase(id, {
+    likes: c.likes,
+    likedBy: c.likedBy
+  });
 
   localStorage.setItem('fishing_catches', JSON.stringify(state.catches));
   renderCatchFeed();
@@ -2117,7 +2269,13 @@ function loadAdminDashboard() {
   if (!isAdmin()) return;
 
   loadStationInsights();
-  loadUsersTable();
+
+  // Load users from Firebase for the admin table
+  loadUsersFromFirebase((users) => {
+    state.allUsers = users;
+    loadUsersTable();
+  });
+
   loadAdminMessages();
 }
 
@@ -2437,6 +2595,9 @@ function registerUserInSystem(user) {
     // Update existing user data
     state.allUsers[existingIndex] = { ...state.allUsers[existingIndex], ...userData };
   }
+
+  // Sync to Firebase
+  syncUserToFirebase(userData);
 
   localStorage.setItem('fishing_all_users', JSON.stringify(state.allUsers));
 }
