@@ -1147,6 +1147,13 @@ function displayTideData(station, data) {
   `;
 
   displayTideTimes(data);
+
+  // Sync sidebar list with live data if it exists
+  const sidebarLevel = document.getElementById(`level-${station.id}`);
+  if (sidebarLevel) {
+    sidebarLevel.innerHTML = `${level.toFixed(1)}m ${icon}`;
+    sidebarLevel.classList.add('live-data-active'); // Optional: add class to show it's live
+  }
 }
 
 function findTideExtremes(data) {
