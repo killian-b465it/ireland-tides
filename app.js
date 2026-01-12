@@ -1781,15 +1781,26 @@ window.openProfileModal = () => {
   badge.innerText = (state.user.plan || 'free').toUpperCase() + ' PLAN';
   if (state.user.plan === 'pro') {
     badge.classList.add('pro');
-    upgradeBtn.innerText = 'Manage Subscription';
+    // During beta: hide manage subscription since Pro is free
+    upgradeBtn.innerText = '✓ Pro Features Active';
     upgradeBtn.classList.add('btn-outline');
-    upgradeBtn.onclick = () => manageStripeSubscription();
+    upgradeBtn.onclick = () => alert('Pro features are FREE during beta! No subscription to manage yet.');
     upgradeBtn.style.display = 'inline-block';
+    upgradeBtn.disabled = false;
   } else {
     badge.classList.remove('pro');
-    upgradeBtn.innerText = 'Upgrade to Pro';
+    // During beta: everyone gets Pro for free
+    upgradeBtn.innerText = 'Activate Free Pro';
     upgradeBtn.classList.remove('btn-outline');
-    upgradeBtn.onclick = () => openPremiumModal();
+    upgradeBtn.onclick = () => {
+      state.user.plan = 'pro';
+      state.user.betaProUser = true;
+      persistUserData();
+      syncUserToFirebase(state.user);
+      alert('🎉 Pro features activated for FREE during beta!');
+      closeProfileModal();
+      updateAuthUI();
+    };
     upgradeBtn.style.display = 'inline-block';
   }
 
