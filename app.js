@@ -2442,7 +2442,20 @@ window.toggleUserStatus = (userId) => {
   if (!user) return;
 
   user.active = user.active === false ? true : false;
+
+  // Sync changes locally and globally
   localStorage.setItem('fishing_all_users', JSON.stringify(state.allUsers));
+  syncUserToFirebase(user);
+
+  // Email Notification Logic for Deactivation
+  if (user.active === false && user.email) {
+    const subject = encodeURIComponent("Account Status Update - Irish Fishing Hub");
+    const body = encodeURIComponent(`Dear ${user.name || 'Member'},\n\nWe are writing to inform you that your account on Irish Fishing Hub has been deactivated.\n\nIf you believe this is an error or would like to appeal this decision, please reply to this email.\n\nBest regards,\nSupport Team\nIrish Fishing Hub`);
+    const mailtoLink = `mailto:${user.email}?subject=${subject}&body=${body}`;
+
+    // Open default email client
+    window.open(mailtoLink, '_blank');
+  }
 
   // If current user is being deactivated, log them out
   if (state.user && state.user.id === userId && !user.active) {
