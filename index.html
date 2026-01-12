@@ -293,6 +293,8 @@
       <p id="auth-sub">Log in to your account</p>
       <div class="auth-form-container">
         <input type="email" id="auth-email" placeholder="Email Address" class="auth-input">
+        <input type="text" id="auth-username" placeholder="Username (Signup Only)" class="auth-input"
+          style="display: none;">
         <input type="password" id="auth-password" placeholder="Password" class="auth-input">
         <label class="auth-remember"
           style="display:flex; align-items:center; gap:8px; margin: 10px 0; font-size: 0.9rem; cursor: pointer;">
@@ -514,8 +516,13 @@
 
         <!-- User Accounts -->
         <div class="admin-card">
-          <div class="admin-card-header">
-            <h3>👥 User Accounts</h3>
+          <div class="admin-card-header" style="justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+              <h3>👥 User Accounts</h3>
+              <input type="text" id="admin-user-search" placeholder="Search email/username..."
+                class="admin-search-input" oninput="loadUsersTable()"
+                style="padding: 4px 10px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-color); font-size: 0.85rem; min-width: 200px;">
+            </div>
             <span class="badge" id="total-users-badge">0 users</span>
           </div>
           <div class="admin-card-body">

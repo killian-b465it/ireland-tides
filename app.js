@@ -178,6 +178,20 @@ function verifySubscriptionStatus() {
   if (!state.user || state.user.plan !== 'pro') return;
 
   const now = Date.now();
+
+  // Check for gifted Pro expiration
+  if (state.user.proExpirationDate && now > state.user.proExpirationDate) {
+    state.user.plan = 'free';
+    state.user.proExpirationDate = null;
+    state.user.subscriptionExpired = true;
+    persistUserData();
+
+    setTimeout(() => {
+      alert('Your complimentary Pro access has expired. We hope you enjoyed it! You can upgrade anytime to keep Pro features.');
+    }, 1000);
+    return;
+  }
+
   const lastVerified = state.user.lastVerifiedDate || 0;
   const todayStart = new Date().setHours(0, 0, 0, 0);
 
@@ -186,6 +200,8 @@ function verifySubscriptionStatus() {
 
   const cycleStart = state.user.subscriptionCycleStart;
   if (!cycleStart) {
+    if (state.user.proExpirationDate) return; // Gifted pro doesn't use cycle tracking
+
     // Legacy Pro user without cycle tracking - set it now
     state.user.subscriptionCycleStart = now;
     state.user.proStartDate = state.user.proStartDate || now;
@@ -1036,22 +1052,26 @@ function updateAuthModalContent() {
   const sub = document.getElementById('auth-sub');
   const btn = document.querySelector('.auth-form-container .btn-primary');
   const switchTarget = document.querySelector('.auth-switch a');
+  const usernameInput = document.getElementById('auth-username');
 
   if (state.authMode === 'login') {
     title.innerText = 'Welcome Back';
     sub.innerText = 'Log in to your account';
     btn.innerText = 'Log In';
+    if (usernameInput) usernameInput.style.display = 'none';
     switchTarget.parentElement.innerHTML = `Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign up</a>`;
   } else {
     title.innerText = 'Join the Hub';
     sub.innerText = 'Create your free account';
     btn.innerText = 'Sign Up';
+    if (usernameInput) usernameInput.style.display = 'block';
     switchTarget.parentElement.innerHTML = `Already have an account? <a href="#" onclick="toggleAuthMode()">Log in</a>`;
   }
 }
 
 window.handleAuthSubmit = () => {
   const email = document.getElementById('auth-email').value;
+  const username = document.getElementById('auth-username').value;
   const password = document.getElementById('auth-password').value;
   if (!email) return alert('Enter email');
 
@@ -1066,16 +1086,23 @@ window.handleAuthSubmit = () => {
   // Check if user exists in system
   const existingUser = state.allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
 
+  // Username validation for signup
+  if (state.authMode === 'signup') {
+    if (!username) return alert('Enter a username');
+    const isUsernameTaken = state.allUsers.some(u => u.name.toLowerCase() === username.toLowerCase());
+    if (isUsernameTaken) return alert('This username is already taken. Please choose another.');
+  }
+
   // Check if user is deactivated
   if (existingUser && existingUser.active === false) {
     return alert('This account has been deactivated. Please contact support.');
   }
 
   // Mock login/signup
-  const name = email.split('@')[0];
+  const defaultName = email.split('@')[0];
   state.user = existingUser || {
     id: 'user_' + Date.now(),
-    name: name.charAt(0).toUpperCase() + name.slice(1),
+    name: username || (defaultName.charAt(0).toUpperCase() + defaultName.slice(1)),
     email: email,
     plan: 'free',
     remember: remember
@@ -1525,16 +1552,21 @@ function loadStationInsights() {
 }
 
 function loadUsersTable() {
-  const users = state.allUsers;
-  document.getElementById('total-users-badge').textContent = `${users.length} users`;
+  const searchTerm = (document.getElementById('admin-user-search')?.value || '').toLowerCase();
+  const filteredUsers = state.allUsers.filter(u =>
+    u.email.toLowerCase().includes(searchTerm) ||
+    (u.name && u.name.toLowerCase().includes(searchTerm))
+  );
+
+  document.getElementById('total-users-badge').textContent = `${filteredUsers.length} users`;
 
   const tbody = document.getElementById('users-table-body');
-  if (users.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 20px;">No users registered yet</td></tr>';
+  if (filteredUsers.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 20px;">${searchTerm ? 'No matches found' : 'No users registered yet'}</td></tr>`;
     return;
   }
 
-  tbody.innerHTML = users.map(u => {
+  tbody.innerHTML = filteredUsers.map(u => {
     const joinDate = u.joinDate ? new Date(u.joinDate).toLocaleDateString('en-GB') : 'N/A';
     const isActive = u.active !== false;
     const plan = u.plan || 'free';
@@ -1546,16 +1578,45 @@ function loadUsersTable() {
         <td><span class="badge ${plan === 'pro' ? 'pro' : ''}">${plan.toUpperCase()}</span></td>
         <td>${joinDate}</td>
         <td><span class="badge ${isActive ? 'active' : 'inactive'}">${isActive ? 'Active' : 'Inactive'}</span></td>
-        <td>
+        <td style="display: flex; gap: 5px;">
           <button class="btn btn-xs ${isActive ? 'btn-danger' : 'btn-success'}" 
                   onclick="toggleUserStatus('${u.id}')">
             ${isActive ? 'Deactivate' : 'Activate'}
           </button>
+          ${plan !== 'pro' ? `
+            <button class="btn btn-xs btn-primary" onclick="giftProSubscription('${u.id}')" title="Gift 1 Month Free Pro">
+              🎁 Gift Pro
+            </button>
+          ` : ''}
         </td>
       </tr>
     `;
   }).join('');
 }
+
+window.giftProSubscription = (userId) => {
+  if (!confirm('Are you sure you want to gift this user 1 month of Pro status for free?')) return;
+
+  const user = state.allUsers.find(u => u.id === userId);
+  if (!user) return;
+
+  user.plan = 'pro';
+  // Expiration in 30 days
+  user.proExpirationDate = Date.now() + (30 * 24 * 60 * 60 * 1000);
+
+  localStorage.setItem('fishing_all_users', JSON.stringify(state.allUsers));
+
+  // If this is the current user, update their state too
+  if (state.user && state.user.id === userId) {
+    state.user.plan = 'pro';
+    state.user.proExpirationDate = user.proExpirationDate;
+    persistUserData();
+    updateAuthUI();
+  }
+
+  alert(`Successfully gifted 1 month of Pro to ${user.name || user.email}`);
+  loadUsersTable();
+};
 
 window.toggleUserStatus = (userId) => {
   const user = state.allUsers.find(u => u.id === userId);
@@ -1769,11 +1830,12 @@ function registerUserInSystem(user) {
   const existingIndex = state.allUsers.findIndex(u => u.email === user.email);
 
   const userData = {
-    id: user.id,
+    id: user.id || (existingIndex !== -1 ? state.allUsers[existingIndex].id : 'user_' + Date.now()),
     name: user.name,
     email: user.email,
-    plan: user.plan || 'free',
-    bio: user.bio || '',
+    plan: user.plan || (existingIndex !== -1 ? state.allUsers[existingIndex].plan : 'free'),
+    proExpirationDate: user.proExpirationDate || (existingIndex !== -1 ? state.allUsers[existingIndex].proExpirationDate : null),
+    bio: user.bio || (existingIndex !== -1 ? state.allUsers[existingIndex].bio : ''),
     joinDate: existingIndex === -1 ? Date.now() : state.allUsers[existingIndex].joinDate,
     active: existingIndex === -1 ? true : state.allUsers[existingIndex].active
   };
