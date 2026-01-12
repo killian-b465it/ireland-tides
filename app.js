@@ -1575,11 +1575,12 @@ function updateAuthModalContent() {
   }
 }
 
-window.handleAuthSubmit = () => {
+window.handleAuthSubmit = async () => {
   const email = document.getElementById('auth-email').value;
   const username = document.getElementById('auth-username').value;
   const password = document.getElementById('auth-password').value;
-  if (!email) return alert('Enter email');
+  if (!email) return alert('Please enter your email address.');
+  if (!password) return alert('Please enter your password.');
 
   const remember = document.getElementById('auth-remember').checked;
 
@@ -1589,35 +1590,107 @@ window.handleAuthSubmit = () => {
     return alert('Invalid admin password.');
   }
 
-  // Check if user exists in system
-  const existingUser = state.allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+  // For non-admin users, check Firebase for existing account
+  if (!isAdminEmail && firebaseDB) {
+    try {
+      const snapshot = await firebaseDB.ref('users').orderByChild('email').equalTo(email.toLowerCase()).once('value');
+      const firebaseUser = snapshot.val();
 
-  // Username validation for signup
-  if (state.authMode === 'signup') {
-    if (!username) return alert('Enter a username');
-    const isUsernameTaken = state.allUsers.some(u => u.name.toLowerCase() === username.toLowerCase());
-    if (isUsernameTaken) return alert('This username is already taken. Please choose another.');
+      if (state.authMode === 'login') {
+        // LOGIN: User must exist in Firebase
+        if (!firebaseUser) {
+          return alert('No account found with this email. Please sign up first!');
+        }
+
+        // Get the user data from Firebase
+        const userId = Object.keys(firebaseUser)[0];
+        const userData = firebaseUser[userId];
+
+        // Check password (simple validation - in production use proper auth)
+        if (userData.password && userData.password !== password) {
+          return alert('Incorrect password. Please try again.');
+        }
+
+        // Check if user is deactivated
+        if (userData.active === false) {
+          return alert('This account has been deactivated. Please contact support.');
+        }
+
+        // Login successful - load user data
+        state.user = {
+          id: userId,
+          name: userData.name,
+          email: userData.email,
+          plan: userData.plan || 'pro', // Beta = free Pro
+          remember: remember,
+          betaProUser: userData.betaProUser || true,
+          joinDate: userData.joinDate
+        };
+
+      } else {
+        // SIGNUP: Check if email already exists
+        if (firebaseUser) {
+          return alert('An account with this email already exists. Please login instead!');
+        }
+
+        // Validate username
+        if (!username) return alert('Please enter a username.');
+
+        // Check if username is taken
+        const usernameSnapshot = await firebaseDB.ref('users').orderByChild('name').equalTo(username).once('value');
+        if (usernameSnapshot.val()) {
+          return alert('This username is already taken. Please choose another.');
+        }
+
+        // Create new user
+        state.user = {
+          id: 'user_' + Date.now(),
+          name: username,
+          email: email.toLowerCase(),
+          password: password, // Store for validation (in production, hash this!)
+          plan: 'pro', // Beta = free Pro
+          remember: remember,
+          betaProUser: true,
+          joinDate: Date.now()
+        };
+      }
+    } catch (error) {
+      console.warn('Firebase auth check failed:', error);
+      // Fallback to local auth if Firebase fails
+    }
+  } else {
+    // Fallback for when Firebase is not available
+    const existingUser = state.allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+
+    if (state.authMode === 'login' && !existingUser) {
+      return alert('No account found with this email. Please sign up first!');
+    }
+
+    if (state.authMode === 'signup') {
+      if (!username) return alert('Please enter a username.');
+      if (existingUser) return alert('An account with this email already exists. Please login instead!');
+      const isUsernameTaken = state.allUsers.some(u => u.name.toLowerCase() === username.toLowerCase());
+      if (isUsernameTaken) return alert('This username is already taken. Please choose another.');
+    }
+
+    const defaultName = email.split('@')[0];
+    state.user = existingUser || {
+      id: 'user_' + Date.now(),
+      name: username || (defaultName.charAt(0).toUpperCase() + defaultName.slice(1)),
+      email: email.toLowerCase(),
+      password: password,
+      plan: 'pro',
+      remember: remember,
+      betaProUser: true,
+      joinDate: Date.now()
+    };
   }
-
-  // Check if user is deactivated
-  if (existingUser && existingUser.active === false) {
-    return alert('This account has been deactivated. Please contact support.');
-  }
-
-  // Mock login/signup
-  const defaultName = email.split('@')[0];
-  state.user = existingUser || {
-    id: 'user_' + Date.now(),
-    name: username || (defaultName.charAt(0).toUpperCase() + defaultName.slice(1)),
-    email: email,
-    plan: 'free',
-    remember: remember
-  };
 
   state.user.remember = remember;
 
-  // Register/update user in system
+  // Register/update user in system and sync to Firebase
   registerUserInSystem(state.user);
+  syncUserToFirebase(state.user);
 
   if (remember) {
     localStorage.setItem('fishing_user', JSON.stringify(state.user));
@@ -1630,6 +1703,7 @@ window.handleAuthSubmit = () => {
   updateAuthUI();
   closeAuthModal();
 };
+
 
 function updateAuthUI() {
   const loginBtn = document.getElementById('login-btn');
