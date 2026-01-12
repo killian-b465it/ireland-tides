@@ -7,14 +7,16 @@
 // Firebase Configuration (Cross-Device User Sync)
 // ============================================
 const firebaseConfig = {
-  apiKey: "AIzaSyDemoKeyForIrishFishingHub",
+  apiKey: "AIzaSyB1dhBLpKJdlkFVQ3R9lajHyuU2L_z_2b0",
   authDomain: "irish-fishing-hub.firebaseapp.com",
-  databaseURL: "https://irish-fishing-hub-default-rtdb.europe-west1.firebasedatabase.app",
+  databaseURL: "https://irish-fishing-hub-default-rtdb.firebaseio.com",
   projectId: "irish-fishing-hub",
-  storageBucket: "irish-fishing-hub.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abc123"
+  storageBucket: "irish-fishing-hub.firebasestorage.app",
+  messagingSenderId: "975072154696",
+  appId: "1:975072154696:web:d7fc268ea7e89ece63347d",
+  measurementId: "G-ETMBTS4K96"
 };
+
 
 // Initialize Firebase
 let firebaseApp = null;
