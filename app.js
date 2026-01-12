@@ -1761,8 +1761,38 @@ window.handleAuthSubmit = async () => {
 
   // Check if admin email - require correct password
   const isAdminEmail = CONFIG.ADMIN_EMAILS.includes(email.toLowerCase());
-  if (isAdminEmail && password !== CONFIG.ADMIN_PASSWORD) {
-    return alert('Invalid admin password.');
+  if (isAdminEmail) {
+    if (password !== CONFIG.ADMIN_PASSWORD) {
+      return alert('Invalid admin password.');
+    }
+    // Admin credentials valid - Force login
+    // Try to find existing profile logic via Firebase would be here, but for simplicity
+    // we just construct the admin session directly to ensure access.
+    state.user = {
+      id: email.includes('admin') ? 'admin_main_root' : 'support_main_root',
+      name: email.includes('admin') ? 'Administrator' : 'Customer Support',
+      email: email.toLowerCase(),
+      plan: 'pro',
+      remember: remember,
+      betaProUser: true,
+      joinDate: Date.now(),
+      isAdmin: true
+    };
+
+    // Complete login process
+    state.user.remember = remember;
+    registerUserInSystem(state.user);
+    // Determine storage
+    if (remember) {
+      localStorage.setItem('fishing_user', JSON.stringify(state.user));
+      sessionStorage.removeItem('fishing_user');
+    } else {
+      sessionStorage.setItem('fishing_user', JSON.stringify(state.user));
+      localStorage.removeItem('fishing_user');
+    }
+    updateAuthUI();
+    closeAuthModal();
+    return;
   }
 
   // For non-admin users, check Firebase for existing account
