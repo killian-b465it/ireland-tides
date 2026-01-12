@@ -92,7 +92,37 @@ const PIERS = [
   { name: 'Dingle Pier', lat: 52.1408, lon: -10.2686 },
   { name: 'Clifden Pier', lat: 53.4880, lon: -10.0217 },
   { name: 'Killybegs Pier', lat: 54.6347, lon: -8.4389 },
-  { name: 'Portrush Pier', lat: 55.2064, lon: -6.6561 }
+  { name: 'Portrush Pier', lat: 55.2064, lon: -6.6561 },
+  // East Coast additions
+  { name: 'Courtown Pier', lat: 52.6461, lon: -6.2289 },
+  { name: 'Rush Pier', lat: 53.5231, lon: -6.0858 },
+  { name: 'Laytown Pier', lat: 53.6853, lon: -6.2389 },
+  { name: 'Clogherhead Pier', lat: 53.7894, lon: -6.2336 },
+  { name: 'Wicklow Pier', lat: 52.9808, lon: -6.0333 },
+  { name: 'Arklow Pier', lat: 52.7978, lon: -6.1419 },
+  // South Coast additions
+  { name: 'Youghal Pier', lat: 51.9547, lon: -7.8447 },
+  { name: 'Ballycotton Pier', lat: 51.8289, lon: -8.0089 },
+  { name: 'Union Hall Pier', lat: 51.5408, lon: -9.1389 },
+  // West Coast additions
+  { name: 'Rossaveal Pier', lat: 53.2689, lon: -9.5567 },
+  { name: 'Roundstone Pier', lat: 53.3997, lon: -9.9239 },
+  { name: 'Cleggan Pier', lat: 53.5603, lon: -10.1256 },
+  { name: 'Westport Quay', lat: 53.7989, lon: -9.5247 },
+  // North West additions
+  { name: 'Downings Pier', lat: 55.1897, lon: -7.8328 },
+  { name: 'Burtonport Pier', lat: 54.9897, lon: -8.4328 },
+  // Northern Ireland
+  { name: 'Bangor Pier', lat: 54.6603, lon: -5.6689 },
+  { name: 'Donaghadee Pier', lat: 54.6419, lon: -5.5344 },
+  { name: 'Ballycastle Pier', lat: 55.2064, lon: -6.2428 },
+  { name: 'Carrickfergus Pier', lat: 54.7139, lon: -5.8064 },
+  { name: 'Newcastle Pier', lat: 54.2103, lon: -5.8828 },
+  { name: 'Ardglass Pier', lat: 54.2611, lon: -5.6056 },
+  { name: 'Portavogie Pier', lat: 54.4586, lon: -5.4361 },
+  { name: 'Kilkeel Pier', lat: 54.0617, lon: -5.9928 },
+  { name: 'Cushendall Pier', lat: 55.0803, lon: -6.0542 },
+  { name: 'Glenarm Pier', lat: 54.9686, lon: -5.9553 }
 ];
 
 // ============================================
@@ -113,7 +143,17 @@ const BOAT_RAMPS = [
   { name: 'Galway Slipway', lat: 53.2700, lon: -9.0600 },
   { name: 'Clifden Slipway', lat: 53.4889, lon: -10.0200 },
   { name: 'Killybegs Slipway', lat: 54.6339, lon: -8.4400 },
-  { name: 'Malin Head Slipway', lat: 55.3757, lon: -7.3906 }
+  { name: 'Malin Head Slipway', lat: 55.3757, lon: -7.3906 },
+  // Northern Ireland
+  { name: 'Bangor Marina Slipway', lat: 54.6622, lon: -5.6706 },
+  { name: 'Donaghadee Slipway', lat: 54.6436, lon: -5.5339 },
+  { name: 'Strangford Slipway', lat: 54.3675, lon: -5.5536 },
+  { name: 'Portaferry Slipway', lat: 54.3803, lon: -5.5519 },
+  { name: 'Kilkeel Slipway', lat: 54.0603, lon: -5.9933 },
+  { name: 'Carlingford Marina Slipway', lat: 54.0442, lon: -6.1883 },
+  { name: 'Warrenpoint Slipway', lat: 54.0997, lon: -6.2519 },
+  { name: 'Portavogie Slipway', lat: 54.4578, lon: -5.4372 },
+  { name: 'Ballycastle Slipway', lat: 55.2047, lon: -6.2417 }
 ];
 
 // ============================================
@@ -134,7 +174,33 @@ const HARBOURS = [
   { name: 'Castletownbere Harbour', lat: 51.6508, lon: -9.9106 },
   { name: 'Bantry Harbour', lat: 51.6839, lon: -9.4522 },
   { name: 'Schull Harbour', lat: 51.5286, lon: -9.5417 },
-  { name: 'Baltimore Harbour', lat: 51.4828, lon: -9.3722 }
+  { name: 'Baltimore Harbour', lat: 51.4828, lon: -9.3722 },
+  // East Coast additions
+  { name: 'Courtown Harbour', lat: 52.6461, lon: -6.2289 },
+  { name: 'Wicklow Harbour', lat: 52.9808, lon: -6.0333 },
+  { name: 'Arklow Harbour', lat: 52.7978, lon: -6.1419 },
+  { name: 'Skerries Harbour', lat: 53.5805, lon: -6.1089 },
+  { name: 'Balbriggan Harbour', lat: 53.6103, lon: -6.1833 },
+  { name: 'Dundalk Harbour', lat: 53.9875, lon: -6.3833 },
+  // South Coast additions
+  { name: 'Youghal Harbour', lat: 51.9547, lon: -7.8447 },
+  { name: 'Kinsale Harbour', lat: 51.7058, lon: -8.5222 },
+  { name: 'Union Hall Harbour', lat: 51.5408, lon: -9.1389 },
+  // West Coast additions
+  { name: 'Westport Harbour', lat: 53.7989, lon: -9.5247 },
+  { name: 'Sligo Harbour', lat: 54.2697, lon: -8.4694 },
+  { name: 'Roundstone Harbour', lat: 53.3997, lon: -9.9239 },
+  // Northern Ireland
+  { name: 'Belfast Harbour', lat: 54.6097, lon: -5.9289 },
+  { name: 'Bangor Marina', lat: 54.6622, lon: -5.6706 },
+  { name: 'Larne Harbour', lat: 54.8531, lon: -5.8128 },
+  { name: 'Portrush Harbour', lat: 55.2064, lon: -6.6561 },
+  { name: 'Coleraine Marina', lat: 55.1333, lon: -6.6667 },
+  { name: 'Ardglass Harbour', lat: 54.2611, lon: -5.6056 },
+  { name: 'Portavogie Harbour', lat: 54.4586, lon: -5.4361 },
+  { name: 'Kilkeel Harbour', lat: 54.0617, lon: -5.9928 },
+  { name: 'Warrenpoint Harbour', lat: 54.0997, lon: -6.2519 },
+  { name: 'Carlingford Marina', lat: 54.0442, lon: -6.1883 }
 ];
 
 // ============================================
@@ -401,7 +467,13 @@ function initMap() {
       iconAnchor: [14, 14]
     });
     const marker = L.marker([pier.lat, pier.lon], { icon })
-      .bindPopup(`<strong>${pier.name}</strong><br>Fishing Pier`);
+      .bindPopup(`
+        <div class="popup-content">
+          <strong>${pier.name}</strong>
+          <span class="popup-type">Fishing Pier</span>
+          <button class="popup-directions-btn" onclick="getDirections(${pier.lat}, ${pier.lon})">📍 Get Directions</button>
+        </div>
+      `);
     state.pierMarkers.addLayer(marker);
   });
 
@@ -414,7 +486,13 @@ function initMap() {
       iconAnchor: [14, 14]
     });
     const marker = L.marker([ramp.lat, ramp.lon], { icon })
-      .bindPopup(`<strong>${ramp.name}</strong><br>Boat Ramp / Slipway`);
+      .bindPopup(`
+        <div class="popup-content">
+          <strong>${ramp.name}</strong>
+          <span class="popup-type">Boat Ramp / Slipway</span>
+          <button class="popup-directions-btn" onclick="getDirections(${ramp.lat}, ${ramp.lon})">📍 Get Directions</button>
+        </div>
+      `);
     state.rampMarkers.addLayer(marker);
   });
 
@@ -428,10 +506,22 @@ function initMap() {
       iconAnchor: [15, 15]
     });
     const marker = L.marker([harbour.lat, harbour.lon], { icon })
-      .bindPopup(`<strong>${harbour.name}</strong><br>Harbour`);
+      .bindPopup(`
+        <div class="popup-content">
+          <strong>${harbour.name}</strong>
+          <span class="popup-type">Harbour</span>
+          <button class="popup-directions-btn" onclick="getDirections(${harbour.lat}, ${harbour.lon})">📍 Get Directions</button>
+        </div>
+      `);
     state.harbourMarkers.addLayer(marker);
   });
 }
+
+// Open Google Maps with directions to coordinates
+window.getDirections = (lat, lon) => {
+  const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
+  window.open(url, '_blank');
+};
 
 // Toggle map filter layers
 window.toggleMapFilter = (layerName) => {
@@ -524,6 +614,71 @@ function selectStation(station) {
   fetchWeatherData(station);
   fetchNearbyShops(station);
 }
+
+// Fetch and display nearby fishing shops based on station region
+function fetchNearbyShops(station) {
+  const shopsCard = document.getElementById('shops-card');
+  const shopList = document.getElementById('shop-list');
+
+  if (!shopsCard || !shopList) return;
+
+  // Show the shops card
+  shopsCard.style.display = 'block';
+
+  // Find shops in the same region as the station
+  const stationRegion = station.region || 'East Coast';
+  const nearbyShops = TACKLE_SHOPS.filter(shop => {
+    // Match by region or find closest shops by distance
+    return shop.county && stationRegion.toLowerCase().includes(shop.county.toLowerCase().split(' ')[0]) ||
+      getDistanceKm(station.lat, station.lon, shop.lat, shop.lng || shop.lon) < 50;
+  });
+
+  // If no regional matches, get closest 3 shops by distance
+  const shopsToShow = nearbyShops.length > 0 ? nearbyShops.slice(0, 5) :
+    TACKLE_SHOPS
+      .map(shop => ({
+        ...shop,
+        distance: getDistanceKm(station.lat, station.lon, shop.lat, shop.lng || shop.lon)
+      }))
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, 3);
+
+  if (shopsToShow.length === 0) {
+    shopList.innerHTML = '<div class="empty-state"><p>No fishing shops found in this area</p></div>';
+    return;
+  }
+
+  shopList.innerHTML = shopsToShow.map(shop => {
+    const lat = shop.lat;
+    const lon = shop.lng || shop.lon;
+    const distance = shop.distance || getDistanceKm(station.lat, station.lon, lat, lon);
+
+    return `
+      <div class="shop-item">
+        <div class="shop-info">
+          <strong>${shop.name}</strong>
+          <span class="shop-address">${shop.address || shop.county}</span>
+          ${shop.phone ? `<span class="shop-phone">📞 ${shop.phone}</span>` : ''}
+          <span class="shop-distance">${distance.toFixed(1)} km away</span>
+        </div>
+        <button class="btn btn-sm btn-primary" onclick="getDirections(${lat}, ${lon})">📍 Directions</button>
+      </div>
+    `;
+  }).join('');
+}
+
+// Calculate distance between two coordinates in kilometers
+function getDistanceKm(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Earth's radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 
 function showTideCards() {
   const cards = ['tide-card', 'weather-card', 'shops-card', 'tide-times-card', 'fishing-card', 'chart-card'];
@@ -2125,7 +2280,16 @@ const TACKLE_SHOPS = [
   { name: "Drogheda Angling Centre", county: "Louth", address: "West St, Drogheda", phone: "041 983 6978", website: "", lat: 53.7193, lng: -6.3509, rating: 4.5 },
 
   // Meath
-  { name: "Navan Tackle", county: "Meath", address: "Trimgate St, Navan", phone: "046 902 8844", website: "", lat: 53.6528, lng: -6.6818, rating: 4.4 }
+  { name: "Navan Tackle", county: "Meath", address: "Trimgate St, Navan", phone: "046 902 8844", website: "", lat: 53.6528, lng: -6.6818, rating: 4.4 },
+
+  // Northern Ireland
+  { name: "Belfast Angling Centre", county: "Antrim", address: "93 North St, Belfast", phone: "028 9024 5678", website: "", lat: 54.6018, lng: -5.9347, rating: 4.7 },
+  { name: "Bangor Angling Centre", county: "Down", address: "High St, Bangor", phone: "028 9127 1234", website: "", lat: 54.6603, lng: -5.6689, rating: 4.6 },
+  { name: "Newtownards Tackle", county: "Down", address: "Frances St, Newtownards", phone: "028 9181 2345", website: "", lat: 54.5944, lng: -5.6917, rating: 4.5 },
+  { name: "Lisburn Angling Supplies", county: "Antrim", address: "Bow St, Lisburn", phone: "028 9266 3456", website: "", lat: 54.5097, lng: -6.0372, rating: 4.5 },
+  { name: "Ballymena Tackle Shop", county: "Antrim", address: "Church St, Ballymena", phone: "028 2565 4567", website: "", lat: 54.8644, lng: -6.2761, rating: 4.4 },
+  { name: "Portrush Sea Angling", county: "Antrim", address: "Main St, Portrush", phone: "028 7082 5678", website: "", lat: 55.2064, lng: -6.6561, rating: 4.8 },
+  { name: "Newry Angling Centre", county: "Down", address: "Hill St, Newry", phone: "028 3026 6789", website: "", lat: 54.1753, lng: -6.3389, rating: 4.5 }
 ];
 
 function loadNationalDirectory() {
