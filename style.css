@@ -93,12 +93,12 @@ body {
   opacity: 1;
 }
 
-body.has-beta-banner {
-  padding-top: 100px;
-}
-
 body.has-beta-banner .navbar {
   top: 40px;
+}
+
+body.has-beta-banner {
+  padding-top: 100px;
 }
 
 body.has-beta-banner .beta-banner {
@@ -130,6 +130,7 @@ body.has-beta-banner .beta-banner {
   align-items: center;
   z-index: 1000;
   padding: 0 var(--space-lg);
+  transition: min-height 0.3s ease;
 }
 
 .nav-container {
@@ -141,6 +142,7 @@ body.has-beta-banner .beta-banner {
   justify-content: space-between;
   position: relative;
   gap: var(--space-md);
+  padding: 10px 0;
 }
 
 .nav-links {
@@ -213,6 +215,12 @@ body.has-beta-banner .beta-banner {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.nav-title {
+  line-height: 1.2;
 }
 
 .nav-links {
@@ -1216,6 +1224,25 @@ body.has-beta-banner .beta-banner {
   .shop-details-body h2 {
     font-size: 1.5rem;
   }
+
+  .nav-title {
+    font-size: 1.1rem;
+    white-space: normal;
+  }
+
+  .nav-brand {
+    gap: 6px;
+  }
+}
+
+@media (max-width: 400px) {
+  .nav-title {
+    font-size: 1rem;
+  }
+
+  .navbar {
+    padding: 0 var(--space-sm);
+  }
 }
 
 #current-time {
@@ -1967,6 +1994,15 @@ body.has-beta-banner .beta-banner {
   .nav-brand {
     position: static;
     transform: none;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+  }
+
+  .navbar {
+    height: auto;
+    min-height: 60px;
   }
 
   .nav-live {
@@ -1975,6 +2011,7 @@ body.has-beta-banner .beta-banner {
 
   .nav-container {
     justify-content: space-between;
+    padding: 8px 0;
   }
 
   .nav-right {

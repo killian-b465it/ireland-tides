@@ -302,6 +302,37 @@ function loadCatchesFromFirebase() {
   });
 }
 
+function syncMessageToFirebase(msg) {
+  if (!firebaseDB || !msg || !msg.id) return;
+  try {
+    firebaseDB.ref('support_messages/' + msg.id).set(msg);
+  } catch (e) {
+    console.warn('Firebase message sync failed:', e.message);
+  }
+}
+
+function loadMessagesFromFirebase() {
+  if (!firebaseDB) return;
+  const messagesRef = firebaseDB.ref('support_messages');
+  messagesRef.on('value', (snapshot) => {
+    const messages = [];
+    snapshot.forEach((childSnapshot) => {
+      messages.push(childSnapshot.val());
+    });
+    state.supportMessages = messages.sort((a, b) => a.timestamp - b.timestamp);
+    localStorage.setItem('fishing_support_messages', JSON.stringify(state.supportMessages));
+
+    // Refresh relevant UIs
+    if (document.getElementById('page-admin').style.display === 'block') {
+      loadAdminMessages();
+    }
+    if (document.getElementById('support-modal').classList.contains('active')) {
+      renderUserSupportThread();
+    }
+    updateNotificationBadge();
+  });
+}
+
 function updateCatchInFirebase(catchId, updates) {
   if (!firebaseDB) return;
 
@@ -567,6 +598,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Check for Stripe redirect results
   checkPaymentStatus();
+
+  loadMessagesFromFirebase();
 
   updateAuthUI();
   showPage('home');
@@ -1860,8 +1893,8 @@ function updateAuthUI() {
     // Show [PRO] if premium
     if (state.user.plan === 'pro') {
       label.innerHTML += ' <span style="font-size:0.65rem; color:#ffab00">[PRO]</span>';
-      // Add a small manage sub link next to it
-      label.innerHTML += ' <a href="#" onclick="manageStripeSubscription()" style="font-size:0.65rem; color:var(--text-muted); margin-left:5px; text-decoration:none">Manage</a>';
+      // During beta: Manage link shows free notice instead of Stripe
+      label.innerHTML += ` <a href="#" onclick="alert('Pro features are FREE during beta! No subscription to manage yet.')" style="font-size:0.65rem; color:var(--text-muted); margin-left:5px; text-decoration:none">Manage</a>`;
     }
     // Show admin nav if admin
     if (isAdmin()) {
@@ -2438,7 +2471,10 @@ window.openAdminReply = (userId) => {
 
   // Mark messages as read
   state.supportMessages.forEach(m => {
-    if (m.userId === userId) m.read = true;
+    if (m.userId === userId && !m.read) {
+      m.read = true;
+      syncMessageToFirebase(m);
+    }
   });
   localStorage.setItem('fishing_support_messages', JSON.stringify(state.supportMessages));
 
@@ -2489,22 +2525,21 @@ window.sendAdminReply = () => {
   const msg = {
     id: 'msg_' + Date.now(),
     userId: state.currentReplyUserId,
-    userName: 'Admin',
-    userEmail: state.user.email,
+    userName: 'Support Team',
+    userEmail: 'support@tides.ie',
     text: text,
     timestamp: Date.now(),
     from: 'admin',
-    read: true
+    read: true,
+    readByUser: false
   };
 
-  state.supportMessages.push(msg);
-  localStorage.setItem('fishing_support_messages', JSON.stringify(state.supportMessages));
+  // Sync to Firebase (Listener handles UI and localStorage)
+  syncMessageToFirebase(msg);
 
   input.value = '';
-
-  const thread = state.supportMessages.filter(m => m.userId === state.currentReplyUserId);
-  renderAdminReplyThread(thread);
 };
+
 
 // ============================================
 // User Support Messaging
@@ -2560,14 +2595,14 @@ window.sendSupportMessage = () => {
     text: text,
     timestamp: Date.now(),
     from: 'user',
-    read: false
+    read: false,
+    readByUser: true
   };
 
-  state.supportMessages.push(msg);
-  localStorage.setItem('fishing_support_messages', JSON.stringify(state.supportMessages));
+  // Sync to Firebase (Real-time listener handles UI and localStorage)
+  syncMessageToFirebase(msg);
 
   input.value = '';
-  renderUserSupportThread();
 };
 
 // ============================================
@@ -2650,8 +2685,9 @@ window.openSupportModal = () => {
 
   // Mark all admin messages as read by user
   state.supportMessages.forEach(m => {
-    if (m.userId === state.user.id && m.from === 'admin') {
+    if (m.userId === state.user.id && m.from === 'admin' && !m.readByUser) {
       m.readByUser = true;
+      syncMessageToFirebase(m);
     }
   });
   localStorage.setItem('fishing_support_messages', JSON.stringify(state.supportMessages));
