@@ -1627,52 +1627,130 @@ function addCommunityMarker(c) {
 }
 
 function renderCatchFeed() {
-  const container = document.getElementById('catch-feed');
-  if (state.catches.length === 0) return;
+  const feed = document.getElementById('community-feed');
+  feed.innerHTML = '';
 
-  container.innerHTML = state.catches.map(c => {
+  const sortedCatches = [...(state.catches || [])].sort((a, b) => b.timestamp - a.timestamp);
+
+  sortedCatches.forEach(c => {
+    const timeAgo = getTimeAgo(c.timestamp);
     const isLiked = c.likedBy && state.user && c.likedBy.includes(state.user.id);
-    return `
-      <div class="catch-card fade-in">
-        <div class="catch-header">
-          <span class="catch-species">${c.species}</span>
-          <span class="catch-date">${c.date}</span>
-        </div>
-        <div class="catch-author">By ${c.author || 'Member'}</div>
-        ${c.photo ? `<img src="${c.photo}" class="catch-image" alt="${c.species}">` : ''}
-        <p class="catch-details">${c.details}</p>
-        
-        <div class="catch-card-actions">
-          <button class="social-btn ${isLiked ? 'liked' : ''}" onclick="likeCatch(${c.id})">
-            ${isLiked ? '❤️' : '🤍'} ${c.likes || 0}
-          </button>
-          <button class="social-btn" onclick="toggleComments(${c.id})">
-            💬 ${c.comments ? c.comments.length : 0}
-          </button>
-        </div>
 
-        <div id="comments-${c.id}" class="comments-section">
-          <div class="comment-list">
-            ${(c.comments || []).map(comment => `
-              <div class="comment-item">
-                <div class="comment-header">
-                  <span class="comment-author">${comment.author}</span>
-                  <span class="comment-date">${comment.date}</span>
-                </div>
-                <div class="comment-text">${comment.text}</div>
-              </div>
-            `).join('')}
-            ${(!c.comments || c.comments.length === 0) ? '<p style="color:var(--text-muted); font-size:0.8rem;">No comments yet.</p>' : ''}
-          </div>
-          <div class="comment-input-area">
-            <input type="text" id="input-${c.id}" class="comment-input" placeholder="Add a comment..." onkeypress="handleCommentKey(event, ${c.id})">
-            <button class="btn btn-primary btn-sm" onclick="postComment(${c.id})">Post</button>
-          </div>
+    // Add clickable functionality to user name
+    const userOnClick = `onclick="viewUserProfile('${c.userId || ''}')"`;
+    const nameStyle = `style="cursor: pointer; font-weight: bold; color: var(--text-main);"`;
+
+    const item = document.createElement('div');
+    item.className = 'feed-item';
+    item.innerHTML = `
+      <div class="feed-header">
+        <span class="feed-user" ${userOnClick} ${nameStyle}>${c.userName}</span>
+        <span class="feed-time">${timeAgo}</span>
+      </div>
+      <div class="feed-content">
+        <p><strong>🎣 Caught:</strong> ${c.species} (${c.weight} lbs)</p>
+        <p>📍 ${c.location} | Method: ${c.method}</p>
+        ${c.image ? `<img src="${c.image}" alt="Catch" class="feed-image" onclick="openImageModal('${c.image}')">` : ''}
+        ${c.notes ? `<p class="feed-notes">"${c.notes}"</p>` : ''}
+      </div>
+      <div class="feed-actions">
+        <button class="action-btn ${isLiked ? 'active' : ''}" onclick="likeCatch(${c.id})">
+          ❤️ ${c.likes || 0}
+        </button>
+        <button class="action-btn" onclick="toggleComments(${c.id})">
+          💬 ${c.comments ? c.comments.length : 0}
+        </button>
+      </div>
+      <div class="comments-section" id="comments-${c.id}" style="display: none;">
+        <div class="comments-list" id="comments-list-${c.id}">
+          ${(c.comments || []).map(comment => `
+            <div class="comment">
+              <span class="comment-user" onclick="viewUserProfile('${comment.userId || ''}')" style="cursor:pointer">${comment.userName}:</span>
+              <span class="comment-text">${comment.text}</span>
+            </div>
+          `).join('')}
+        </div>
+        <div class="comment-input-area">
+          <input type="text" placeholder="Add a comment..." id="comment-input-${c.id}">
+          <button onclick="postComment(${c.id})">Post</button>
         </div>
       </div>
     `;
-  }).join('');
+    feed.appendChild(item);
+  });
 }
+
+// ============================================
+// Public Profile Logic
+// ============================================
+
+window.viewUserProfile = (userId) => {
+  if (!userId) return;
+
+  // Find user in local state (synced from Firebase)
+  let user = state.allUsers.find(u => u.id === userId);
+
+  if (!user) {
+    const userCatches = state.catches.filter(c => c.userId === userId);
+    if (userCatches.length > 0) {
+      user = {
+        name: userCatches[0].userName,
+        joinDate: null,
+        plan: 'Standard'
+      };
+    } else {
+      return alert('User profile not found.');
+    }
+  }
+
+  const modal = document.getElementById('public-profile-modal');
+  const avatarEl = document.getElementById('public-profile-avatar');
+
+  document.getElementById('public-profile-name').textContent = user.name;
+  document.getElementById('public-profile-badge').textContent = (user.plan === 'pro') ? 'Pro Angler' : 'Member';
+  document.getElementById('public-profile-badge').style.background = (user.plan === 'pro') ? 'var(--accent-primary)' : 'var(--glass)';
+
+  document.getElementById('public-profile-badge').style.background = (user.plan === 'pro') ? 'var(--accent-primary)' : 'var(--glass)';
+
+  // Custom Avatar for Admin/Support
+  if (user.isAdmin || user.email.includes('admin') || user.email.includes('support')) {
+    avatarEl.textContent = '';
+    avatarEl.style.backgroundImage = 'url("assets/logo.png")';
+    avatarEl.style.backgroundSize = '80%';
+    avatarEl.style.backgroundPosition = 'center';
+    avatarEl.style.backgroundRepeat = 'no-repeat';
+    avatarEl.style.border = '2px solid var(--accent-warning)';
+  } else {
+    // Default
+    avatarEl.style.backgroundImage = 'none';
+    avatarEl.textContent = user.name.charAt(0).toUpperCase();
+    avatarEl.style.border = '2px solid var(--accent-primary)';
+  }
+
+  const userCatches = state.catches.filter(c => c.userId === userId);
+  document.getElementById('public-profile-catches').textContent = userCatches.length;
+
+  if (user.joinDate) {
+    document.getElementById('public-profile-joined').textContent = new Date(user.joinDate).toLocaleDateString();
+  } else {
+    document.getElementById('public-profile-joined').textContent = 'N/A';
+  }
+
+  modal.classList.add('active');
+};
+
+window.closePublicProfileModal = () => {
+  document.getElementById('public-profile-modal').classList.remove('active');
+};
+
+// ============================================
+// Filter UI Logic
+// ============================================
+
+window.applyAndCloseFilters = () => {
+  applyFilters();
+  closeFilterPanel();
+};
 
 window.toggleComments = (id) => {
   const el = document.getElementById(`comments-${id}`);

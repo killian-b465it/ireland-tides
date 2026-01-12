@@ -58,7 +58,8 @@
       </div>
 
       <div class="nav-brand">
-        <span class="nav-logo">🌊</span>
+        <img src="assets/logo.png" alt="Logo" class="nav-logo-img"
+          style="height: 32px; width: 32px; margin-right: 8px;">
         <span class="nav-title">Irish Fishing Hub</span>
       </div>
 
@@ -219,7 +220,7 @@
         <div class="filter-sidebar" id="filter-sidebar">
           <div class="filter-sidebar-header">
             <h3>Map Filters</h3>
-            <button class="filter-close-btn" onclick="closeFilterPanel()">&times;</button>
+            <button class="filter-close-btn" onclick="applyAndCloseFilters()">&times;</button>
           </div>
           <div class="filter-options">
             <label class="filter-option">
@@ -638,6 +639,32 @@
       <div class="support-compose">
         <textarea id="support-message-input" placeholder="Type your message here..." rows="3"></textarea>
         <button class="btn btn-primary" onclick="sendSupportMessage()">Send Message</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Public User Profile Modal -->
+  <div class="modal" id="public-profile-modal">
+    <div class="modal-content profile-modal-content">
+      <div class="modal-header">
+        <h2>👤 User Profile</h2>
+        <button class="modal-close-btn-inline" onclick="closePublicProfileModal()">✕</button>
+      </div>
+      <div class="public-profile-view">
+        <div class="profile-avatar-large" id="public-profile-avatar">👤</div>
+        <h3 id="public-profile-name">User Name</h3>
+        <span class="badge" id="public-profile-badge">Pro Angler</span>
+        <p class="profile-bio" id="public-profile-bio">No bio available.</p>
+        <div class="profile-stats-row">
+          <div class="profile-stat">
+            <span class="stat-value" id="public-profile-joined">-</span>
+            <span class="stat-label">Joined</span>
+          </div>
+          <div class="profile-stat">
+            <span class="stat-value" id="public-profile-catches">0</span>
+            <span class="stat-label">Catches</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>

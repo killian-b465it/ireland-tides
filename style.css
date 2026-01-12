@@ -1991,6 +1991,35 @@ body.has-beta-banner .beta-banner {
     display: flex;
   }
 
+  @media (max-width: 768px) {
+    .nav-right span:not(.user-avatar):not(.badge) {
+      display: none;
+    }
+
+    .nav-links {
+      display: none;
+    }
+
+    .nav-center {
+      display: none;
+    }
+  }
+
+  /* Extra compact profile for very small screens */
+  @media (max-width: 400px) {
+    #user-name-label {
+      display: none !important;
+    }
+
+    #user-display .badge {
+      display: none !important;
+    }
+
+    #user-display {
+      gap: 5px;
+    }
+  }
+
   .nav-brand {
     position: static;
     transform: none;
