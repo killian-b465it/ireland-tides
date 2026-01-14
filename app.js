@@ -1631,8 +1631,17 @@ function displayShops(station, shops) {
 }
 
 function addShopMarker(s) {
-  const icon = L.divIcon({ className: 'shop-marker', html: '🎣', iconSize: [24, 24], iconAnchor: [12, 12] });
-  L.marker([s.lat, s.lon], { icon }).bindPopup(`<strong>${s.tags.name || 'Tackle Shop'}</strong>`).addTo(state.shopMarkers);
+  const icon = L.divIcon({ className: 'shop-marker', html: '🏪', iconSize: [28, 28], iconAnchor: [14, 14] });
+  const name = s.tags.name || 'Tackle Shop';
+  const street = s.tags['addr:street'] || s.tags['addr:city'] || '';
+  const popupContent = `
+    <div class="freshwater-popup">
+      <h3>🏪 ${name}</h3>
+      ${street ? `<p><strong>Address:</strong> ${street}</p>` : ''}
+      <a href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}" target="_blank" class="directions-btn">📍 Get Directions</a>
+    </div>
+  `;
+  L.marker([s.lat, s.lon], { icon }).bindPopup(popupContent).addTo(state.shopMarkers);
 }
 
 window.getDirections = (lat, lon) => {
@@ -2046,9 +2055,9 @@ function updateMapForFishingMode() {
     }
     if (fwFilterSidebar) fwFilterSidebar.style.display = 'none';
   } else {
-    // Hide sea fishing markers
+    // Hide sea fishing markers (but keep shops visible)
     Object.values(state.markers).forEach(m => state.map.removeLayer(m));
-    if (state.shopMarkers) state.map.removeLayer(state.shopMarkers);
+    // Keep shopMarkers visible - they work in both modes!
     if (state.pierMarkers) state.map.removeLayer(state.pierMarkers);
     if (state.rampMarkers) state.map.removeLayer(state.rampMarkers);
     if (state.harbourMarkers) state.map.removeLayer(state.harbourMarkers);
@@ -2247,6 +2256,7 @@ window.applyFreshwaterFilters = () => {
   const showParks = document.getElementById('filter-fw-parks')?.checked ?? true;
   const showRamps = document.getElementById('filter-fw-ramps')?.checked ?? true;
   const showPiers = document.getElementById('filter-fw-piers')?.checked ?? true;
+  const showShops = document.getElementById('filter-fw-shops')?.checked ?? true;
 
   // Toggle layer visibility
   if (freshwaterMarkerGroup) {
@@ -2264,6 +2274,10 @@ window.applyFreshwaterFilters = () => {
   if (freshwaterPiersGroup) {
     if (showPiers) state.map.addLayer(freshwaterPiersGroup);
     else state.map.removeLayer(freshwaterPiersGroup);
+  }
+  if (state.shopMarkers) {
+    if (showShops) state.map.addLayer(state.shopMarkers);
+    else state.map.removeLayer(state.shopMarkers);
   }
 
   closeFreshwaterFilterPanel();

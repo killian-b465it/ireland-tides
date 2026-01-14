@@ -208,9 +208,8 @@
         </div>
       </aside>
 
-      <!-- Map -->
-      <section class="map-container">
-        <!-- Fishing Mode Toggle -->
+      <!-- Fishing Mode Toggle (above map) -->
+      <div class="fishing-mode-toggle-wrapper">
         <div class="fishing-mode-toggle" id="fishing-mode-toggle-container">
           <span class="mode-label active" id="mode-label-sea">🌊 Sea Fishing</span>
           <label class="toggle-switch">
@@ -219,7 +218,10 @@
           </label>
           <span class="mode-label" id="mode-label-freshwater">🏞️ Lakes & Rivers</span>
         </div>
+      </div>
 
+      <!-- Map -->
+      <section class="map-container">
         <!-- Filter Toggle Button -->
         <button class="filter-toggle-btn" id="filter-toggle-btn" onclick="toggleFilterPanel()" title="Map Filters">
           <span class="filter-toggle-icon">🗺️</span>
@@ -291,6 +293,11 @@
               <input type="checkbox" id="filter-fw-piers" checked>
               <span class="filter-checkbox"></span>
               <span class="filter-emoji">🎣</span> Piers & Platforms
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" id="filter-fw-shops" checked>
+              <span class="filter-checkbox"></span>
+              <span class="filter-emoji">🏪</span> Tackle Shops
             </label>
           </div>
           <button class="filter-apply-btn" onclick="applyFreshwaterFilters()">✓ Apply Filters</button>
