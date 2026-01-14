@@ -1628,7 +1628,8 @@ function addCommunityMarker(c) {
 }
 
 function renderCatchFeed() {
-  const feed = document.getElementById('community-feed');
+  const feed = document.getElementById('catch-feed');
+  if (!feed) return; // Guard against null element
   feed.innerHTML = '';
 
   const now = Date.now();
