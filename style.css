@@ -720,6 +720,37 @@ body.has-beta-banner .beta-banner {
   color: var(--accent-danger);
 }
 
+/* Archive Toggle Button */
+.archive-toggle-btn {
+  width: 100%;
+  margin-bottom: var(--space-md);
+  text-align: center;
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px dashed var(--accent-primary);
+}
+
+.archive-toggle-btn:hover {
+  background: rgba(0, 212, 255, 0.2);
+}
+
+/* Admin Delete Post Button */
+.delete-post-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  margin-left: auto;
+  transition: var(--transition-normal);
+}
+
+.delete-post-btn:hover {
+  background: rgba(255, 59, 48, 0.2);
+  color: var(--accent-danger);
+}
+
 /* Comment Section */
 .comments-section {
   margin-top: var(--space-md);
@@ -1932,11 +1963,12 @@ body.has-beta-banner .beta-banner {
 
 .hamburger-btn span {
   display: block;
-  width: 100%;
+  width: 18px;
   height: 2px;
   background: var(--text-main);
   border-radius: 2px;
   transition: var(--transition-normal);
+  pointer-events: none;
 }
 
 .hamburger-btn.active span:nth-child(1) {

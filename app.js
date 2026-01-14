@@ -254,7 +254,8 @@ let state = {
   authMode: 'login', // 'login' or 'signup'
   allUsers: JSON.parse(localStorage.getItem('fishing_all_users') || '[]'),
   supportMessages: JSON.parse(localStorage.getItem('fishing_support_messages') || '[]'),
-  currentReplyUserId: null
+  currentReplyUserId: null,
+  showArchive: false // Toggle for viewing posts older than 7 days
 };
 
 // ============================================
@@ -1630,11 +1631,44 @@ function renderCatchFeed() {
   const feed = document.getElementById('community-feed');
   feed.innerHTML = '';
 
-  const sortedCatches = [...(state.catches || [])].sort((a, b) => b.timestamp - a.timestamp);
+  const now = Date.now();
+  const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
 
-  sortedCatches.forEach(c => {
+  // Sort all catches by time
+  const allSortedCatches = [...(state.catches || [])].sort((a, b) => b.timestamp - a.timestamp);
+
+  // Filter based on archive mode
+  const catchesToShow = state.showArchive
+    ? allSortedCatches
+    : allSortedCatches.filter(c => (now - c.timestamp) <= sevenDaysMs);
+
+  // Check if there are older posts available
+  const hasOlderPosts = allSortedCatches.some(c => (now - c.timestamp) > sevenDaysMs);
+
+  // Archive toggle button at top
+  if (hasOlderPosts || state.showArchive) {
+    const toggleBtn = document.createElement('button');
+    toggleBtn.className = 'btn btn-sm btn-outline archive-toggle-btn';
+    toggleBtn.innerHTML = state.showArchive ? '📅 Show Recent (Last 7 Days)' : '📜 View Older Posts';
+    toggleBtn.onclick = () => {
+      state.showArchive = !state.showArchive;
+      renderCatchFeed();
+    };
+    feed.appendChild(toggleBtn);
+  }
+
+  if (catchesToShow.length === 0) {
+    const emptyMsg = document.createElement('div');
+    emptyMsg.className = 'empty-state';
+    emptyMsg.innerHTML = '<p>No catches to show. Be the first to share!</p>';
+    feed.appendChild(emptyMsg);
+    return;
+  }
+
+  catchesToShow.forEach(c => {
     const timeAgo = getTimeAgo(c.timestamp);
     const isLiked = c.likedBy && state.user && c.likedBy.includes(state.user.id);
+    const isAdmin = state.user && state.user.isAdmin;
 
     // Add clickable functionality to user name
     const userOnClick = `onclick="viewUserProfile('${c.userId || ''}')"`;
@@ -1646,6 +1680,7 @@ function renderCatchFeed() {
       <div class="feed-header">
         <span class="feed-user" ${userOnClick} ${nameStyle}>${c.userName}</span>
         <span class="feed-time">${timeAgo}</span>
+        ${isAdmin ? `<button class="delete-post-btn" onclick="deleteCatch(${c.id})" title="Delete Post">🗑️</button>` : ''}
       </div>
       <div class="feed-content">
         <p><strong>🎣 Caught:</strong> ${c.species} (${c.weight} lbs)</p>
@@ -1679,6 +1714,33 @@ function renderCatchFeed() {
     feed.appendChild(item);
   });
 }
+
+// Admin Delete Post Function
+window.deleteCatch = (catchId) => {
+  if (!state.user || !state.user.isAdmin) {
+    return alert('Only admins can delete posts.');
+  }
+
+  if (!confirm('Are you sure you want to delete this post? This cannot be undone.')) {
+    return;
+  }
+
+  // Remove from local state
+  state.catches = state.catches.filter(c => c.id !== catchId);
+
+  // Remove from Firebase
+  if (typeof firebaseDB !== 'undefined') {
+    firebaseDB.ref('catches/' + catchId).remove()
+      .then(() => console.log('Post deleted from Firebase'))
+      .catch(err => console.error('Error deleting post:', err));
+  }
+
+  // Update localStorage backup
+  localStorage.setItem('fishing_catches', JSON.stringify(state.catches));
+
+  // Re-render feed
+  renderCatchFeed();
+};
 
 // ============================================
 // Public Profile Logic
