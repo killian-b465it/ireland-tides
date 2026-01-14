@@ -210,6 +210,16 @@
 
       <!-- Map -->
       <section class="map-container">
+        <!-- Fishing Mode Toggle -->
+        <div class="fishing-mode-toggle" id="fishing-mode-toggle-container">
+          <span class="mode-label active" id="mode-label-sea">🌊 Sea Fishing</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="fishing-mode-toggle" onchange="toggleFishingMode()">
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="mode-label" id="mode-label-freshwater">🏞️ Lakes & Rivers</span>
+        </div>
+
         <!-- Filter Toggle Button -->
         <button class="filter-toggle-btn" id="filter-toggle-btn" onclick="toggleFilterPanel()" title="Map Filters">
           <span class="filter-toggle-icon">🗺️</span>
@@ -254,6 +264,40 @@
 
         <!-- Filter Overlay -->
         <div class="filter-overlay" id="filter-overlay" onclick="closeFilterPanel()"></div>
+
+        <!-- Freshwater Filter Sidebar (hidden in sea mode) -->
+        <div class="filter-sidebar freshwater-filter-sidebar" id="freshwater-filter-sidebar" style="display: none;">
+          <div class="filter-sidebar-header">
+            <h3>🏞️ Freshwater Filters</h3>
+            <button class="filter-close-btn" onclick="applyFreshwaterFilters()">&times;</button>
+          </div>
+          <div class="filter-options">
+            <label class="filter-option">
+              <input type="checkbox" id="filter-fw-spots" checked>
+              <span class="filter-checkbox"></span>
+              <span class="filter-emoji">🐟</span> Fishing Spots
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" id="filter-fw-parks" checked>
+              <span class="filter-checkbox"></span>
+              <span class="filter-emoji">🏞️</span> Fishing Parks
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" id="filter-fw-ramps" checked>
+              <span class="filter-checkbox"></span>
+              <span class="filter-emoji">🚤</span> Boat Ramps
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" id="filter-fw-piers" checked>
+              <span class="filter-checkbox"></span>
+              <span class="filter-emoji">🎣</span> Piers & Platforms
+            </label>
+          </div>
+          <button class="filter-apply-btn" onclick="applyFreshwaterFilters()">✓ Apply Filters</button>
+        </div>
+
+        <!-- Freshwater Filter Overlay -->
+        <div class="filter-overlay" id="freshwater-filter-overlay" onclick="closeFreshwaterFilterPanel()"></div>
 
         <div id="map"></div>
       </section>

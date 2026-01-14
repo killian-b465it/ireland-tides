@@ -255,8 +255,145 @@ let state = {
   allUsers: JSON.parse(localStorage.getItem('fishing_all_users') || '[]'),
   supportMessages: JSON.parse(localStorage.getItem('fishing_support_messages') || '[]'),
   currentReplyUserId: null,
-  showArchive: false // Toggle for viewing posts older than 7 days
+  showArchive: false, // Toggle for viewing posts older than 7 days
+  fishingMode: 'sea' // 'sea' or 'freshwater'
 };
+
+// ============================================
+// Freshwater Fishing Spots Data
+// ============================================
+const FRESHWATER_SPOTS = [
+  // ===== CONNACHT (Galway, Mayo, Sligo, Roscommon, Leitrim) =====
+  { id: 'lough_corrib', name: 'Lough Corrib', type: 'Lake', lat: 53.4167, lng: -9.1833, species: ['Brown Trout', 'Pike', 'Salmon', 'Perch'], licenseRequired: true, licenseType: 'Salmon/Sea Trout License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: "Ireland's largest lake. Famous mayfly hatches May-June." },
+  { id: 'lough_mask', name: 'Lough Mask', type: 'Lake', lat: 53.60, lng: -9.40, species: ['Brown Trout', 'Pike', 'Ferox Trout'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Crystal clear water. Excellent fly fishing.' },
+  { id: 'lough_conn', name: 'Lough Conn', type: 'Lake', lat: 53.95, lng: -9.53, species: ['Salmon', 'Brown Trout', 'Sea Trout'], licenseRequired: true, licenseType: 'Salmon/Sea Trout License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Best April-September.' },
+  { id: 'lough_cullin', name: 'Lough Cullin', type: 'Lake', lat: 53.87, lng: -9.47, species: ['Brown Trout', 'Pike'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Connected to Lough Conn.' },
+  { id: 'lough_beltra', name: 'Lough Beltra', type: 'Lake', lat: 53.83, lng: -9.70, species: ['Salmon', 'Sea Trout'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Scenic Mayo lake.' },
+  { id: 'lough_inagh', name: 'Lough Inagh', type: 'Lake', lat: 53.48, lng: -9.85, species: ['Salmon', 'Sea Trout', 'Brown Trout'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Connemara. Part of Ballynahinch system.' },
+  { id: 'kylemore_lough', name: 'Kylemore Lough', type: 'Lake', lat: 53.55, lng: -9.88, species: ['Salmon', 'Sea Trout'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'At base of Kylemore Abbey.' },
+  { id: 'derryclare_lough', name: 'Derryclare Lough', type: 'Lake', lat: 53.48, lng: -9.82, species: ['Salmon', 'Brown Trout'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Connemara scenic lake.' },
+  { id: 'lough_gill', name: 'Lough Gill', type: 'Lake', lat: 54.25, lng: -8.40, species: ['Pike', 'Perch', 'Brown Trout'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Sligo/Leitrim border. Isle of Innisfree.' },
+  { id: 'glencar_lake', name: 'Glencar Lake', type: 'Lake', lat: 54.35, lng: -8.38, species: ['Brown Trout'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Scenic lake near waterfall.' },
+  { id: 'lough_allen', name: 'Lough Allen', type: 'Lake', lat: 54.08, lng: -8.05, species: ['Pike', 'Perch', 'Bream'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Source of River Shannon.' },
+  { id: 'lough_key', name: 'Lough Key', type: 'Lake', lat: 53.98, lng: -8.18, species: ['Pike', 'Perch', 'Bream', 'Roach'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Roscommon. Forest park nearby.' },
+  { id: 'lough_rinn', name: 'Lough Rinn', type: 'Lake', lat: 53.90, lng: -7.95, species: ['Pike', 'Perch', 'Bream'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Leitrim. Good coarse fishing.' },
+  { id: 'river_moy', name: 'River Moy', type: 'River', lat: 54.10, lng: -9.15, species: ['Salmon', 'Sea Trout'], licenseRequired: true, licenseType: 'Salmon License + Local Permit', licenseUrl: 'https://fishinginireland.info/salmon/north-west/moy/', notes: 'Top salmon river. Ridge Pool famous.' },
+  { id: 'river_erriff', name: 'River Erriff', type: 'River', lat: 53.63, lng: -9.72, species: ['Salmon', 'Sea Trout'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Excellent spate river.' },
+  { id: 'owenmore_river', name: 'Owenmore River', type: 'River', lat: 53.90, lng: -9.92, species: ['Salmon'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Mayo salmon fishery.' },
+
+  // ===== MUNSTER (Kerry, Cork, Clare, Limerick, Tipperary, Waterford) =====
+  { id: 'killarney_lakes', name: 'Killarney Lakes (Lough Leane)', type: 'Lake', lat: 52.02, lng: -9.52, species: ['Salmon', 'Brown Trout'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Free fishing. Stunning scenery.' },
+  { id: 'muckross_lake', name: 'Muckross Lake', type: 'Lake', lat: 52.00, lng: -9.50, species: ['Brown Trout'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Middle Killarney lake.' },
+  { id: 'lough_currane', name: 'Lough Currane', type: 'Lake', lat: 51.82, lng: -10.15, species: ['Salmon', 'Sea Trout'], licenseRequired: true, licenseType: 'Salmon/Sea Trout License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Waterville. World famous sea trout.' },
+  { id: 'caragh_lake', name: 'Caragh Lake', type: 'Lake', lat: 52.00, lng: -9.87, species: ['Salmon', 'Brown Trout'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Kerry gem.' },
+  { id: 'barfinnihy_lake', name: 'Barfinnihy Lake', type: 'Lake', lat: 51.93, lng: -9.85, species: ['Rainbow Trout'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Stocked monthly with rainbows.' },
+  { id: 'lough_derg', name: 'Lough Derg', type: 'Lake', lat: 52.92, lng: -8.33, species: ['Pike', 'Brown Trout', 'Perch', 'Bream'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Third largest lake. Great pike fishing.' },
+  { id: 'lake_inchiquin', name: 'Lake Inchiquin', type: 'Lake', lat: 52.90, lng: -9.05, species: ['Brown Trout', 'Pike'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Clare. Scenic limestone lake.' },
+  { id: 'lough_bofinne', name: 'Lough Bofinne', type: 'Lake', lat: 51.70, lng: -9.50, species: ['Rainbow Trout', 'Brown Trout', 'Pike'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Near Bantry. IFI stocked.' },
+  { id: 'shepperton_lakes', name: 'Shepperton Lakes', type: 'Lake', lat: 51.55, lng: -9.27, species: ['Rainbow Trout', 'Brown Trout'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Skibbereen. IFI stocked.' },
+  { id: 'river_shannon', name: 'River Shannon', type: 'River', lat: 52.67, lng: -8.63, species: ['Salmon', 'Brown Trout', 'Pike', 'Bream', 'Roach'], licenseRequired: true, licenseType: 'Salmon License (salmon only)', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: "Ireland's longest river." },
+  { id: 'river_blackwater_munster', name: 'Munster Blackwater', type: 'River', lat: 52.13, lng: -8.00, species: ['Salmon', 'Brown Trout', 'Sea Trout'], licenseRequired: true, licenseType: 'Salmon License + Permit', licenseUrl: 'https://fishinginireland.info/salmon/south-west/blackwater/', notes: 'The Irish Rhine.' },
+  { id: 'river_laune', name: 'River Laune', type: 'River', lat: 52.07, lng: -9.75, species: ['Salmon', 'Sea Trout', 'Brown Trout'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Flows from Killarney Lakes.' },
+  { id: 'river_feale', name: 'River Feale', type: 'River', lat: 52.45, lng: -9.40, species: ['Salmon', 'Sea Trout'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Kerry/Limerick border.' },
+  { id: 'river_suir', name: 'River Suir', type: 'River', lat: 52.35, lng: -7.50, species: ['Salmon', 'Brown Trout', 'Sea Trout'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Three Sisters river.' },
+  { id: 'river_bandon', name: 'River Bandon', type: 'River', lat: 51.73, lng: -8.73, species: ['Salmon', 'Sea Trout', 'Brown Trout'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Cork river.' },
+  { id: 'river_lee', name: 'River Lee', type: 'River', lat: 51.90, lng: -8.90, species: ['Salmon', 'Sea Trout', 'Brown Trout'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Flows through Cork city.' },
+
+  // ===== LEINSTER (Dublin, Wicklow, Wexford, Carlow, Kilkenny, Laois, Offaly, Westmeath, Longford, Meath, Louth, Kildare) =====
+  { id: 'blessington_lakes', name: 'Blessington Lakes', type: 'Lake', lat: 53.15, lng: -6.55, species: ['Brown Trout', 'Pike', 'Perch', 'Roach'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Near Glendalough. Permit required.' },
+  { id: 'lough_dan', name: 'Lough Dan', type: 'Lake', lat: 53.08, lng: -6.28, species: ['Brown Trout', 'Minnow', 'Eel'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Wicklow Mountains. Scenic.' },
+  { id: 'lough_tay', name: 'Lough Tay (Guinness Lake)', type: 'Lake', lat: 53.10, lng: -6.25, species: ['Brown Trout'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Private but worth noting. Dramatic views.' },
+  { id: 'annamoe_trout_fishery', name: 'Annamoe Trout Fishery', type: 'Lake', lat: 53.05, lng: -6.25, species: ['Rainbow Trout', 'Brown Trout'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Near Glendalough. Fly fishing.' },
+  { id: 'roundwood_lakes', name: 'Roundwood Lakes', type: 'Lake', lat: 53.07, lng: -6.23, species: ['Brown Trout'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Wicklow. Scenic trout fishing.' },
+  { id: 'lough_ennell', name: 'Lough Ennell', type: 'Lake', lat: 53.45, lng: -7.38, species: ['Brown Trout', 'Perch', 'Pike'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Westmeath. Good trout & coarse.' },
+  { id: 'lough_owel', name: 'Lough Owel', type: 'Lake', lat: 53.55, lng: -7.37, species: ['Brown Trout'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Westmeath. Quality trout.' },
+  { id: 'lough_derravaragh', name: 'Lough Derravaragh', type: 'Lake', lat: 53.62, lng: -7.32, species: ['Brown Trout', 'Pike', 'Perch'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Children of Lir legend.' },
+  { id: 'lough_sheelin', name: 'Lough Sheelin', type: 'Lake', lat: 53.78, lng: -7.33, species: ['Brown Trout'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Famous mayfly fishing.' },
+  { id: 'lough_boora', name: 'Lough Boora', type: 'Lake', lat: 53.25, lng: -7.70, species: ['Tench', 'Roach', 'Perch'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Offaly. Great for kids.' },
+  { id: 'grand_canal', name: 'Grand Canal', type: 'River', lat: 53.27, lng: -7.05, species: ['Bream', 'Rudd', 'Tench', 'Roach', 'Perch'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Excellent coarse fishing.' },
+  { id: 'river_barrow', name: 'River Barrow', type: 'River', lat: 52.50, lng: -6.95, species: ['Pike', 'Bream', 'Roach', 'Tench'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Carlow/Kilkenny. Coarse paradise.' },
+  { id: 'river_slaney', name: 'River Slaney', type: 'River', lat: 52.67, lng: -6.55, species: ['Salmon', 'Brown Trout', 'Sea Trout'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Wexford/Wicklow salmon river.' },
+  { id: 'river_dargle', name: 'River Dargle', type: 'River', lat: 53.18, lng: -6.10, species: ['Salmon', 'Sea Trout', 'Brown Trout'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Wicklow spate river.' },
+  { id: 'avonmore_river', name: 'Avonmore River', type: 'River', lat: 52.95, lng: -6.20, species: ['Brown Trout'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Wicklow. Near Glendalough.' },
+  { id: 'river_nore', name: 'River Nore', type: 'River', lat: 52.65, lng: -7.25, species: ['Salmon', 'Brown Trout'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Kilkenny. Three Sisters.' },
+
+  // ===== ULSTER - Republic (Donegal, Cavan, Monaghan) =====
+  { id: 'rosses_lakes', name: 'Rosses Lakes', type: 'Lake', lat: 54.95, lng: -8.35, species: ['Brown Trout', 'Sea Trout', 'Salmon'], licenseRequired: true, licenseType: 'Salmon License for salmon', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Donegal. 130+ small lakes.' },
+  { id: 'dunfanaghy_lakes', name: 'Dunfanaghy Lakes', type: 'Lake', lat: 55.18, lng: -7.97, species: ['Brown Trout'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Donegal. Scenic fishing.' },
+  { id: 'lough_eske', name: 'Lough Eske', type: 'Lake', lat: 54.72, lng: -8.02, species: ['Brown Trout', 'Salmon'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Donegal. Near Donegal town.' },
+  { id: 'lough_melvin', name: 'Lough Melvin', type: 'Lake', lat: 54.42, lng: -8.15, species: ['Brown Trout', 'Salmon', 'Gillaroo', 'Sonaghan'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Border lake. Unique trout varieties.' },
+  { id: 'lough_gowna', name: 'Lough Gowna', type: 'Lake', lat: 53.83, lng: -7.53, species: ['Pike', 'Bream', 'Perch'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Cavan. Excellent pike.' },
+  { id: 'river_finn', name: 'River Finn', type: 'River', lat: 54.80, lng: -7.72, species: ['Salmon', 'Sea Trout'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Donegal. Spring salmon.' },
+  { id: 'river_drowes', name: 'River Drowes', type: 'River', lat: 54.47, lng: -8.25, species: ['Salmon', 'Sea Trout'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Donegal/Leitrim. First salmon often here.' },
+  { id: 'gweebarra_river', name: 'Gweebarra River', type: 'River', lat: 54.90, lng: -8.25, species: ['Salmon', 'Sea Trout'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Donegal spate river.' },
+  { id: 'owenea_river', name: 'Owenea River', type: 'River', lat: 54.77, lng: -8.37, species: ['Salmon', 'Sea Trout'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Donegal spate river.' },
+
+  // ===== NORTHERN IRELAND =====
+  { id: 'lower_lough_erne', name: 'Lower Lough Erne', type: 'Lake', lat: 54.45, lng: -7.75, species: ['Pike', 'Bream', 'Roach', 'Brown Trout'], licenseRequired: false, licenseType: null, licenseUrl: 'https://www.nidirect.gov.uk/articles/freshwater-angling', notes: 'Fermanagh. Excellent coarse & pike.' },
+  { id: 'upper_lough_erne', name: 'Upper Lough Erne', type: 'Lake', lat: 54.18, lng: -7.52, species: ['Pike', 'Bream', 'Roach', 'Perch', 'Tench'], licenseRequired: false, licenseType: null, licenseUrl: 'https://www.nidirect.gov.uk/articles/freshwater-angling', notes: 'Fermanagh. Exceptional pike.' },
+  { id: 'lough_neagh', name: 'Lough Neagh', type: 'Lake', lat: 54.62, lng: -6.40, species: ['Pike', 'Perch', 'Bream', 'Roach', 'Pollan', 'Trout'], licenseRequired: false, licenseType: null, licenseUrl: 'https://www.nidirect.gov.uk/articles/freshwater-angling', notes: 'Largest lake in British Isles.' },
+  { id: 'lough_beg', name: 'Lough Beg', type: 'Lake', lat: 54.78, lng: -6.48, species: ['Pike'], licenseRequired: false, licenseType: null, licenseUrl: 'https://www.nidirect.gov.uk/articles/freshwater-angling', notes: 'Antrim. Premier pike fishery.' },
+  { id: 'camlough_lake', name: 'Camlough Lake', type: 'Lake', lat: 54.12, lng: -6.38, species: ['Pike', 'Bream', 'Roach', 'Perch'], licenseRequired: false, licenseType: null, licenseUrl: 'https://www.nidirect.gov.uk/articles/freshwater-angling', notes: 'Armagh. Coarse fishing.' },
+  { id: 'clay_lake', name: 'Clay Lake', type: 'Lake', lat: 54.25, lng: -6.72, species: ['Pike', 'Perch'], licenseRequired: false, licenseType: null, licenseUrl: 'https://www.nidirect.gov.uk/articles/freshwater-angling', notes: 'Armagh pike fishery.' },
+  { id: 'river_bush', name: 'River Bush', type: 'River', lat: 55.20, lng: -6.52, species: ['Salmon', 'Sea Trout', 'Brown Trout'], licenseRequired: true, licenseType: 'DAERA Rod License', licenseUrl: 'https://www.nidirect.gov.uk/articles/game-angling', notes: 'Famous NI salmon river.' },
+  { id: 'river_bann_lower', name: 'Lower River Bann', type: 'River', lat: 54.85, lng: -6.67, species: ['Salmon', 'Roach', 'Bream', 'Pike'], licenseRequired: true, licenseType: 'DAERA Rod License (salmon)', licenseUrl: 'https://www.nidirect.gov.uk/articles/game-angling', notes: 'Portglenone. Top coarse venue.' },
+  { id: 'river_foyle', name: 'River Foyle', type: 'River', lat: 54.98, lng: -7.32, species: ['Salmon', 'Sea Trout'], licenseRequired: true, licenseType: 'Foyle Carlingford Licence', licenseUrl: 'https://www.loughs-agency.org/', notes: 'Cross-border. Excellent salmon.' },
+  { id: 'river_mourne_ni', name: 'River Mourne/Strule', type: 'River', lat: 54.60, lng: -7.30, species: ['Salmon', 'Sea Trout'], licenseRequired: true, licenseType: 'Foyle Carlingford Licence', licenseUrl: 'https://www.loughs-agency.org/', notes: 'Tyrone. Salmon & sea trout.' }
+];
+
+// ============================================
+// Freshwater Fishing Parks Data
+// ============================================
+const FRESHWATER_PARKS = [
+  { id: 'lough_boora', name: 'Lough Boora Discovery Park', lat: 53.25, lng: -7.70, county: 'Offaly', species: ['Tench', 'Roach', 'Perch'], notes: 'Excellent for families. April-October.', website: 'https://www.loughboora.com/' },
+  { id: 'lough_key_park', name: 'Lough Key Forest Park', lat: 53.98, lng: -8.18, county: 'Roscommon', species: ['Pike', 'Perch', 'Bream'], notes: 'Fishing from docks. Coillte managed.', website: 'https://www.loughkey.ie/' },
+  { id: 'corkagh_park', name: 'Corkagh Park Fishery', lat: 53.31, lng: -6.40, county: 'Dublin', species: ['Rainbow Trout', 'Brown Trout'], notes: 'Wheelchair accessible. Urban fishery.', website: null },
+  { id: 'rathbeggan_lakes', name: 'Rathbeggan Lakes', lat: 53.62, lng: -6.62, county: 'Meath', species: ['Rainbow Trout'], notes: 'Stocked fishery. Family friendly.', website: 'https://www.rathbegganlakes.ie/' },
+  { id: 'lough_muckno', name: 'Lough Muckno Leisure Park', lat: 54.07, lng: -6.70, county: 'Monaghan', species: ['Pike', 'Bream', 'Rudd', 'Perch'], notes: 'Public park. Good coarse fishing.', website: null },
+  { id: 'annagh_lake_park', name: 'Annagh Lake', lat: 53.83, lng: -6.95, county: 'Cavan', species: ['Rainbow Trout', 'Brown Trout'], notes: 'Stocked May-September.', website: null },
+  { id: 'castle_lake', name: 'Castle Lake (Virginia)', lat: 53.83, lng: -7.08, county: 'Cavan', species: ['Pike', 'Perch', 'Bream'], notes: 'Disabled angling facilities.', website: null },
+  { id: 'oaklands_lake', name: 'Oaklands Lake', lat: 52.40, lng: -6.95, county: 'Wexford', species: ['Coarse Fish'], notes: 'New Ross. Accessible stands.', website: null },
+  { id: 'ballyshunnock', name: 'Ballyshunnock Reservoir', lat: 52.22, lng: -7.18, county: 'Waterford', species: ['Brown Trout'], notes: 'Scenic reservoir. Fly fishing.', website: null },
+  { id: 'laois_angling', name: 'Laois Angling Centre', lat: 53.05, lng: -7.55, county: 'Laois', species: ['Rainbow Trout', 'Brown Trout', 'Carp', 'Bream'], notes: 'Multiple lakes. Well stocked.', website: 'https://www.laoisanglingcentre.ie/' },
+  { id: 'angling_for_all', name: 'Angling for All (Aughrim)', lat: 52.85, lng: -6.32, county: 'Wicklow', species: ['Rainbow Trout', 'Brown Trout'], notes: 'National disabled facility. Year round.', website: null },
+  { id: 'tinnehinch', name: 'Tinnehinch Fly Fishery', lat: 53.18, lng: -6.17, county: 'Wicklow', species: ['Rainbow Trout'], notes: 'Enniskerry. Open all year.', website: null },
+  { id: 'annamoe_fishery', name: 'Annamoe Trout Fishery', lat: 53.05, lng: -6.25, county: 'Wicklow', species: ['Rainbow Trout', 'Brown Trout'], notes: 'Near Glendalough. Fly & bait.', website: null },
+  { id: 'rathcon_fishery', name: 'Rathcon Trout Fishery', lat: 53.02, lng: -6.28, county: 'Wicklow', species: ['Rainbow Trout'], notes: '8.5 acre lake. Open all year.', website: null }
+];
+
+// ============================================
+// Freshwater Boat Ramps/Slipways Data
+// ============================================
+const FRESHWATER_RAMPS = [
+  { id: 'killaloe_slip', name: 'Killaloe Slipway', lat: 52.80, lng: -8.44, waterway: 'Lough Derg', type: 'Public', notes: 'Main access to Lough Derg south.' },
+  { id: 'dromineer_slip', name: 'Dromineer Slipway', lat: 52.93, lng: -8.27, waterway: 'Lough Derg', type: 'Public', notes: 'Good parking. Marina nearby.' },
+  { id: 'garrykennedy_slip', name: 'Garrykennedy Slipway', lat: 52.90, lng: -8.22, waterway: 'Lough Derg', type: 'Public', notes: 'Scenic harbour access.' },
+  { id: 'portumna_slip', name: 'Portumna Slipway', lat: 53.09, lng: -8.22, waterway: 'Lough Derg', type: 'Public', notes: 'Near Portumna Castle.' },
+  { id: 'carrick_shannon', name: 'Carrick-on-Shannon Slipway', lat: 53.95, lng: -8.10, waterway: 'River Shannon', type: 'Public', notes: 'Town centre. Waterways Ireland.' },
+  { id: 'athlone_slip', name: 'Athlone Slipway', lat: 53.42, lng: -7.95, waterway: 'River Shannon', type: 'Public', notes: 'Central location.' },
+  { id: 'banagher_slip', name: 'Banagher Slipway', lat: 53.19, lng: -7.99, waterway: 'River Shannon', type: 'Public', notes: 'River access. Good facilities.' },
+  { id: 'roosky_slip', name: 'Roosky Slipway', lat: 53.83, lng: -7.92, waterway: 'River Shannon', type: 'Public', notes: 'Shannon navigation access.' },
+  { id: 'lough_key_slip', name: 'Lough Key Slipway', lat: 53.97, lng: -8.17, waterway: 'Lough Key', type: 'Public', notes: 'Forest park access.' },
+  { id: 'enniskillen_slip', name: 'Enniskillen Slipway', lat: 54.35, lng: -7.63, waterway: 'Lower Lough Erne', type: 'Public', notes: 'NI. Waterways Ireland.' },
+  { id: 'belturbet_slip', name: 'Belturbet Slipway', lat: 54.10, lng: -7.45, waterway: 'River Erne', type: 'Public', notes: 'Border area access.' },
+  { id: 'graiguenamanagh', name: 'Graiguenamanagh Slipway', lat: 52.54, lng: -6.95, waterway: 'River Barrow', type: 'Public', notes: 'Barrow Navigation.' }
+];
+
+// ============================================
+// Freshwater Piers/Platforms Data
+// ============================================
+const FRESHWATER_PIERS = [
+  { id: 'athlone_platform', name: 'Athlone Fishing Platform', lat: 53.42, lng: -7.94, waterway: 'River Shannon', accessible: true, notes: 'Wheelchair accessible stand.' },
+  { id: 'moy_platform', name: 'River Moy Angling Platform', lat: 54.11, lng: -9.17, waterway: 'River Moy', accessible: true, notes: '76m wheelchair accessible. IFI built.' },
+  { id: 'lough_ree_pier', name: 'Lough Ree Fishing Stand', lat: 53.52, lng: -7.95, waterway: 'Lough Ree', accessible: true, notes: 'Access for All boat available.' },
+  { id: 'portumna_pier', name: 'Portumna Fishing Pier', lat: 53.09, lng: -8.21, waterway: 'Lough Derg', accessible: false, notes: 'Stone pier. Good for pike.' },
+  { id: 'ballina_pier', name: 'Ballina Ridge Pool Stand', lat: 54.11, lng: -9.15, waterway: 'River Moy', accessible: false, notes: 'Famous salmon pool.' },
+  { id: 'enniskillen_stand', name: 'Enniskillen Fishing Stand', lat: 54.35, lng: -7.64, waterway: 'Lower Lough Erne', accessible: true, notes: 'NI. Good coarse fishing.' },
+  { id: 'cootehill_stand', name: 'Cootehill Lake Stand', lat: 54.07, lng: -7.08, waterway: 'Cootehill Lakes', accessible: false, notes: 'Cavan. Pike & bream.' },
+  { id: 'virginia_stand', name: 'Virginia Lake Stand', lat: 53.83, lng: -7.08, waterway: 'Virginia Lake', accessible: true, notes: 'Disabled facilities.' },
+  { id: 'mullingar_stand', name: 'Lough Ennell Stand', lat: 53.45, lng: -7.40, waterway: 'Lough Ennell', accessible: false, notes: 'Westmeath. Trout fishing.' },
+  { id: 'carrick_stand', name: 'Carrick-on-Shannon Stand', lat: 53.94, lng: -8.09, waterway: 'River Shannon', accessible: true, notes: 'Town centre. Coarse fishing.' }
+];
 
 // ============================================
 // Utility Functions
@@ -1842,6 +1979,280 @@ window.closePublicProfileModal = () => {
 window.applyAndCloseFilters = () => {
   applyFilters();
   closeFilterPanel();
+};
+
+// ============================================
+// Fishing Mode Toggle Logic
+// ============================================
+let freshwaterMarkerGroup = null;
+
+window.toggleFishingMode = () => {
+  const toggle = document.getElementById('fishing-mode-toggle');
+  const seaLabel = document.getElementById('mode-label-sea');
+  const freshwaterLabel = document.getElementById('mode-label-freshwater');
+
+  if (toggle.checked) {
+    state.fishingMode = 'freshwater';
+    seaLabel.classList.remove('active');
+    freshwaterLabel.classList.add('active');
+  } else {
+    state.fishingMode = 'sea';
+    seaLabel.classList.add('active');
+    freshwaterLabel.classList.remove('active');
+  }
+
+  updateMapForFishingMode();
+};
+
+function updateMapForFishingMode() {
+  if (!state.map) return;
+
+  const seaFilterBtn = document.getElementById('filter-toggle-btn');
+  const seaFilterSidebar = document.getElementById('filter-sidebar');
+  const fwFilterSidebar = document.getElementById('freshwater-filter-sidebar');
+
+  if (state.fishingMode === 'sea') {
+    // Show sea fishing markers
+    Object.values(state.markers).forEach(m => state.map.addLayer(m));
+    if (state.shopMarkers) state.map.addLayer(state.shopMarkers);
+    if (state.pierMarkers) state.map.addLayer(state.pierMarkers);
+    if (state.rampMarkers) state.map.addLayer(state.rampMarkers);
+    if (state.harbourMarkers) state.map.addLayer(state.harbourMarkers);
+
+    // Hide freshwater markers
+    if (freshwaterMarkerGroup) state.map.removeLayer(freshwaterMarkerGroup);
+    if (freshwaterParksGroup) state.map.removeLayer(freshwaterParksGroup);
+    if (freshwaterRampsGroup) state.map.removeLayer(freshwaterRampsGroup);
+    if (freshwaterPiersGroup) state.map.removeLayer(freshwaterPiersGroup);
+
+    // Toggle filter button to sea filters
+    if (seaFilterBtn) {
+      seaFilterBtn.onclick = () => toggleFilterPanel();
+      seaFilterBtn.innerHTML = '<span class="filter-toggle-icon">🗺️</span><span class="filter-toggle-text">Filters</span>';
+    }
+    if (fwFilterSidebar) fwFilterSidebar.style.display = 'none';
+  } else {
+    // Hide sea fishing markers
+    Object.values(state.markers).forEach(m => state.map.removeLayer(m));
+    if (state.shopMarkers) state.map.removeLayer(state.shopMarkers);
+    if (state.pierMarkers) state.map.removeLayer(state.pierMarkers);
+    if (state.rampMarkers) state.map.removeLayer(state.rampMarkers);
+    if (state.harbourMarkers) state.map.removeLayer(state.harbourMarkers);
+
+    // Show freshwater markers (all types)
+    renderFreshwaterSpots();
+    renderFreshwaterParks();
+    renderFreshwaterRamps();
+    renderFreshwaterPiers();
+
+    // Toggle filter button to freshwater filters
+    if (seaFilterBtn) {
+      seaFilterBtn.onclick = () => toggleFreshwaterFilterPanel();
+      seaFilterBtn.innerHTML = '<span class="filter-toggle-icon">🏞️</span><span class="filter-toggle-text">Filters</span>';
+    }
+    if (fwFilterSidebar) fwFilterSidebar.style.display = '';
+    if (seaFilterSidebar) seaFilterSidebar.classList.remove('open');
+  }
+}
+
+function renderFreshwaterSpots() {
+  if (!state.map) return;
+
+  // Create layer group if not exists
+  if (!freshwaterMarkerGroup) {
+    freshwaterMarkerGroup = L.layerGroup();
+  } else {
+    freshwaterMarkerGroup.clearLayers();
+  }
+
+  FRESHWATER_SPOTS.forEach(spot => {
+    const icon = L.divIcon({
+      className: 'freshwater-marker',
+      html: spot.type === 'Lake' ? '🏞️' : '🌊',
+      iconSize: [28, 28],
+      iconAnchor: [14, 14]
+    });
+
+    const popupContent = `
+      <div class="freshwater-popup">
+        <h3>${spot.name}</h3>
+        <p><strong>Type:</strong> ${spot.type}</p>
+        <p><strong>Species:</strong> ${spot.species.join(', ')}</p>
+        ${spot.notes ? `<p><em>${spot.notes}</em></p>` : ''}
+        ${spot.licenseRequired
+        ? `<a href="${spot.licenseUrl}" target="_blank" class="license-btn">🎫 ${spot.licenseType} - Get Info</a>`
+        : '<span class="no-license">✅ No State License Required</span>'
+      }
+        <a href="https://www.google.com/maps/dir/?api=1&destination=${spot.lat},${spot.lng}" target="_blank" class="directions-btn">📍 Get Directions</a>
+      </div>
+    `;
+
+    const marker = L.marker([spot.lat, spot.lng], { icon })
+      .bindPopup(popupContent);
+
+    freshwaterMarkerGroup.addLayer(marker);
+  });
+
+  freshwaterMarkerGroup.addTo(state.map);
+}
+
+// Layer groups for freshwater amenities
+let freshwaterParksGroup = null;
+let freshwaterRampsGroup = null;
+let freshwaterPiersGroup = null;
+
+function renderFreshwaterParks() {
+  if (!state.map) return;
+
+  if (!freshwaterParksGroup) {
+    freshwaterParksGroup = L.layerGroup();
+  } else {
+    freshwaterParksGroup.clearLayers();
+  }
+
+  FRESHWATER_PARKS.forEach(park => {
+    const icon = L.divIcon({
+      className: 'freshwater-park-marker',
+      html: '🏕️',
+      iconSize: [28, 28],
+      iconAnchor: [14, 14]
+    });
+
+    const popupContent = `
+      <div class="freshwater-popup">
+        <h3>🏕️ ${park.name}</h3>
+        <p><strong>County:</strong> ${park.county}</p>
+        <p><strong>Species:</strong> ${park.species.join(', ')}</p>
+        ${park.notes ? `<p><em>${park.notes}</em></p>` : ''}
+        ${park.website ? `<a href="${park.website}" target="_blank" class="license-btn">🌐 Visit Website</a>` : ''}
+        <a href="https://www.google.com/maps/dir/?api=1&destination=${park.lat},${park.lng}" target="_blank" class="directions-btn">📍 Get Directions</a>
+      </div>
+    `;
+
+    const marker = L.marker([park.lat, park.lng], { icon })
+      .bindPopup(popupContent);
+
+    freshwaterParksGroup.addLayer(marker);
+  });
+
+  freshwaterParksGroup.addTo(state.map);
+}
+
+function renderFreshwaterRamps() {
+  if (!state.map) return;
+
+  if (!freshwaterRampsGroup) {
+    freshwaterRampsGroup = L.layerGroup();
+  } else {
+    freshwaterRampsGroup.clearLayers();
+  }
+
+  FRESHWATER_RAMPS.forEach(ramp => {
+    const icon = L.divIcon({
+      className: 'freshwater-ramp-marker',
+      html: '🚤',
+      iconSize: [28, 28],
+      iconAnchor: [14, 14]
+    });
+
+    const popupContent = `
+      <div class="freshwater-popup">
+        <h3>🚤 ${ramp.name}</h3>
+        <p><strong>Waterway:</strong> ${ramp.waterway}</p>
+        <p><strong>Type:</strong> ${ramp.type}</p>
+        ${ramp.notes ? `<p><em>${ramp.notes}</em></p>` : ''}
+        <a href="https://www.google.com/maps/dir/?api=1&destination=${ramp.lat},${ramp.lng}" target="_blank" class="directions-btn">📍 Get Directions</a>
+      </div>
+    `;
+
+    const marker = L.marker([ramp.lat, ramp.lng], { icon })
+      .bindPopup(popupContent);
+
+    freshwaterRampsGroup.addLayer(marker);
+  });
+
+  freshwaterRampsGroup.addTo(state.map);
+}
+
+function renderFreshwaterPiers() {
+  if (!state.map) return;
+
+  if (!freshwaterPiersGroup) {
+    freshwaterPiersGroup = L.layerGroup();
+  } else {
+    freshwaterPiersGroup.clearLayers();
+  }
+
+  FRESHWATER_PIERS.forEach(pier => {
+    const icon = L.divIcon({
+      className: 'freshwater-pier-marker',
+      html: '🎣',
+      iconSize: [28, 28],
+      iconAnchor: [14, 14]
+    });
+
+    const accessibleBadge = pier.accessible ? '♿ Wheelchair Accessible' : '';
+    const popupContent = `
+      <div class="freshwater-popup">
+        <h3>🎣 ${pier.name}</h3>
+        <p><strong>Waterway:</strong> ${pier.waterway}</p>
+        ${pier.accessible ? `<p class="accessible-badge">♿ Wheelchair Accessible</p>` : ''}
+        ${pier.notes ? `<p><em>${pier.notes}</em></p>` : ''}
+        <a href="https://www.google.com/maps/dir/?api=1&destination=${pier.lat},${pier.lng}" target="_blank" class="directions-btn">📍 Get Directions</a>
+      </div>
+    `;
+
+    const marker = L.marker([pier.lat, pier.lng], { icon })
+      .bindPopup(popupContent);
+
+    freshwaterPiersGroup.addLayer(marker);
+  });
+
+  freshwaterPiersGroup.addTo(state.map);
+}
+
+// Freshwater filter functions
+window.toggleFreshwaterFilterPanel = () => {
+  const sidebar = document.getElementById('freshwater-filter-sidebar');
+  const overlay = document.getElementById('freshwater-filter-overlay');
+  if (sidebar && overlay) {
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('active');
+  }
+};
+
+window.closeFreshwaterFilterPanel = () => {
+  const sidebar = document.getElementById('freshwater-filter-sidebar');
+  const overlay = document.getElementById('freshwater-filter-overlay');
+  if (sidebar) sidebar.classList.remove('open');
+  if (overlay) overlay.classList.remove('active');
+};
+
+window.applyFreshwaterFilters = () => {
+  const showSpots = document.getElementById('filter-fw-spots')?.checked ?? true;
+  const showParks = document.getElementById('filter-fw-parks')?.checked ?? true;
+  const showRamps = document.getElementById('filter-fw-ramps')?.checked ?? true;
+  const showPiers = document.getElementById('filter-fw-piers')?.checked ?? true;
+
+  // Toggle layer visibility
+  if (freshwaterMarkerGroup) {
+    if (showSpots) state.map.addLayer(freshwaterMarkerGroup);
+    else state.map.removeLayer(freshwaterMarkerGroup);
+  }
+  if (freshwaterParksGroup) {
+    if (showParks) state.map.addLayer(freshwaterParksGroup);
+    else state.map.removeLayer(freshwaterParksGroup);
+  }
+  if (freshwaterRampsGroup) {
+    if (showRamps) state.map.addLayer(freshwaterRampsGroup);
+    else state.map.removeLayer(freshwaterRampsGroup);
+  }
+  if (freshwaterPiersGroup) {
+    if (showPiers) state.map.addLayer(freshwaterPiersGroup);
+    else state.map.removeLayer(freshwaterPiersGroup);
+  }
+
+  closeFreshwaterFilterPanel();
 };
 
 window.toggleComments = (id) => {
