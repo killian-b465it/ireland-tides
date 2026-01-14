@@ -1635,16 +1635,16 @@ function renderCatchFeed() {
   const now = Date.now();
   const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
 
-  // Sort all catches by time
-  const allSortedCatches = [...(state.catches || [])].sort((a, b) => b.timestamp - a.timestamp);
+  // Sort all catches by time (id is the timestamp in submitCatch)
+  const allSortedCatches = [...(state.catches || [])].sort((a, b) => (b.id || 0) - (a.id || 0));
 
   // Filter based on archive mode
   const catchesToShow = state.showArchive
     ? allSortedCatches
-    : allSortedCatches.filter(c => (now - c.timestamp) <= sevenDaysMs);
+    : allSortedCatches.filter(c => (now - (c.id || 0)) <= sevenDaysMs);
 
   // Check if there are older posts available
-  const hasOlderPosts = allSortedCatches.some(c => (now - c.timestamp) > sevenDaysMs);
+  const hasOlderPosts = allSortedCatches.some(c => (now - (c.id || 0)) > sevenDaysMs);
 
   // Archive toggle button at top
   if (hasOlderPosts || state.showArchive) {
@@ -1667,48 +1667,53 @@ function renderCatchFeed() {
   }
 
   catchesToShow.forEach(c => {
-    const timeAgo = getTimeAgo(c.timestamp);
+    // Use c.id as timestamp since that's how submitCatch creates it
+    const timeAgo = getTimeAgo(c.id);
     const isLiked = c.likedBy && state.user && c.likedBy.includes(state.user.id);
     const isAdmin = state.user && state.user.isAdmin;
 
-    // Add clickable functionality to user name
-    const userOnClick = `onclick="viewUserProfile('${c.userId || ''}')"`;
+    // Use correct field names from submitCatch: author, authorId, photo, details
+    const displayName = c.author || c.userName || 'Anonymous';
+    const displayUserId = c.authorId || c.userId || '';
+    const displayPhoto = c.photo || c.image || '';
+    const displayDetails = c.details || c.notes || '';
+
+    const userOnClick = `onclick="viewUserProfile('${displayUserId}')"`;
     const nameStyle = `style="cursor: pointer; font-weight: bold; color: var(--text-main);"`;
 
     const item = document.createElement('div');
-    item.className = 'feed-item';
+    item.className = 'feed-item catch-card';
     item.innerHTML = `
-      <div class="feed-header">
-        <span class="feed-user" ${userOnClick} ${nameStyle}>${c.userName}</span>
-        <span class="feed-time">${timeAgo}</span>
+      <div class="feed-header catch-header">
+        <span class="feed-user" ${userOnClick} ${nameStyle}>${displayName}</span>
+        <span class="feed-time catch-date">${c.date || timeAgo}</span>
         ${isAdmin ? `<button class="delete-post-btn" onclick="deleteCatch(${c.id})" title="Delete Post">🗑️</button>` : ''}
       </div>
       <div class="feed-content">
-        <p><strong>🎣 Caught:</strong> ${c.species} (${c.weight} lbs)</p>
-        <p>📍 ${c.location} | Method: ${c.method}</p>
-        ${c.image ? `<img src="${c.image}" alt="Catch" class="feed-image" onclick="openImageModal('${c.image}')">` : ''}
-        ${c.notes ? `<p class="feed-notes">"${c.notes}"</p>` : ''}
+        <p class="catch-species"><strong>🎣 ${c.species || 'Catch'}</strong></p>
+        ${displayDetails ? `<p class="catch-details">${displayDetails}</p>` : ''}
+        ${displayPhoto ? `<img src="${displayPhoto}" alt="Catch" class="catch-image feed-image" onclick="openImageModal('${displayPhoto}')">` : ''}
       </div>
-      <div class="feed-actions">
-        <button class="action-btn ${isLiked ? 'active' : ''}" onclick="likeCatch(${c.id})">
-          ❤️ ${c.likes || 0}
+      <div class="feed-actions catch-card-actions">
+        <button class="action-btn social-btn ${isLiked ? 'active liked' : ''}" onclick="likeCatch(${c.id})">
+          ${isLiked ? '❤️' : '🤍'} ${c.likes || 0}
         </button>
-        <button class="action-btn" onclick="toggleComments(${c.id})">
+        <button class="action-btn social-btn" onclick="toggleComments(${c.id})">
           💬 ${c.comments ? c.comments.length : 0}
         </button>
       </div>
       <div class="comments-section" id="comments-${c.id}" style="display: none;">
-        <div class="comments-list" id="comments-list-${c.id}">
+        <div class="comments-list comment-list" id="comments-list-${c.id}">
           ${(c.comments || []).map(comment => `
-            <div class="comment">
-              <span class="comment-user" onclick="viewUserProfile('${comment.userId || ''}')" style="cursor:pointer">${comment.userName}:</span>
+            <div class="comment comment-item">
+              <span class="comment-user comment-author" onclick="viewUserProfile('${comment.authorId || ''}')" style="cursor:pointer">${comment.author || 'User'}:</span>
               <span class="comment-text">${comment.text}</span>
             </div>
           `).join('')}
         </div>
         <div class="comment-input-area">
-          <input type="text" placeholder="Add a comment..." id="comment-input-${c.id}">
-          <button onclick="postComment(${c.id})">Post</button>
+          <input type="text" placeholder="Add a comment..." id="input-${c.id}" class="comment-input" onkeypress="handleCommentKey(event, ${c.id})">
+          <button class="btn btn-primary btn-sm" onclick="postComment(${c.id})">Post</button>
         </div>
       </div>
     `;
