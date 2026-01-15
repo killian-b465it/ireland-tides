@@ -1406,6 +1406,13 @@ function displayCalculatedTides(station) {
     <div class="tide-status ${direction}">${icon} ${direction.toUpperCase()}</div>
     <div style="font-size: 0.75rem; color: var(--accent-warning); margin-top: 8px;">⚠️ Estimated</div>
   `;
+
+  // Sync sidebar list with calculated data
+  const sidebarLevel = document.getElementById(`level-${station.id}`);
+  if (sidebarLevel) {
+    sidebarLevel.innerHTML = `${level.toFixed(1)}m ${icon}`;
+  }
+
   displayTideTimes([]);
   updateCalculatedChart(station);
   updateFishingConditions(station, null);
