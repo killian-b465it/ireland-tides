@@ -609,6 +609,17 @@ body.has-beta-banner .beta-banner {
   max-height: none !important;
 }
 
+.leaflet-tile-pane img {
+  image-rendering: auto;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+.leaflet-tile-container {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
 .tide-marker {
   font-size: 20px;
   text-shadow: 0 2px 10px rgba(0, 212, 255, 0.5);
@@ -3028,26 +3039,6 @@ input:checked+.toggle-slider:before {
   transform: scale(1.15);
 }
 
-/* Harbour Markers */
-.harbour-marker-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.harbour-marker {
-  font-size: 1.4rem;
-  background: var(--glass);
-  border-radius: 50%;
-  width: 34px;
-  height: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid #0088ff;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
 
 .harbour-marker:hover {
   transform: scale(1.15);
