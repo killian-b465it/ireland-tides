@@ -598,6 +598,7 @@ window.showPage = (pageId) => {
   }
   if (pageId === 'admin') {
     loadAdminDashboard();
+    setTimeout(() => initAdminMap(), 100);
   }
 };
 
@@ -3634,3 +3635,298 @@ window.openTermsModal = () => {
 window.closeTermsModal = () => {
   document.getElementById('terms-modal').classList.remove('active');
 };
+
+// ============================================
+// Admin Location Manager
+// ============================================
+let adminMap = null;
+let adminMapMode = 'sea';
+let adminMarkers = L.layerGroup();
+let addLocationMode = false;
+let editingLocation = null;
+
+// Admin-managed locations stored in Firebase
+let adminLocations = {
+  sea: { piers: [], ramps: [], harbours: [] },
+  freshwater: { spots: [], parks: [], ramps: [], piers: [] }
+};
+
+function initAdminMap() {
+  if (adminMap) {
+    adminMap.invalidateSize();
+    return;
+  }
+
+  const mapContainer = document.getElementById('admin-map');
+  if (!mapContainer) return;
+
+  adminMap = L.map('admin-map').setView([53.5, -8.0], 7);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+  }).addTo(adminMap);
+
+  adminMarkers.addTo(adminMap);
+
+  // Click handler for adding locations
+  adminMap.on('click', (e) => {
+    if (addLocationMode) {
+      openLocationEditor(null, e.latlng.lat, e.latlng.lng);
+      disableAddLocationMode();
+    }
+  });
+
+  loadAdminLocationsFromFirebase();
+  loadAdminLocations();
+}
+
+window.setAdminMapMode = (mode) => {
+  adminMapMode = mode;
+  document.getElementById('admin-mode-sea').classList.toggle('active', mode === 'sea');
+  document.getElementById('admin-mode-freshwater').classList.toggle('active', mode === 'freshwater');
+
+  // Update type selector based on mode
+  const typeSelect = document.getElementById('admin-location-type');
+  if (mode === 'sea') {
+    typeSelect.innerHTML = `
+      <option value="pier">🎣 Pier</option>
+      <option value="ramp">🚤 Boat Ramp</option>
+      <option value="harbour">🛥️ Harbour</option>
+    `;
+  } else {
+    typeSelect.innerHTML = `
+      <option value="spot">🐟 Fishing Spot</option>
+      <option value="park">🌲 Park</option>
+      <option value="ramp">🚤 Boat Ramp</option>
+      <option value="pier">🎣 Pier</option>
+    `;
+  }
+
+  loadAdminLocations();
+};
+
+function loadAdminLocations() {
+  adminMarkers.clearLayers();
+
+  const typeIcons = {
+    pier: '🎣', ramp: '🚤', harbour: '🛥️',
+    spot: '🐟', park: '🌲'
+  };
+
+  // Get source arrays based on mode
+  let locations = [];
+  if (adminMapMode === 'sea') {
+    locations = [
+      ...PIERS.map(p => ({ ...p, type: 'pier', source: 'static' })),
+      ...BOAT_RAMPS.map(r => ({ ...r, type: 'ramp', source: 'static' })),
+      ...HARBOURS.map(h => ({ ...h, type: 'harbour', source: 'static' })),
+      ...(adminLocations.sea.piers || []).map(p => ({ ...p, type: 'pier', source: 'firebase' })),
+      ...(adminLocations.sea.ramps || []).map(r => ({ ...r, type: 'ramp', source: 'firebase' })),
+      ...(adminLocations.sea.harbours || []).map(h => ({ ...h, type: 'harbour', source: 'firebase' }))
+    ];
+  } else {
+    locations = [
+      ...FRESHWATER_SPOTS.map(s => ({ ...s, type: 'spot', source: 'static' })),
+      ...FRESHWATER_PARKS.map(p => ({ ...p, type: 'park', source: 'static' })),
+      ...FRESHWATER_RAMPS.map(r => ({ ...r, type: 'ramp', source: 'static' })),
+      ...FRESHWATER_PIERS.map(p => ({ ...p, type: 'pier', source: 'static' })),
+      ...(adminLocations.freshwater.spots || []).map(s => ({ ...s, type: 'spot', source: 'firebase' })),
+      ...(adminLocations.freshwater.parks || []).map(p => ({ ...p, type: 'park', source: 'firebase' })),
+      ...(adminLocations.freshwater.ramps || []).map(r => ({ ...r, type: 'ramp', source: 'firebase' })),
+      ...(adminLocations.freshwater.piers || []).map(p => ({ ...p, type: 'pier', source: 'firebase' }))
+    ];
+  }
+
+  // Add markers
+  locations.forEach(loc => {
+    const icon = L.divIcon({
+      className: 'admin-marker',
+      html: `<div class="admin-marker-icon" data-source="${loc.source}">${typeIcons[loc.type] || '📍'}</div>`,
+      iconSize: [28, 28],
+      iconAnchor: [14, 14]
+    });
+
+    const marker = L.marker([loc.lat, loc.lon], { icon })
+      .bindPopup(`<strong>${loc.name}</strong><br><em>${loc.type}</em>`)
+      .on('click', () => {
+        if (!addLocationMode && loc.source === 'firebase') {
+          openLocationEditor(loc);
+        }
+      });
+
+    adminMarkers.addLayer(marker);
+  });
+
+  // Update location list
+  renderAdminLocationList(locations);
+  document.getElementById('admin-location-count').textContent = `(${locations.length})`;
+}
+
+function renderAdminLocationList(locations) {
+  const container = document.getElementById('admin-location-list');
+  const typeIcons = { pier: '🎣', ramp: '🚤', harbour: '🛥️', spot: '🐟', park: '🌲' };
+
+  container.innerHTML = locations.map(loc => `
+    <div class="location-list-item" onclick="flyToLocation(${loc.lat}, ${loc.lon})">
+      <div class="location-info">
+        <span>${typeIcons[loc.type] || '📍'}</span>
+        <div>
+          <div class="location-name">${loc.name}</div>
+          <div class="location-type">${loc.type} ${loc.source === 'firebase' ? '(custom)' : ''}</div>
+        </div>
+      </div>
+      ${loc.source === 'firebase' ? `
+        <div class="location-actions">
+          <button class="action-btn" onclick="event.stopPropagation(); openLocationEditor(${JSON.stringify(loc).replace(/"/g, '&quot;')})">✏️</button>
+        </div>
+      ` : ''}
+    </div>
+  `).join('');
+}
+
+window.flyToLocation = (lat, lon) => {
+  if (adminMap) {
+    adminMap.flyTo([lat, lon], 12);
+  }
+};
+
+window.enableAddLocationMode = () => {
+  addLocationMode = true;
+  document.getElementById('add-location-btn').classList.add('active');
+  document.getElementById('admin-map-instructions').style.display = 'block';
+  if (adminMap) adminMap.getContainer().style.cursor = 'crosshair';
+};
+
+function disableAddLocationMode() {
+  addLocationMode = false;
+  document.getElementById('add-location-btn').classList.remove('active');
+  document.getElementById('admin-map-instructions').style.display = 'none';
+  if (adminMap) adminMap.getContainer().style.cursor = '';
+}
+
+window.openLocationEditor = (location, lat, lon) => {
+  editingLocation = location;
+  const modal = document.getElementById('location-editor-modal');
+  const title = document.getElementById('location-editor-title');
+  const deleteBtn = document.getElementById('delete-location-btn');
+
+  if (location) {
+    title.textContent = 'Edit Location';
+    deleteBtn.style.display = 'block';
+    document.getElementById('location-id').value = location.id || '';
+    document.getElementById('location-name').value = location.name || '';
+    document.getElementById('location-lat').value = location.lat || '';
+    document.getElementById('location-lon').value = location.lon || '';
+    document.getElementById('location-type-edit').value = location.type || 'pier';
+    document.getElementById('location-description').value = location.description || '';
+  } else {
+    title.textContent = 'Add Location';
+    deleteBtn.style.display = 'none';
+    document.getElementById('location-id').value = '';
+    document.getElementById('location-name').value = '';
+    document.getElementById('location-lat').value = lat || '';
+    document.getElementById('location-lon').value = lon || '';
+    document.getElementById('location-type-edit').value = document.getElementById('admin-location-type').value;
+    document.getElementById('location-description').value = '';
+  }
+
+  document.getElementById('location-mode').value = adminMapMode;
+  modal.classList.add('active');
+};
+
+window.closeLocationEditor = () => {
+  document.getElementById('location-editor-modal').classList.remove('active');
+  editingLocation = null;
+};
+
+window.saveLocation = async (event) => {
+  event.preventDefault();
+
+  const locationData = {
+    id: document.getElementById('location-id').value || `loc_${Date.now()}`,
+    name: document.getElementById('location-name').value,
+    lat: parseFloat(document.getElementById('location-lat').value),
+    lon: parseFloat(document.getElementById('location-lon').value),
+    type: document.getElementById('location-type-edit').value,
+    mode: document.getElementById('location-mode').value,
+    description: document.getElementById('location-description').value,
+    addedBy: state.user?.email || 'admin',
+    addedAt: new Date().toISOString()
+  };
+
+  try {
+    // Save to Firebase
+    const path = `locations/${locationData.mode}/${locationData.type}s/${locationData.id}`;
+    await firebase.database().ref(path).set(locationData);
+
+    // Update local state
+    const typeKey = locationData.type + 's';
+    if (!adminLocations[locationData.mode][typeKey]) {
+      adminLocations[locationData.mode][typeKey] = [];
+    }
+
+    const existingIdx = adminLocations[locationData.mode][typeKey].findIndex(l => l.id === locationData.id);
+    if (existingIdx >= 0) {
+      adminLocations[locationData.mode][typeKey][existingIdx] = locationData;
+    } else {
+      adminLocations[locationData.mode][typeKey].push(locationData);
+    }
+
+    closeLocationEditor();
+    loadAdminLocations();
+    alert('Location saved successfully!');
+  } catch (err) {
+    console.error('Failed to save location:', err);
+    alert('Failed to save location. Please try again.');
+  }
+};
+
+window.deleteLocation = async () => {
+  if (!editingLocation || !editingLocation.id) return;
+
+  if (!confirm(`Are you sure you want to delete "${editingLocation.name}"?`)) return;
+
+  try {
+    const path = `locations/${editingLocation.mode || adminMapMode}/${editingLocation.type}s/${editingLocation.id}`;
+    await firebase.database().ref(path).remove();
+
+    // Remove from local state
+    const typeKey = editingLocation.type + 's';
+    const mode = editingLocation.mode || adminMapMode;
+    adminLocations[mode][typeKey] = (adminLocations[mode][typeKey] || []).filter(l => l.id !== editingLocation.id);
+
+    closeLocationEditor();
+    loadAdminLocations();
+    alert('Location deleted successfully!');
+  } catch (err) {
+    console.error('Failed to delete location:', err);
+    alert('Failed to delete location. Please try again.');
+  }
+};
+
+async function loadAdminLocationsFromFirebase() {
+  try {
+    const snapshot = await firebase.database().ref('locations').once('value');
+    const data = snapshot.val();
+
+    if (data) {
+      // Sea locations
+      if (data.sea) {
+        adminLocations.sea.piers = Object.values(data.sea.piers || {});
+        adminLocations.sea.ramps = Object.values(data.sea.ramps || {});
+        adminLocations.sea.harbours = Object.values(data.sea.harbours || {});
+      }
+
+      // Freshwater locations
+      if (data.freshwater) {
+        adminLocations.freshwater.spots = Object.values(data.freshwater.spots || {});
+        adminLocations.freshwater.parks = Object.values(data.freshwater.parks || {});
+        adminLocations.freshwater.ramps = Object.values(data.freshwater.ramps || {});
+        adminLocations.freshwater.piers = Object.values(data.freshwater.piers || {});
+      }
+    }
+
+    loadAdminLocations();
+  } catch (err) {
+    console.warn('Failed to load locations from Firebase:', err);
+  }
+}
