@@ -189,47 +189,47 @@ const BOAT_RAMPS = [
 // Harbours Data (Major Harbours)
 // ============================================
 const HARBOURS = [
-  { name: 'Dublin Port', lat: 53.3490, lon: -6.2020 },
-  { name: 'Cork Harbour', lat: 51.8503, lon: -8.2967 },
-  { name: 'Galway Harbour', lat: 53.2707, lon: -9.0568 },
+  { name: 'Dublin Port', lat: 53.3490, lon: -6.2020 },       // Offset from station
+  { name: 'Cork Harbour', lat: 51.8520, lon: -8.2940 },      // Offset from Cobh pier/slipway
+  { name: 'Galway Harbour', lat: 53.2725, lon: -9.0540 },    // Offset from pier
   { name: 'Waterford Harbour', lat: 52.2633, lon: -7.0911 },
   { name: 'Limerick Harbour', lat: 52.6639, lon: -8.6308 },
   { name: 'Drogheda Port', lat: 53.7189, lon: -6.3475 },
-  { name: 'Rosslare Harbour', lat: 52.2536, lon: -6.3394 },
-  { name: 'Dun Laoghaire Harbour', lat: 53.2960, lon: -6.1320 },
-  { name: 'Howth Harbour', lat: 53.3905, lon: -6.0672 },
-  { name: 'Killybegs Harbour', lat: 54.6347, lon: -8.4389 },
+  { name: 'Rosslare Harbour', lat: 52.2550, lon: -6.3360 },  // Offset from station
+  { name: 'Dun Laoghaire Harbour', lat: 53.2960, lon: -6.1320 },  // Offset from pier
+  { name: 'Howth Harbour', lat: 53.3920, lon: -6.0640 },     // Offset from pier/station
+  { name: 'Killybegs Harbour', lat: 54.6370, lon: -8.4360 }, // Offset from pier/station
   { name: 'Greencastle Harbour', lat: 55.1997, lon: -6.9836 },
-  { name: 'Castletownbere Harbour', lat: 51.6508, lon: -9.9106 },
-  { name: 'Bantry Harbour', lat: 51.6839, lon: -9.4522 },
-  { name: 'Schull Harbour', lat: 51.5286, lon: -9.5417 },
+  { name: 'Castletownbere Harbour', lat: 51.6520, lon: -9.9080 }, // Offset from station
+  { name: 'Bantry Harbour', lat: 51.6820, lon: -9.4500 },    // Offset from station
+  { name: 'Schull Harbour', lat: 51.5295, lon: -9.5390 },    // Offset from station
   { name: 'Baltimore Harbour', lat: 51.4828, lon: -9.3722 },
   // East Coast additions
-  { name: 'Courtown Harbour', lat: 52.6461, lon: -6.2289 },
-  { name: 'Wicklow Harbour', lat: 52.9808, lon: -6.0333 },
-  { name: 'Arklow Harbour', lat: 52.7978, lon: -6.1419 },
-  { name: 'Skerries Harbour', lat: 53.5805, lon: -6.1089 },
-  { name: 'Balbriggan Harbour', lat: 53.6103, lon: -6.1833 },
+  { name: 'Courtown Harbour', lat: 52.6480, lon: -6.2260 },  // Offset from pier/station
+  { name: 'Wicklow Harbour', lat: 52.9825, lon: -6.0305 },   // Offset from pier
+  { name: 'Arklow Harbour', lat: 52.7995, lon: -6.1390 },    // Offset from pier/station/slipway
+  { name: 'Skerries Harbour', lat: 53.5835, lon: -6.1060 },  // Offset from pier/station/slipway
+  { name: 'Balbriggan Harbour', lat: 53.6120, lon: -6.1805 }, // Offset from slipway
   { name: 'Dundalk Harbour', lat: 53.9875, lon: -6.3833 },
   // South Coast additions
-  { name: 'Youghal Harbour', lat: 51.9547, lon: -7.8447 },
-  { name: 'Kinsale Harbour', lat: 51.7058, lon: -8.5222 },
-  { name: 'Union Hall Harbour', lat: 51.5408, lon: -9.1389 },
+  { name: 'Youghal Harbour', lat: 51.9565, lon: -7.8420 },   // Offset from pier
+  { name: 'Kinsale Harbour', lat: 51.7075, lon: -8.5195 },   // Offset from pier/slipway/station
+  { name: 'Union Hall Harbour', lat: 51.5425, lon: -9.1360 }, // Offset from pier/station
   // West Coast additions
-  { name: 'Westport Harbour', lat: 53.7989, lon: -9.5247 },
-  { name: 'Sligo Harbour', lat: 54.2697, lon: -8.4694 },
-  { name: 'Roundstone Harbour', lat: 53.3997, lon: -9.9239 },
+  { name: 'Westport Harbour', lat: 53.8005, lon: -9.5220 },  // Offset from pier
+  { name: 'Sligo Harbour', lat: 54.2715, lon: -8.4720 },     // Offset from station
+  { name: 'Roundstone Harbour', lat: 53.4015, lon: -9.9210 }, // Offset from pier
   // Northern Ireland
   { name: 'Belfast Harbour', lat: 54.6097, lon: -5.9289 },
-  { name: 'Bangor Marina', lat: 54.6622, lon: -5.6706 },
-  { name: 'Larne Harbour', lat: 54.8531, lon: -5.8128 },
-  { name: 'Portrush Harbour', lat: 55.2064, lon: -6.6561 },
+  { name: 'Bangor Marina', lat: 54.6640, lon: -5.6675 },     // Offset from pier/slipway
+  { name: 'Larne Harbour', lat: 54.8550, lon: -5.8100 },     // Offset from station
+  { name: 'Portrush Harbour', lat: 55.2080, lon: -6.6530 },  // Offset from pier/station
   { name: 'Coleraine Marina', lat: 55.1333, lon: -6.6667 },
-  { name: 'Ardglass Harbour', lat: 54.2611, lon: -5.6056 },
-  { name: 'Portavogie Harbour', lat: 54.4586, lon: -5.4361 },
-  { name: 'Kilkeel Harbour', lat: 54.0617, lon: -5.9928 },
-  { name: 'Warrenpoint Harbour', lat: 54.0997, lon: -6.2519 },
-  { name: 'Carlingford Marina', lat: 54.0442, lon: -6.1883 }
+  { name: 'Ardglass Harbour', lat: 54.2630, lon: -5.6030 },  // Offset from pier
+  { name: 'Portavogie Harbour', lat: 54.4600, lon: -5.4335 }, // Offset from pier/slipway
+  { name: 'Kilkeel Harbour', lat: 54.0635, lon: -5.9900 },   // Offset from pier/slipway
+  { name: 'Warrenpoint Harbour', lat: 54.1015, lon: -6.2490 }, // Offset from slipway
+  { name: 'Carlingford Marina', lat: 54.0460, lon: -6.1855 }  // Offset from slipway
 ];
 
 // ============================================
