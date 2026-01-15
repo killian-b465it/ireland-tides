@@ -3647,8 +3647,8 @@ let editingLocation = null;
 
 // Admin-managed locations stored in Firebase
 let adminLocations = {
-  sea: { piers: [], ramps: [], harbours: [] },
-  freshwater: { spots: [], parks: [], ramps: [], piers: [] }
+  sea: { piers: [], ramps: [], harbours: [], shops: [] },
+  freshwater: { spots: [], parks: [], ramps: [], piers: [], shops: [] }
 };
 
 function initAdminMap() {
@@ -3691,6 +3691,7 @@ window.setAdminMapMode = (mode) => {
       <option value="pier">🎣 Pier</option>
       <option value="ramp">🚤 Boat Ramp</option>
       <option value="harbour">🛥️ Harbour</option>
+      <option value="shop">🏠 Tackle Shop</option>
     `;
   } else {
     typeSelect.innerHTML = `
@@ -3698,6 +3699,7 @@ window.setAdminMapMode = (mode) => {
       <option value="park">🌲 Park</option>
       <option value="ramp">🚤 Boat Ramp</option>
       <option value="pier">🎣 Pier</option>
+      <option value="shop">🏠 Tackle Shop</option>
     `;
   }
 
@@ -3709,7 +3711,7 @@ function loadAdminLocations() {
 
   const typeIcons = {
     pier: '🎣', ramp: '🚤', harbour: '🛥️',
-    spot: '🐟', park: '🌲'
+    spot: '🐟', park: '🌲', shop: '🏠'
   };
 
   // Get source arrays based on mode
@@ -3721,7 +3723,8 @@ function loadAdminLocations() {
       ...HARBOURS.map(h => ({ ...h, type: 'harbour', source: 'static' })),
       ...(adminLocations.sea.piers || []).map(p => ({ ...p, type: 'pier', source: 'firebase' })),
       ...(adminLocations.sea.ramps || []).map(r => ({ ...r, type: 'ramp', source: 'firebase' })),
-      ...(adminLocations.sea.harbours || []).map(h => ({ ...h, type: 'harbour', source: 'firebase' }))
+      ...(adminLocations.sea.harbours || []).map(h => ({ ...h, type: 'harbour', source: 'firebase' })),
+      ...(adminLocations.sea.shops || []).map(s => ({ ...s, type: 'shop', source: 'firebase' }))
     ];
   } else {
     locations = [
@@ -3732,7 +3735,8 @@ function loadAdminLocations() {
       ...(adminLocations.freshwater.spots || []).map(s => ({ ...s, type: 'spot', source: 'firebase' })),
       ...(adminLocations.freshwater.parks || []).map(p => ({ ...p, type: 'park', source: 'firebase' })),
       ...(adminLocations.freshwater.ramps || []).map(r => ({ ...r, type: 'ramp', source: 'firebase' })),
-      ...(adminLocations.freshwater.piers || []).map(p => ({ ...p, type: 'pier', source: 'firebase' }))
+      ...(adminLocations.freshwater.piers || []).map(p => ({ ...p, type: 'pier', source: 'firebase' })),
+      ...(adminLocations.freshwater.shops || []).map(s => ({ ...s, type: 'shop', source: 'firebase' }))
     ];
   }
 
@@ -3814,6 +3818,7 @@ window.openLocationEditor = (location, lat, lon) => {
       <option value="pier">🎣 Pier</option>
       <option value="ramp">🚤 Boat Ramp</option>
       <option value="harbour">🛥️ Harbour</option>
+      <option value="shop">🏠 Tackle Shop</option>
     `;
   } else {
     typeSelect.innerHTML = `
@@ -3821,6 +3826,7 @@ window.openLocationEditor = (location, lat, lon) => {
       <option value="park">🌲 Park</option>
       <option value="ramp">🚤 Boat Ramp</option>
       <option value="pier">🎣 Pier</option>
+      <option value="shop">🏠 Tackle Shop</option>
     `;
   }
 
@@ -3934,6 +3940,7 @@ async function loadAdminLocationsFromFirebase() {
         adminLocations.sea.piers = Object.values(data.sea.piers || {});
         adminLocations.sea.ramps = Object.values(data.sea.ramps || {});
         adminLocations.sea.harbours = Object.values(data.sea.harbours || {});
+        adminLocations.sea.shops = Object.values(data.sea.shops || {});
       }
 
       // Freshwater locations
@@ -3942,6 +3949,7 @@ async function loadAdminLocationsFromFirebase() {
         adminLocations.freshwater.parks = Object.values(data.freshwater.parks || {});
         adminLocations.freshwater.ramps = Object.values(data.freshwater.ramps || {});
         adminLocations.freshwater.piers = Object.values(data.freshwater.piers || {});
+        adminLocations.freshwater.shops = Object.values(data.freshwater.shops || {});
       }
     }
 
