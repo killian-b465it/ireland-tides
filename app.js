@@ -907,9 +907,9 @@ function initMap() {
   HARBOURS.forEach(harbour => {
     const icon = L.divIcon({
       className: 'harbour-marker-wrapper',
-      html: `<div class="harbour-marker" title="${harbour.name}">⚓</div>`,
-      iconSize: [30, 30],
-      iconAnchor: [15, 15]
+      html: `<div class="harbour-marker" title="${harbour.name}">🛥️</div>`,
+      iconSize: [28, 28],
+      iconAnchor: [14, 14]
     });
     const marker = L.marker([harbour.lat, harbour.lon], { icon })
       .bindPopup(`
@@ -1058,9 +1058,9 @@ window.toggleMapFilter = (layerName) => {
 function addStationMarker(station) {
   const icon = L.divIcon({
     className: 'tide-marker-wrapper',
-    html: `<div class="tide-marker ${station.status === 'offline' ? 'offline' : ''}" data-station="${station.id}">🌊</div>`,
-    iconSize: [30, 30],
-    iconAnchor: [15, 15]
+    html: `<div class="tide-marker ${station.status === 'offline' ? 'offline' : ''}" data-station="${station.id}">⚓</div>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14]
   });
 
   const marker = L.marker([station.lat, station.lon], { icon })
@@ -2033,8 +2033,12 @@ function updateMapForFishingMode() {
   const seaFilterBtn = document.getElementById('filter-toggle-btn');
   const seaFilterSidebar = document.getElementById('filter-sidebar');
   const fwFilterSidebar = document.getElementById('freshwater-filter-sidebar');
+  const sidebar = document.querySelector('.sidebar');
 
   if (state.fishingMode === 'sea') {
+    // Show tidal stations sidebar
+    if (sidebar) sidebar.style.display = '';
+
     // Show sea fishing markers
     Object.values(state.markers).forEach(m => state.map.addLayer(m));
     if (state.shopMarkers) state.map.addLayer(state.shopMarkers);
@@ -2055,6 +2059,9 @@ function updateMapForFishingMode() {
     }
     if (fwFilterSidebar) fwFilterSidebar.style.display = 'none';
   } else {
+    // Hide tidal stations sidebar in freshwater mode
+    if (sidebar) sidebar.style.display = 'none';
+
     // Hide sea fishing markers (but keep shops visible)
     Object.values(state.markers).forEach(m => state.map.removeLayer(m));
     // Keep shopMarkers visible - they work in both modes!
