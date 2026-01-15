@@ -586,11 +586,12 @@ body.has-beta-banner .beta-banner {
 
 /* Map & Markers */
 .map-container {
-  height: 100%;
+  height: calc(100vh - 120px);
+  max-height: calc(100vh - 120px);
   border-radius: 20px;
   overflow: hidden;
   position: sticky;
-  top: 80px;
+  top: 95px;
   border: 1px solid var(--border-glass);
 }
 
