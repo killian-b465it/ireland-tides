@@ -189,14 +189,14 @@ const BOAT_RAMPS = [
 // Harbours Data (Major Harbours)
 // ============================================
 const HARBOURS = [
-  { name: 'Dublin Port', lat: 53.3478, lon: -6.2044 },
+  { name: 'Dublin Port', lat: 53.3490, lon: -6.2020 },
   { name: 'Cork Harbour', lat: 51.8503, lon: -8.2967 },
   { name: 'Galway Harbour', lat: 53.2707, lon: -9.0568 },
   { name: 'Waterford Harbour', lat: 52.2633, lon: -7.0911 },
   { name: 'Limerick Harbour', lat: 52.6639, lon: -8.6308 },
   { name: 'Drogheda Port', lat: 53.7189, lon: -6.3475 },
   { name: 'Rosslare Harbour', lat: 52.2536, lon: -6.3394 },
-  { name: 'Dun Laoghaire Harbour', lat: 53.2946, lon: -6.1349 },
+  { name: 'Dun Laoghaire Harbour', lat: 53.2960, lon: -6.1320 },
   { name: 'Howth Harbour', lat: 53.3905, lon: -6.0672 },
   { name: 'Killybegs Harbour', lat: 54.6347, lon: -8.4389 },
   { name: 'Greencastle Harbour', lat: 55.1997, lon: -6.9836 },
