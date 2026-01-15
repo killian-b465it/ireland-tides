@@ -2041,6 +2041,8 @@ function updateMapForFishingMode() {
     // Restore grid layout with sidebar
     const appContainer = document.querySelector('.app-container');
     if (appContainer) appContainer.style.gridTemplateColumns = '400px 1fr';
+    // Trigger map resize after grid change
+    setTimeout(() => state.map.invalidateSize(), 100);
 
     // Show sea fishing markers
     Object.values(state.markers).forEach(m => state.map.addLayer(m));
@@ -2067,6 +2069,8 @@ function updateMapForFishingMode() {
     // Make map full width when sidebar is hidden
     const appContainer = document.querySelector('.app-container');
     if (appContainer) appContainer.style.gridTemplateColumns = '1fr';
+    // Trigger map resize to fill new width
+    setTimeout(() => state.map.invalidateSize(), 100);
 
     // Hide sea fishing markers (but keep shops visible)
     Object.values(state.markers).forEach(m => state.map.removeLayer(m));

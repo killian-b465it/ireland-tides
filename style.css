@@ -3007,38 +3007,25 @@ input:checked+.toggle-slider:before {
 
 /* Pier & Boat Ramp Markers */
 .pier-marker-wrapper,
-.ramp-marker-wrapper {
+.ramp-marker-wrapper,
+.harbour-marker-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .pier-marker,
-.ramp-marker {
+.ramp-marker,
+.harbour-marker {
   font-size: 1.3rem;
-  background: var(--glass);
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid var(--accent-primary);
   cursor: pointer;
   transition: transform 0.2s ease;
 }
 
 .pier-marker:hover,
-.ramp-marker:hover {
+.ramp-marker:hover,
+.harbour-marker:hover {
   transform: scale(1.15);
-}
-
-.pier-marker {
-  border-color: #00ff88;
-}
-
-.ramp-marker {
-  border-color: #ffab00;
 }
 
 /* Harbour Markers */
