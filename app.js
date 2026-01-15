@@ -923,6 +923,73 @@ function initMap() {
       `);
     state.harbourMarkers.addLayer(marker);
   });
+
+  // Add tackle shops from static array and Firebase
+  loadShopsToMainMap();
+}
+
+// Load all shops (static + Firebase) to main map
+async function loadShopsToMainMap() {
+  if (!state.shopMarkers) return;
+  state.shopMarkers.clearLayers();
+
+  // Add static TACKLE_SHOPS
+  TACKLE_SHOPS.forEach(shop => {
+    const icon = L.divIcon({
+      className: 'shop-marker-wrapper',
+      html: '<div class="shop-marker">🏠</div>',
+      iconSize: [28, 28],
+      iconAnchor: [14, 14]
+    });
+    const marker = L.marker([shop.lat, shop.lng || shop.lon], { icon })
+      .bindPopup(`
+        <div class="popup-content">
+          <strong>${shop.name}</strong>
+          <span class="popup-type">Tackle Shop</span>
+          ${shop.address ? `<p style="font-size:0.8rem;margin:4px 0">${shop.address}</p>` : ''}
+          ${shop.phone ? `<a href="tel:${shop.phone}" style="font-size:0.8rem">📞 ${shop.phone}</a>` : ''}
+          <button class="popup-directions-btn" onclick="getDirections(${shop.lat}, ${shop.lng || shop.lon})">📍 Get Directions</button>
+        </div>
+      `);
+    state.shopMarkers.addLayer(marker);
+  });
+
+  // Load admin-added shops from Firebase
+  try {
+    const snapshot = await firebase.database().ref('locations').once('value');
+    const data = snapshot.val();
+    if (data) {
+      // Sea shops
+      if (data.sea && data.sea.shops) {
+        Object.values(data.sea.shops).forEach(shop => addFirebaseShopMarker(shop));
+      }
+      // Freshwater shops
+      if (data.freshwater && data.freshwater.shops) {
+        Object.values(data.freshwater.shops).forEach(shop => addFirebaseShopMarker(shop));
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to load admin shops:', err);
+  }
+}
+
+function addFirebaseShopMarker(shop) {
+  const icon = L.divIcon({
+    className: 'shop-marker-wrapper',
+    html: '<div class="shop-marker">🏠</div>',
+    iconSize: [28, 28],
+    iconAnchor: [14, 14]
+  });
+  const marker = L.marker([shop.lat, shop.lon], { icon })
+    .bindPopup(`
+      <div class="popup-content">
+        <strong>${shop.name}</strong>
+        <span class="popup-type">Tackle Shop</span>
+        ${shop.description ? `<p style="font-size:0.8rem;margin:4px 0">${shop.description}</p>` : ''}
+        <button class="popup-directions-btn" onclick="getDirections(${shop.lat}, ${shop.lon})">📍 Get Directions</button>
+      </div>
+    `);
+  state.shopMarkers.addLayer(marker);
 }
 
 // Open Google Maps with directions to coordinates
@@ -3721,6 +3788,7 @@ function loadAdminLocations() {
       ...PIERS.map(p => ({ ...p, type: 'pier', source: 'static' })),
       ...BOAT_RAMPS.map(r => ({ ...r, type: 'ramp', source: 'static' })),
       ...HARBOURS.map(h => ({ ...h, type: 'harbour', source: 'static' })),
+      ...TACKLE_SHOPS.map(s => ({ ...s, type: 'shop', source: 'static' })),
       ...(adminLocations.sea.piers || []).map(p => ({ ...p, type: 'pier', source: 'firebase' })),
       ...(adminLocations.sea.ramps || []).map(r => ({ ...r, type: 'ramp', source: 'firebase' })),
       ...(adminLocations.sea.harbours || []).map(h => ({ ...h, type: 'harbour', source: 'firebase' })),
