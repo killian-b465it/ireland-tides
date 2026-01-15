@@ -216,11 +216,11 @@ const HARBOURS = [
   { name: 'Kinsale Harbour', lat: 51.7075, lon: -8.5195 },   // Offset from pier/slipway/station
   { name: 'Union Hall Harbour', lat: 51.5425, lon: -9.1360 }, // Offset from pier/station
   // West Coast additions
-  { name: 'Westport Harbour', lat: 53.8005, lon: -9.5220 },  // Offset from pier
+  { name: 'Westport Harbour', lat: 53.7995, lon: -9.5195 },  // Offset from pier/station
   { name: 'Sligo Harbour', lat: 54.2715, lon: -8.4720 },     // Offset from station
   { name: 'Roundstone Harbour', lat: 53.4015, lon: -9.9210 }, // Offset from pier
   // Northern Ireland
-  { name: 'Belfast Harbour', lat: 54.6097, lon: -5.9289 },
+  { name: 'Belfast Harbour', lat: 54.6110, lon: -5.9250 },   // Offset from station
   { name: 'Bangor Marina', lat: 54.6640, lon: -5.6675 },     // Offset from pier/slipway
   { name: 'Larne Harbour', lat: 54.8550, lon: -5.8100 },     // Offset from station
   { name: 'Portrush Harbour', lat: 55.2080, lon: -6.6530 },  // Offset from pier/station
@@ -3536,8 +3536,8 @@ window.openSupportModal = () => {
 
 const TACKLE_SHOPS = [
   // Dublin - Verified coordinates
-  { name: "Rory's Fishing Tackle", county: "Dublin", address: "17A Temple Bar, Dublin 2", phone: "01 677 2351", website: "https://www.rorys.ie", lat: 53.3457, lng: -6.2626, rating: 4.8 },
-  { name: "Southside Angling", county: "Dublin", address: "Unit D, South Gate, Cork Street, Dublin 8", phone: "01 455 9049", website: "https://www.southsideangling.ie", lat: 53.3384, lng: -6.2795, rating: 4.6 },
+  { name: "Rory's Fishing Tackle", county: "Dublin", address: "17A Temple Bar, Dublin 2", phone: "01 677 2351", website: "https://www.rorys.ie", lat: 53.345697, lng: -6.2625518, rating: 4.8 },
+  { name: "Southside Angling", county: "Dublin", address: "Unit D, South Gate, Cork Street, Dublin 8", phone: "01 455 9049", website: "https://www.southsideangling.ie", lat: 53.3384303, lng: -6.279546, rating: 4.6 },
   { name: "The Angling Centre", county: "Dublin", address: "Unit 1, Swords Business Park, Swords", phone: "01 813 4455", website: "", lat: 53.4610, lng: -6.2180, rating: 4.5 },
 
   // Cork - Verified
@@ -3545,9 +3545,9 @@ const TACKLE_SHOPS = [
   { name: "The Tackle Shop Cork", county: "Cork", address: "4 Drawbridge St, Cork City", phone: "021 427 2842", website: "", lat: 51.8968, lng: -8.4730, rating: 4.5 },
   { name: "West Cork Angling", county: "Cork", address: "Main St, Bantry", phone: "027 50328", website: "", lat: 51.6805, lng: -9.4530, rating: 4.4 },
 
-  // Galway - Verified (Mainguard St coords)
-  { name: "Duffy's Fishing", county: "Galway", address: "5 Mainguard St, Galway City", phone: "091 562 367", website: "https://www.duffysfishing.ie", lat: 53.2720, lng: -9.0540, rating: 4.9 },
-  { name: "Freeney's Angling", county: "Galway", address: "19 High St, Galway", phone: "091 568 794", website: "", lat: 53.2735, lng: -9.0525, rating: 4.6 },
+  // Galway - Verified (Mainguard St & High St)
+  { name: "Duffy's Fishing", county: "Galway", address: "5 Mainguard St, Galway City", phone: "091 562 367", website: "https://www.duffysfishing.ie", lat: 53.2720737, lng: -9.0539299, rating: 4.9 },
+  { name: "Freeney's Angling", county: "Galway", address: "19 High St, Galway", phone: "091 568 794", website: "", lat: 53.2718802, lng: -9.0533498, rating: 4.6 },
 
   // Kerry
   { name: "O'Neill's Fishing Tackle", county: "Kerry", address: "6 Plunkett St, Killarney", phone: "064 663 1970", website: "https://www.killarneyfishing.com", lat: 52.0599, lng: -9.5044, rating: 4.7 },
@@ -3563,8 +3563,8 @@ const TACKLE_SHOPS = [
 
   // Wicklow - Verified locations
   { name: "Rod and Tackle", county: "Wicklow", address: "Wicklow Enterprise Centre, The Murrough, Wicklow", phone: "0404 61444", website: "", lat: 52.9750, lng: -6.0495, rating: 4.5 },
-  { name: "Wild Ireland Outdoors", county: "Wicklow", address: "1 Upper Main Street, Arklow", phone: "087 068 9268", website: "", lat: 52.7969, lng: -6.1605, rating: 4.7 },
-  { name: "Powersound Fishing", county: "Wicklow", address: "12a Main Street, Arklow", phone: "0402 32847", website: "", lat: 52.7936, lng: -6.1582, rating: 4.5 },
+  { name: "Wild Ireland Outdoors", county: "Wicklow", address: "1 Upper Main Street, Arklow", phone: "087 068 9268", website: "", lat: 52.7976593, lng: -6.1590175, rating: 4.7 },
+  { name: "Powersound Fishing", county: "Wicklow", address: "12a Main Street, Arklow", phone: "0402 32847", website: "", lat: 52.7981434, lng: -6.1557531, rating: 4.5 },
 
   // Wexford
   { name: "Wexford Tackle Shop", county: "Wexford", address: "Crescent Quay, Wexford", phone: "053 912 3055", website: "", lat: 52.3365, lng: -6.4625, rating: 4.4 },
@@ -3579,7 +3579,7 @@ const TACKLE_SHOPS = [
   { name: "Steve's Fishing Tackle", county: "Limerick", address: "23 William St, Limerick City", phone: "061 415 484", website: "", lat: 52.6642, lng: -8.6295, rating: 4.6 },
 
   // Sligo - Verified Hyde Bridge coords
-  { name: "Barton Smith Tackle", county: "Sligo", address: "Hyde Bridge, Sligo", phone: "071 914 2356", website: "https://www.bartonsmith.ie", lat: 54.2723, lng: -8.4744, rating: 4.7 },
+  { name: "Barton Smith Tackle", county: "Sligo", address: "Hyde Bridge, Sligo", phone: "071 914 2356", website: "https://www.bartonsmith.ie", lat: 54.272258, lng: -8.4740566, rating: 4.7 },
 
   // Louth
   { name: "Drogheda Angling Centre", county: "Louth", address: "West St, Drogheda", phone: "041 983 6978", website: "", lat: 53.7180, lng: -6.3495, rating: 4.5 },
@@ -3589,11 +3589,11 @@ const TACKLE_SHOPS = [
 
   // Northern Ireland - Verified/Updated
   { name: "Belfast Angling Centre", county: "Antrim", address: "49 Northumberland St, Belfast", phone: "028 9024 5678", website: "", lat: 54.6005, lng: -5.9455, rating: 4.7 },
-  { name: "McKees Angling Centre", county: "Down", address: "16 Balloo Avenue, Bangor", phone: "028 9127 1234", website: "", lat: 54.6475, lng: -5.6750, rating: 4.6 },
+  { name: "McKees Angling Centre", county: "Down", address: "16 Balloo Avenue, Bangor", phone: "028 9127 1234", website: "", lat: 54.6412827, lng: -5.670344, rating: 4.6 },
   { name: "Newtownards Tackle", county: "Down", address: "Frances St, Newtownards", phone: "028 9181 2345", website: "", lat: 54.5940, lng: -5.6920, rating: 4.5 },
   { name: "Lisburn Angling Supplies", county: "Antrim", address: "Bow St, Lisburn", phone: "028 9266 3456", website: "", lat: 54.5095, lng: -6.0375, rating: 4.5 },
   { name: "Ballymena Tackle Shop", county: "Antrim", address: "Church St, Ballymena", phone: "028 2565 4567", website: "", lat: 54.8642, lng: -6.2765, rating: 4.4 },
-  { name: "Flying Tackle Portrush", county: "Antrim", address: "74 Main St, Portrush", phone: "028 7082 3601", website: "", lat: 55.2016, lng: -6.6560, rating: 4.8 },
+  { name: "Flying Tackle Portrush", county: "Antrim", address: "74 Main St, Portrush", phone: "028 7082 3601", website: "", lat: 55.2074164, lng: -6.6538849, rating: 4.8 },
   { name: "Newry Angling Centre", county: "Down", address: "Hill St, Newry", phone: "028 3026 6789", website: "", lat: 54.1750, lng: -6.3392, rating: 4.5 }
 ];
 
