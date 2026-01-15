@@ -2038,6 +2038,9 @@ function updateMapForFishingMode() {
   if (state.fishingMode === 'sea') {
     // Show tidal stations sidebar
     if (sidebar) sidebar.style.display = '';
+    // Restore grid layout with sidebar
+    const appContainer = document.querySelector('.app-container');
+    if (appContainer) appContainer.style.gridTemplateColumns = '400px 1fr';
 
     // Show sea fishing markers
     Object.values(state.markers).forEach(m => state.map.addLayer(m));
@@ -2061,6 +2064,9 @@ function updateMapForFishingMode() {
   } else {
     // Hide tidal stations sidebar in freshwater mode
     if (sidebar) sidebar.style.display = 'none';
+    // Make map full width when sidebar is hidden
+    const appContainer = document.querySelector('.app-container');
+    if (appContainer) appContainer.style.gridTemplateColumns = '1fr';
 
     // Hide sea fishing markers (but keep shops visible)
     Object.values(state.markers).forEach(m => state.map.removeLayer(m));
