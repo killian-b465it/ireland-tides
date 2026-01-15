@@ -603,6 +603,17 @@ body.has-beta-banner .beta-banner {
   border-radius: 20px;
 }
 
+/* Fix Leaflet map tile gaps/lines */
+.leaflet-tile-container img {
+  width: 256.5px !important;
+  height: 256.5px !important;
+}
+
+.leaflet-container img {
+  max-width: none !important;
+  max-height: none !important;
+}
+
 .tide-marker {
   font-size: 20px;
   text-shadow: 0 2px 10px rgba(0, 212, 255, 0.5);
