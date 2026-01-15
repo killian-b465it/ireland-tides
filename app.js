@@ -3748,7 +3748,7 @@ function loadAdminLocations() {
     const marker = L.marker([loc.lat, loc.lon], { icon })
       .bindPopup(`<strong>${loc.name}</strong><br><em>${loc.type}</em>`)
       .on('click', () => {
-        if (!addLocationMode && loc.source === 'firebase') {
+        if (!addLocationMode) {
           openLocationEditor(loc);
         }
       });
@@ -3771,14 +3771,12 @@ function renderAdminLocationList(locations) {
         <span>${typeIcons[loc.type] || '📍'}</span>
         <div>
           <div class="location-name">${loc.name}</div>
-          <div class="location-type">${loc.type} ${loc.source === 'firebase' ? '(custom)' : ''}</div>
+          <div class="location-type">${loc.type} ${loc.source === 'firebase' ? '(custom)' : '(built-in)'}</div>
         </div>
       </div>
-      ${loc.source === 'firebase' ? `
-        <div class="location-actions">
-          <button class="action-btn" onclick="event.stopPropagation(); openLocationEditor(${JSON.stringify(loc).replace(/"/g, '&quot;')})">✏️</button>
-        </div>
-      ` : ''}
+      <div class="location-actions">
+        <button class="action-btn" onclick="event.stopPropagation(); openLocationEditor(${JSON.stringify(loc).replace(/"/g, '&quot;')})">✏️</button>
+      </div>
     </div>
   `).join('');
 }
@@ -3808,6 +3806,23 @@ window.openLocationEditor = (location, lat, lon) => {
   const modal = document.getElementById('location-editor-modal');
   const title = document.getElementById('location-editor-title');
   const deleteBtn = document.getElementById('delete-location-btn');
+  const typeSelect = document.getElementById('location-type-edit');
+
+  // Set type options based on current mode
+  if (adminMapMode === 'sea') {
+    typeSelect.innerHTML = `
+      <option value="pier">🎣 Pier</option>
+      <option value="ramp">🚤 Boat Ramp</option>
+      <option value="harbour">🛥️ Harbour</option>
+    `;
+  } else {
+    typeSelect.innerHTML = `
+      <option value="spot">🐟 Fishing Spot</option>
+      <option value="park">🌲 Park</option>
+      <option value="ramp">🚤 Boat Ramp</option>
+      <option value="pier">🎣 Pier</option>
+    `;
+  }
 
   if (location) {
     title.textContent = 'Edit Location';
@@ -3816,7 +3831,7 @@ window.openLocationEditor = (location, lat, lon) => {
     document.getElementById('location-name').value = location.name || '';
     document.getElementById('location-lat').value = location.lat || '';
     document.getElementById('location-lon').value = location.lon || '';
-    document.getElementById('location-type-edit').value = location.type || 'pier';
+    typeSelect.value = location.type || 'pier';
     document.getElementById('location-description').value = location.description || '';
   } else {
     title.textContent = 'Add Location';
@@ -3825,7 +3840,7 @@ window.openLocationEditor = (location, lat, lon) => {
     document.getElementById('location-name').value = '';
     document.getElementById('location-lat').value = lat || '';
     document.getElementById('location-lon').value = lon || '';
-    document.getElementById('location-type-edit').value = document.getElementById('admin-location-type').value;
+    typeSelect.value = document.getElementById('admin-location-type').value;
     document.getElementById('location-description').value = '';
   }
 
@@ -3841,8 +3856,12 @@ window.closeLocationEditor = () => {
 window.saveLocation = async (event) => {
   event.preventDefault();
 
+  // Generate new ID if editing a built-in location (which has no ID) or if no ID exists
+  const existingId = document.getElementById('location-id').value;
+  const isNewOrBuiltIn = !existingId || (editingLocation && editingLocation.source === 'static');
+
   const locationData = {
-    id: document.getElementById('location-id').value || `loc_${Date.now()}`,
+    id: isNewOrBuiltIn ? `loc_${Date.now()}` : existingId,
     name: document.getElementById('location-name').value,
     lat: parseFloat(document.getElementById('location-lat').value),
     lon: parseFloat(document.getElementById('location-lon').value),
@@ -3850,7 +3869,8 @@ window.saveLocation = async (event) => {
     mode: document.getElementById('location-mode').value,
     description: document.getElementById('location-description').value,
     addedBy: state.user?.email || 'admin',
-    addedAt: new Date().toISOString()
+    addedAt: new Date().toISOString(),
+    originalName: editingLocation?.source === 'static' ? editingLocation.name : null
   };
 
   try {
