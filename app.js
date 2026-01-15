@@ -3563,7 +3563,8 @@ const TACKLE_SHOPS = [
 
   // Wicklow
   { name: "Wicklow Bait & Tackle", county: "Wicklow", address: "The Harbour, Wicklow Town", phone: "0404 61444", website: "", lat: 52.9808, lng: -6.0332, rating: 4.5 },
-  { name: "Arklow Marine & Angling", county: "Wicklow", address: "South Quay, Arklow", phone: "0402 32125", website: "", lat: 52.7960, lng: -6.1472, rating: 4.6 },
+  { name: "Wild Ireland Outdoors", county: "Wicklow", address: "Main St, Arklow", phone: "0402 39828", website: "", lat: 52.7972, lng: -6.1558, rating: 4.7 },
+  { name: "Powersound Fishing", county: "Wicklow", address: "Wexford Rd, Arklow", phone: "0402 32847", website: "", lat: 52.7935, lng: -6.1489, rating: 4.5 },
 
   // Wexford
   { name: "Wexford Tackle Shop", county: "Wexford", address: "Crescent Quay, Wexford", phone: "053 912 3055", website: "", lat: 52.3369, lng: -6.4633, rating: 4.4 },
