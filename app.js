@@ -961,11 +961,15 @@ async function loadShopsToMainMap() {
     if (data) {
       // Sea shops
       if (data.sea && data.sea.shops) {
-        Object.values(data.sea.shops).forEach(shop => addFirebaseShopMarker(shop));
+        Object.values(data.sea.shops).forEach(shop => {
+          if (shop.id) addFirebaseShopMarker(shop);
+        });
       }
       // Freshwater shops
       if (data.freshwater && data.freshwater.shops) {
-        Object.values(data.freshwater.shops).forEach(shop => addFirebaseShopMarker(shop));
+        Object.values(data.freshwater.shops).forEach(shop => {
+          if (shop.id) addFirebaseShopMarker(shop);
+        });
       }
     }
   } catch (err) {
@@ -3597,15 +3601,54 @@ const TACKLE_SHOPS = [
   { name: "Newry Angling Centre", county: "Down", address: "Hill St, Newry", phone: "028 3026 6789", website: "", lat: 54.1750, lng: -6.3392, rating: 4.5 }
 ];
 
-function loadNationalDirectory() {
+async function loadNationalDirectory() {
   const container = document.getElementById('county-directory');
   if (!container) return;
 
+  // Clear current list and show loading
+  container.innerHTML = `
+    <div class="loading">
+      <div class="loading-spinner"></div>
+      <span>Updating directory with latest data...</span>
+    </div>
+  `;
+
+  let combinedShops = [...TACKLE_SHOPS];
+
+  // Try to load extra shops from Firebase
+  try {
+    const snapshot = await firebase.database().ref('locations').once('value');
+    const data = snapshot.val();
+    if (data) {
+      const firebaseShops = [];
+      if (data.sea && data.sea.shops) firebaseShops.push(...Object.values(data.sea.shops));
+      if (data.freshwater && data.freshwater.shops) firebaseShops.push(...Object.values(data.freshwater.shops));
+
+      firebaseShops.forEach(fbShop => {
+        // Find if this is an edit of a static shop (match by name and county)
+        const existingIdx = combinedShops.findIndex(s =>
+          s.name === fbShop.name && s.county === fbShop.county
+        );
+
+        if (existingIdx !== -1) {
+          // Replace with edited version
+          combinedShops[existingIdx] = { ...combinedShops[existingIdx], ...fbShop };
+        } else {
+          // Add as new shop
+          combinedShops.push(fbShop);
+        }
+      });
+    }
+  } catch (err) {
+    console.warn('Directory: Failed to load Firebase shops:', err);
+  }
+
   // Group shops by county
   const byCounty = {};
-  TACKLE_SHOPS.forEach(shop => {
-    if (!byCounty[shop.county]) byCounty[shop.county] = [];
-    byCounty[shop.county].push(shop);
+  combinedShops.forEach(shop => {
+    const county = shop.county || 'Other';
+    if (!byCounty[county]) byCounty[county] = [];
+    byCounty[county].push(shop);
   });
 
   // Sort counties alphabetically
@@ -3625,14 +3668,17 @@ function loadNationalDirectory() {
     `;
 
     shops.forEach(shop => {
-      const stars = '⭐'.repeat(Math.round(shop.rating));
+      const rating = shop.rating || 4.5;
+      const stars = '⭐'.repeat(Math.round(rating));
+      const lat = shop.lat;
+      const lng = shop.lng || shop.lon;
       html += `
-        <div class="shop-item" onclick="showShopOnMap(${shop.lat}, ${shop.lng}, '${shop.name.replace(/'/g, "\\'")}')">
+        <div class="shop-item" onclick="showShopOnMap(${lat}, ${lng}, '${shop.name.replace(/'/g, "\\'")}')">
           <div class="shop-name">${shop.name}</div>
-          <div class="shop-address">${shop.address}</div>
+          <div class="shop-address">${shop.address || 'Address on map'}</div>
           <div class="shop-meta">
-            <span class="shop-rating">${shop.rating} ${stars}</span>
-            <a href="tel:${shop.phone}" class="shop-phone" onclick="event.stopPropagation()">📞 ${shop.phone}</a>
+            <span class="shop-rating">${rating} ${stars}</span>
+            ${shop.phone ? `<a href="tel:${shop.phone}" class="shop-phone" onclick="event.stopPropagation()">📞 ${shop.phone}</a>` : ''}
           </div>
           ${shop.website ? `<a href="${shop.website}" target="_blank" class="shop-website" onclick="event.stopPropagation()">🌐 Visit Website</a>` : ''}
         </div>
@@ -3645,21 +3691,22 @@ function loadNationalDirectory() {
   html += '</div>';
 
   // Add summary stats
-  const totalShops = TACKLE_SHOPS.length;
+  const totalShops = combinedShops.length;
   const counties = sortedCounties.length;
+  const avgRating = (combinedShops.reduce((acc, s) => acc + (s.rating || 4.5), 0) / totalShops).toFixed(1);
 
   html = `
     <div class="directory-stats">
       <div class="stat-item">
         <span class="stat-value">${totalShops}</span>
-        <span class="stat-label">Tackle Shops</span>
+        <span class="stat-label">Total Shops</span>
       </div>
       <div class="stat-item">
         <span class="stat-value">${counties}</span>
         <span class="stat-label">Counties</span>
       </div>
       <div class="stat-item">
-        <span class="stat-value">⭐ ${(TACKLE_SHOPS.reduce((acc, s) => acc + s.rating, 0) / totalShops).toFixed(1)}</span>
+        <span class="stat-value">⭐ ${avgRating}</span>
         <span class="stat-label">Avg Rating</span>
       </div>
     </div>

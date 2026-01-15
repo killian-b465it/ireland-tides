@@ -1,0 +1,23 @@
+{
+  "rules": {
+    "locations": {
+      ".read": true,
+      ".write": "auth != null && (auth.token.email == 'admin@irishtides.ie' || auth.token.email == 'support@irishtides.ie' || auth.token.email == 'killian@email.com')"
+    },
+    "users": {
+        ".read": "auth != null",
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid"
+      }
+    },
+    "catches": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "system": {
+      ".read": true,
+      ".write": "auth != null && (auth.token.email == 'admin@irishtides.ie' || auth.token.email == 'support@irishtides.ie')"
+    }
+  }
+}
