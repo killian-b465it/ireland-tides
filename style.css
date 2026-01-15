@@ -603,13 +603,8 @@ body.has-beta-banner .beta-banner {
   border-radius: 20px;
 }
 
-/* Fix Leaflet map tile gaps/lines */
-.leaflet-tile-container img {
-  width: 256.5px !important;
-  height: 256.5px !important;
-}
-
-.leaflet-container img {
+/* Prevent Leaflet map tile gaps */
+.leaflet-container img.leaflet-tile {
   max-width: none !important;
   max-height: none !important;
 }
