@@ -3810,6 +3810,9 @@ function loadAdminLocations() {
 
   // Add markers
   locations.forEach(loc => {
+    const longitude = loc.lon || loc.lng; // Handle both lon and lng
+    if (!loc.lat || !longitude) return; // Skip if missing coordinates
+
     const icon = L.divIcon({
       className: 'admin-marker',
       html: `<div class="admin-marker-icon" data-source="${loc.source}">${typeIcons[loc.type] || '📍'}</div>`,
@@ -3817,11 +3820,11 @@ function loadAdminLocations() {
       iconAnchor: [14, 14]
     });
 
-    const marker = L.marker([loc.lat, loc.lon], { icon })
+    const marker = L.marker([loc.lat, longitude], { icon })
       .bindPopup(`<strong>${loc.name}</strong><br><em>${loc.type}</em>`)
       .on('click', () => {
         if (!addLocationMode) {
-          openLocationEditor(loc);
+          openLocationEditor({ ...loc, lon: longitude }); // Normalize to lon
         }
       });
 
@@ -3835,10 +3838,13 @@ function loadAdminLocations() {
 
 function renderAdminLocationList(locations) {
   const container = document.getElementById('admin-location-list');
-  const typeIcons = { pier: '🎣', ramp: '🚤', harbour: '🛥️', spot: '🐟', park: '🌲' };
+  const typeIcons = { pier: '🎣', ramp: '🚤', harbour: '🛥️', spot: '🐟', park: '🌲', shop: '🏠' };
 
-  container.innerHTML = locations.map(loc => `
-    <div class="location-list-item" onclick="flyToLocation(${loc.lat}, ${loc.lon})">
+  container.innerHTML = locations.map(loc => {
+    const longitude = loc.lon || loc.lng;
+    const normalizedLoc = { ...loc, lon: longitude };
+    return `
+    <div class="location-list-item" onclick="flyToLocation(${loc.lat}, ${longitude})">
       <div class="location-info">
         <span>${typeIcons[loc.type] || '📍'}</span>
         <div>
@@ -3847,10 +3853,11 @@ function renderAdminLocationList(locations) {
         </div>
       </div>
       <div class="location-actions">
-        <button class="action-btn" onclick="event.stopPropagation(); openLocationEditor(${JSON.stringify(loc).replace(/"/g, '&quot;')})">✏️</button>
+        <button class="action-btn" onclick="event.stopPropagation(); openLocationEditor(${JSON.stringify(normalizedLoc).replace(/"/g, '&quot;')})">✏️</button>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
 window.flyToLocation = (lat, lon) => {
@@ -3883,19 +3890,19 @@ window.openLocationEditor = (location, lat, lon) => {
   // Set type options based on current mode
   if (adminMapMode === 'sea') {
     typeSelect.innerHTML = `
-      <option value="pier">🎣 Pier</option>
+    < option value = "pier" >🎣 Pier</option >
       <option value="ramp">🚤 Boat Ramp</option>
       <option value="harbour">🛥️ Harbour</option>
       <option value="shop">🏠 Tackle Shop</option>
-    `;
+  `;
   } else {
     typeSelect.innerHTML = `
-      <option value="spot">🐟 Fishing Spot</option>
+    < option value = "spot" >🐟 Fishing Spot</option >
       <option value="park">🌲 Park</option>
       <option value="ramp">🚤 Boat Ramp</option>
       <option value="pier">🎣 Pier</option>
       <option value="shop">🏠 Tackle Shop</option>
-    `;
+  `;
   }
 
   if (location) {
@@ -3935,7 +3942,7 @@ window.saveLocation = async (event) => {
   const isNewOrBuiltIn = !existingId || (editingLocation && editingLocation.source === 'static');
 
   const locationData = {
-    id: isNewOrBuiltIn ? `loc_${Date.now()}` : existingId,
+    id: isNewOrBuiltIn ? `loc_${Date.now()} ` : existingId,
     name: document.getElementById('location-name').value,
     lat: parseFloat(document.getElementById('location-lat').value),
     lon: parseFloat(document.getElementById('location-lon').value),
@@ -3949,7 +3956,7 @@ window.saveLocation = async (event) => {
 
   try {
     // Save to Firebase
-    const path = `locations/${locationData.mode}/${locationData.type}s/${locationData.id}`;
+    const path = `locations / ${locationData.mode} /${locationData.type}s/${locationData.id} `;
     await firebase.database().ref(path).set(locationData);
 
     // Update local state
@@ -3977,10 +3984,10 @@ window.saveLocation = async (event) => {
 window.deleteLocation = async () => {
   if (!editingLocation || !editingLocation.id) return;
 
-  if (!confirm(`Are you sure you want to delete "${editingLocation.name}"?`)) return;
+  if (!confirm(`Are you sure you want to delete "${editingLocation.name}" ? `)) return;
 
   try {
-    const path = `locations/${editingLocation.mode || adminMapMode}/${editingLocation.type}s/${editingLocation.id}`;
+    const path = `locations / ${editingLocation.mode || adminMapMode} /${editingLocation.type}s/${editingLocation.id} `;
     await firebase.database().ref(path).remove();
 
     // Remove from local state
