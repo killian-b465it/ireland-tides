@@ -755,6 +755,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(updateClock, 1000);
   initMap();
   loadStationList();
+  fetchAllLiveStationData(); // Sync sidebar with live API data on load
   startAutoUpdate();
 
   // Auto-grant Pro status during beta (free for all users)
@@ -1225,6 +1226,7 @@ window.toggleRegion = (header) => {
 
 function updateAllStationLevels() {
   const now = new Date();
+  // Update non-live stations with calculated values
   CONFIG.stations.forEach(station => {
     const levelEl = document.getElementById(`level-${station.id}`);
     if (levelEl && !state.tideData[station.id]) {
@@ -1233,6 +1235,51 @@ function updateAllStationLevels() {
       levelEl.textContent = `${level.toFixed(1)}m ${arrow}`;
     }
   });
+}
+
+// Fetch real tide data for all live stations and sync sidebar
+async function fetchAllLiveStationData() {
+  try {
+    const now = new Date();
+    const past24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const url = `${CONFIG.apiBase}.json?station_id,time,Water_Level_LAT&time>=${past24h.toISOString()}&orderBy("time")`;
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('API request failed');
+    const data = await response.json();
+
+    // Group data by station
+    const stationDataMap = {};
+    data.table.rows.forEach(row => {
+      const stationId = row[0];
+      if (!stationDataMap[stationId]) stationDataMap[stationId] = [];
+      stationDataMap[stationId].push(row);
+    });
+
+    // Update sidebar for live stations
+    CONFIG.stations.forEach(station => {
+      const sidebarLevel = document.getElementById(`level-${station.id}`);
+      if (!sidebarLevel) return;
+
+      const stationData = stationDataMap[station.id];
+      if (stationData && stationData.length > 0) {
+        const latest = stationData[stationData.length - 1];
+        const level = latest[2];
+        let dir = 'stable';
+        if (stationData.length >= 2) {
+          const prev = stationData[stationData.length - 2][2];
+          dir = level > prev ? 'rising' : level < prev ? 'falling' : 'stable';
+        }
+        const icon = dir === 'rising' ? '↑' : dir === 'falling' ? '↓' : '';
+        sidebarLevel.innerHTML = `${level.toFixed(1)}m ${icon}`;
+        state.tideData[station.id] = stationData;
+      }
+    });
+
+    console.log('All live station data synced to sidebar');
+  } catch (err) {
+    console.warn('Failed to fetch all station data:', err);
+  }
 }
 
 function updateLocationInfo(station) {
