@@ -856,17 +856,18 @@ function initMap() {
     maxZoom: 19
   }).addTo(state.map);
 
-  // Create layer groups
-  state.shopMarkers = L.layerGroup().addTo(state.map);
-  state.pierMarkers = L.layerGroup().addTo(state.map);
-  state.rampMarkers = L.layerGroup().addTo(state.map);
+  // Create layer groups (but don't add to map yet - map starts empty)
+  state.shopMarkers = L.layerGroup();
+  state.pierMarkers = L.layerGroup();
+  state.rampMarkers = L.layerGroup();
+  state.harbourMarkers = L.layerGroup();
 
-  // Add station markers
+  // Prepare station markers (but don't add to map yet)
   CONFIG.stations.forEach(station => {
     addStationMarker(station);
   });
 
-  // Add pier markers
+  // Prepare pier markers
   PIERS.forEach(pier => {
     const icon = L.divIcon({
       className: 'pier-marker-wrapper',
@@ -885,7 +886,7 @@ function initMap() {
     state.pierMarkers.addLayer(marker);
   });
 
-  // Add boat ramp markers
+  // Prepare boat ramp markers
   BOAT_RAMPS.forEach(ramp => {
     const icon = L.divIcon({
       className: 'ramp-marker-wrapper',
@@ -904,8 +905,7 @@ function initMap() {
     state.rampMarkers.addLayer(marker);
   });
 
-  // Add harbour markers
-  state.harbourMarkers = L.layerGroup().addTo(state.map);
+  // Prepare harbour markers
   HARBOURS.forEach(harbour => {
     const icon = L.divIcon({
       className: 'harbour-marker-wrapper',
@@ -924,8 +924,11 @@ function initMap() {
     state.harbourMarkers.addLayer(marker);
   });
 
-  // Add tackle shops from static array and Firebase
+  // Prepare tackle shops from static array and Firebase (but don't add to map yet)
   loadShopsToMainMap();
+
+  // Log that map is ready but empty
+  console.log('Map loaded. Apply filters to show locations.');
 }
 
 // Load all shops (static + Firebase) to main map
@@ -1077,6 +1080,35 @@ window.applyFilters = () => {
   closeFilterPanel();
 };
 
+// Toggle Station List (Collapsible)
+window.toggleStationList = () => {
+  const list = document.getElementById('station-list');
+  const icon = document.getElementById('station-collapse-icon');
+
+  if (list && icon) {
+    if (list.classList.contains('collapsed')) {
+      list.classList.remove('collapsed');
+      icon.textContent = '▲';
+    } else {
+      list.classList.add('collapsed');
+      icon.textContent = '▼';
+    }
+  }
+};
+
+// Toggle Region Areas (East Coast, North West, etc.)
+window.toggleRegion = (headerElement) => {
+  const regionContent = headerElement.nextElementSibling;
+
+  if (regionContent && regionContent.classList.contains('region-content')) {
+    // Toggle collapsed class
+    regionContent.classList.toggle('collapsed');
+
+    // Toggle expanded class on header for chevron rotation
+    headerElement.classList.toggle('expanded');
+  }
+};
+
 // Toggle map filter layers
 window.toggleMapFilter = (layerName) => {
   const btn = document.querySelector(`.filter-btn[data-layer="${layerName}"]`);
@@ -1137,7 +1169,6 @@ function addStationMarker(station) {
   });
 
   const marker = L.marker([station.lat, station.lon], { icon })
-    .addTo(state.map)
     .on('click', () => selectStation(station));
 
   state.markers[station.id] = marker;
@@ -1258,7 +1289,7 @@ function loadStationList() {
   container.innerHTML = regions.map(region => {
     const stations = stationsByRegion[region].sort((a, b) => a.name.localeCompare(b.name));
     return `
-      <div class="region-group">
+      <div class="region-group collapsed">
         <div class="region-header" onclick="toggleRegion(this)">
           <span class="region-title">${region}</span>
           <span class="region-chevron">▼</span>

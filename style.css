@@ -3321,3 +3321,133 @@ input:checked+.toggle-slider:before {
   white-space: nowrap;
   flex-shrink: 0;
 }
+
+/* ============================================
+   Inline Filter Button (next to toggle)
+   ============================================ */
+.filter-toggle-btn-inline {
+  background: var(--glass);
+  border: 1px solid var(--border-glass);
+  border-radius: 8px;
+  padding: 8px 16px;
+  color: var(--text-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: var(--transition-normal);
+  margin-left: 16px;
+}
+
+.filter-toggle-btn-inline:hover {
+  background: rgba(0, 212, 255, 0.1);
+  border-color: var(--accent-primary);
+}
+
+.filter-toggle-icon {
+  font-size: 1.1rem;
+}
+
+@media (max-width: 600px) {
+  .filter-toggle-text {
+    display: none;
+    /* Hide "Filters" text on small screens */
+  }
+
+  .filter-toggle-btn-inline {
+    padding: 8px 12px;
+    margin-left: 8px;
+  }
+}
+
+/* ============================================
+   Collapsible Station List
+   ============================================ */
+.collapsible-header {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  transition: var(--transition-normal);
+}
+
+.collapsible-header:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.collapse-icon {
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
+  color: var(--text-secondary);
+}
+
+.station-list.collapsed {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+}
+
+.station-list:not(.collapsed) {
+  max-height: 500px;
+  overflow-y: auto;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  opacity: 1;
+}
+
+/* Rotate icon when expanded */
+.collapsible-header:has(+ .station-list:not(.collapsed)) .collapse-icon {
+  transform: rotate(180deg);
+}
+
+/* ============================================
+   Collapsible Region Areas
+   ============================================ */
+.region-header {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  margin-bottom: 4px;
+  transition: var(--transition-normal);
+  user-select: none;
+}
+
+.region-header:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.region-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-main);
+}
+
+.region-chevron {
+  font-size: 0.7rem;
+  transition: transform 0.3s ease;
+  color: var(--text-secondary);
+}
+
+.region-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+}
+
+.region-group:not(.collapsed) .region-content {
+  max-height: 500px;
+  opacity: 1;
+}
+
+/* Rotate chevron when expanded */
+.region-header.expanded .region-chevron {
+  transform: rotate(180deg);
+}

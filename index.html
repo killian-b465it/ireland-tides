@@ -109,6 +109,12 @@
         <span class="toggle-slider"></span>
       </label>
       <span class="mode-label" id="mode-label-freshwater">🏞️ Freshwater</span>
+
+      <!-- Filter Button (moved here for sleeker UI) -->
+      <button class="filter-toggle-btn-inline" id="filter-toggle-btn" onclick="toggleFilterPanel()" title="Map Filters">
+        <span class="filter-toggle-icon">🗺️</span>
+        <span class="filter-toggle-text">Filters</span>
+      </button>
     </div>
   </div>
 
@@ -222,11 +228,6 @@
 
       <!-- Map -->
       <section class="map-container">
-        <!-- Filter Toggle Button -->
-        <button class="filter-toggle-btn" id="filter-toggle-btn" onclick="toggleFilterPanel()" title="Map Filters">
-          <span class="filter-toggle-icon">🗺️</span>
-          <span class="filter-toggle-text">Filters</span>
-        </button>
 
         <!-- Collapsible Filter Panel -->
         <div class="filter-sidebar" id="filter-sidebar">
@@ -236,29 +237,29 @@
           </div>
           <div class="filter-options">
             <label class="filter-option">
-              <input type="checkbox" id="filter-stations" checked>
+              <input type="checkbox" id="filter-stations">
               <span class="filter-checkbox"></span>
               <span class="filter-emoji">🌊</span> Tidal Stations
             </label>
             <label class="filter-option">
-              <input type="checkbox" id="filter-shops" checked>
+              <input type="checkbox" id="filter-shops">
               <span class="filter-checkbox"></span>
               <span class="filter-emoji">🏪</span> Tackle Shops
             </label>
             <label class="filter-option">
-              <input type="checkbox" id="filter-piers" checked>
+              <input type="checkbox" id="filter-piers">
               <span class="filter-checkbox"></span>
               <span class="filter-emoji">🎣</span> Fishing Piers
             </label>
             <label class="filter-option">
-              <input type="checkbox" id="filter-ramps" checked>
+              <input type="checkbox" id="filter-ramps">
               <span class="filter-checkbox"></span>
               <span class="filter-emoji">🚤</span> Boat Ramps
             </label>
             <label class="filter-option">
-              <input type="checkbox" id="filter-harbours" checked>
+              <input type="checkbox" id="filter-harbours">
               <span class="filter-checkbox"></span>
-              <span class="filter-emoji">⚓</span> Harbours
+              <span class="filter-emoji">🛥️</span> Harbours
             </label>
           </div>
           <button class="filter-apply-btn" onclick="applyFilters()">✓ Apply Filters</button>
