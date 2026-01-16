@@ -2166,7 +2166,14 @@ function updateMapForFishingMode() {
     if (sidebar) sidebar.style.display = '';
     // Restore grid layout with sidebar
     const appContainer = document.querySelector('.app-container');
-    if (appContainer) appContainer.style.gridTemplateColumns = '400px 1fr';
+    // Only apply desktop grid on larger screens, let CSS handle mobile
+    if (appContainer) {
+      if (window.innerWidth > 900) {
+        appContainer.style.gridTemplateColumns = '400px 1fr';
+      } else {
+        appContainer.style.gridTemplateColumns = '';  // Remove inline style, use CSS
+      }
+    }
     // Trigger map resize after grid change
     setTimeout(() => state.map.invalidateSize(), 100);
 
