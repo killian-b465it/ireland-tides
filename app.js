@@ -940,7 +940,7 @@ async function loadShopsToMainMap() {
   TACKLE_SHOPS.forEach(shop => {
     const icon = L.divIcon({
       className: 'shop-marker-wrapper',
-      html: '<div class="shop-marker">🏠</div>',
+      html: '<div class="shop-marker">🏪</div>',
       iconSize: [28, 28],
       iconAnchor: [14, 14]
     });
@@ -983,7 +983,7 @@ async function loadShopsToMainMap() {
 function addFirebaseShopMarker(shop) {
   const icon = L.divIcon({
     className: 'shop-marker-wrapper',
-    html: '<div class="shop-marker">🏠</div>',
+    html: '<div class="shop-marker">🏪</div>',
     iconSize: [28, 28],
     iconAnchor: [14, 14]
   });
@@ -1163,7 +1163,7 @@ window.toggleMapFilter = (layerName) => {
 function addStationMarker(station) {
   const icon = L.divIcon({
     className: 'tide-marker-wrapper',
-    html: `<div class="tide-marker ${station.status === 'offline' ? 'offline' : ''}" data-station="${station.id}">⚓</div>`,
+    html: `<div class="tide-marker ${station.status === 'offline' ? 'offline' : ''}" data-station="${station.id}">🌊</div>`,
     iconSize: [28, 28],
     iconAnchor: [14, 14]
   });
@@ -3864,7 +3864,7 @@ function loadAdminLocations() {
 
   const typeIcons = {
     pier: '🎣', ramp: '🚤', harbour: '🛥️',
-    spot: '🐟', park: '🌲', shop: '🏠'
+    spot: '🐟', park: '🌲', shop: '🏪'
   };
 
   // Get source arrays based on mode
@@ -3924,7 +3924,7 @@ function loadAdminLocations() {
 
 function renderAdminLocationList(locations) {
   const container = document.getElementById('admin-location-list');
-  const typeIcons = { pier: '🎣', ramp: '🚤', harbour: '🛥️', spot: '🐟', park: '🌲', shop: '🏠' };
+  const typeIcons = { pier: '🎣', ramp: '🚤', harbour: '🛥️', spot: '🐟', park: '🌲', shop: '🏪' };
 
   container.innerHTML = locations.map(loc => {
     const longitude = loc.lon || loc.lng;
