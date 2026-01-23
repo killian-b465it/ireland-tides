@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Ireland Tides - Real-Time Fishing Tide Data
  * Main Application Logic
  */
@@ -2049,8 +2049,8 @@ function renderCatchFeed() {
             <div class="comment comment-item">
               <div class="comment-content">
                 <span class="comment-user comment-author" onclick="viewUserProfile('${comment.authorId || '}')" style="cursor:pointer">${comment.author || 'User'}:</span>
-      < span class="comment-text" > ${ comment.text }</span >
-              </div >
+                <span class="comment-text">${comment.text}</span>
+              </div>
       <div class="comment-actions">
         ${state.user && state.user.id !== comment.authorId ? `
                   <button class="comment-report-btn" onclick="reportComment(${c.id}, ${commentIndex}, \`${(comment.text || '').replace(/`/g, '\\`')}\`, \`${(comment.author || 'User').replace(/`/g, '\\`')}\`, '${comment.authorId || ''}')" title="Report Comment">⚠️</button>
