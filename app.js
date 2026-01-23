@@ -1810,11 +1810,66 @@ function initCommunityMap() {
     maxZoom: 19
   }).addTo(state.communityMap);
   state.communityMap.on('click', e => {
-    state.currentModalLatLng = e.latlng;
-    document.getElementById('catch-modal').classList.add('active');
+    openPostModal(e.latlng);
   });
   loadCommunityCatches();
 }
+
+window.openPostModal = (latlng) => {
+  if (!state.user || state.user.plan !== 'pro') return openPremiumModal();
+
+  state.currentModalLatLng = latlng; // null if general post
+
+  const modalTitle = document.querySelector('#catch-modal h3');
+  const detailsLabel = document.querySelector('#catch-details').previousElementSibling; // Label for details
+  const speciesLabel = document.querySelector('#catch-species').previousElementSibling; // Label for species
+
+  if (latlng) {
+    // Catch Report (Map Click)
+    modalTitle.innerText = "🎣 Share Your Catch";
+    if (speciesLabel) speciesLabel.innerText = "What did you catch?";
+    if (detailsLabel) detailsLabel.innerText = "Details";
+    document.getElementById('catch-species').placeholder = "e.g., Sea Bass, Mackerel";
+    document.getElementById('catch-details').placeholder = "How was the fight? What bait did you use?";
+  } else {
+    // General Update (Button Click)
+    modalTitle.innerText = "📝 Share Update";
+    if (speciesLabel) speciesLabel.innerText = "Title / Topic";
+    if (detailsLabel) detailsLabel.innerText = "Message";
+    document.getElementById('catch-species').placeholder = "e.g., Heading out to Howth";
+    document.getElementById('catch-details').placeholder = "Share a tip, question, or update...";
+  }
+
+  document.getElementById('catch-modal').classList.add('active');
+};
+
+window.openPostModal = (latlng) => {
+  if (!state.user || state.user.plan !== 'pro') return openPremiumModal();
+
+  state.currentModalLatLng = latlng; // null if general post
+
+  const modalTitle = document.querySelector('#catch-modal h3');
+  const detailsLabel = document.querySelector('#catch-details').previousElementSibling; // Label for details
+  const speciesLabel = document.querySelector('#catch-species').previousElementSibling; // Label for species
+
+  if (latlng) {
+    // Catch Report (Map Click)
+    modalTitle.innerText = "🎣 Share Your Catch";
+    if (speciesLabel) speciesLabel.innerText = "What did you catch?";
+    if (detailsLabel) detailsLabel.innerText = "Details";
+    document.getElementById('catch-species').placeholder = "e.g., Sea Bass, Mackerel";
+    document.getElementById('catch-details').placeholder = "How was the fight? What bait did you use?";
+  } else {
+    // General Update (Button Click)
+    modalTitle.innerText = "📝 Share Update";
+    if (speciesLabel) speciesLabel.innerText = "Title / Topic";
+    if (detailsLabel) detailsLabel.innerText = "Message";
+    document.getElementById('catch-species').placeholder = "e.g., Heading out to Howth";
+    document.getElementById('catch-details').placeholder = "Share a tip, question, or update...";
+  }
+
+  document.getElementById('catch-modal').classList.add('active');
+};
 
 window.closeModal = () => {
   document.getElementById('catch-modal').classList.remove('active');
@@ -1852,15 +1907,18 @@ window.submitCatch = () => {
   const dt = document.getElementById('catch-details').value;
   const photoInput = document.getElementById('catch-photo');
 
-  if (!sp) return alert('Enter species!');
+  if (!sp) return alert('Enter a title or species!');
 
   const processCatch = (photoData) => {
+    const isGeneralPost = !state.currentModalLatLng;
+
     const c = {
       id: Date.now(),
       species: sp,
       details: dt,
-      lat: state.currentModalLatLng.lat,
-      lng: state.currentModalLatLng.lng,
+      lat: isGeneralPost ? null : state.currentModalLatLng.lat,
+      lng: isGeneralPost ? null : state.currentModalLatLng.lng,
+      isGeneralPost: isGeneralPost, // flag for easier rendering
       date: new Date().toLocaleDateString('en-GB'),
       author: state.user.name,
       authorId: state.user.id,
@@ -1932,6 +1990,9 @@ function loadCommunityCatches() {
 
 function addCommunityMarker(c) {
   if (!state.communityMap || !communityMarkerGroup) return;
+
+  // Skip general posts (no coordinates)
+  if (!c.lat || !c.lng) return;
 
   const icon = L.divIcon({
     className: 'social-marker',
