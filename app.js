@@ -3674,6 +3674,7 @@ function loadAdminMessages() {
           </div>
           <div class="message-preview">${lastMsg.text}</div>
         </div>
+        <button class="delete-thread-btn" onclick="event.stopPropagation(); deleteSupportThread('${thread.userId}')" title="Delete thread">🗑️</button>
       </div>
     `;
   }).join('');
