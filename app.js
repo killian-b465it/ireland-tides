@@ -3748,10 +3748,31 @@ window.sendAdminReply = () => {
     readByUser: false
   };
 
-  // Sync to Firebase (Listener handles UI and localStorage)
-  syncMessageToFirebase(msg);
-
   input.value = '';
+};
+
+window.deleteSupportThread = (userId) => {
+  if (!confirm('Are you sure you want to delete this entire message thread? This cannot be undone.')) return;
+
+  const messagesToDelete = state.supportMessages.filter(m => m.userId === userId);
+
+  messagesToDelete.forEach(m => {
+    if (firebaseDB) {
+      firebaseDB.ref('support_messages/' + m.id).remove()
+        .catch(err => console.error('Error deleting message:', err));
+    }
+  });
+
+  // Local state update (though Firebase listener will handle this too)
+  state.supportMessages = state.supportMessages.filter(m => m.userId !== userId);
+  localStorage.setItem('fishing_support_messages', JSON.stringify(state.supportMessages));
+
+  // If we're currently replying to this user, close the modal
+  if (state.currentReplyUserId === userId) {
+    closeAdminReplyModal();
+  }
+
+  loadAdminMessages();
 };
 
 
