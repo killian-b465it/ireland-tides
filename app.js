@@ -520,32 +520,7 @@ function updateCatchInFirebase(catchId, updates) {
   }
 }
 
-function syncUserToFirebase(user) {
-  if (!firebaseDB || !user || !user.id) return;
-  try {
-    // Sanitize user object for Firebase (remove session specific flags if any)
-    const data = { ...user };
-    delete data.remember; // Don't sync remember me preference
-    firebaseDB.ref('users/' + user.id).set(data);
-  } catch (e) {
-    console.warn('Firebase user sync failed:', e.message);
-  }
-}
 
-function loadUsersFromFirebase(callback) {
-  if (!firebaseDB) return;
-  try {
-    firebaseDB.ref('users').once('value', (snapshot) => {
-      const users = [];
-      snapshot.forEach((childSnapshot) => {
-        users.push(childSnapshot.val());
-      });
-      if (callback) callback(users);
-    });
-  } catch (e) {
-    console.warn('Firebase users load failed:', e.message);
-  }
-}
 
 // ============================================
 // Navigation Logic
@@ -748,6 +723,9 @@ function loadUsersFromFirebase(callback) {
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize beta banner
   initBetaBanner();
+
+  // Verify if current session is still active (not deactivated by admin)
+  verifySessionStatus();
 
   updateClock();
   setInterval(updateClock, 1000);
@@ -3486,6 +3464,9 @@ function loadUsersTable() {
           <button class="btn btn-xs btn-primary" onclick="changeUserPassword('${u.id}')" title="Change Password">
             🔑 Change
           </button>
+          <button class="btn btn-xs btn-danger" onclick="deleteUserAccount('${u.id}')" title="Permanently Delete Account">
+            🗑️ Delete
+          </button>
           ${plan !== 'pro' ? `
             <button class="btn btn-xs btn-primary" onclick="giftProSubscription('${u.id}')" title="Gift 1 Month Free Pro">
               🎁 Gift Pro
@@ -3495,6 +3476,49 @@ function loadUsersTable() {
       </tr>
     `;
   }).join('');
+}
+
+window.deleteUserAccount = async (userId) => {
+  const user = state.allUsers.find(u => u.id === userId);
+  if (!user) return;
+
+  if (!confirm(`⚠️ PERMANENT DELETE\n\nAre you sure you want to permanently delete the account for ${user.email}?\n\nThis cannot be undone!`)) return;
+
+  try {
+    // Remove from Firebase
+    if (firebaseDB) {
+      await firebaseDB.ref('users/' + userId).remove();
+    }
+
+    // Remove from local state
+    state.allUsers = state.allUsers.filter(u => u.id !== userId);
+    localStorage.setItem('fishing_all_users', JSON.stringify(state.allUsers));
+
+    alert(`Account for ${user.email} has been permanently deleted.`);
+    loadUsersTable();
+  } catch (err) {
+    console.error('Delete failed:', err);
+    alert('Failed to delete account. Please try again.');
+  }
+};
+
+async function verifySessionStatus() {
+  if (!state.user || !firebaseDB) return;
+
+  // Root admins are exempt from deactivation check
+  if (state.user.id.includes('_main_root')) return;
+
+  try {
+    const snapshot = await firebaseDB.ref('users/' + state.user.id).once('value');
+    const userData = snapshot.val();
+
+    if (userData && userData.active === false) {
+      alert('This account has been deactivated by an administrator.');
+      logout();
+    }
+  } catch (err) {
+    console.warn('Session verification failed:', err);
+  }
 }
 
 window.changeUserPassword = (userId) => {
