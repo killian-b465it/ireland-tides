@@ -1497,36 +1497,7 @@ function findTideExtremes(data) {
 window.navigateForecast = (delta) => {
   const newOffset = state.forecastOffset + delta;
   
-  // Limit: -7 days (past) to +7 days (future)
-  if (newOffset < -7 || newOffset > 7) return;
-  
-  state.forecastOffset = newOffset;
-  
-  // Re-render components that depend on the day
-  updateForecastHeaders();
-  
-  // Re-fetch or re-render
-  // If we have daily weather data, update display
-  const weatherData = state.currentWeatherDaily;
-  if (weatherData) {
-    displayWeatherData({
-      // Mocking current structure from daily array
-      temperature_2m: weatherData.temperature_2m_max[newOffset + (newOffset >= 0 ? 0 : 7)], // Logic here gets tricky with offset vs array index
-      // For simplicity, let's assume currentWeatherDaily index 0 is TODAY.
-      // Ideally we need to map offsets to array indices.
-      // OpenMeteo daily usually gives 7 days starting from today.
-      // So index = offset. If offset < 0 (past), we might not have data unless we requested past_days.
-      // The implemented API call was "&daily=...&timezone=auto". Default is 7 days forward.
-      // So we can only go 0 to 6.
-    });
-    // This requires a more robust displayWeatherData refactor.
-    // Let's call a specific render function instead.
-    renderForecastView();
-  }
-  
-  // Re-render tides
-  displayTideTimes([]); 
-};
+
 
 function updateForecastHeaders() {
   const date = new Date();
