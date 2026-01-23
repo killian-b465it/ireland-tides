@@ -1227,6 +1227,9 @@ function fetchNearbyShops(station) {
         <span>📍 ${dist}km away</span>
         <span>${shop.phone ? '📞 ' + shop.phone : ''}</span>
       </div>
+    </div>
+  `}).join('');
+}
 
 
 // Calculate distance between two coordinates in kilometers
@@ -1325,11 +1328,11 @@ function updateAllStationLevels() {
   const now = new Date();
   // Update non-live stations with calculated values
   CONFIG.stations.forEach(station => {
-    const levelEl = document.getElementById(`level - ${ station.id } `);
+    const levelEl = document.getElementById(`level - ${station.id} `);
     if (levelEl && !state.tideData[station.id]) {
       const { level, direction } = calculateTideLevel(now, station);
       const arrow = direction === 'rising' ? '↑' : direction === 'falling' ? '↓' : '';
-      levelEl.textContent = `${ level.toFixed(1) }m ${ arrow } `;
+      levelEl.textContent = `${level.toFixed(1)}m ${arrow} `;
     }
   });
 }
@@ -1339,7 +1342,7 @@ async function fetchAllLiveStationData() {
   try {
     const now = new Date();
     const past24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    const url = `${ CONFIG.apiBase }.json ? station_id, time, Water_Level_LAT & time >= ${ past24h.toISOString() }& orderBy("time")`;
+    const url = `${CONFIG.apiBase}.json ? station_id, time, Water_Level_LAT & time >= ${past24h.toISOString()}& orderBy("time")`;
 
     const response = await fetch(url);
     if (!response.ok) throw new Error('API request failed');
@@ -1355,7 +1358,7 @@ async function fetchAllLiveStationData() {
 
     // Update sidebar for live stations
     CONFIG.stations.forEach(station => {
-      const sidebarLevel = document.getElementById(`level - ${ station.id } `);
+      const sidebarLevel = document.getElementById(`level - ${station.id} `);
       if (!sidebarLevel) return;
 
       const stationData = stationDataMap[station.id];
@@ -1368,7 +1371,7 @@ async function fetchAllLiveStationData() {
           dir = level > prev ? 'rising' : level < prev ? 'falling' : 'stable';
         }
         const icon = dir === 'rising' ? '↑' : dir === 'falling' ? '↓' : '';
-        sidebarLevel.innerHTML = `${ level.toFixed(1) }m ${ icon } `;
+        sidebarLevel.innerHTML = `${level.toFixed(1)}m ${icon} `;
         state.tideData[station.id] = stationData;
       }
     });
@@ -1398,9 +1401,9 @@ function updateLocationInfo(station) {
   }
 
   container.innerHTML = `
-      < h2 class="location-name" > ${ station.name }</h2 >
+      < h2 class="location-name" > ${station.name}</h2 >
         <div class="location-coords">${station.lat.toFixed(4)}°N, ${Math.abs(station.lon).toFixed(4)}°W</div>
-    ${ maintHtml }
+    ${maintHtml}
     `;
 }
 
@@ -1413,7 +1416,7 @@ async function fetchTideData(station) {
 
   // If station doesn't have live data, use calculated estimates directly
   if (station.live === false) {
-    console.log(`${ station.name }: No live API data available, using estimates.`);
+    console.log(`${station.name}: No live API data available, using estimates.`);
     displayCalculatedTides(station);
     return;
   }
@@ -1421,7 +1424,7 @@ async function fetchTideData(station) {
   try {
     const now = new Date();
     const past24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    const url = `${ CONFIG.apiBase }.json ? station_id, time, Water_Level_LAT & time >= ${ past24h.toISOString() }& orderBy("time")`;
+    const url = `${CONFIG.apiBase}.json ? station_id, time, Water_Level_LAT & time >= ${past24h.toISOString()}& orderBy("time")`;
 
     const response = await fetch(url);
     if (!response.ok) throw new Error('API request failed');
@@ -1436,11 +1439,11 @@ async function fetchTideData(station) {
       updateChart(stationData);
       updateFishingConditions(station, stationData);
     } else {
-      console.warn(`No tide data found for ${ station.id }, using estimate.`);
+      console.warn(`No tide data found for ${station.id}, using estimate.`);
       displayCalculatedTides(station);
     }
   } catch (err) {
-    console.error(`Failed to fetch tide data for ${ station.id }: `, err);
+    console.error(`Failed to fetch tide data for ${station.id}: `, err);
     displayCalculatedTides(station);
   }
 }
@@ -1459,7 +1462,7 @@ function displayTideData(station, data) {
 
   const icon = dir === 'rising' ? '↑' : dir === 'falling' ? '↓' : '→';
   container.innerHTML = `
-      < div class="tide-level" > ${ level.toFixed(2) } <span class="tide-unit">m</span></div >
+      < div class="tide-level" > ${level.toFixed(2)} <span class="tide-unit">m</span></div >
     <div class="tide-status ${dir}">${icon} ${dir.toUpperCase()}</div>
     <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px;">
       Updated: ${time.toLocaleTimeString('en-IE', { hour: '2-digit', minute: '2-digit' })}
@@ -1469,9 +1472,9 @@ function displayTideData(station, data) {
   displayTideTimes(data);
 
   // Sync sidebar list with live data if it exists
-  const sidebarLevel = document.getElementById(`level - ${ station.id } `);
+  const sidebarLevel = document.getElementById(`level - ${station.id} `);
   if (sidebarLevel) {
-    sidebarLevel.innerHTML = `${ level.toFixed(1) }m ${ icon } `;
+    sidebarLevel.innerHTML = `${level.toFixed(1)}m ${icon} `;
     sidebarLevel.classList.add('live-data-active'); // Optional: add class to show it's live
   }
 }
@@ -1529,8 +1532,8 @@ function updateForecastHeaders() {
   const weatherTitle = document.getElementById('weather-card-title');
   const tideTitle = document.getElementById('tide-card-title');
 
-  if (weatherTitle) weatherTitle.innerText = state.forecastOffset === 0 ? "🌦️ Local Weather" : `🌦️ Weather(${ dateStr })`;
-  if (tideTitle) tideTitle.innerText = state.forecastOffset === 0 ? "⏰ Today's Tides" : `⏰ Tides(${ dateStr })`;
+  if (weatherTitle) weatherTitle.innerText = state.forecastOffset === 0 ? "🌦️ Local Weather" : `🌦️ Weather(${dateStr})`;
+  if (tideTitle) tideTitle.innerText = state.forecastOffset === 0 ? "⏰ Today's Tides" : `⏰ Tides(${dateStr})`;
 }
 
 function renderForecastView() {
@@ -1728,15 +1731,15 @@ function displayCalculatedTides(station) {
   const icon = direction === 'rising' ? '↑' : direction === 'falling' ? '↓' : '→';
 
   container.innerHTML = `
-      < div class="tide-level" > ${ level.toFixed(2) } <span class="tide-unit">m</span></div >
+      < div class="tide-level" > ${level.toFixed(2)} <span class="tide-unit">m</span></div >
     <div class="tide-status ${direction}">${icon} ${direction.toUpperCase()}</div>
     <div style="font-size: 0.75rem; color: var(--accent-warning); margin-top: 8px;">⚠️ Estimated</div>
     `;
 
   // Sync sidebar list with calculated data
-  const sidebarLevel = document.getElementById(`level - ${ station.id } `);
+  const sidebarLevel = document.getElementById(`level - ${station.id} `);
   if (sidebarLevel) {
-    sidebarLevel.innerHTML = `${ level.toFixed(1) }m ${ icon } `;
+    sidebarLevel.innerHTML = `${level.toFixed(1)}m ${icon} `;
   }
 
   displayTideTimes([]);
