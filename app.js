@@ -1860,8 +1860,37 @@ function displayWeatherData(d) {
 }
 
 function mapWeatherCode(c) {
-  const map = { 0: '☀️ Clear', 1: '🌤️ Mostly Clear', 2: '⛅ Partly Cloudy', 3: '☁️ Overcast', 45: '🌫️ Fog', 51: '🌦️ Drizzle', 61: '🌧️ Rain', 80: '🌦️ Showers', 95: '⛈️ Storm' };
-  const desc = map[c] || ' Normal';
+  const map = {
+    0: '☀️ Clear Sky',
+    1: '🌤️ Mostly Clear',
+    2: '⛅ Partly Cloudy',
+    3: '☁️ Overcast',
+    45: '🌫️ Fog',
+    48: '🌫️ Rime Fog',
+    51: '🌦️ Light Drizzle',
+    53: '🌦️ Drizzle',
+    55: '🌦️ Heavy Drizzle',
+    56: '🌨️ Freezing Drizzle',
+    57: '🌨️ Heavy Freezing Drizzle',
+    61: '🌧️ Slight Rain',
+    63: '🌧️ Moderate Rain',
+    65: '🌧️ Heavy Rain',
+    66: '🌨️ Light Freezing Rain',
+    67: '🌨️ Heavy Freezing Rain',
+    71: '❄️ Slight Snow',
+    73: '❄️ Moderate Snow',
+    75: '❄️ Heavy Snow',
+    77: '❄️ Snow Grains',
+    80: '🌦️ Slight Showers',
+    81: '🌦️ Moderate Showers',
+    82: '🌧️ Violent Showers',
+    85: '❄️ Snow Showers',
+    86: '❄️ Heavy Snow Showers',
+    95: '⛈️ Thunderstorm',
+    96: '⛈️ Thunderstorm & Hail',
+    99: '⛈️ Heavy Thunderstorm & Hail'
+  };
+  const desc = map[c] || 'Unknown';
   return { icon: desc.split(' ')[0], description: desc.split(' ').slice(1).join(' ') };
 }
 
