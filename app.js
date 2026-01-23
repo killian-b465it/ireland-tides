@@ -2870,7 +2870,7 @@ window.handleAuthSubmit = async () => {
 
         // Check if user is deactivated
         if (userData.active === false) {
-          return alert('This account has been deactivated. Please contact support.');
+          return alert('Your account has been deactivated. Please contact irishfishinghub@gmail.com if you believe this is a mistake.');
         }
 
         // Login successful - load user data
@@ -3505,7 +3505,7 @@ async function verifySessionStatus() {
     const userData = snapshot.val();
 
     if (userData && userData.active === false) {
-      alert('This account has been deactivated by an administrator.');
+      alert('Your account has been deactivated. Please contact irishfishinghub@gmail.com if you believe this is a mistake.');
       logout();
     }
   } catch (err) {
