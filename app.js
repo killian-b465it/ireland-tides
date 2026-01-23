@@ -1424,7 +1424,7 @@ async function fetchTideData(station) {
   try {
     const now = new Date();
     const past24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    const url = `${CONFIG.apiBase}.json ? station_id, time, Water_Level_LAT & time >= ${past24h.toISOString()}& orderBy("time")`;
+    const url = `${CONFIG.apiBase}.json?station_id=${station.id}&parameters=time,Water_Level_LAT&time>=${past24h.toISOString()}&orderBy("time")`;
 
     const response = await fetch(url);
     if (!response.ok) throw new Error('API request failed');
