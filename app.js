@@ -1242,6 +1242,23 @@ function getDistanceKm(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
+function findNearestLiveStation(inputStation) {
+  if (inputStation.live) return inputStation;
+
+  let nearest = null;
+  let minDistance = Infinity;
+
+  CONFIG.stations.filter(s => s.live).forEach(s => {
+    const dist = getDistanceKm(inputStation.lat, inputStation.lon, s.lat, s.lon);
+    if (dist < minDistance) {
+      minDistance = dist;
+      nearest = s;
+    }
+  });
+
+  return nearest;
+}
+
 
 function showTideCards() {
   const cards = ['tide-card', 'weather-card', 'shops-card', 'tide-times-card', 'fishing-card', 'chart-card'];
@@ -1498,6 +1515,49 @@ function displayTideTimes(data) {
   `).join('');
 }
 
+
+function generateSevenDayTides(station) {
+  const days = [];
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+
+  // Generate for next 7 days
+  for (let i = 0; i < 7; i++) {
+    const dayDate = new Date(now.getTime() + i * 24 * 60 * 60 * 1000);
+    const dateStr = dayDate.toLocaleDateString('en-IE', { weekday: 'short', day: 'numeric', month: 'short' });
+
+    // Simple harmonic prediction for daily highs/lows
+    // A full tidal day is approx 24h 50m. Highs shift by ~50m each day.
+    // We start from current time and project forward.
+    // This is improved by using the calculateTideLevel over a 24h window for each day.
+
+    // Find highs/lows for this specific day
+    const dayExtremes = [];
+    const step = 15 * 60 * 1000; // 15 min steps
+    const dayStart = dayDate.getTime();
+    const dayEnd = dayStart + 24 * 60 * 60 * 1000;
+
+    let prevLvl = calculateTideLevel(new Date(dayStart - step), station).level;
+    let currLvl = calculateTideLevel(new Date(dayStart), station).level;
+
+    for (let t = dayStart + step; t <= dayEnd; t += step) {
+      const nextLvl = calculateTideLevel(new Date(t), station).level;
+
+      if (currLvl > prevLvl && currLvl > nextLvl) {
+        dayExtremes.push({ type: 'High', time: t, level: currLvl });
+      } else if (currLvl < prevLvl && currLvl < nextLvl) {
+        dayExtremes.push({ type: 'Low', time: t, level: currLvl });
+      }
+      prevLvl = currLvl;
+      currLvl = nextLvl;
+    }
+
+    days.push({ date: dateStr, tides: dayExtremes });
+  }
+  return days;
+}
+
+// Keeping this for fallback/legacy display if needed
 function generateEstimatedTides(base) {
   const tides = [];
   const period = 6.2 * 60 * 60 * 1000;
@@ -1512,13 +1572,54 @@ function generateEstimatedTides(base) {
   return tides;
 }
 
+
 function calculateTideLevel(time, station) {
+  // 1. Try to find a nearby live reference station
+  const refStation = findNearestLiveStation(station);
+  let refData = null;
+
+  if (refStation && state.tideData[refStation.id]) {
+    refData = state.tideData[refStation.id];
+  }
+
+  // 2. Base Calculation (harmonic approximation)
   const period = 12.42 * 60 * 60 * 1000;
-  const mean = 2.5, amp = 1.8;
+  const mean = 2.5;
   const phase = station.lon * (period / 360);
-  const t = time.getTime() + phase;
+
+  // If we have live reference data, use it to improve the phase and amplitude
+  let t = time.getTime() + phase;
+  let amp = 1.8;
+
+  if (refData && refData.length > 0) {
+    // Find the latest high tide in reference data
+    const extremes = findTideExtremes(refData);
+    const lastHigh = extremes.find(e => e.type === 'high');
+
+    if (lastHigh) {
+      // Align projected phase to the known real high tide nearby
+      // Time difference roughly corresponds to longitude difference (approx 1h per 15 deg, but simplified here)
+      // A small offset per km distance can be added if needed, typically 2-5 mins per 10km along coast
+      const timeOffset = (station.lon - refStation.lon) * 4 * 60 * 1000; // 4 mins per degree roughly
+      const refTime = new Date(lastHigh.time).getTime();
+
+      // We want cos(...) to be 1 at (refTime + offset)
+      // So 2*PI*t_sim/period = 0 (mod 2PI) at t_sim = time
+      // This is complex to splice into the simple harmonic model perfectly without a full solver,
+      // so we use the reference Amplitude directly and shift the curve.
+
+      amp = lastHigh.level - mean; // Scale amplitude to match recent local conditions
+
+      // Re-calculate t to align peaks
+      // The peak of cos(2*PI*t/P) is at t=0. We want peak at refTime + offset.
+      // So we shift time input:
+      t = time.getTime() - (refTime + timeOffset);
+    }
+  }
+
   const level = mean + amp * Math.cos(2 * Math.PI * t / period);
-  const prevLevel = mean + amp * Math.cos(2 * Math.PI * (t - 60000) / period);
+  const prevLevel = mean + amp * Math.cos(2 * Math.PI * (t - 60000) / period); // 1 min ago
+
   const dir = level > prevLevel + 0.001 ? 'rising' : level < prevLevel - 0.001 ? 'falling' : 'stable';
   return { level, direction: dir };
 }
@@ -1552,10 +1653,13 @@ function displayCalculatedTides(station) {
 async function fetchWeatherData(station) {
   const container = document.getElementById('weather-display');
   try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${station.lat}&longitude=${station.lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${station.lat}&longitude=${station.lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`;
     const res = await fetch(url);
     const data = await res.json();
     displayWeatherData(data.current);
+
+    // Store daily data for 7-day forecast
+    state.currentWeatherDaily = data.daily;
   } catch (err) {
     console.warn(`Weather fetch failed for ${station.id}:`, err);
     container.innerHTML = `
@@ -1565,6 +1669,64 @@ async function fetchWeatherData(station) {
       </div>`;
   }
 }
+
+window.openForecastModal = () => {
+  if (!state.selectedStation) return;
+
+  const station = state.selectedStation;
+  const tideDays = generateSevenDayTides(station);
+  const weatherDays = state.currentWeatherDaily;
+
+  const container = document.getElementById('forecast-list');
+  if (!container) return;
+
+  container.innerHTML = tideDays.map((day, i) => {
+    // Weather for this day
+    let weatherHtml = '<div class="forecast-weather">No Data</div>';
+    if (weatherDays && weatherDays.weather_code && weatherDays.weather_code[i] !== undefined) {
+      const w = mapWeatherCode(weatherDays.weather_code[i]);
+      const maxT = Math.round(weatherDays.temperature_2m_max[i]);
+      const minT = Math.round(weatherDays.temperature_2m_min[i]);
+      weatherHtml = `
+        <div class="forecast-weather">
+          <span class="f-icon">${w.icon}</span>
+          <div class="f-temps">
+            <span class="f-high">${maxT}°</span>
+            <span class="f-low">${minT}°</span>
+          </div>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="forecast-item">
+        <div class="forecast-date">
+          <span class="f-day">${day.date.split(',')[0]}</span>
+          <span class="f-date-num">${day.date.split(',')[1]}</span>
+        </div>
+        
+        <div class="forecast-tides">
+          ${day.tides.map(t => `
+            <div class="f-tide-row">
+              <span class="f-type ${t.type.toLowerCase()}">${t.type}</span>
+              <span class="f-time">${new Date(t.time).toLocaleTimeString('en-IE', { hour: '2-digit', minute: '2-digit' })}</span>
+              <span class="f-level">${t.level.toFixed(2)}m</span>
+            </div>
+          `).join('')}
+        </div>
+        
+        ${weatherHtml}
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('forecast-station-name').innerText = station.name;
+  document.getElementById('forecast-modal').classList.add('active');
+};
+
+window.closeForecastModal = () => {
+  document.getElementById('forecast-modal').classList.remove('active');
+};
 
 function displayWeatherData(d) {
   const container = document.getElementById('weather-display');

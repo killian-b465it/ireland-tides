@@ -147,8 +147,9 @@
 
         <!-- Current Tide -->
         <div class="card fade-in" id="tide-card" style="display: none;">
-          <div class="card-header">
+          <div class="card-header" style="justify-content: space-between; display: flex; align-items: center;">
             <span class="card-title">🌊 Current Tide</span>
+            <button class="btn btn-sm btn-outline" onclick="openForecastModal()">📅 7-Day Forecast</button>
           </div>
           <div class="tide-current" id="tide-current">
             <div class="loading">
@@ -402,6 +403,22 @@
       <div class="modal-actions">
         <button class="btn" onclick="closeModal()">Cancel</button>
         <button class="btn btn-primary" onclick="submitCatch()">Post Spot</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7-Day Forecast Modal -->
+  <div class="modal" id="forecast-modal">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h2>📅 7-Day Forecast: <span id="forecast-station-name">Station</span></h2>
+        <button class="modal-close-btn-inline" onclick="closeForecastModal()">✕</button>
+      </div>
+      <div class="forecast-list" id="forecast-list">
+        <!-- Populated by JS -->
+      </div>
+      <div class="modal-footer">
+        <p class="disclaimer-text">Predictions based on nearby live data and astronomical harmonics.</p>
       </div>
     </div>
   </div>
