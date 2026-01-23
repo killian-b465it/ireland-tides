@@ -2047,10 +2047,19 @@ function renderCatchFeed() {
         <div class="comments-list comment-list" id="comments-list-${c.id}">
           ${(c.comments || []).map((comment, commentIndex) => `
             <div class="comment comment-item">
-              <span class="comment-user comment-author" onclick="viewUserProfile('${comment.authorId || ''}')" style="cursor:pointer">${comment.author || 'User'}:</span>
-              <span class="comment-text">${comment.text}</span>
-            </div>
-          `).join('')}
+              <div class="comment-content">
+                <span class="comment-user comment-author" onclick="viewUserProfile('${comment.authorId || '}')" style="cursor:pointer">${comment.author || 'User'}:</span>
+      < span class="comment-text" > ${ comment.text }</span >
+              </div >
+      <div class="comment-actions">
+        ${state.user && state.user.id !== comment.authorId ? `
+                  <button class="comment-report-btn" onclick="reportComment(${c.id}, ${commentIndex}, \`${(comment.text || '').replace(/`/g, '\\`')}\`, \`${(comment.author || 'User').replace(/`/g, '\\`')}\`, '${comment.authorId || ''}')" title="Report Comment">⚠️</button>
+                ` : ''}
+        ${isAdmin ? `
+                  <button class="comment-delete-btn" onclick="deleteComment(${c.id}, ${commentIndex})" title="Delete Comment">🗑️</button>
+                ` : ''}
+      </div>
+    `).join('')}
         </div>
         <div class="comment-input-area">
           <input type="text" placeholder="Add a comment..." id="input-${c.id}" class="comment-input" onkeypress="handleCommentKey(event, ${c.id})">
