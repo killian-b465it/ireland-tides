@@ -3575,7 +3575,7 @@ window.toggleUserStatus = (userId) => {
   // Email Notification Logic for Deactivation
   if (user.active === false && user.email) {
     const subject = encodeURIComponent("Account Status Update - Irish Fishing Hub");
-    const body = encodeURIComponent(`Dear ${user.name || 'Member'},\n\nWe are writing to inform you that your account on Irish Fishing Hub has been deactivated.\n\nIf you believe this is an error or would like to appeal this decision, please reply to this email.\n\nBest regards,\nSupport Team\nIrish Fishing Hub`);
+    const body = `Dear ${user.name || 'Member'},%0D%0A%0D%0AWe are writing to inform you that your account on Irish Fishing Hub has been deactivated.%0D%0A%0D%0AIf you believe this is an error or would like to appeal this decision, please reply to this email.%0D%0A%0D%0ABest regards,%0D%0ASupport Team%0D%0AIrish Fishing Hub`;
     const mailtoLink = `mailto:${user.email}?subject=${subject}&body=${body}`;
 
     // Open default email client

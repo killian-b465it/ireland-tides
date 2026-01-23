@@ -3542,9 +3542,6 @@ input:checked+.toggle-slider:before {
 }
 
 @media (max-width: 600px) {
-  .filter-toggle-text {
-    /* Always show label for clarity */
-  }
 
   .filter-toggle-btn-inline {
     padding: 8px 12px;
