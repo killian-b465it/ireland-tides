@@ -2048,7 +2048,7 @@ function renderCatchFeed() {
           ${(c.comments || []).map((comment, commentIndex) => `
             <div class="comment comment-item">
               <div class="comment-content">
-                <span class="comment-user comment-author" onclick="viewUserProfile('${comment.authorId || '}')" style="cursor:pointer">${comment.author || 'User'}:</span>
+                <span class="comment-user comment-author" onclick="viewUserProfile('${comment.authorId || ''}')" style="cursor:pointer">${comment.author || 'User'}:</span>
                 <span class="comment-text">${comment.text}</span>
               </div>
       <div class="comment-actions">
