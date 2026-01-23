@@ -761,6 +761,9 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     const loader = document.getElementById('loading-screen');
     if (loader) loader.classList.add('hidden');
+
+    // Check for mandatory legal consent after loading
+    checkLegalConsent();
   }, 6500); // 1s delay + 5s fill animation
 });
 
@@ -3134,7 +3137,65 @@ window.closePremiumModal = () => document.getElementById('premium-modal').classL
 
 window.upgradeToPremium = () => {
   if (!state.user) {
-    closePremiumModal();
+    return;
+  }
+
+  // Logic to redirect to Stripe would go here
+  alert('Redirecting to secure payment...');
+};
+
+// ============================================
+// Mandatory Legal Consent Logic
+// ============================================
+window.checkLegalConsent = () => {
+  const legalAccepted = localStorage.getItem('legal_accepted_v1');
+  const overlay = document.getElementById('legal-consent-overlay');
+
+  if (!legalAccepted) {
+    if (overlay) {
+      overlay.classList.remove('hidden');
+      document.body.style.overflow = 'hidden'; // Block scrolling
+    }
+  } else {
+    if (overlay) overlay.classList.add('hidden');
+  }
+};
+
+window.updateLegalContinueButton = () => {
+  const termsChecked = document.getElementById('check-terms').checked;
+  const privacyChecked = document.getElementById('check-privacy').checked;
+  const btn = document.getElementById('legal-continue-btn');
+
+  if (termsChecked && privacyChecked) {
+    btn.disabled = false;
+  } else {
+    btn.disabled = true;
+  }
+};
+
+window.acceptLegal = () => {
+  const termsChecked = document.getElementById('check-terms').checked;
+  const privacyChecked = document.getElementById('check-privacy').checked;
+
+  if (termsChecked && privacyChecked) {
+    localStorage.setItem('legal_accepted_v1', 'true');
+    const overlay = document.getElementById('legal-consent-overlay');
+    if (overlay) {
+      overlay.classList.add('hidden');
+      document.body.style.overflow = ''; // Restore scrolling
+    }
+  }
+};
+
+window.openPrivacyModal = () => {
+  const modal = document.getElementById('privacy-modal');
+  if (modal) modal.classList.add('active');
+};
+
+window.closePrivacyModal = () => {
+  const modal = document.getElementById('privacy-modal');
+  if (modal) modal.classList.remove('active');
+  if (!state.user) {
     return openAuthModal();
   }
 

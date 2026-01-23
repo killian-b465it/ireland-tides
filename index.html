@@ -843,7 +843,7 @@
         <button class="modal-close-btn-inline" onclick="closeTermsModal()">✕</button>
       </div>
       <div class="modal-body terms-content">
-        <p>Last updated: January 11, 2026</p>
+        <p>Last updated: January 23, 2026</p>
 
         <h3>1. Acceptance of Terms</h3>
         <p>By accessing the Irish Fishing Hub, you agree to be bound by these Terms and Conditions and all applicable
@@ -865,10 +865,87 @@
         <h3>5. Limitation of Liability</h3>
         <p>Irish Fishing Hub shall not be held liable for any loss, damage, or injury resulting from the use of data
           provided through this service.</p>
+
+        <h3>6. Account Deactivation & Termination</h3>
+        <p>Irish Fishing Hub reserves the right to deactivate or delete any user account at any time, for any reason, at
+          our sole discretion, regardless of subscription status or payment history. This includes, but is not limited
+          to, violations of community guidelines or suspicious activity.</p>
       </div>
       <div class="modal-footer">
         <button class="btn btn-primary" onclick="closeTermsModal()">I Understand</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Privacy Policy Modal -->
+  <div class="modal" id="privacy-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🛡️ Privacy Policy</h2>
+        <button class="modal-close-btn-inline" onclick="closePrivacyModal()">✕</button>
+      </div>
+      <div class="modal-body terms-content">
+        <p>Last updated: January 23, 2026</p>
+
+        <h3>1. Introduction</h3>
+        <p>We value your privacy. This policy explains how Irish Fishing Hub collects and uses your data.</p>
+
+        <h3>2. Data Collection</h3>
+        <p><strong>Account Info:</strong> Email and username collected during signup (stored via Firebase).</p>
+        <p><strong>Activity:</strong> Catch reports including photos, location, and fishing notes you choose to post.
+        </p>
+        <p><strong>Automated:</strong> Basic browsing data used by Google AdSense for advertisement delivery and
+          security purposes.</p>
+
+        <h3>3. Use of Data</h3>
+        <p>We use your data to provide tide details, enable community posting features, manage your account, and display
+          relevant advertisements via Google AdSense.</p>
+
+        <h3>4. Data Sharing</h3>
+        <p>We do not sell your personal data. Data is shared with our technology partners exclusively to operate the
+          app: Firebase (Database), Stripe (Payments), and Google AdSense (Advertising).</p>
+
+        <h3>5. Your Rights</h3>
+        <p>You can request account deletion at any time via your Profile settings or by contacting us directly.</p>
+
+        <h3>6. Cookies</h3>
+        <p>We use essential cookies for keeping you logged in and for Google AdSense functionality.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="closePrivacyModal()">I Understand</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mandatory Legal Consent Overlay -->
+  <div class="legal-overlay" id="legal-consent-overlay">
+    <div class="legal-consent-card">
+      <div class="legal-header">
+        <div class="legal-logo">🌊</div>
+        <h1>Legal Update</h1>
+        <p>Please review and accept our updated terms to continue.</p>
+      </div>
+
+      <div class="legal-checklist">
+        <label class="legal-item">
+          <input type="checkbox" id="check-terms" onchange="updateLegalContinueButton()">
+          <span class="custom-check"></span>
+          <span class="legal-text">I accept the <a href="#" onclick="openTermsModal()">Terms & Conditions</a></span>
+        </label>
+
+        <label class="legal-item">
+          <input type="checkbox" id="check-privacy" onchange="updateLegalContinueButton()">
+          <span class="custom-check"></span>
+          <span class="legal-text">I accept the <a href="#" onclick="openPrivacyModal()">Privacy Policy</a></span>
+        </label>
+      </div>
+
+      <p class="legal-note">By clicking "Agree & Continue", you confirm you are over 18 or have parental consent to use
+        this fishing hub.</p>
+
+      <button id="legal-continue-btn" class="btn btn-primary btn-full" disabled onclick="acceptLegal()">
+        Agree & Continue
+      </button>
     </div>
   </div>
 
