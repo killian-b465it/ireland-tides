@@ -866,6 +866,39 @@
     </div>
   </div>
 
+  <!-- Report Comment Modal -->
+  <div class="modal" id="report-comment-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Report Comment</h2>
+        <button class="modal-close" onclick="closeReportModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <p class="report-comment-text" id="report-comment-text"></p>
+
+        <div class="form-group">
+          <label>Reason for reporting:</label>
+          <select id="report-reason" class="form-input">
+            <option value="spam">Spam</option>
+            <option value="harassment">Harassment or Bullying</option>
+            <option value="inappropriate">Inappropriate Content</option>
+            <option value="misinformation">Misinformation</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Additional details (optional):</label>
+          <textarea id="report-details" class="form-input" rows="3" placeholder="Provide more context..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeReportModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="submitReport()">Submit Report</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

@@ -2045,7 +2045,7 @@ function renderCatchFeed() {
       </div>
       <div class="comments-section" id="comments-${c.id}">
         <div class="comments-list comment-list" id="comments-list-${c.id}">
-          ${(c.comments || []).map(comment => `
+          ${(c.comments || []).map((comment, commentIndex) => `
             <div class="comment comment-item">
               <span class="comment-user comment-author" onclick="viewUserProfile('${comment.authorId || ''}')" style="cursor:pointer">${comment.author || 'User'}:</span>
               <span class="comment-text">${comment.text}</span>
@@ -2507,6 +2507,285 @@ window.postComment = (id) => {
   }
 };
 
+
+// ============================================
+// Comment Moderation Functions
+// ============================================
+
+// Delete Comment (Admin Only)
+window.deleteComment = (catchId, commentIndex) => {
+  if (!state.user || !state.user.isAdmin) {
+    return alert('Only admins can delete comments.');
+  }
+
+  if (!confirm('Delete this comment? This cannot be undone.')) {
+    return;
+  }
+
+  const targetCatch = state.catches.find(c => c.id === catchId);
+  if (targetCatch && targetCatch.comments) {
+    // Remove comment from array
+    targetCatch.comments.splice(commentIndex, 1);
+
+    // Update Firebase
+    updateCatchInFirebase(catchId, { comments: targetCatch.comments });
+
+    // Update local storage
+    localStorage.setItem('fishing_catches', JSON.stringify(state.catches));
+
+    // Re-render feed
+    renderCatchFeed();
+
+    // Re-open comments section
+    setTimeout(() => {
+      const commentsSection = document.getElementById(`comments-${catchId}`);
+      if (commentsSection) commentsSection.classList.add('active');
+    }, 50);
+  }
+};
+
+// Report Comment
+let currentReportContext = null;
+
+window.reportComment = (catchId, commentIndex, commentText, commentAuthor, commentAuthorId) => {
+  if (!state.user) {
+    return openAuthModal();
+  }
+
+  const targetCatch = state.catches.find(c => c.id === catchId);
+  if (!targetCatch || !targetCatch.comments || !targetCatch.comments[commentIndex]) {
+    return alert('Comment not found.');
+  }
+
+  // Store context for submission
+  currentReportContext = {
+    catchId,
+    commentIndex,
+    commentText,
+    commentAuthor,
+    commentAuthorId
+  };
+
+  // Display comment in modal
+  document.getElementById('report-comment-text').textContent = `"${commentText}" - ${commentAuthor}`;
+
+  // Reset form
+  document.getElementById('report-reason').value = 'spam';
+  document.getElementById('report-details').value = '';
+
+  // Show modal
+  document.getElementById('report-comment-modal').classList.add('active');
+};
+
+window.closeReportModal = () => {
+  document.getElementById('report-comment-modal').classList.remove('active');
+  currentReportContext = null;
+};
+
+window.submitReport = () => {
+  if (!currentReportContext) return;
+
+  const reason = document.getElementById('report-reason').value;
+  const details = document.getElementById('report-details').value.trim();
+
+  const report = {
+    id: 'report_' + Date.now(),
+    catchId: currentReportContext.catchId,
+    commentIndex: currentReportContext.commentIndex,
+    commentText: currentReportContext.commentText,
+    commentAuthor: currentReportContext.commentAuthor,
+    commentAuthorId: currentReportContext.commentAuthorId,
+    reportedBy: state.user.name,
+    reportedById: state.user.id,
+    reportReason: reason,
+    reportDetails: details,
+    reportDate: Date.now(),
+    status: 'pending'
+  };
+
+  // Save to Firebase
+  if (firebaseDB) {
+    firebaseDB.ref('reportedComments/' + report.id).set(report)
+      .then(() => {
+        alert('Comment reported. Our team will review it shortly.');
+        closeReportModal();
+      })
+      .catch(err => {
+        console.error('Error reporting comment:', err);
+        alert('Failed to submit report. Please try again.');
+      });
+  } else {
+    // Fallback to localStorage
+    const reports = JSON.parse(localStorage.getItem('reported_comments') || '[]');
+    reports.push(report);
+    localStorage.setItem('reported_comments', JSON.stringify(reports));
+    alert('Comment reported. Our team will review it shortly.');
+    closeReportModal();
+  }
+};
+
+
+// ============================================
+// Admin - Reported Comments Management
+// ============================================
+
+function loadReportedComments() {
+  if (!firebaseDB) {
+    state.reportedComments = JSON.parse(localStorage.getItem('reported_comments') || '[]');
+    renderReportedComments();
+    return;
+  }
+
+  firebaseDB.ref('reportedComments').on('value', (snapshot) => {
+    const reports = [];
+    snapshot.forEach((childSnapshot) => {
+      reports.push(childSnapshot.val());
+    });
+    state.reportedComments = reports.sort((a, b) => b.reportDate - a.reportDate);
+    renderReportedComments();
+  });
+}
+
+window.filterReports = (filter) => {
+  state.reportFilter = filter;
+  renderReportedComments(filter);
+
+  // Update button states
+  document.querySelectorAll('.report-filters .btn').forEach(btn => {
+    btn.classList.remove('btn-primary');
+    btn.classList.add('btn-outline');
+  });
+  event.target.classList.remove('btn-outline');
+  event.target.classList.add('btn-primary');
+};
+
+function renderReportedComments(filter = 'pending') {
+  const container = document.getElementById('reported-comments-list');
+  if (!container) return;
+
+  const filtered = filter === 'all'
+    ? state.reportedComments
+    : state.reportedComments.filter(r => r.status === filter);
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<p class="empty-state">No reported comments to review.</p>';
+    return;
+  }
+
+  container.innerHTML = filtered.map(report => {
+    const statusClass = report.status === 'pending' ? 'status-pending' :
+      report.status === 'removed' ? 'status-removed' : 'status-dismissed';
+
+    return `
+      <div class="report-card ${statusClass}">
+        <div class="report-header">
+          <span class="report-status">${report.status.toUpperCase()}</span>
+          <span class="report-date">${new Date(report.reportDate).toLocaleDateString()}</span>
+        </div>
+        
+        <div class="report-content">
+          <div class="reported-comment">
+            <strong>Comment:</strong> "${report.commentText}"
+            <br><small>By: ${report.commentAuthor}</small>
+          </div>
+          
+          <div class="report-details">
+            <strong>Reported by:</strong> ${report.reportedBy}
+            <br><strong>Reason:</strong> ${report.reportReason}
+            ${report.reportDetails ? `<br><strong>Details:</strong> ${report.reportDetails}` : ''}
+          </div>
+        </div>
+        
+        ${report.status === 'pending' ? `
+          <div class="report-actions">
+            <button class="btn btn-sm btn-danger" onclick="removeReportedComment('${report.id}', ${report.catchId}, ${report.commentIndex})">
+              Remove Comment
+            </button>
+            <button class="btn btn-sm btn-outline" onclick="dismissReport('${report.id}')">
+              Dismiss Report
+            </button>
+            <button class="btn btn-sm btn-outline" onclick="viewReportedPost(${report.catchId})">
+              View Post
+            </button>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+window.removeReportedComment = (reportId, catchId, commentIndex) => {
+  if (!confirm('Remove this comment and mark report as resolved?')) return;
+
+  // Delete the comment
+  const targetCatch = state.catches.find(c => c.id === catchId);
+  if (targetCatch && targetCatch.comments) {
+    targetCatch.comments.splice(commentIndex, 1);
+    updateCatchInFirebase(catchId, { comments: targetCatch.comments });
+    localStorage.setItem('fishing_catches', JSON.stringify(state.catches));
+  }
+
+  // Update report status
+  const report = state.reportedComments.find(r => r.id === reportId);
+  if (report) {
+    report.status = 'removed';
+    report.reviewedBy = state.user.name;
+    report.reviewedById = state.user.id;
+    report.reviewDate = Date.now();
+
+    if (firebaseDB) {
+      firebaseDB.ref('reportedComments/' + reportId).update({
+        status: 'removed',
+        reviewedBy: state.user.name,
+        reviewedById: state.user.id,
+        reviewDate: Date.now()
+      });
+    } else {
+      localStorage.setItem('reported_comments', JSON.stringify(state.reportedComments));
+    }
+  }
+
+  renderReportedComments(state.reportFilter || 'pending');
+};
+
+window.dismissReport = (reportId) => {
+  if (!confirm('Dismiss this report? The comment will remain.')) return;
+
+  const report = state.reportedComments.find(r => r.id === reportId);
+  if (report) {
+    report.status = 'dismissed';
+    report.reviewedBy = state.user.name;
+    report.reviewedById = state.user.id;
+    report.reviewDate = Date.now();
+
+    if (firebaseDB) {
+      firebaseDB.ref('reportedComments/' + reportId).update({
+        status: 'dismissed',
+        reviewedBy: state.user.name,
+        reviewedById: state.user.id,
+        reviewDate: Date.now()
+      });
+    } else {
+      localStorage.setItem('reported_comments', JSON.stringify(state.reportedComments));
+    }
+  }
+
+  renderReportedComments(state.reportFilter || 'pending');
+};
+
+window.viewReportedPost = (catchId) => {
+  showPage('community');
+  setTimeout(() => {
+    const postElement = document.querySelector(`[data-catch-id="${catchId}"]`);
+    if (postElement) {
+      postElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      postElement.style.border = '2px solid var(--accent-warning)';
+      setTimeout(() => {
+        postElement.style.border = '';
+      }, 3000);
+    }
+  }, 500);
+};
 
 
 // ============================================
@@ -4119,3 +4398,4 @@ async function loadAdminLocationsFromFirebase() {
     console.warn('Failed to load locations from Firebase:', err);
   }
 }
+

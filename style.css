@@ -837,6 +837,150 @@ body.has-beta-banner .beta-banner {
   border-color: var(--accent-secondary);
 }
 
+/* Comment Moderation Styles */
+.comment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.comment-content {
+  flex: 1;
+}
+
+.comment-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.comment-delete-btn,
+.comment-report-btn {
+  background: transparent;
+  border: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 4px;
+  opacity: 0.6;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.comment-delete-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 4px var(--accent-danger));
+}
+
+.comment-report-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 4px var(--accent-warning));
+}
+
+/* Report Modal */
+.report-comment-text {
+  background: rgba(0, 0, 0, 0.3);
+  padding: var(--space-md);
+  border-radius: 8px;
+  font-style: italic;
+  margin-bottom: var(--space-md);
+  border-left: 3px solid var(--accent-warning);
+  color: var(--text-secondary);
+}
+
+/* Reported Comments Section */
+.reported-comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.report-card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: var(--space-md);
+  border-left: 4px solid var(--accent-warning);
+}
+
+.report-card.status-removed {
+  border-left-color: var(--accent-danger);
+  opacity: 0.7;
+}
+
+.report-card.status-dismissed {
+  border-left-color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--space-sm);
+}
+
+.report-status {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--accent-warning);
+  color: var(--bg-dark);
+}
+
+.status-removed .report-status {
+  background: var(--accent-danger);
+}
+
+.status-dismissed .report-status {
+  background: var(--text-muted);
+}
+
+.report-date {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.report-content {
+  margin: var(--space-md) 0;
+}
+
+.reported-comment {
+  background: rgba(0, 0, 0, 0.3);
+  padding: var(--space-sm);
+  border-radius: 8px;
+  margin-bottom: var(--space-sm);
+  font-style: italic;
+}
+
+.report-details {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.report-actions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-danger {
+  background: var(--accent-danger);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #ff3333;
+}
+
+.report-filters {
+  display: flex;
+  gap: var(--space-sm);
+}
+
 /* Image Preview in Modal */
 .image-preview {
   position: relative;
