@@ -1286,7 +1286,7 @@ function loadStationList() {
   container.innerHTML = regions.map(region => {
     const stations = stationsByRegion[region].sort((a, b) => a.name.localeCompare(b.name));
     return `
-      < div class="region-group collapsed" >
+      <div class="region-group collapsed">
         <div class="region-header" onclick="toggleRegion(this)">
           <span class="region-title">${region}</span>
           <span class="region-chevron">▼</span>
