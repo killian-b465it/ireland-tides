@@ -3597,130 +3597,82 @@ input:checked+.toggle-slider:before {
 }
 
 /* Admin User Management Styles */
-.user-selector-wrapper {
-  margin-bottom: var(--space-lg);
-  background: rgba(255, 255, 255, 0.03);
-  padding: var(--space-md);
-  border-radius: 12px;
-  border: 1px solid var(--border-glass);
-}
-
-.admin-select {
-  width: 100%;
-  padding: 10px;
-  background: var(--bg-dark);
-  color: var(--text-main);
+.admin-table-scroll-wrapper {
+  max-height: 400px;
+  overflow-y: auto;
   border: 1px solid var(--border-glass);
   border-radius: 8px;
-  font-size: 1rem;
-  margin-top: var(--space-sm);
-  outline: none;
-  cursor: pointer;
+  background: rgba(0, 0, 0, 0.2);
 }
 
-.admin-select:focus {
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
+/* Custom Scrollbar for Admin Tables */
+.admin-table-scroll-wrapper::-webkit-scrollbar {
+  width: 8px;
 }
 
-.user-details-card {
-  background: var(--bg-card-hover);
-  border-radius: 16px;
-  padding: var(--space-lg);
-  border: 1px solid rgba(0, 212, 255, 0.2);
-  animation: fadeIn 0.3s ease-out;
+.admin-table-scroll-wrapper::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.admin-table-scroll-wrapper::-webkit-scrollbar-thumb {
+  background: var(--border-glass);
+  border-radius: 4px;
 }
 
-.user-details-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--space-lg);
-  padding-bottom: var(--space-md);
-  border-bottom: 1px solid var(--border-glass);
+.admin-table-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
 }
 
-.user-main-info h4 {
-  font-size: 1.25rem;
-  color: var(--accent-primary);
-  margin-bottom: 4px;
-}
-
-.user-email {
-  color: var(--text-secondary);
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
   font-size: 0.9rem;
 }
 
-.user-details-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-lg);
-  margin-bottom: var(--space-xl);
-}
-
-.detail-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.detail-item label {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  letter-spacing: 0.05em;
+.admin-table th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-card);
+  padding: 12px;
+  text-align: left;
   font-weight: 600;
+  color: var(--text-muted);
+  border-bottom: 2px solid var(--border-glass);
+  z-index: 10;
 }
 
-.detail-item span {
-  font-size: 1rem;
-  color: var(--text-main);
+.admin-table td {
+  padding: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  vertical-align: middle;
 }
 
-.detail-item code {
+.admin-table tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.admin-table code {
   background: rgba(0, 0, 0, 0.3);
   padding: 2px 6px;
   border-radius: 4px;
-  font-size: 0.85rem;
-  color: var(--accent-secondary);
-}
-
-.user-actions-section {
-  background: rgba(0, 0, 0, 0.2);
-  padding: var(--space-md);
-  border-radius: 12px;
-  border: 1px dashed var(--border-glass);
-}
-
-.user-actions-section h5 {
-  margin-bottom: var(--space-md);
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-}
-
-.user-action-buttons {
-  display: flex;
-  gap: var(--space-md);
-  flex-wrap: wrap;
-}
-
-.pro-info {
-  background: rgba(0, 212, 255, 0.1);
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid var(--accent-primary);
   color: var(--accent-primary);
-  font-size: 0.85rem;
+  font-family: monospace;
+}
+
+.admin-search-input:focus {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
+  outline: none;
+}
+
+.badge.pro {
+  background: rgba(0, 212, 255, 0.15);
+  color: var(--accent-primary);
+  border: 1px solid var(--accent-primary);
+}
+
+/* Password reveal button tweak */
+.admin-table .btn-xs {
+  padding: 2px 6px;
+  font-size: 0.75rem;
 }

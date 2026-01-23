@@ -2,10 +2,11 @@
 
 ## Tasks
 
-- [x] Add Firebase SDK to index.html
-- [x] Create Firebase configuration
-- [x] Implement login validation (require account in Firebase)
-- [x] Implement user sync on registration & updates
+- [/] Execution
+    - [x] Revert `index.html` to table structure with scrollbars
+    - [/] Update `app.js` to render user table with password column
+    - [ ] Implement `changeUserPassword(userId)` functionality
+    - [ ] Style the user management card to match "Station Insights"es
 - [x] Load users from Firebase in admin dashboard
 - [x] Implement real-time Community Tab sync
     - [x] Global catch/post sync
