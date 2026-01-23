@@ -3415,7 +3415,7 @@ function loadStationInsights() {
   document.getElementById('offline-stations').textContent = offline;
 
   const listEl = document.getElementById('admin-station-list');
-  listEl.innerHTML = stations.map(s => `
+  listEl.innerHTML = stations.slice(0, 10).map(s => `
     <div class="station-status-item">
       <span>${s.name}</span>
       <span class="status ${s.maintenance ? 'offline' : 'online'}">

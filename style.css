@@ -2001,9 +2001,7 @@ body.has-beta-banner .beta-banner {
 }
 
 .station-status-list {
-  flex: 1;
-  height: 0;
-  min-height: 200px;
+  height: 420px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -3647,9 +3645,7 @@ input:checked+.toggle-slider:before {
 
 /* Admin User Management Styles */
 .admin-table-scroll-wrapper {
-  flex: 1;
-  height: 0;
-  min-height: 200px;
+  height: 420px;
   overflow-y: auto;
   border-top: 1px solid var(--border-glass);
   background: rgba(0, 0, 0, 0.25);
