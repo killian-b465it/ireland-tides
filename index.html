@@ -100,26 +100,28 @@
     </div>
   </nav>
 
-  <!-- Fishing Mode Toggle (in gap between header and content) -->
-  <div class="fishing-mode-toggle-wrapper">
-    <div class="fishing-mode-toggle" id="fishing-mode-toggle-container">
-      <span class="mode-label active" id="mode-label-sea">🌊 Sea</span>
-      <label class="toggle-switch">
-        <input type="checkbox" id="fishing-mode-toggle" onchange="toggleFishingMode()">
-        <span class="toggle-slider"></span>
-      </label>
-      <span class="mode-label" id="mode-label-freshwater">🏞️ Freshwater</span>
-
-      <!-- Filter Button (moved here for sleeker UI) -->
-      <button class="filter-toggle-btn-inline" id="filter-toggle-btn" onclick="toggleFilterPanel()" title="Map Filters">
-        <span class="filter-toggle-icon">🗺️</span>
-        <span class="filter-toggle-text">Filters</span>
-      </button>
-    </div>
-  </div>
 
   <!-- Home Page (Dashboard) -->
   <main class="page active" id="page-home">
+    <!-- Fishing Mode Toggle (Moved inside page container) -->
+    <div class="fishing-mode-toggle-wrapper">
+      <div class="fishing-mode-toggle" id="fishing-mode-toggle-container">
+        <span class="mode-label active" id="mode-label-sea">🌊 Sea</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="fishing-mode-toggle" onchange="toggleFishingMode()">
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="mode-label" id="mode-label-freshwater">🏞️ Freshwater</span>
+
+        <!-- Filter Button (moved here for sleeker UI) -->
+        <button class="filter-toggle-btn-inline" id="filter-toggle-btn" onclick="toggleFilterPanel()"
+          title="Map Filters">
+          <span class="filter-toggle-icon">🗺️</span>
+          <span class="filter-toggle-text">Filters</span>
+        </button>
+      </div>
+    </div>
+
     <div class="app-container">
       <!-- Sidebar -->
       <aside class="sidebar">
