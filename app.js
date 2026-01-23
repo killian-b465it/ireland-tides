@@ -3109,6 +3109,11 @@ window.saveProfile = () => {
 
 
 window.logout = () => {
+  // Clear real-time deactivation listener if active
+  if (state.user && firebaseDB) {
+    firebaseDB.ref('users/' + state.user.id).off('value');
+  }
+
   state.user = null;
   localStorage.removeItem('fishing_user');
   sessionStorage.removeItem('fishing_user');
@@ -3118,8 +3123,10 @@ window.logout = () => {
 
   // Reset nav avatar
   const navAvatar = document.querySelector('.user-avatar');
-  navAvatar.innerHTML = '👤';
-  navAvatar.style.backgroundImage = 'none';
+  if (navAvatar) {
+    navAvatar.innerHTML = '👤';
+    navAvatar.style.backgroundImage = 'none';
+  }
 };
 
 window.openPremiumModal = () => document.getElementById('premium-modal').classList.add('active');
@@ -3501,13 +3508,21 @@ async function verifySessionStatus() {
   if (state.user.id.includes('_main_root')) return;
 
   try {
-    const snapshot = await firebaseDB.ref('users/' + state.user.id).once('value');
-    const userData = snapshot.val();
+    const userRef = firebaseDB.ref('users/' + state.user.id);
 
-    if (userData && userData.active === false) {
-      alert('Your account has been deactivated. Please contact irishfishinghub@gmail.com if you believe this is a mistake.');
-      logout();
-    }
+    // Switch to real-time listener for immediate deactivation response
+    userRef.on('value', (snapshot) => {
+      const userData = snapshot.val();
+
+      if (userData && userData.active === false) {
+        // Stop listening before logging out to avoid infinite loop or errors
+        userRef.off('value');
+
+        alert('Your account has been deactivated. Please contact irishfishinghub@gmail.com if you believe this is a mistake.');
+        logout();
+      }
+    });
+
   } catch (err) {
     console.warn('Session verification failed:', err);
   }
