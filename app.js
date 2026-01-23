@@ -1389,7 +1389,7 @@ function updateLocationInfo(station) {
   if (station.status === 'offline') {
     const m = station.maintenance || { reason: 'Offline', duration: 'Unknown', restoration: 'TBD' };
     maintHtml = `
-      < div class="maintenance-info fade-in" >
+      <div class="maintenance-info fade-in">
         <div class="maintenance-icon">⚠️</div>
         <div class="maintenance-text">
           <div class="maintenance-title"><span class="maintenance-dot"></span>OFFLINE</div>
@@ -1401,8 +1401,8 @@ function updateLocationInfo(station) {
   }
 
   container.innerHTML = `
-      < h2 class="location-name" > ${station.name}</h2 >
-        <div class="location-coords">${station.lat.toFixed(4)}°N, ${Math.abs(station.lon).toFixed(4)}°W</div>
+    <h2 class="location-name">${station.name}</h2>
+    <div class="location-coords">${station.lat.toFixed(4)}°N, ${Math.abs(station.lon).toFixed(4)}°W</div>
     ${maintHtml}
     `;
 }
@@ -1412,7 +1412,7 @@ function updateLocationInfo(station) {
 // ============================================
 async function fetchTideData(station) {
   const container = document.getElementById('tide-current');
-  container.innerHTML = `< div class="loading" ><div class="loading-spinner"></div><span>Loading...</span></div > `;
+  container.innerHTML = `<div class="loading"><div class="loading-spinner"></div><span>Loading...</span></div>`;
 
   // If station doesn't have live data, use calculated estimates directly
   if (station.live === false) {
@@ -1462,7 +1462,7 @@ function displayTideData(station, data) {
 
   const icon = dir === 'rising' ? '↑' : dir === 'falling' ? '↓' : '→';
   container.innerHTML = `
-      < div class="tide-level" > ${level.toFixed(2)} <span class="tide-unit">m</span></div >
+    <div class="tide-level">${level.toFixed(2)}<span class="tide-unit">m</span></div>
     <div class="tide-status ${dir}">${icon} ${dir.toUpperCase()}</div>
     <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px;">
       Updated: ${time.toLocaleTimeString('en-IE', { hour: '2-digit', minute: '2-digit' })}
@@ -1549,7 +1549,7 @@ function renderForecastView() {
     const w = mapWeatherCode(d.weather_code[idx]);
 
     container.innerHTML = `
-      < div class="weather-main fade-in" >
+      <div class="weather-main fade-in">
         <div class="weather-temp-section">
           <div class="weather-icon">${w.icon}</div>
           <div>
@@ -1601,7 +1601,7 @@ function displayTideTimes(data) {
   }
 
   container.innerHTML = dayExtremes.map(e => `
-      < div class="tide-time-item ${e.type.toLowerCase()}" >
+    <div class="tide-time-item ${e.type.toLowerCase()}">
       <div class="tide-time-label">${e.type.toUpperCase()} TIDE</div>
       <div class="tide-time-value">${new Date(e.time).toLocaleTimeString('en-IE', { hour: '2-digit', minute: '2-digit' })}</div>
       <div class="tide-time-height">${e.level.toFixed(2)}m</div>
@@ -1731,7 +1731,7 @@ function displayCalculatedTides(station) {
   const icon = direction === 'rising' ? '↑' : direction === 'falling' ? '↓' : '→';
 
   container.innerHTML = `
-      < div class="tide-level" > ${level.toFixed(2)} <span class="tide-unit">m</span></div >
+    <div class="tide-level">${level.toFixed(2)}<span class="tide-unit">m</span></div>
     <div class="tide-status ${direction}">${icon} ${direction.toUpperCase()}</div>
     <div style="font-size: 0.75rem; color: var(--accent-warning); margin-top: 8px;">⚠️ Estimated</div>
     `;
