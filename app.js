@@ -1001,7 +1001,7 @@ window.closeFilterPanel = () => {
   if (overlay) overlay.classList.remove('active');
 };
 
-window.applyFilters = () => {
+window.applyFilters = (closePanel = true) => {
   // Read checkbox states
   const filters = {
     stations: document.getElementById('filter-stations')?.checked ?? true,
@@ -1051,8 +1051,8 @@ window.applyFilters = () => {
   // Update state
   state.activeFilters = filters;
 
-  // Close the panel
-  closeFilterPanel();
+  // Close the panel if requested
+  if (closePanel) closeFilterPanel();
 };
 
 // Toggle Station List (Collapsible)
@@ -2192,12 +2192,8 @@ function updateMapForFishingMode() {
     // Trigger map resize after grid change
     setTimeout(() => state.map.invalidateSize(), 100);
 
-    // Show sea fishing markers
-    Object.values(state.markers).forEach(m => state.map.addLayer(m));
-    if (state.shopMarkers) state.map.addLayer(state.shopMarkers);
-    if (state.pierMarkers) state.map.addLayer(state.pierMarkers);
-    if (state.rampMarkers) state.map.addLayer(state.rampMarkers);
-    if (state.harbourMarkers) state.map.addLayer(state.harbourMarkers);
+    // Show sea fishing markers (Respect filters)
+    applyFilters(false);
 
     // Hide freshwater markers
     if (freshwaterMarkerGroup) state.map.removeLayer(freshwaterMarkerGroup);
@@ -2220,18 +2216,14 @@ function updateMapForFishingMode() {
     // Trigger map resize to fill new width
     setTimeout(() => state.map.invalidateSize(), 100);
 
-    // Hide sea fishing markers (but keep shops visible)
+    // Hide sea fishing markers
     Object.values(state.markers).forEach(m => state.map.removeLayer(m));
-    // Keep shopMarkers visible - they work in both modes!
     if (state.pierMarkers) state.map.removeLayer(state.pierMarkers);
     if (state.rampMarkers) state.map.removeLayer(state.rampMarkers);
     if (state.harbourMarkers) state.map.removeLayer(state.harbourMarkers);
 
-    // Show freshwater markers (all types)
-    renderFreshwaterSpots();
-    renderFreshwaterParks();
-    renderFreshwaterRamps();
-    renderFreshwaterPiers();
+    // Show freshwater markers (Respect filters)
+    applyFreshwaterFilters(false);
 
     // Toggle filter button to freshwater filters
     if (seaFilterBtn) {
@@ -2416,7 +2408,7 @@ window.closeFreshwaterFilterPanel = () => {
   if (overlay) overlay.classList.remove('active');
 };
 
-window.applyFreshwaterFilters = () => {
+window.applyFreshwaterFilters = (closePanel = true) => {
   const showSpots = document.getElementById('filter-fw-spots')?.checked ?? true;
   const showParks = document.getElementById('filter-fw-parks')?.checked ?? true;
   const showRamps = document.getElementById('filter-fw-ramps')?.checked ?? true;
@@ -2445,7 +2437,7 @@ window.applyFreshwaterFilters = () => {
     else state.map.removeLayer(state.shopMarkers);
   }
 
-  closeFreshwaterFilterPanel();
+  if (closePanel) closeFreshwaterFilterPanel();
 };
 
 window.toggleComments = (id) => {

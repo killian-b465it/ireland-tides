@@ -3543,8 +3543,7 @@ input:checked+.toggle-slider:before {
 
 @media (max-width: 600px) {
   .filter-toggle-text {
-    display: none;
-    /* Hide "Filters" text on small screens */
+    /* Always show label for clarity */
   }
 
   .filter-toggle-btn-inline {
@@ -3763,4 +3762,6 @@ input:checked+.toggle-slider:before {
 .admin-table .btn-primary:hover {
   background: var(--accent-secondary);
   box-shadow: 0 4px 12px rgba(0, 136, 255, 0.3);
-}$css
+}
+
+$css
