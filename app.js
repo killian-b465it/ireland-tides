@@ -1328,11 +1328,11 @@ function updateAllStationLevels() {
   const now = new Date();
   // Update non-live stations with calculated values
   CONFIG.stations.forEach(station => {
-    const levelEl = document.getElementById(`level - ${station.id} `);
+    const levelEl = document.getElementById(`level-${station.id}`);
     if (levelEl && !state.tideData[station.id]) {
       const { level, direction } = calculateTideLevel(now, station);
       const arrow = direction === 'rising' ? '↑' : direction === 'falling' ? '↓' : '';
-      levelEl.textContent = `${level.toFixed(1)}m ${arrow} `;
+      levelEl.textContent = `${level.toFixed(1)}m ${arrow}`;
     }
   });
 }
@@ -1342,7 +1342,7 @@ async function fetchAllLiveStationData() {
   try {
     const now = new Date();
     const past24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    const url = `${CONFIG.apiBase}.json ? station_id, time, Water_Level_LAT & time >= ${past24h.toISOString()}& orderBy("time")`;
+    const url = `${CONFIG.apiBase}.json?station_id,time,Water_Level_LAT&time>=${past24h.toISOString()}&orderBy("time")`;
 
     const response = await fetch(url);
     if (!response.ok) throw new Error('API request failed');
@@ -1472,9 +1472,9 @@ function displayTideData(station, data) {
   displayTideTimes(data);
 
   // Sync sidebar list with live data if it exists
-  const sidebarLevel = document.getElementById(`level - ${station.id} `);
+  const sidebarLevel = document.getElementById(`level-${station.id}`);
   if (sidebarLevel) {
-    sidebarLevel.innerHTML = `${level.toFixed(1)}m ${icon} `;
+    sidebarLevel.innerHTML = `${level.toFixed(1)}m ${icon}`;
     sidebarLevel.classList.add('live-data-active'); // Optional: add class to show it's live
   }
 }
@@ -1737,9 +1737,9 @@ function displayCalculatedTides(station) {
     `;
 
   // Sync sidebar list with calculated data
-  const sidebarLevel = document.getElementById(`level - ${station.id} `);
+  const sidebarLevel = document.getElementById(`level-${station.id}`);
   if (sidebarLevel) {
-    sidebarLevel.innerHTML = `${level.toFixed(1)}m ${icon} `;
+    sidebarLevel.innerHTML = `${level.toFixed(1)}m ${icon}`;
   }
 
   displayTideTimes([]);
