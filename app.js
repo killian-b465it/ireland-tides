@@ -3459,39 +3459,96 @@ function loadUsersTable() {
 
   document.getElementById('total-users-badge').textContent = `${filteredUsers.length} users`;
 
-  const tbody = document.getElementById('users-table-body');
-  if (filteredUsers.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 20px;">${searchTerm ? 'No matches found' : 'No users registered yet'}</td></tr>`;
+  const select = document.getElementById('admin-user-select');
+  if (!select) return;
+
+  // Preserve selected value if possible
+  const currentSelected = select.value;
+
+  select.innerHTML = '<option value="">-- Select a User --</option>' +
+    filteredUsers.sort((a, b) => (a.name || a.email).localeCompare(b.name || b.email))
+      .map(u => `<option value="${u.id}" ${u.id === currentSelected ? 'selected' : ''}>
+      ${u.name || 'Unknown'} (${u.email}) ${u.active === false ? '⛔' : ''}
+    </option>`).join('');
+
+  // If the selected user is no longer in the filtered list, clear the details view
+  if (currentSelected && !filteredUsers.find(u => u.id === currentSelected)) {
+    document.getElementById('user-details-view').style.display = 'none';
+    select.value = "";
+  }
+}
+
+window.renderUserDetails = (userId) => {
+  const container = document.getElementById('user-details-view');
+  if (!container) return;
+
+  if (!userId) {
+    container.style.display = 'none';
     return;
   }
 
-  tbody.innerHTML = filteredUsers.map(u => {
-    const joinDate = u.joinDate ? new Date(u.joinDate).toLocaleDateString('en-GB') : 'N/A';
-    const isActive = u.active !== false;
-    const plan = u.plan || 'free';
+  const user = state.allUsers.find(u => u.id === userId);
+  if (!user) {
+    container.innerHTML = '<p class="error">User not found.</p>';
+    container.style.display = 'block';
+    return;
+  }
 
-    return `
-      <tr>
-        <td>${u.name || 'Unknown'}</td>
-        <td>${u.email}</td>
-        <td><span class="badge ${plan === 'pro' ? 'pro' : ''}">${plan.toUpperCase()}</span></td>
-        <td>${joinDate}</td>
-        <td><span class="badge ${isActive ? 'active' : 'inactive'}">${isActive ? 'Active' : 'Inactive'}</span></td>
-        <td style="display: flex; gap: 5px;">
-          <button class="btn btn-xs ${isActive ? 'btn-danger' : 'btn-success'}" 
-                  onclick="toggleUserStatus('${u.id}')">
-            ${isActive ? 'Deactivate' : 'Activate'}
+  const joinDate = user.joinDate ? new Date(user.joinDate).toLocaleDateString('en-GB', {
+    day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+  }) : 'N/A';
+  const isActive = user.active !== false;
+  const plan = user.plan || 'free';
+
+  container.innerHTML = `
+    <div class="user-details-header">
+      <div class="user-main-info">
+        <h4>${user.name || 'Unknown User'}</h4>
+        <p class="user-email">${user.email}</p>
+      </div>
+      <span class="badge ${isActive ? 'active' : 'inactive'}">${isActive ? 'Active' : 'Deactivated'}</span>
+    </div>
+    
+    <div class="user-details-grid">
+      <div class="detail-item">
+        <label>Account ID</label>
+        <span><code>${user.id}</code></span>
+      </div>
+      <div class="detail-item">
+        <label>Subscription Plan</label>
+        <span class="badge ${plan === 'pro' ? 'pro' : ''}">${plan.toUpperCase()}</span>
+      </div>
+      <div class="detail-item">
+        <label>Joined On</label>
+        <span>${joinDate}</span>
+      </div>
+      <div class="detail-item">
+        <label>Last Activity</label>
+        <span>${user.lastLogin ? new Date(user.lastLogin).toLocaleDateString('en-GB') : 'N/A'}</span>
+      </div>
+    </div>
+
+    <div class="user-actions-section">
+      <h5>Admin Actions</h5>
+      <div class="user-action-buttons">
+        <button class="btn ${isActive ? 'btn-danger' : 'btn-success'}" onclick="toggleUserStatus('${user.id}')">
+          ${isActive ? 'Deactivate User Account' : 'Reactivate User Account'}
+        </button>
+        
+        ${plan !== 'pro' ? `
+          <button class="btn btn-primary" onclick="giftProSubscription('${user.id}')">
+            🎁 Gift 1 Month Pro Access
           </button>
-          ${plan !== 'pro' ? `
-            <button class="btn btn-xs btn-primary" onclick="giftProSubscription('${u.id}')" title="Gift 1 Month Free Pro">
-              🎁 Gift Pro
-            </button>
-          ` : ''}
-        </td>
-      </tr>
-    `;
-  }).join('');
-}
+        ` : `
+          <div class="pro-info">
+            <p><strong>Pro Plan active</strong>${user.proExpirationDate ? ` until ${new Date(user.proExpirationDate).toLocaleDateString('en-GB')}` : ''}</p>
+          </div>
+        `}
+      </div>
+    </div>
+  `;
+  container.style.display = 'block';
+};
 
 window.giftProSubscription = (userId) => {
   if (!confirm('Are you sure you want to gift this user 1 month of Pro status for free?')) return;
@@ -3515,6 +3572,7 @@ window.giftProSubscription = (userId) => {
 
   alert(`Successfully gifted 1 month of Pro to ${user.name || user.email}`);
   loadUsersTable();
+  renderUserDetails(userId);
 };
 
 window.toggleUserStatus = (userId) => {
@@ -3542,6 +3600,10 @@ window.toggleUserStatus = (userId) => {
     // Open default email client
     window.open(mailtoLink, '_blank');
   }
+
+  // Refresh UI
+  loadUsersTable();
+  renderUserDetails(userId);
 
   // If current user is being deactivated, log them out
   if (state.user && state.user.id === userId && !user.active) {

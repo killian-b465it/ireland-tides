@@ -635,23 +635,19 @@
             </div>
             <span class="badge" id="total-users-badge">0 users</span>
           </div>
-          <div class="admin-card-body">
-            <div class="admin-table-wrapper">
-              <table class="admin-table" id="users-table">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Plan</th>
-                    <th>Joined</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="users-table-body">
-                  <!-- Populated by JS -->
-                </tbody>
-              </table>
+          <div class="user-selector-wrapper">
+            <div class="form-group">
+              <label for="admin-user-select">Select User to Manage:</label>
+              <select id="admin-user-select" class="admin-select" onchange="renderUserDetails(this.value)">
+                <option value="">-- Select a User --</option>
+                <!-- Populated by JS -->
+              </select>
+            </div>
+          </div>
+          <div id="user-details-view" class="user-details-card" style="display: none;">
+            <!-- Populated by JS -->
+            <div class="empty-state">
+              <p>Select a user from the dropdown to see details and actions.</p>
             </div>
           </div>
         </div>
