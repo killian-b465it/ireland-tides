@@ -147,9 +147,8 @@
 
         <!-- Current Tide -->
         <div class="card fade-in" id="tide-card" style="display: none;">
-          <div class="card-header" style="justify-content: space-between; display: flex; align-items: center;">
+          <div class="card-header">
             <span class="card-title">🌊 Current Tide</span>
-            <button class="btn btn-sm btn-outline" onclick="openForecastModal()">📅 7-Day Forecast</button>
           </div>
           <div class="tide-current" id="tide-current">
             <div class="loading">
@@ -161,8 +160,10 @@
 
         <!-- Weather Conditions -->
         <div class="card fade-in" id="weather-card" style="display: none;">
-          <div class="card-header">
-            <span class="card-title">🌦️ Local Weather</span>
+          <div class="card-header" style="justify-content: space-between; display: flex; align-items: center;">
+            <button class="nav-arrow" onclick="navigateForecast(-1)">❮</button>
+            <span class="card-title" id="weather-card-title">Local Weather</span>
+            <button class="nav-arrow" onclick="navigateForecast(1)">❯</button>
           </div>
           <div class="weather-display" id="weather-display">
             <div class="loading">
@@ -174,8 +175,10 @@
 
         <!-- Today's Tides -->
         <div class="card fade-in" id="tide-times-card" style="display: none;">
-          <div class="card-header">
-            <span class="card-title">⏰ Today's Tides</span>
+          <div class="card-header" style="justify-content: space-between; display: flex; align-items: center;">
+            <button class="nav-arrow" onclick="navigateForecast(-1)">❮</button>
+            <span class="card-title" id="tide-card-title">Today's Tides</span>
+            <button class="nav-arrow" onclick="navigateForecast(1)">❯</button>
           </div>
           <div class="tide-times" id="tide-times">
             <!-- Populated by JS -->
@@ -407,21 +410,7 @@
     </div>
   </div>
 
-  <!-- 7-Day Forecast Modal -->
-  <div class="modal" id="forecast-modal">
-    <div class="modal-content modal-large">
-      <div class="modal-header">
-        <h2>📅 7-Day Forecast: <span id="forecast-station-name">Station</span></h2>
-        <button class="modal-close-btn-inline" onclick="closeForecastModal()">✕</button>
-      </div>
-      <div class="forecast-list" id="forecast-list">
-        <!-- Populated by JS -->
-      </div>
-      <div class="modal-footer">
-        <p class="disclaimer-text">Predictions based on nearby live data and astronomical harmonics.</p>
-      </div>
-    </div>
-  </div>
+
 
   <!-- Auth Modal -->
   <div class="modal" id="auth-modal">

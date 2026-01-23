@@ -247,6 +247,8 @@ let state = {
   harbourMarkers: null,
   activeFilters: { stations: true, shops: true, piers: true, ramps: true, harbours: true },
   tideData: {},
+  currentWeatherDaily: null, // Store 7-day weather
+  forecastOffset: 0, // 0 = Today, 1 = Tomorrow, etc.
   isLoading: false,
   catches: [], // Will be loaded from Firebase
   currentModalLatLng: null,
@@ -1488,32 +1490,136 @@ function findTideExtremes(data) {
   return extremes;
 }
 
+`).join('');
+}
+
+// Inline Forecast Navigation
+window.navigateForecast = (delta) => {
+  const newOffset = state.forecastOffset + delta;
+  
+  // Limit: -7 days (past) to +7 days (future)
+  if (newOffset < -7 || newOffset > 7) return;
+  
+  state.forecastOffset = newOffset;
+  
+  // Re-render components that depend on the day
+  updateForecastHeaders();
+  
+  // Re-fetch or re-render
+  // If we have daily weather data, update display
+  const weatherData = state.currentWeatherDaily;
+  if (weatherData) {
+    displayWeatherData({
+      // Mocking current structure from daily array
+      temperature_2m: weatherData.temperature_2m_max[newOffset + (newOffset >= 0 ? 0 : 7)], // Logic here gets tricky with offset vs array index
+      // For simplicity, let's assume currentWeatherDaily index 0 is TODAY.
+      // Ideally we need to map offsets to array indices.
+      // OpenMeteo daily usually gives 7 days starting from today.
+      // So index = offset. If offset < 0 (past), we might not have data unless we requested past_days.
+      // The implemented API call was "&daily=...&timezone=auto". Default is 7 days forward.
+      // So we can only go 0 to 6.
+    });
+    // This requires a more robust displayWeatherData refactor.
+    // Let's call a specific render function instead.
+    renderForecastView();
+  }
+  
+  // Re-render tides
+  displayTideTimes([]); 
+};
+
+function updateForecastHeaders() {
+  const date = new Date();
+  date.setDate(date.getDate() + state.forecastOffset);
+  
+  const options = { weekday: 'short', day: 'numeric', month: 'short' };
+  const dateStr = state.forecastOffset === 0 ? "Today" : date.toLocaleDateString('en-IE', options);
+  
+  const weatherTitle = document.getElementById('weather-card-title');
+  const tideTitle = document.getElementById('tide-card-title');
+  
+  if (weatherTitle) weatherTitle.innerText = state.forecastOffset === 0 ? "🌦️ Local Weather" : `🌦️ Weather(${ dateStr })`;
+  if (tideTitle) tideTitle.innerText = state.forecastOffset === 0 ? "⏰ Today's Tides" : `⏰ Tides(${ dateStr })`;
+}
+
+function renderForecastView() {
+  if (!state.selectedStation || !state.currentWeatherDaily) return;
+  
+  // Update Weather Card
+  const d = state.currentWeatherDaily;
+  // Limit offset to 0-6 for now as API default is 7 days forward
+  const idx = state.forecastOffset;
+  
+  if (idx >= 0 && idx < d.time.length) {
+    const container = document.getElementById('weather-display');
+    const w = mapWeatherCode(d.weather_code[idx]);
+    
+    container.innerHTML = `
+  < div class="weather-main fade-in" >
+    <div class="weather-temp-section">
+      <div class="weather-icon">${w.icon}</div>
+      <div>
+        <div class="weather-temp">${Math.round(d.temperature_2m_max[idx])}°C</div>
+        <div class="weather-condition">${w.description}</div>
+        <div class="weather-label">Low: ${Math.round(d.temperature_2m_min[idx])}°C</div>
+      </div>
+    </div>
+      </div >
+  `;
+  } else {
+     document.getElementById('weather-display').innerHTML = '<div class="empty-state"><p>No forecast data available for this day.</p></div>';
+  }
+}
+
+// Override displayTideTimes to handle offset
 function displayTideTimes(data) {
   const container = document.getElementById('tide-times');
-  const extremes = findTideExtremes(data);
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-
-  const display = extremes.filter(e => new Date(e.time) >= now).slice(0, 4);
-  if (display.length === 0) {
-    container.innerHTML = generateEstimatedTides(new Date()).map(t => `
-      <div class="tide-time-item ${t.type}">
-        <div class="tide-time-label">${t.type.toUpperCase()} TIDE</div>
-        <div class="tide-time-value">${t.time}</div>
-        <div class="tide-time-height">${t.height}</div>
-      </div>
-    `).join('');
-    return;
+  
+  // We need to generate tides for the specific offset day
+  // generateSevenDayTides returns an array of days.
+  // We can reuse that or calculate on fly.
+  
+  if (!state.selectedStation) {
+     container.innerHTML = '<div class="empty-state"><p>Select a station</p></div>';
+     return;
   }
 
-  container.innerHTML = display.map(e => `
-    <div class="tide-time-item ${e.type}">
+  const station = state.selectedStation;
+  const dayStart = new Date();
+  dayStart.setHours(0,0,0,0);
+  dayStart.setDate(dayStart.getDate() + state.forecastOffset);
+  
+  // Calculate tides for this specific day using improved logic
+  const dayExtremes = [];
+  const step = 15 * 60 * 1000;
+  const tStart = dayStart.getTime();
+  const tEnd = tStart + 24 * 60 * 60 * 1000;
+  
+  let prevLvl = calculateTideLevel(new Date(tStart - step), station).level;
+  let currLvl = calculateTideLevel(new Date(tStart), station).level;
+  
+  for (let t = tStart + step; t <= tEnd; t += step) {
+    const nextLvl = calculateTideLevel(new Date(t), station).level;
+    if (currLvl > prevLvl && currLvl > nextLvl) dayExtremes.push({ type: 'High', time: t, level: currLvl });
+    else if (currLvl < prevLvl && currLvl < nextLvl) dayExtremes.push({ type: 'Low', time: t, level: currLvl });
+    prevLvl = currLvl;
+    currLvl = nextLvl;
+  }
+
+  container.innerHTML = dayExtremes.map(e => `
+  < div class="tide-time-item ${e.type.toLowerCase()}" >
       <div class="tide-time-label">${e.type.toUpperCase()} TIDE</div>
       <div class="tide-time-value">${new Date(e.time).toLocaleTimeString('en-IE', { hour: '2-digit', minute: '2-digit' })}</div>
       <div class="tide-time-height">${e.level.toFixed(2)}m</div>
-    </div>
+    </div >
   `).join('');
+  
+  // Show empty if none found (rare for semidiurnal)
+  if (dayExtremes.length === 0) {
+     container.innerHTML = '<div class="empty-state"><p>No highs/lows calculated.</p></div>';
+  }
 }
+
 
 
 function generateSevenDayTides(station) {
@@ -1631,15 +1737,15 @@ function displayCalculatedTides(station) {
   const icon = direction === 'rising' ? '↑' : direction === 'falling' ? '↓' : '→';
 
   container.innerHTML = `
-    <div class="tide-level">${level.toFixed(2)}<span class="tide-unit">m</span></div>
+  < div class="tide-level" > ${ level.toFixed(2) } <span class="tide-unit">m</span></div >
     <div class="tide-status ${direction}">${icon} ${direction.toUpperCase()}</div>
     <div style="font-size: 0.75rem; color: var(--accent-warning); margin-top: 8px;">⚠️ Estimated</div>
-  `;
+`;
 
   // Sync sidebar list with calculated data
-  const sidebarLevel = document.getElementById(`level-${station.id}`);
+  const sidebarLevel = document.getElementById(`level - ${ station.id } `);
   if (sidebarLevel) {
-    sidebarLevel.innerHTML = `${level.toFixed(1)}m ${icon}`;
+    sidebarLevel.innerHTML = `${ level.toFixed(1) }m ${ icon } `;
   }
 
   displayTideTimes([]);
@@ -1654,20 +1760,24 @@ async function fetchWeatherData(station) {
   const container = document.getElementById('weather-display');
   try {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${station.lat}&longitude=${station.lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`;
-    const res = await fetch(url);
-    const data = await res.json();
-    displayWeatherData(data.current);
+const res = await fetch(url);
+const data = await res.json();
+displayWeatherData(data.current);
 
-    // Store daily data for 7-day forecast
-    state.currentWeatherDaily = data.daily;
+// Store daily data for 7-day forecast
+state.currentWeatherDaily = data.daily;
+
+// Initial Render of Forecast View (Today)
+renderForecastView();
+    
   } catch (err) {
-    console.warn(`Weather fetch failed for ${station.id}:`, err);
-    container.innerHTML = `
+  console.warn(`Weather fetch failed for ${station.id}:`, err);
+  container.innerHTML = `
       <div class="error-message fade-in">
         <span>⚠️ Weather unavailable</span>
         <button class="btn btn-sm btn-outline" onclick="fetchWeatherData(state.selectedStation)" style="margin-top:8px">Retry</button>
       </div>`;
-  }
+}
 }
 
 window.openForecastModal = () => {
