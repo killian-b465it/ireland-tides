@@ -3474,12 +3474,7 @@ function loadUsersTable() {
       <tr>
         <td>${u.name || 'Unknown'}</td>
         <td style="font-size: 0.8rem;">${u.email}</td>
-        <td>
-          <div style="display: flex; align-items: center; gap: 5px;">
-            <code id="pwd-${u.id}" style="font-size: 0.8rem;">●●●●●●</code>
-            <button class="btn btn-xs" onclick="togglePasswordShow('${u.id}', '${pwd.replace(/'/g, "\\'")}')" title="Show Password">👁️</button>
-          </div>
-        </td>
+        <td><code style="font-size: 0.8rem;">${pwd}</code></td>
         <td><span class="badge ${plan === 'pro' ? 'pro' : ''}">${plan.toUpperCase()}</span></td>
         <td>${joinDate}</td>
         <td><span class="badge ${isActive ? 'active' : 'inactive'}">${isActive ? 'Active' : 'Inactive'}</span></td>
@@ -3501,16 +3496,6 @@ function loadUsersTable() {
     `;
   }).join('');
 }
-
-window.togglePasswordShow = (userId, pwd) => {
-  const el = document.getElementById(`pwd-${userId}`);
-  if (!el) return;
-  if (el.textContent === '●●●●●●') {
-    el.textContent = pwd;
-  } else {
-    el.textContent = '●●●●●●';
-  }
-};
 
 window.changeUserPassword = (userId) => {
   const user = state.allUsers.find(u => u.id === userId);
