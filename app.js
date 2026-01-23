@@ -1490,41 +1490,64 @@ function findTideExtremes(data) {
   return extremes;
 }
 
-`).join('');
-}
-
 // Inline Forecast Navigation
 window.navigateForecast = (delta) => {
   const newOffset = state.forecastOffset + delta;
-  
 
+  // Limit: -7 days (past) to +7 days (future)
+  if (newOffset < -7 || newOffset > 7) return;
+
+  state.forecastOffset = newOffset;
+
+  // Re-render components that depend on the day
+  updateForecastHeaders();
+
+  // Re-fetch or re-render
+  // If we have daily weather data, update display
+  const weatherData = state.currentWeatherDaily;
+  if (weatherData) {
+    // Determine index for daily data.
+    const idx = newOffset;
+
+    if (idx >= 0 && idx < weatherData.time.length) {
+      // We need to render the forecast view directly as displayWeatherData is for current weather
+      renderForecastView();
+    } else {
+      const wContainer = document.getElementById('weather-display');
+      if (wContainer) wContainer.innerHTML = '<div class="empty-state"><p>No forecast data available for this day.</p></div>';
+    }
+  }
+
+  // Re-render tides
+  displayTideTimes([]);
+};
 
 function updateForecastHeaders() {
   const date = new Date();
   date.setDate(date.getDate() + state.forecastOffset);
-  
+
   const options = { weekday: 'short', day: 'numeric', month: 'short' };
   const dateStr = state.forecastOffset === 0 ? "Today" : date.toLocaleDateString('en-IE', options);
-  
+
   const weatherTitle = document.getElementById('weather-card-title');
   const tideTitle = document.getElementById('tide-card-title');
-  
-  if (weatherTitle) weatherTitle.innerText = state.forecastOffset === 0 ? "🌦️ Local Weather" : `🌦️ Weather(${ dateStr })`;
-  if (tideTitle) tideTitle.innerText = state.forecastOffset === 0 ? "⏰ Today's Tides" : `⏰ Tides(${ dateStr })`;
+
+  if (weatherTitle) weatherTitle.innerText = state.forecastOffset === 0 ? "🌦️ Local Weather" : `🌦️ Weather(${dateStr})`;
+  if (tideTitle) tideTitle.innerText = state.forecastOffset === 0 ? "⏰ Today's Tides" : `⏰ Tides(${dateStr})`;
 }
 
 function renderForecastView() {
   if (!state.selectedStation || !state.currentWeatherDaily) return;
-  
+
   // Update Weather Card
   const d = state.currentWeatherDaily;
   // Limit offset to 0-6 for now as API default is 7 days forward
   const idx = state.forecastOffset;
-  
+
   if (idx >= 0 && idx < d.time.length) {
     const container = document.getElementById('weather-display');
     const w = mapWeatherCode(d.weather_code[idx]);
-    
+
     container.innerHTML = `
   < div class="weather-main fade-in" >
     <div class="weather-temp-section">
@@ -1538,37 +1561,37 @@ function renderForecastView() {
       </div >
   `;
   } else {
-     document.getElementById('weather-display').innerHTML = '<div class="empty-state"><p>No forecast data available for this day.</p></div>';
+    document.getElementById('weather-display').innerHTML = '<div class="empty-state"><p>No forecast data available for this day.</p></div>';
   }
 }
 
 // Override displayTideTimes to handle offset
 function displayTideTimes(data) {
   const container = document.getElementById('tide-times');
-  
+
   // We need to generate tides for the specific offset day
   // generateSevenDayTides returns an array of days.
   // We can reuse that or calculate on fly.
-  
+
   if (!state.selectedStation) {
-     container.innerHTML = '<div class="empty-state"><p>Select a station</p></div>';
-     return;
+    container.innerHTML = '<div class="empty-state"><p>Select a station</p></div>';
+    return;
   }
 
   const station = state.selectedStation;
   const dayStart = new Date();
-  dayStart.setHours(0,0,0,0);
+  dayStart.setHours(0, 0, 0, 0);
   dayStart.setDate(dayStart.getDate() + state.forecastOffset);
-  
+
   // Calculate tides for this specific day using improved logic
   const dayExtremes = [];
   const step = 15 * 60 * 1000;
   const tStart = dayStart.getTime();
   const tEnd = tStart + 24 * 60 * 60 * 1000;
-  
+
   let prevLvl = calculateTideLevel(new Date(tStart - step), station).level;
   let currLvl = calculateTideLevel(new Date(tStart), station).level;
-  
+
   for (let t = tStart + step; t <= tEnd; t += step) {
     const nextLvl = calculateTideLevel(new Date(t), station).level;
     if (currLvl > prevLvl && currLvl > nextLvl) dayExtremes.push({ type: 'High', time: t, level: currLvl });
@@ -1584,10 +1607,10 @@ function displayTideTimes(data) {
       <div class="tide-time-height">${e.level.toFixed(2)}m</div>
     </div >
   `).join('');
-  
+
   // Show empty if none found (rare for semidiurnal)
   if (dayExtremes.length === 0) {
-     container.innerHTML = '<div class="empty-state"><p>No highs/lows calculated.</p></div>';
+    container.innerHTML = '<div class="empty-state"><p>No highs/lows calculated.</p></div>';
   }
 }
 
@@ -1708,15 +1731,15 @@ function displayCalculatedTides(station) {
   const icon = direction === 'rising' ? '↑' : direction === 'falling' ? '↓' : '→';
 
   container.innerHTML = `
-  < div class="tide-level" > ${ level.toFixed(2) } <span class="tide-unit">m</span></div >
+  < div class="tide-level" > ${level.toFixed(2)} <span class="tide-unit">m</span></div >
     <div class="tide-status ${direction}">${icon} ${direction.toUpperCase()}</div>
     <div style="font-size: 0.75rem; color: var(--accent-warning); margin-top: 8px;">⚠️ Estimated</div>
 `;
 
   // Sync sidebar list with calculated data
-  const sidebarLevel = document.getElementById(`level - ${ station.id } `);
+  const sidebarLevel = document.getElementById(`level - ${station.id} `);
   if (sidebarLevel) {
-    sidebarLevel.innerHTML = `${ level.toFixed(1) }m ${ icon } `;
+    sidebarLevel.innerHTML = `${level.toFixed(1)}m ${icon} `;
   }
 
   displayTideTimes([]);
@@ -1731,24 +1754,24 @@ async function fetchWeatherData(station) {
   const container = document.getElementById('weather-display');
   try {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${station.lat}&longitude=${station.lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`;
-const res = await fetch(url);
-const data = await res.json();
-displayWeatherData(data.current);
+    const res = await fetch(url);
+    const data = await res.json();
+    displayWeatherData(data.current);
 
-// Store daily data for 7-day forecast
-state.currentWeatherDaily = data.daily;
+    // Store daily data for 7-day forecast
+    state.currentWeatherDaily = data.daily;
 
-// Initial Render of Forecast View (Today)
-renderForecastView();
-    
+    // Initial Render of Forecast View (Today)
+    renderForecastView();
+
   } catch (err) {
-  console.warn(`Weather fetch failed for ${station.id}:`, err);
-  container.innerHTML = `
+    console.warn(`Weather fetch failed for ${station.id}:`, err);
+    container.innerHTML = `
       <div class="error-message fade-in">
         <span>⚠️ Weather unavailable</span>
         <button class="btn btn-sm btn-outline" onclick="fetchWeatherData(state.selectedStation)" style="margin-top:8px">Retry</button>
       </div>`;
-}
+  }
 }
 
 window.openForecastModal = () => {
