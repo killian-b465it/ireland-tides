@@ -2043,7 +2043,7 @@ function renderCatchFeed() {
           💬 ${c.comments ? c.comments.length : 0}
         </button>
       </div>
-      <div class="comments-section" id="comments-${c.id}" style="display: none;">
+      <div class="comments-section" id="comments-${c.id}">
         <div class="comments-list comment-list" id="comments-list-${c.id}">
           ${(c.comments || []).map(comment => `
             <div class="comment comment-item">
