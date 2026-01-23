@@ -1985,11 +1985,33 @@ body.has-beta-banner .beta-banner {
 }
 
 .station-status-list {
-  max-height: 200px;
+  max-height: 480px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
+}
+
+/* Match scrollbar style with User Accounts table */
+.station-status-list::-webkit-scrollbar {
+  width: 10px;
+}
+
+.station-status-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0 12px 12px 0;
+}
+
+.station-status-list::-webkit-scrollbar-thumb {
+  background: var(--border-glass);
+  border-radius: 5px;
+  border: 2px solid rgba(0, 0, 0, 0);
+  background-clip: padding-box;
+}
+
+.station-status-list::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
+  background-clip: padding-box;
 }
 
 .station-status-item {
