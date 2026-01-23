@@ -1549,7 +1549,7 @@ function renderForecastView() {
     const w = mapWeatherCode(d.weather_code[idx]);
 
     container.innerHTML = `
-  < div class="weather-main fade-in" >
+  <div class="weather-main fade-in">
     <div class="weather-temp-section">
       <div class="weather-icon">${w.icon}</div>
       <div>
@@ -1601,11 +1601,11 @@ function displayTideTimes(data) {
   }
 
   container.innerHTML = dayExtremes.map(e => `
-  < div class="tide-time-item ${e.type.toLowerCase()}" >
+    <div class="tide-time-item ${e.type.toLowerCase()}">
       <div class="tide-time-label">${e.type.toUpperCase()} TIDE</div>
       <div class="tide-time-value">${new Date(e.time).toLocaleTimeString('en-IE', { hour: '2-digit', minute: '2-digit' })}</div>
       <div class="tide-time-height">${e.level.toFixed(2)}m</div>
-    </div >
+    </div>
   `).join('');
 
   // Show empty if none found (rare for semidiurnal)
@@ -1731,10 +1731,10 @@ function displayCalculatedTides(station) {
   const icon = direction === 'rising' ? '↑' : direction === 'falling' ? '↓' : '→';
 
   container.innerHTML = `
-  < div class="tide-level" > ${level.toFixed(2)} <span class="tide-unit">m</span></div >
+    <div class="tide-level">${level.toFixed(2)}<span class="tide-unit">m</span></div>
     <div class="tide-status ${direction}">${icon} ${direction.toUpperCase()}</div>
     <div style="font-size: 0.75rem; color: var(--accent-warning); margin-top: 8px;">⚠️ Estimated</div>
-`;
+  `;
 
   // Sync sidebar list with calculated data
   const sidebarLevel = document.getElementById(`level - ${station.id} `);
