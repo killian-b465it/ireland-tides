@@ -3402,28 +3402,61 @@ input:checked+.toggle-slider:before {
 
 @media (max-width: 600px) {
   .filter-toggle-text {
-    display: none;
+    display: inline-block;
+    font-size: 0.8rem;
   }
 
   .filter-toggle-btn {
-    padding: 10px;
+    padding: 12px 16px;
+    background: var(--accent-primary);
+    color: #000;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+    animation: buttonPulse 2s infinite;
+  }
+
+  @keyframes buttonPulse {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+    }
+
+    50% {
+      transform: scale(1.05);
+      box-shadow: 0 4px 25px rgba(0, 212, 255, 0.6);
+    }
+
+    100% {
+      transform: scale(1);
+      box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+    }
   }
 
   .filter-sidebar {
-    width: 85%;
-    max-width: 300px;
-    left: -100%;
-    max-height: 80vh;
-    top: 10vh;
-    border-radius: 0 12px 12px 0;
+    width: 90%;
+    max-width: 320px;
+    height: auto;
+    max-height: 85vh;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    border-radius: 20px;
+    border: 1px solid var(--border-glass);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
   }
 
   .filter-sidebar.open {
-    left: 0;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    visibility: visible;
   }
 
   .filter-options {
-    max-height: calc(80vh - 180px);
+    max-height: 50vh;
   }
 }
 
@@ -3567,10 +3600,14 @@ input:checked+.toggle-slider:before {
 }
 
 @media (max-width: 600px) {
-
   .filter-toggle-btn-inline {
-    padding: 8px 12px;
+    padding: 10px 16px;
     margin-left: 8px;
+    background: var(--accent-primary);
+    color: #000;
+    font-weight: 700;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
   }
 }
 
@@ -3858,9 +3895,31 @@ input:checked+.toggle-slider:before {
   cursor: pointer;
   padding: 12px 15px;
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  transition: all 0.2s ease;
+  border: 2px solid var(--border-color);
+  border-radius: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.legal-item:has(input[type="checkbox"]:not(:checked)) {
+  border-color: rgba(0, 212, 255, 0.3);
+  animation: borderPulse 2s infinite;
+}
+
+@keyframes borderPulse {
+  0% {
+    border-color: rgba(0, 212, 255, 0.2);
+    box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.1);
+  }
+
+  50% {
+    border-color: rgba(0, 212, 255, 0.5);
+    box-shadow: 0 0 10px 0 rgba(0, 212, 255, 0.2);
+  }
+
+  100% {
+    border-color: rgba(0, 212, 255, 0.2);
+    box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.1);
+  }
 }
 
 .legal-item:hover {
@@ -3873,12 +3932,14 @@ input:checked+.toggle-slider:before {
 }
 
 .custom-check {
-  width: 20px;
-  height: 20px;
+  width: 28px;
+  height: 28px;
   border: 2px solid var(--border-color);
-  border-radius: 6px;
+  border-radius: 8px;
   position: relative;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
 }
 
 .legal-item input[type="checkbox"]:checked+.custom-check {
@@ -3893,7 +3954,7 @@ input:checked+.toggle-slider:before {
   left: 50%;
   transform: translate(-50%, -50%);
   color: white;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: bold;
 }
 
