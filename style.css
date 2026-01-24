@@ -3931,19 +3931,28 @@ input:checked+.toggle-slider:before {
   filter: grayscale(1);
 }
 
-/* Fix map tile lines (all devices) */
-.leaflet-tile {
+/* Fix map tile lines (all devices) - comprehensive */
+.leaflet-tile,
+.leaflet-tile-container,
+.leaflet-layer,
+.leaflet-tile-pane {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.leaflet-container {
   border: none !important;
   outline: none !important;
 }
 
-.leaflet-container {
+.leaflet-container img {
   border: none !important;
 }
 
 /* Fix community map positioning on mobile */
 @media (max-width: 768px) {
   #social-map {
-    margin-top: 10px;
+    margin-top: 30px;
   }
 }
