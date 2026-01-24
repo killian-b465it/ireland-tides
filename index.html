@@ -918,6 +918,28 @@
     </div>
   </div>
 
+  <!-- Username Editor Modal (Admin) -->
+  <div class="modal" id="username-editor-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>✏️ Edit Username</h2>
+        <button class="modal-close-btn-inline" onclick="closeUsernameEditor()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p>Editing username for: <strong id="username-edit-email"></strong></p>
+        <div class="form-group">
+          <label for="username-edit-input">New Username</label>
+          <input type="text" id="username-edit-input" class="auth-input" placeholder="Enter new username">
+        </div>
+        <input type="hidden" id="username-edit-userid">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeUsernameEditor()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveUsername()">Save Username</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Terms & Conditions Modal -->
   <div class="modal" id="terms-modal">
     <div class="modal-content">

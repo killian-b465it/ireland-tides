@@ -4844,6 +4844,55 @@ window.closePrivacyModal = () => {
 };
 
 // ============================================
+// Username Editor (Admin)
+// ============================================
+window.openUsernameEditor = (userId, currentUsername, userEmail) => {
+  document.getElementById('username-edit-userid').value = userId;
+  document.getElementById('username-edit-input').value = currentUsername;
+  document.getElementById('username-edit-email').textContent = userEmail;
+  document.getElementById('username-editor-modal').classList.add('active');
+};
+
+window.closeUsernameEditor = () => {
+  document.getElementById('username-editor-modal').classList.remove('active');
+};
+
+window.saveUsername = async () => {
+  const userId = document.getElementById('username-edit-userid').value;
+  const newUsername = document.getElementById('username-edit-input').value.trim();
+
+  if (!newUsername) {
+    alert('Username cannot be empty');
+    return;
+  }
+
+  if (newUsername.length < 3) {
+    alert('Username must be at least 3 characters');
+    return;
+  }
+
+  try {
+    // Update username in Firebase
+    await firebase.database().ref(`users/${userId}`).update({
+      username: newUsername
+    });
+
+    alert('Username updated successfully!');
+    closeUsernameEditor();
+
+    // Reload the users table if there's a function for it
+    // If you have a loadAdminDashboard or similar function, call it here
+    // For now, just reload the page section
+    if (typeof loadAdminDashboard === 'function') {
+      loadAdminDashboard();
+    }
+  } catch (error) {
+    console.error('Error updating username:', error);
+    alert('Failed to update username. Please try again.');
+  }
+};
+
+// ============================================
 // Admin Location Manager
 // ============================================
 let adminMap = null;
