@@ -35,5 +35,8 @@ The application has officially reached Version 1.0.0 (v1). This release consolid
 - [x] Fix Admin Dashboard button visibility
 - [/] Security Audit & Remediation
   - [x] Audit for XSS and credential exposure
-  - [/] Implement `sanitizeHTML` and secure rendering
-  - [ ] Secure administrative credentials
+  - [x] Implement `sanitizeHTML` and secure rendering
+  - [x] Secure administrative credentials
+- [/] Implement Reported Content UI
+  - [ ] Add "Reported Community Content" card to Admin Dashboard
+  - [ ] Verify moderation functionality (Remove/Dismiss)

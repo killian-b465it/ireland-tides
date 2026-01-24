@@ -4002,6 +4002,7 @@ function loadAdminDashboard() {
   });
 
   loadAdminMessages();
+  loadReportedComments();
 }
 
 function loadStationInsights() {

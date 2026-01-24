@@ -703,6 +703,26 @@
           </div>
         </div>
 
+        <!-- Reported Community Content -->
+        <div class="admin-card admin-card-full">
+          <div class="admin-card-header">
+            <h3>⚠️ Reported Community Content</h3>
+            <div class="report-filters">
+              <button class="btn btn-sm btn-primary" onclick="filterReports('pending')">Pending</button>
+              <button class="btn btn-sm btn-outline" onclick="filterReports('dismissed')">Dismissed</button>
+              <button class="btn btn-sm btn-outline" onclick="filterReports('removed')">Removed</button>
+              <button class="btn btn-sm btn-outline" onclick="filterReports('all')">All</button>
+            </div>
+          </div>
+          <div class="admin-card-body">
+            <div id="reported-comments-list">
+              <div class="empty-state">
+                <p>Loading reports...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Location Manager -->
         <div class="admin-card admin-card-full">
           <div class="admin-card-header">
