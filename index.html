@@ -352,7 +352,15 @@
       </aside>
       <section class="map-container">
         <div id="community-gating-overlay" class="premium-overlay" style="display: none;">
-          <div class="overlay-content">
+          <div class="overlay-content" id="community-login-prompt">
+            <div class="premium-badge">🔒 LOGIN REQUIRED</div>
+            <h2>Create a Free Account</h2>
+            <p>The Community Hub is available to all registered users. Create a free account to share catches, interact
+              with other anglers, and access all features!</p>
+            <button class="btn btn-primary btn-lg" onclick="openAuthModal()">Sign Up / Login</button>
+            <p class="premium-footer">Join the Irish fishing community today 🎣</p>
+          </div>
+          <div class="overlay-content" id="community-premium-prompt" style="display: none;">
             <div class="premium-badge">🏆 PREMIUM</div>
             <h2>Join the Crew!</h2>
             <p>The Community Hub is exclusive to Pro members. See live catches, share your own spots, and interact with

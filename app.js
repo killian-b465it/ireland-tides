@@ -530,13 +530,23 @@ function updateCatchInFirebase(catchId, updates) {
 window.showPage = (pageId) => {
   // Gating check for Community tab
   if (pageId === 'community') {
-    const isPremium = state.user && state.user.plan === 'pro';
     const overlay = document.getElementById('community-gating-overlay');
+    const loginPrompt = document.getElementById('community-login-prompt');
+    const premiumPrompt = document.getElementById('community-premium-prompt');
 
-    if (overlay) {
-      if (!isPremium) {
+    if (overlay && loginPrompt && premiumPrompt) {
+      if (!state.user) {
+        // User not logged in - show login prompt
         overlay.style.display = 'flex';
+        loginPrompt.style.display = 'block';
+        premiumPrompt.style.display = 'none';
+      } else if (state.user.plan !== 'pro') {
+        // User logged in but not pro - show premium prompt
+        overlay.style.display = 'flex';
+        loginPrompt.style.display = 'none';
+        premiumPrompt.style.display = 'block';
       } else {
+        // User is pro - hide overlay
         overlay.style.display = 'none';
       }
     }
@@ -4799,6 +4809,14 @@ window.openTermsModal = () => {
 
 window.closeTermsModal = () => {
   document.getElementById('terms-modal').classList.remove('active');
+};
+
+window.openPrivacyModal = () => {
+  document.getElementById('privacy-modal').classList.add('active');
+};
+
+window.closePrivacyModal = () => {
+  document.getElementById('privacy-modal').classList.remove('active');
 };
 
 // ============================================
