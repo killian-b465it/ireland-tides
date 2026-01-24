@@ -98,7 +98,7 @@ const CONFIG = {
     stripePublishable: 'pk_live_51PWJQERsc2tHXy0gV05ejlWaH6mwy4Xfqvfa7cSqUTdZaK6eFr4oEFYlXsZyeutnrlKzOmsRW7VDZkAQ4yO0XVu7004MBj4h9Q'
   },
   // Admin emails - users with these emails get admin access
-  ADMIN_EMAILS: ['IrishFishingHub@gmail.com'],
+  ADMIN_EMAILS: ['irishfishinghub@gmail.com'],
   // Admin password - required for admin accounts
   // [SECURITY WARNING] In a production environment, this should never be hardcoded on the client-side.
   // Use Firebase Authentication's custom claims or a secure backend for admin verification.
@@ -595,7 +595,7 @@ window.showPage = (pageId) => {
 
 // Check if current user is admin
 function isAdmin() {
-  return state.user && CONFIG.ADMIN_EMAILS.includes(state.user.email?.toLowerCase());
+  return state.user && CONFIG.ADMIN_EMAILS.map(e => e.toLowerCase()).includes(state.user.email?.toLowerCase());
 }
 
 // Refresh community gating overlay based on current user state
@@ -3348,7 +3348,7 @@ window.handleAuthSubmit = async () => {
   const remember = document.getElementById('auth-remember').checked;
 
   // Check if admin email - require correct password
-  const isAdminEmail = CONFIG.ADMIN_EMAILS.includes(email.toLowerCase());
+  const isAdminEmail = CONFIG.ADMIN_EMAILS.map(e => e.toLowerCase()).includes(email.toLowerCase());
   if (isAdminEmail) {
     if (password !== CONFIG.ADMIN_PASSWORD) {
       return alert('Invalid admin password.');
