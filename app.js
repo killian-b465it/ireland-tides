@@ -1380,10 +1380,19 @@ async function fetchAllLiveStationData() {
       if (stationData && stationData.length > 0) {
         const latest = stationData[stationData.length - 1];
         const level = latest[2];
+
+        // Skip if level is null or undefined
+        if (level == null) {
+          console.warn(`Null water level for station: ${station.id}`);
+          return;
+        }
+
         let dir = 'stable';
         if (stationData.length >= 2) {
           const prev = stationData[stationData.length - 2][2];
-          dir = level > prev ? 'rising' : level < prev ? 'falling' : 'stable';
+          if (prev != null) {
+            dir = level > prev ? 'rising' : level < prev ? 'falling' : 'stable';
+          }
         }
         const icon = dir === 'rising' ? '↑' : dir === 'falling' ? '↓' : '';
         sidebarLevel.innerHTML = `${level.toFixed(1)}m ${icon}`;
