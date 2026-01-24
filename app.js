@@ -73,25 +73,25 @@ const CONFIG = {
     { id: 'Buncranna', name: 'Buncrana', lat: 55.1333, lon: -7.4500, region: 'North West', live: true },
     { id: 'Malin Head - Portmore Pier', name: 'Malin Head', lat: 55.3717, lon: -7.3392, region: 'North West', live: true },
 
-    // Additional stations without live API data (estimates only)
-    { id: 'Arklow', name: 'Arklow', lat: 52.7978, lon: -6.1419, region: 'East Coast', live: false },
-    { id: 'Courtown', name: 'Courtown Harbour', lat: 52.6461, lon: -6.2289, region: 'East Coast', live: false },
-    { id: 'Cobh', name: 'Cobh (Cork)', lat: 51.8503, lon: -8.2967, region: 'South Coast', live: false },
-    { id: 'Kinsale', name: 'Kinsale', lat: 51.7058, lon: -8.5222, region: 'South Coast', live: false },
-    { id: 'Schull', name: 'Schull', lat: 51.5278, lon: -9.5417, region: 'South Coast', live: false },
-    { id: 'Bantry', name: 'Bantry', lat: 51.6803, lon: -9.4528, region: 'South West', live: false },
-    { id: 'Fenit', name: 'Fenit', lat: 52.2728, lon: -9.8608, region: 'South West', live: false },
-    { id: 'Tarbert', name: 'Tarbert', lat: 52.5747, lon: -9.3664, region: 'South West', live: false },
-    { id: 'Rossaveal', name: 'Rossaveal', lat: 53.2667, lon: -9.8333, region: 'West Coast', live: false },
-    { id: 'Clifden', name: 'Clifden', lat: 53.4897, lon: -10.0189, region: 'West Coast', live: false },
-    { id: 'Westport', name: 'Westport', lat: 53.8008, lon: -9.5228, region: 'West Coast', live: false },
-    // Northern Ireland - no live data from Marine.ie
-    { id: 'Portrush', name: 'Portrush', lat: 55.2069, lon: -6.6556, region: 'North of Ireland', live: false },
-    { id: 'Larne', name: 'Larne', lat: 54.8531, lon: -5.7928, region: 'North of Ireland', live: false },
-    { id: 'Bangor', name: 'Bangor', lat: 54.6603, lon: -5.6689, region: 'North of Ireland', live: false },
-    { id: 'Belfast', name: 'Belfast', lat: 54.6097, lon: -5.9289, region: 'North of Ireland', live: false },
-    { id: 'Warrenpoint', name: 'Warrenpoint', lat: 54.0997, lon: -6.2519, region: 'North of Ireland', live: false },
-    { id: 'Carlingford', name: 'Carlingford', lat: 54.0442, lon: -6.1883, region: 'North of Ireland', live: false }
+    // Additional stations - attempting live API data
+    { id: 'Arklow', name: 'Arklow', lat: 52.7978, lon: -6.1419, region: 'East Coast', live: true },
+    { id: 'Courtown', name: 'Courtown Harbour', lat: 52.6461, lon: -6.2289, region: 'East Coast', live: true },
+    { id: 'Cobh', name: 'Cobh (Cork)', lat: 51.8503, lon: -8.2967, region: 'South Coast', live: true },
+    { id: 'Kinsale', name: 'Kinsale', lat: 51.7058, lon: -8.5222, region: 'South Coast', live: true },
+    { id: 'Schull', name: 'Schull', lat: 51.5278, lon: -9.5417, region: 'South Coast', live: true },
+    { id: 'Bantry', name: 'Bantry', lat: 51.6803, lon: -9.4528, region: 'South West', live: true },
+    { id: 'Fenit', name: 'Fenit', lat: 52.2728, lon: -9.8608, region: 'South West', live: true },
+    { id: 'Tarbert', name: 'Tarbert', lat: 52.5747, lon: -9.3664, region: 'South West', live: true },
+    { id: 'Rossaveal', name: 'Rossaveal', lat: 53.2667, lon: -9.8333, region: 'West Coast', live: true },
+    { id: 'Clifden', name: 'Clifden', lat: 53.4897, lon: -10.0189, region: 'West Coast', live: true },
+    { id: 'Westport', name: 'Westport', lat: 53.8008, lon: -9.5228, region: 'West Coast', live: true },
+    // Northern Ireland - attempting live data from Marine.ie
+    { id: 'Portrush', name: 'Portrush', lat: 55.2069, lon: -6.6556, region: 'North of Ireland', live: true },
+    { id: 'Larne', name: 'Larne', lat: 54.8531, lon: -5.7928, region: 'North of Ireland', live: true },
+    { id: 'Bangor', name: 'Bangor', lat: 54.6603, lon: -5.6689, region: 'North of Ireland', live: true },
+    { id: 'Belfast', name: 'Belfast', lat: 54.6097, lon: -5.9289, region: 'North of Ireland', live: true },
+    { id: 'Warrenpoint', name: 'Warrenpoint', lat: 54.0997, lon: -6.2519, region: 'North of Ireland', live: true },
+    { id: 'Carlingford', name: 'Carlingford', lat: 54.0442, lon: -6.1883, region: 'North of Ireland', live: true }
   ],
   API_KEYS: {
     streetView: 'DEMO_KEY_PLACEHOLDER', // Replace with valid Google Maps API Key
