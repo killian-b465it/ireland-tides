@@ -594,6 +594,30 @@ function isAdmin() {
   return state.user && CONFIG.ADMIN_EMAILS.includes(state.user.email?.toLowerCase());
 }
 
+// Refresh community gating overlay based on current user state
+window.refreshCommunityGating = function () {
+  const overlay = document.getElementById('community-gating-overlay');
+  const loginPrompt = document.getElementById('community-login-prompt');
+  const premiumPrompt = document.getElementById('community-premium-prompt');
+
+  if (overlay && loginPrompt && premiumPrompt) {
+    if (!state.user) {
+      // User not logged in - show login prompt
+      overlay.style.display = 'flex';
+      loginPrompt.style.display = 'block';
+      premiumPrompt.style.display = 'none';
+    } else if (state.user.plan !== 'pro') {
+      // User logged in but not pro - show premium prompt
+      overlay.style.display = 'flex';
+      loginPrompt.style.display = 'none';
+      premiumPrompt.style.display = 'block';
+    } else {
+      // User is pro - hide overlay
+      overlay.style.display = 'none';
+    }
+  }
+};
+
 function updateClock() {
   const now = new Date();
   const options = {

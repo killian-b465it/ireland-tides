@@ -440,7 +440,8 @@
           <input type="checkbox" id="auth-remember" checked>
           <span>Remember me</span>
         </label>
-        <button class="btn btn-primary" onclick="handleAuthSubmit()">Continue</button>
+        <button class="btn btn-primary"
+          onclick="handleAuthSubmit(); setTimeout(refreshCommunityGating, 100);">Continue</button>
         <p class="auth-switch">Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign up</a></p>
       </div>
       <button class="modal-close-btn" onclick="closeAuthModal()">✕</button>
