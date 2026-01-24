@@ -2390,13 +2390,20 @@ function renderCatchFeed() {
   const now = Date.now();
   const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
 
-  // Sort all catches by time (id is the timestamp in submitCatch)
-  const allSortedCatches = [...(state.catches || [])].sort((a, b) => (b.id || 0) - (a.id || 0));
+  // Sort all catches: First by pinned status, then by time (id is the timestamp)
+  const allSortedCatches = [...(state.catches || [])].sort((a, b) => {
+    // Both pinned or both unpinned, sort by time
+    if (!!a.isPinned === !!b.isPinned) {
+      return (b.id || 0) - (a.id || 0);
+    }
+    // Pinned posts come first
+    return a.isPinned ? -1 : 1;
+  });
 
-  // Filter based on archive mode
+  // Filter based on archive mode - Pinned posts ALWAYS show regardless of 7-day filter
   const catchesToShow = state.showArchive
     ? allSortedCatches
-    : allSortedCatches.filter(c => (now - (c.id || 0)) <= sevenDaysMs);
+    : allSortedCatches.filter(c => c.isPinned || (now - (c.id || 0)) <= sevenDaysMs);
 
   // Check if there are older posts available
   const hasOlderPosts = allSortedCatches.some(c => (now - (c.id || 0)) > sevenDaysMs);
@@ -2437,12 +2444,22 @@ function renderCatchFeed() {
     const nameStyle = `style="cursor: pointer; font-weight: bold; color: var(--text-main);"`;
 
     const item = document.createElement('div');
-    item.className = 'feed-item catch-card';
+    item.className = `feed-item catch-card ${c.isPinned ? 'pinned-post' : ''}`;
     item.innerHTML = `
       <div class="feed-header catch-header">
-        <span class="feed-user" ${userOnClick} ${nameStyle}>${displayName}</span>
-        <span class="feed-time catch-date">${c.date || timeAgo}</span>
-        ${isAdmin ? `<button class="delete-post-btn" onclick="deleteCatch(${c.id})" title="Delete Post">🗑️</button>` : ''}
+        <div class="header-left">
+          <span class="feed-user" ${userOnClick} ${nameStyle}>${displayName}</span>
+          ${c.isPinned ? '<span class="pinned-badge">📌 Pinned</span>' : ''}
+        </div>
+        <div class="header-right">
+          <span class="feed-time catch-date">${c.date || timeAgo}</span>
+          ${isAdmin ? `
+            <button class="pin-post-btn" onclick="togglePinCatch(${c.id})" title="${c.isPinned ? 'Unpin Post' : 'Pin Post'}">
+              ${c.isPinned ? '📍' : '📌'}
+            </button>
+            <button class="delete-post-btn" onclick="deleteCatch(${c.id})" title="Delete Post">🗑️</button>
+          ` : ''}
+        </div>
       </div>
       <div class="feed-content">
         <p class="catch-species"><strong>🎣 ${c.species || 'Catch'}</strong></p>
@@ -2484,6 +2501,36 @@ function renderCatchFeed() {
     feed.appendChild(item);
   });
 }
+
+// Admin Pin/Unpin Post Function
+window.togglePinCatch = (catchId) => {
+  if (!state.user || !state.user.isAdmin) {
+    return alert('Only admins can pin posts.');
+  }
+
+  const post = state.catches.find(c => c.id === catchId);
+  if (!post) return;
+
+  const newPinnedState = !post.isPinned;
+
+  // Update local state immediately for snappy UI
+  post.isPinned = newPinnedState;
+
+  // Sync to Firebase
+  if (typeof firebaseDB !== 'undefined') {
+    firebaseDB.ref('catches/' + catchId).update({
+      isPinned: newPinnedState
+    })
+      .then(() => console.log(`Post ${newPinnedState ? 'pinned' : 'unpinned'} in Firebase`))
+      .catch(err => console.error('Error toggling pin:', err));
+  }
+
+  // Update localStorage backup
+  localStorage.setItem('fishing_catches', JSON.stringify(state.catches));
+
+  // Re-render feed
+  renderCatchFeed();
+};
 
 // Admin Delete Post Function
 window.deleteCatch = (catchId) => {

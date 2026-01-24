@@ -705,7 +705,53 @@ body.has-beta-banner .beta-banner {
 .catch-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 8px;
+  gap: 10px;
+}
+
+.header-left,
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pinned-post {
+  border: 1px solid rgba(255, 171, 0, 0.3);
+  background: linear-gradient(145deg, var(--bg-card), rgba(255, 171, 0, 0.05));
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.pinned-badge {
+  background: rgba(255, 171, 0, 0.15);
+  color: var(--accent-warning);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 171, 0, 0.2);
+}
+
+.pin-post-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pin-post-btn:hover {
+  background: rgba(255, 171, 0, 0.1);
+  color: var(--accent-warning);
+  transform: scale(1.1);
 }
 
 .catch-species {
