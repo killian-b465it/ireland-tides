@@ -907,6 +907,12 @@ function initMap() {
   // Prepare tackle shops from static array and Firebase (but don't add to map yet)
   loadShopsToMainMap();
 
+  // Prepare freshwater fishing markers (but don't add to map yet)
+  renderFreshwaterSpots();
+  renderFreshwaterParks();
+  renderFreshwaterRamps();
+  renderFreshwaterPiers();
+
   // Log that map is ready but empty
   console.log('Map loaded. Apply filters to show locations.');
 }
@@ -2632,7 +2638,7 @@ function renderFreshwaterSpots() {
     freshwaterMarkerGroup.addLayer(marker);
   });
 
-  freshwaterMarkerGroup.addTo(state.map);
+  // Don't add to map yet - controlled by applyFreshwaterFilters()
 }
 
 // Layer groups for freshwater amenities
@@ -2674,7 +2680,7 @@ function renderFreshwaterParks() {
     freshwaterParksGroup.addLayer(marker);
   });
 
-  freshwaterParksGroup.addTo(state.map);
+  // Don't add to map yet - controlled by applyFreshwaterFilters()
 }
 
 function renderFreshwaterRamps() {
@@ -2710,7 +2716,7 @@ function renderFreshwaterRamps() {
     freshwaterRampsGroup.addLayer(marker);
   });
 
-  freshwaterRampsGroup.addTo(state.map);
+  // Don't add to map yet - controlled by applyFreshwaterFilters()
 }
 
 function renderFreshwaterPiers() {
@@ -2747,7 +2753,7 @@ function renderFreshwaterPiers() {
     freshwaterPiersGroup.addLayer(marker);
   });
 
-  freshwaterPiersGroup.addTo(state.map);
+  // Don't add to map yet - controlled by applyFreshwaterFilters()
 }
 
 // Freshwater filter functions
