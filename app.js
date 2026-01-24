@@ -4515,6 +4515,7 @@ async function loadNationalDirectory() {
   // Sort counties alphabetically
   const sortedCounties = Object.keys(byCounty).sort();
 
+  const adminUser = isAdmin();
   let html = '<div class="directory-grid">';
 
   sortedCounties.forEach(county => {
@@ -4533,6 +4534,8 @@ async function loadNationalDirectory() {
       const stars = '⭐'.repeat(Math.round(rating));
       const lat = shop.lat;
       const lng = shop.lng || shop.lon;
+      const shopData = JSON.stringify({ ...shop, lng }).replace(/"/g, '&quot;');
+
       html += `
         <div class="shop-item" onclick="showShopOnMap(${lat}, ${lng}, '${shop.name.replace(/'/g, "\\'")}')">
           <div class="shop-name">${shop.name}</div>
@@ -4542,6 +4545,12 @@ async function loadNationalDirectory() {
             ${shop.phone ? `<a href="tel:${shop.phone}" class="shop-phone" onclick="event.stopPropagation()">📞 ${shop.phone}</a>` : ''}
           </div>
           ${shop.website ? `<a href="${shop.website}" target="_blank" class="shop-website" onclick="event.stopPropagation()">🌐 Visit Website</a>` : ''}
+          ${adminUser ? `
+            <div class="shop-admin-actions" onclick="event.stopPropagation()">
+              <button class="btn btn-sm btn-outline" onclick="openShopEditor(${shopData})">✏️ Edit</button>
+              ${shop.id ? `<button class="btn btn-sm btn-danger" onclick="deleteShopFromDirectory('${shop.id}', '${shop.mode || 'sea'}')">🗑️ Delete</button>` : ''}
+            </div>
+          ` : ''}
         </div>
       `;
     });
@@ -4570,6 +4579,11 @@ async function loadNationalDirectory() {
         <span class="stat-value">⭐ ${avgRating}</span>
         <span class="stat-label">Avg Rating</span>
       </div>
+      ${adminUser ? `
+        <div class="stat-item">
+          <button class="btn btn-primary btn-sm" onclick="openShopEditor(null)">➕ Add New Shop</button>
+        </div>
+      ` : ''}
     </div>
   ` + html;
 
@@ -4598,6 +4612,181 @@ window.showShopOnMap = (lat, lng, name) => {
     setTimeout(() => {
       state.map.removeLayer(marker);
     }, 30000);
+  }
+};
+
+// ============================================
+// Shop Management Functions (Admin)
+// ============================================
+let editingShop = null;
+
+window.openShopEditor = (shop) => {
+  editingShop = shop;
+  const modal = document.getElementById('shop-editor-modal');
+  const title = document.getElementById('shop-editor-title');
+  const deleteBtn = document.getElementById('delete-shop-btn');
+
+  if (shop) {
+    title.textContent = 'Edit Shop';
+    deleteBtn.style.display = shop.id ? 'block' : 'none';
+    document.getElementById('shop-id').value = shop.id || '';
+    document.getElementById('shop-name').value = shop.name || '';
+    document.getElementById('shop-county').value = shop.county || '';
+    document.getElementById('shop-address').value = shop.address || '';
+    document.getElementById('shop-phone').value = shop.phone || '';
+    document.getElementById('shop-website').value = shop.website || '';
+    document.getElementById('shop-lat').value = shop.lat || '';
+    document.getElementById('shop-lon').value = shop.lng || shop.lon || '';
+    document.getElementById('shop-rating').value = shop.rating || '';
+    document.getElementById('shop-mode').value = shop.mode || 'sea';
+  } else {
+    title.textContent = 'Add New Shop';
+    deleteBtn.style.display = 'none';
+    document.getElementById('shop-id').value = '';
+    document.getElementById('shop-name').value = '';
+    document.getElementById('shop-county').value = '';
+    document.getElementById('shop-address').value = '';
+    document.getElementById('shop-phone').value = '';
+    document.getElementById('shop-website').value = '';
+    document.getElementById('shop-lat').value = '';
+    document.getElementById('shop-lon').value = '';
+    document.getElementById('shop-rating').value = '4.5';
+    document.getElementById('shop-mode').value = 'sea';
+  }
+
+  modal.classList.add('active');
+};
+
+window.closeShopEditor = () => {
+  document.getElementById('shop-editor-modal').classList.remove('active');
+  editingShop = null;
+};
+
+window.saveShop = async (event) => {
+  event.preventDefault();
+
+  const existingId = document.getElementById('shop-id').value;
+  const isNew = !existingId;
+
+  const shopData = {
+    id: isNew ? `shop_${Date.now()}` : existingId,
+    name: document.getElementById('shop-name').value,
+    county: document.getElementById('shop-county').value,
+    address: document.getElementById('shop-address').value,
+    phone: document.getElementById('shop-phone').value,
+    website: document.getElementById('shop-website').value,
+    lat: parseFloat(document.getElementById('shop-lat').value),
+    lng: parseFloat(document.getElementById('shop-lon').value),
+    rating: parseFloat(document.getElementById('shop-rating').value) || 4.5,
+    mode: document.getElementById('shop-mode').value || 'sea',
+    addedBy: state.user?.email || 'admin',
+    addedAt: new Date().toISOString()
+  };
+
+  try {
+    // Save to Firebase
+    const path = `locations/${shopData.mode}/shops/${shopData.id}`;
+    await firebase.database().ref(path).set(shopData);
+
+    // Update local admin locations if admin panel is loaded
+    if (adminLocations && adminLocations[shopData.mode]) {
+      if (!adminLocations[shopData.mode].shops) {
+        adminLocations[shopData.mode].shops = [];
+      }
+      const existingIdx = adminLocations[shopData.mode].shops.findIndex(s => s.id === shopData.id);
+      if (existingIdx >= 0) {
+        adminLocations[shopData.mode].shops[existingIdx] = shopData;
+      } else {
+        adminLocations[shopData.mode].shops.push(shopData);
+      }
+    }
+
+    closeShopEditor();
+
+    // Reload directory to show changes
+    await loadNationalDirectory();
+
+    // Reload admin map if it exists
+    if (adminMap) {
+      loadAdminLocations();
+    }
+
+    alert('Shop saved successfully!');
+  } catch (err) {
+    console.error('Failed to save shop:', err);
+    alert('Failed to save shop. Please try again.');
+  }
+};
+
+window.deleteShop = async () => {
+  if (!editingShop || !editingShop.id) {
+    alert('Cannot delete this shop.');
+    return;
+  }
+
+  if (!confirm(`Are you sure you want to delete "${editingShop.name}"?`)) return;
+
+  try {
+    const mode = editingShop.mode || 'sea';
+    const path = `locations/${mode}/shops/${editingShop.id}`;
+    await firebase.database().ref(path).remove();
+
+    // Remove from local state
+    if (adminLocations && adminLocations[mode] && adminLocations[mode].shops) {
+      adminLocations[mode].shops = adminLocations[mode].shops.filter(s => s.id !== editingShop.id);
+    }
+
+    closeShopEditor();
+
+    // Reload directory
+    await loadNationalDirectory();
+
+    // Reload admin map if it exists
+    if (adminMap) {
+      loadAdminLocations();
+    }
+
+    alert('Shop deleted successfully!');
+  } catch (err) {
+    console.error('Failed to delete shop:', err);
+    alert('Failed to delete shop. Please try again.');
+  }
+};
+
+window.deleteShopFromDirectory = async (shopId, mode) => {
+  // Find the shop to get its name for confirmation
+  let shopName = 'this shop';
+  try {
+    const snapshot = await firebase.database().ref(`locations/${mode}/shops/${shopId}`).once('value');
+    const shop = snapshot.val();
+    if (shop) shopName = shop.name;
+  } catch (err) {
+    console.warn('Could not fetch shop name:', err);
+  }
+
+  if (!confirm(`Are you sure you want to delete "${shopName}"?`)) return;
+
+  try {
+    const path = `locations/${mode}/shops/${shopId}`;
+    await firebase.database().ref(path).remove();
+
+    // Remove from local state
+    if (adminLocations && adminLocations[mode] && adminLocations[mode].shops) {
+      adminLocations[mode].shops = adminLocations[mode].shops.filter(s => s.id !== shopId);
+    }
+
+    // Reload directory
+    await loadNationalDirectory();
+
+    // Reload admin map if it exists
+    if (adminMap) {
+      loadAdminLocations();
+    }
+
+    alert('Shop deleted successfully!');
+  } catch (err) {
+    console.error('Failed to delete shop:', err);
+    alert('Failed to delete shop. Please try again.');
   }
 };
 

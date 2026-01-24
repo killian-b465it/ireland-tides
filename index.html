@@ -779,6 +779,64 @@
     </div>
   </div>
 
+  <!-- Shop Editor Modal -->
+  <div class="modal" id="shop-editor-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="shop-editor-title">Add Shop</h2>
+        <button class="modal-close-btn-inline" onclick="closeShopEditor()">✕</button>
+      </div>
+      <form id="shop-editor-form" onsubmit="saveShop(event)">
+        <input type="hidden" id="shop-id">
+        <input type="hidden" id="shop-mode">
+        <div class="form-group">
+          <label for="shop-name">Shop Name *</label>
+          <input type="text" id="shop-name" required placeholder="e.g., Rory's Fishing Tackle">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="shop-county">County *</label>
+            <input type="text" id="shop-county" required placeholder="e.g., Dublin">
+          </div>
+          <div class="form-group">
+            <label for="shop-rating">Rating</label>
+            <input type="number" id="shop-rating" step="0.1" min="0" max="5" placeholder="4.5">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="shop-address">Address</label>
+          <input type="text" id="shop-address" placeholder="Full street address">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="shop-phone">Phone</label>
+            <input type="tel" id="shop-phone" placeholder="01 234 5678">
+          </div>
+          <div class="form-group">
+            <label for="shop-website">Website</label>
+            <input type="url" id="shop-website" placeholder="https://example.com">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="shop-lat">Latitude *</label>
+            <input type="number" id="shop-lat" required step="0.0001" placeholder="53.3478">
+          </div>
+          <div class="form-group">
+            <label for="shop-lon">Longitude *</label>
+            <input type="number" id="shop-lon" required step="0.0001" placeholder="-6.2044">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" onclick="closeShopEditor()">Cancel</button>
+          <button type="button" class="btn btn-danger" id="delete-shop-btn" onclick="deleteShop()"
+            style="display: none;">Delete</button>
+          <button type="submit" class="btn btn-primary">Save Shop</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
 
   <!-- Contact Support Modal -->
   <div class="modal" id="support-modal">

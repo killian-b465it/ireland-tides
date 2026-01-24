@@ -548,6 +548,31 @@ body.has-beta-banner .beta-banner {
   gap: 8px;
 }
 
+.shop-admin-actions {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.shop-admin-actions .btn {
+  font-size: 0.75rem;
+  padding: 6px 12px;
+}
+
+.shop-admin-actions .btn-danger {
+  background: rgba(255, 77, 77, 0.1);
+  color: var(--accent-danger);
+  border: 1px solid var(--accent-danger);
+}
+
+.shop-admin-actions .btn-danger:hover {
+  background: var(--accent-danger);
+  color: white;
+}
+
 /* Maintenance UI */
 .maintenance-info {
   background: rgba(255, 171, 0, 0.05);
