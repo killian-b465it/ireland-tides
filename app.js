@@ -100,6 +100,8 @@ const CONFIG = {
   // Admin emails - users with these emails get admin access
   ADMIN_EMAILS: ['admin@irishtides.ie', 'support@irishtides.ie'],
   // Admin password - required for admin accounts
+  // [SECURITY WARNING] In a production environment, this should never be hardcoded on the client-side.
+  // Use Firebase Authentication's custom claims or a secure backend for admin verification.
   ADMIN_PASSWORD: 'IrishTides2026!'
 };
 
@@ -2408,6 +2410,14 @@ function addCommunityMarker(c) {
   communityMarkerGroup.addLayer(marker);
 }
 
+// XSS Prevention Utility
+function sanitizeHTML(str) {
+  if (!str) return "";
+  const temp = document.createElement('div');
+  temp.textContent = str;
+  return temp.innerHTML;
+}
+
 function renderCatchFeed() {
   const feed = document.getElementById('catch-feed');
   if (!feed) return; // Guard against null element
@@ -2461,10 +2471,11 @@ function renderCatchFeed() {
     const isAdmin = state.user && state.user.isAdmin;
 
     // Use correct field names from submitCatch: author, authorId, photo, details
-    const displayName = c.author || c.userName || 'Anonymous';
-    const displayUserId = c.authorId || c.userId || '';
-    const displayPhoto = c.photo || c.image || '';
-    const displayDetails = c.details || c.notes || '';
+    // [SECURITY] Sanitize all user-generated strings to prevent XSS
+    const displayName = sanitizeHTML(c.author || c.userName || 'Anonymous');
+    const displayDetails = sanitizeHTML(c.details || c.notes || '');
+    const displayUserId = c.authorId || c.userId || ''; // IDs are internal, but still keep safe
+    const displayPhoto = c.photo || c.image || ''; // Base64 or URL
 
     const userOnClick = `onclick="viewUserProfile('${displayUserId}')"`;
     const nameStyle = `style="cursor: pointer; font-weight: bold; color: var(--text-main);"`;
@@ -2488,7 +2499,7 @@ function renderCatchFeed() {
         </div>
       </div>
       <div class="feed-content">
-        <p class="catch-species"><strong>🎣 ${c.species || 'Catch'}</strong></p>
+        <p class="catch-species"><strong>🎣 ${sanitizeHTML(c.species || 'Catch')}</strong></p>
         ${displayDetails ? `<p class="catch-details">${displayDetails}</p>` : ''}
         ${displayPhoto ? `<img src="${displayPhoto}" alt="Catch" class="catch-image feed-image" onclick="openImageModal('${displayPhoto}')">` : ''}
       </div>
@@ -2505,12 +2516,12 @@ function renderCatchFeed() {
           ${(c.comments || []).map((comment, commentIndex) => `
             <div class="comment comment-item">
               <div class="comment-content">
-                <span class="comment-user comment-author" onclick="viewUserProfile('${comment.authorId || ''}')" style="cursor:pointer">${comment.author || 'User'}:</span>
-                <span class="comment-text">${comment.text}</span>
+                <span class="comment-user comment-author" onclick="viewUserProfile('${comment.authorId || ''}')" style="cursor:pointer">${sanitizeHTML(comment.author || 'User')}:</span>
+                <span class="comment-text">${sanitizeHTML(comment.text)}</span>
               </div>
       <div class="comment-actions">
         ${state.user && state.user.id !== comment.authorId ? `
-                  <button class="comment-report-btn" onclick="reportComment(${c.id}, ${commentIndex}, \`${(comment.text || '').replace(/`/g, '\\`')}\`, \`${(comment.author || 'User').replace(/`/g, '\\`')}\`, '${comment.authorId || ''}')" title="Report Comment">⚠️</button>
+                  <button class="comment-report-btn" onclick="reportComment(${c.id}, ${commentIndex}, \`${sanitizeHTML(comment.text || '').replace(/`/g, '\\`')}\`, \`${sanitizeHTML(comment.author || 'User').replace(/`/g, '\\`')}\`, '${comment.authorId || ''}')" title="Report Comment">⚠️</button>
                 ` : ''}
         ${isAdmin ? `
                   <button class="comment-delete-btn" onclick="deleteComment(${c.id}, ${commentIndex})" title="Delete Comment">🗑️</button>
@@ -3171,25 +3182,21 @@ function renderReportedComments(filter = 'pending') {
   }
 
   container.innerHTML = filtered.map(report => {
-    const statusClass = report.status === 'pending' ? 'status-pending' :
-      report.status === 'removed' ? 'status-removed' : 'status-dismissed';
-
+    const catchData = state.catches.find(c => c.id === report.catchId);
     return `
-      <div class="report-card ${statusClass}">
+      <div class="report-card ${report.status}">
         <div class="report-header">
-          <span class="report-status">${report.status.toUpperCase()}</span>
+          <span class="report-status-badge ${report.status}">${report.status.toUpperCase()}</span>
           <span class="report-date">${new Date(report.reportDate).toLocaleDateString()}</span>
         </div>
-        
-        <div class="report-content">
+        <div class="report-body">
           <div class="reported-comment">
-            <strong>Comment:</strong> "${report.commentText}"
-            <br><small>By: ${report.commentAuthor}</small>
+            <p class="report-label">Reported Comment:</p>
+            <p class="comment-content">"${sanitizeHTML(report.commentText)}"</p>
+            <p class="comment-meta">By ${sanitizeHTML(report.commentAuthor)}</p>
           </div>
           
           <div class="report-details">
-            <strong>Reported by:</strong> ${report.reportedBy}
-            <br><strong>Reason:</strong> ${report.reportReason}
             ${report.reportDetails ? `<br><strong>Details:</strong> ${report.reportDetails}` : ''}
           </div>
         </div>

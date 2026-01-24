@@ -23,3 +23,7 @@
 - [x] Disable Manage Subscription for beta
 - [x] Verify Admin/Support Logins on Live Site
 - [x] Fix Admin Dashboard button visibility
+- [/] Security Audit & Remediation
+  - [x] Audit for XSS and credential exposure
+  - [/] Implement `sanitizeHTML` and secure rendering
+  - [ ] Secure administrative credentials
