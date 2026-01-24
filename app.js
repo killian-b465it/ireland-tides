@@ -1364,7 +1364,7 @@ async function fetchAllLiveStationData() {
 
     // Update sidebar for live stations
     CONFIG.stations.forEach(station => {
-      const sidebarLevel = document.getElementById(`level - ${station.id} `);
+      const sidebarLevel = document.getElementById(`level-${station.id}`);
       if (!sidebarLevel) return;
 
       const stationData = stationDataMap[station.id];
@@ -2097,7 +2097,12 @@ function updateStationStatusUI(id, status) {
 }
 
 function startAutoUpdate() {
-  setInterval(() => { if (state.selectedStation) fetchTideData(state.selectedStation); }, CONFIG.updateInterval);
+  setInterval(() => {
+    // Update currently selected station
+    if (state.selectedStation) fetchTideData(state.selectedStation);
+    // Update all station data in sidebar
+    fetchAllLiveStationData();
+  }, CONFIG.updateInterval);
 }
 
 // ============================================
