@@ -3957,38 +3957,13 @@ input:checked+.toggle-slider:before {
     white-space: nowrap;
   }
 
-  /* Fix map positioning - prevent navbar overlap without affecting menu */
-  .map-container {
-    padding-top: 70px !important;
-    /* Add space for navbar */
-    height: 100vh !important;
-  }
-
-  #map,
-  #social-map {
-    height: calc(100vh - 70px) !important;
-    /* Full height minus navbar */
-    margin-top: 0 !important;
-  }
-
-  /* Remove horizontal lines on map */
-  .leaflet-container {
-    border: none !important;
-  }
-
-  .leaflet-tile-pane {
-    border: none !important;
-  }
-
-  /* Ensure map tiles don't show lines */
+  /* Remove horizontal lines on map tiles */
   .leaflet-tile {
     border: none !important;
     outline: none !important;
   }
 
-  /* Fix sidebar on mobile if present */
-  .sidebar {
-    top: 70px !important;
-    height: calc(100vh - 70px) !important;
+  .leaflet-container {
+    border: none !important;
   }
 }
