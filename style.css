@@ -3957,10 +3957,11 @@ input:checked+.toggle-slider:before {
     white-space: nowrap;
   }
 
-  /* Fix map positioning - prevent navbar overlap */
-  .page {
+  /* Fix map positioning - prevent navbar overlap without affecting menu */
+  .map-container {
     padding-top: 70px !important;
     /* Add space for navbar */
+    height: 100vh !important;
   }
 
   #map,
