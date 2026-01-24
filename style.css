@@ -3956,3 +3956,8 @@ input:checked+.toggle-slider:before {
     margin-top: 30px;
   }
 }
+/* Remove white grid lines from map tiles */
+.leaflet-tile-loaded {
+  border: none !important;
+  outline: none !important;
+}
