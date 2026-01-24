@@ -102,7 +102,9 @@ const CONFIG = {
   // Admin password - required for admin accounts
   // [SECURITY WARNING] In a production environment, this should never be hardcoded on the client-side.
   // Use Firebase Authentication's custom claims or a secure backend for admin verification.
-  ADMIN_PASSWORD: 'IrishTides2026!'
+  ADMIN_PASSWORD: 'IrishTides2026!',
+  // Integration endpoints
+  STRIPE_API_ENDPOINT: window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://api.irishtides.ie'
 };
 
 // ============================================
@@ -2142,14 +2144,19 @@ function displayShops(station, shops) {
 
   container.innerHTML = sorted.map(s => {
     addShopMarker(s);
+    const tags = s.tags || {};
+    const name = tags.name || 'Tackle Shop';
+    const street = tags['addr:street'] || tags['addr:city'] || '';
+    const city = tags['addr:city'] || '';
+    const phone = tags.phone || tags['contact:phone'] || '';
     const email = tags.email || '';
 
     return `
-      <div class="shop-item fade-in" onclick="openShopDetails(${s.lat}, ${s.lon}, '${name.replace(/'/g, "\\'")}', '${street.replace(/'/g, "\\'")}', '${city.replace(/'/g, "\\'")}', '${phone}', '${email}')">
-        <span class="shop-name">${name}</span>
+      <div class="shop-item fade-in" onclick="openShopDetails(${s.lat}, ${s.lon}, \`${sanitizeHTML(name).replace(/`/g, '\\`')}\`, \`${sanitizeHTML(street).replace(/`/g, '\\`')}\`, \`${sanitizeHTML(city).replace(/`/g, '\\`')}\`, \`${sanitizeHTML(phone).replace(/`/g, '\\`')}\`, \`${sanitizeHTML(email).replace(/`/g, '\\`')}\`)">
+        <span class="shop-name">${sanitizeHTML(name)}</span>
         <div class="shop-detail">
           <span class="shop-dist">${s.dist.toFixed(1)} km</span>
-          <span>${street || 'Local area'}</span>
+          <span>${sanitizeHTML(street) || 'Local area'}</span>
         </div>
         <div class="shop-actions">
           <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); getDirections(${s.lat},${s.lon})">Directions</button>
@@ -3758,7 +3765,7 @@ window.processStripePayment = async () => {
   if (spinner) spinner.classList.remove('hidden');
 
   try {
-    const response = await fetch('http://localhost:3000/create-checkout-session', {
+    const response = await fetch(`${CONFIG.STRIPE_API_ENDPOINT}/create-checkout-session`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: state.user.email })
@@ -3784,7 +3791,7 @@ window.manageStripeSubscription = async () => {
   if (!state.user || state.user.plan !== 'pro') return;
 
   try {
-    const response = await fetch('http://localhost:3000/create-portal-session', {
+    const response = await fetch(`${CONFIG.STRIPE_API_ENDPOINT}/create-portal-session`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: state.user.email })
@@ -3958,13 +3965,20 @@ function renderCountyShops(c, shops) {
     const street = tags['addr:street'] || '';
     const city = tags['addr:city'] || '';
     const phone = tags.phone || tags['contact:phone'] || '';
-    const email = tags.email || tags['contact:email'] || '';
+    const email = tags.email || '';
 
     return `
-      <div class="shop-item" onclick="openShopDetails(${lat}, ${lon}, '${name.replace(/'/g, "\\'")}', '${street.replace(/'/g, "\\'")}', '${city.replace(/'/g, "\\'")}', '${phone}', '${email}')">
-        <span class="shop-name">${name}</span>
-        <div class="shop-detail"><span>${street || 'Ireland'}</span></div>
-        <div class="shop-actions"><button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); getDirections(${lat},${lon})">Directions</button></div>
+      <div class="shop-item" onclick="openShopDetails(${lat}, ${lon}, \`${sanitizeHTML(name).replace(/`/g, '\\`')}\`, \`${sanitizeHTML(street).replace(/`/g, '\\`')}\`, \`${sanitizeHTML(city).replace(/`/g, '\\`')}\`, \`${sanitizeHTML(phone).replace(/`/g, '\\`')}\`, \`${sanitizeHTML(email).replace(/`/g, '\\`')}\`)">
+        <div class="shop-info">
+          <div class="shop-name-row">
+            <span class="shop-name">${sanitizeHTML(name)}</span>
+          </div>
+          <div class="shop-meta">
+            ${street ? `<span>📍 ${sanitizeHTML(street)}</span>` : ''}
+            ${city ? `<span>🏘️ ${sanitizeHTML(city)}</span>` : ''}
+          </div>
+        </div>
+        <button class="btn btn-sm btn-primary">Details</button>
       </div>
     `;
   }).join('');
@@ -4036,9 +4050,9 @@ function loadUsersTable() {
 
     return `
       <tr>
-        <td>${u.name || 'Unknown'}</td>
-        <td style="font-size: 0.8rem;">${u.email}</td>
-        <td><code style="font-size: 0.8rem;">${pwd}</code></td>
+        <td>${sanitizeHTML(u.name || 'Unknown')}</td>
+        <td style="font-size: 0.8rem;">${sanitizeHTML(u.email)}</td>
+        <td><code style="font-size: 0.8rem;">${sanitizeHTML(pwd)}</code></td>
         <td><span class="badge ${plan === 'pro' ? 'pro' : ''}">${plan.toUpperCase()}</span></td>
         <td>${joinDate}</td>
         <td><span class="badge ${isActive ? 'active' : 'inactive'}">${isActive ? 'Active' : 'Inactive'}</span></td>
@@ -4316,7 +4330,7 @@ function renderAdminReplyThread(messages) {
     });
     return `
       <div class="thread-message ${m.from === 'admin' ? 'admin' : 'user'}">
-        ${m.text}
+        ${sanitizeHTML(m.text)}
         <span class="time">${time}</span>
       </div>
     `;
@@ -4405,7 +4419,7 @@ function renderUserSupportThread() {
     });
     return `
       <div class="thread-message ${m.from === 'admin' ? 'admin' : 'user'}">
-        ${m.text}
+        ${sanitizeHTML(m.text)}
         <span class="time">${time}</span>
       </div>
     `;
