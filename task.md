@@ -13,6 +13,12 @@
     - [x] Global likes & comments sync
     - [x] Real-time updates for all users
 - [x] Push changes to GitHub
+- [/] Unify Emoji Aesthetics: Matching icons and standardized sizes
+  - [ ] Standardize map marker font sizes in `style.css`
+  - [ ] Standardize filter emoji font sizes in `style.css`
+  - [ ] Align freshwater marker icons in `app.js` with filters
+  - [ ] Verify visual consistency across tabs
+- [ ] Push changes to GitHub
 - [x] Fix filter sidebar scrolling
 - [x] Disable Manage Subscription for beta
 - [x] Verify Admin/Support Logins on Live Site

@@ -2760,7 +2760,7 @@ function renderFreshwaterSpots() {
   FRESHWATER_SPOTS.forEach(spot => {
     const icon = L.divIcon({
       className: 'freshwater-marker',
-      html: spot.type === 'Lake' ? '🏞️' : '🌊',
+      html: '🐟', // Standardized to match filter emoji
       iconSize: [28, 28],
       iconAnchor: [14, 14]
     });
@@ -2805,7 +2805,7 @@ function renderFreshwaterParks() {
   FRESHWATER_PARKS.forEach(park => {
     const icon = L.divIcon({
       className: 'freshwater-park-marker',
-      html: '🏕️',
+      html: '🏞️', // Standardized to match filter emoji
       iconSize: [28, 28],
       iconAnchor: [14, 14]
     });

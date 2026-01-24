@@ -646,7 +646,7 @@ body.has-beta-banner .beta-banner {
 }
 
 .tide-marker {
-  font-size: 20px;
+  font-size: 1.3rem;
   text-shadow: 0 2px 10px rgba(0, 212, 255, 0.5);
   cursor: pointer;
   transition: transform 0.2s;
@@ -2761,7 +2761,7 @@ body.has-beta-banner .beta-banner {
 
 /* Shop marker on map */
 .shop-marker {
-  font-size: 24px;
+  font-size: 1.3rem;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
@@ -3404,7 +3404,7 @@ input:checked+.toggle-slider:before {
 }
 
 .filter-emoji {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
 }
 
 /* Apply Button */
@@ -3517,7 +3517,11 @@ input:checked+.toggle-slider:before {
 
 .pier-marker,
 .ramp-marker,
-.harbour-marker {
+.harbour-marker,
+.freshwater-marker,
+.freshwater-park-marker,
+.freshwater-ramp-marker,
+.freshwater-pier-marker {
   font-size: 1.3rem;
   cursor: pointer;
   transition: transform 0.2s ease;
