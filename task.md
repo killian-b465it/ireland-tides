@@ -1,6 +1,6 @@
-# Firebase Integration & Community Sync
+# Firebase Integration & Community Sync - Irish Fishing Hub
 
-# Walkthrough - Ireland Tides v1.0.0
+# Walkthrough - Irish Fishing Hub v1.0.0
 
 The application has officially reached Version 1.0.0 (v1). This release consolidates UI improvements, security hardening, and core community features into a stable production-ready state.
 

@@ -1,5 +1,5 @@
 ﻿/**
- * Ireland Tides - Real-Time Fishing Tide Data
+ * Irish Fishing Hub - Real-Time Fishing Tide Data
  * Main Application Logic
  */
 
@@ -851,7 +851,7 @@ function checkPaymentStatus() {
       // Clean up URL parameters without reloading
       window.history.replaceState({}, document.title, window.location.pathname);
 
-      alert('Welcome to Ireland Tides Pro! Your payment was successful.');
+      alert('Welcome to Irish Fishing Hub Pro! Your payment was successful.');
       showPage('community');
     }
   } else if (paymentStatus === 'cancel') {
