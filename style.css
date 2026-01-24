@@ -3931,12 +3931,13 @@ input:checked+.toggle-slider:before {
   filter: grayscale(1);
 }
 
-/* Fix map tile lines (all devices) - Shadow Gap-Filler Fix */
+/* Fix map tile lines (all devices) - Shadow + Overlap Fix */
 .leaflet-tile {
   border: none !important;
   outline: none !important;
-  /* Use a dark shadow to fill any sub-pixel gaps between tiles */
-  box-shadow: 0 0 1px #060606 !important;
+  /* Shift tiles by 0.5px and fill gaps with shadow to completely hide lines */
+  margin: -0.5px !important;
+  box-shadow: 0 0 1.5px #060606 !important;
   /* Hardware acceleration & rendering optimization */
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
