@@ -1362,10 +1362,17 @@ async function fetchAllLiveStationData() {
       stationDataMap[stationId].push(row);
     });
 
+    console.log('API returned station IDs:', Object.keys(stationDataMap));
+    console.log('Config station IDs:', CONFIG.stations.map(s => s.id));
+
     // Update sidebar for live stations
+    let updatedCount = 0;
     CONFIG.stations.forEach(station => {
       const sidebarLevel = document.getElementById(`level-${station.id}`);
-      if (!sidebarLevel) return;
+      if (!sidebarLevel) {
+        console.warn(`Element not found for station: ${station.id}`);
+        return;
+      }
 
       const stationData = stationDataMap[station.id];
       if (stationData && stationData.length > 0) {
@@ -1377,14 +1384,17 @@ async function fetchAllLiveStationData() {
           dir = level > prev ? 'rising' : level < prev ? 'falling' : 'stable';
         }
         const icon = dir === 'rising' ? '↑' : dir === 'falling' ? '↓' : '';
-        sidebarLevel.innerHTML = `${level.toFixed(1)}m ${icon} `;
+        sidebarLevel.innerHTML = `${level.toFixed(1)}m ${icon}`;
         state.tideData[station.id] = stationData;
+        updatedCount++;
+      } else {
+        console.warn(`No API data for station: ${station.id}`);
       }
     });
 
-    console.log('All live station data synced to sidebar');
+    console.log(`All live station data synced to sidebar (${updatedCount} stations updated)`);
   } catch (err) {
-    console.warn('Failed to fetch all station data:', err);
+    console.error('Failed to fetch all station data:', err);
   }
 }
 
