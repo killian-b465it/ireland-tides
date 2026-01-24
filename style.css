@@ -3961,3 +3961,11 @@ input:checked+.toggle-slider:before {
   border: none !important;
   outline: none !important;
 }
+
+/* Force tile rendering without gaps */
+.leaflet-tile {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
