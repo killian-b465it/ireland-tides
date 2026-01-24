@@ -3930,3 +3930,64 @@ input:checked+.toggle-slider:before {
   cursor: not-allowed;
   filter: grayscale(1);
 }
+
+/* Mobile Navigation and Map Fixes */
+@media (max-width: 768px) {
+
+  /* Stack navigation buttons vertically */
+  .nav-right {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+  }
+
+  /* Hide Support Development button on mobile to save space */
+  .nav-right>a[href*="buymeacoffee"] {
+    display: none !important;
+  }
+
+  .nav-auth {
+    width: auto;
+  }
+
+  #login-btn {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+    white-space: nowrap;
+  }
+
+  /* Fix map positioning - prevent navbar overlap */
+  .page {
+    padding-top: 70px !important;
+    /* Add space for navbar */
+  }
+
+  #map,
+  #social-map {
+    height: calc(100vh - 70px) !important;
+    /* Full height minus navbar */
+    margin-top: 0 !important;
+  }
+
+  /* Remove horizontal lines on map */
+  .leaflet-container {
+    border: none !important;
+  }
+
+  .leaflet-tile-pane {
+    border: none !important;
+  }
+
+  /* Ensure map tiles don't show lines */
+  .leaflet-tile {
+    border: none !important;
+    outline: none !important;
+  }
+
+  /* Fix sidebar on mobile if present */
+  .sidebar {
+    top: 70px !important;
+    height: calc(100vh - 70px) !important;
+  }
+}
