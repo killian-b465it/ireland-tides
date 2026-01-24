@@ -733,7 +733,8 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(updateClock, 1000);
   initMap();
   loadStationList();
-  fetchAllLiveStationData(); // Sync sidebar with live API data on load
+  // Delay to ensure DOM elements are ready before syncing live data
+  setTimeout(() => fetchAllLiveStationData(), 500);
   startAutoUpdate();
 
   // Auto-grant Pro status during beta (free for all users)
@@ -1345,6 +1346,7 @@ function updateAllStationLevels() {
 
 // Fetch real tide data for all live stations and sync sidebar
 async function fetchAllLiveStationData() {
+  console.log('🔄 fetchAllLiveStationData() called');
   try {
     const now = new Date();
     const past24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
