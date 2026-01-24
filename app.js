@@ -98,13 +98,13 @@ const CONFIG = {
     stripePublishable: 'pk_live_51PWJQERsc2tHXy0gV05ejlWaH6mwy4Xfqvfa7cSqUTdZaK6eFr4oEFYlXsZyeutnrlKzOmsRW7VDZkAQ4yO0XVu7004MBj4h9Q'
   },
   // Admin emails - users with these emails get admin access
-  ADMIN_EMAILS: ['admin@irishtides.ie', 'support@irishtides.ie'],
+  ADMIN_EMAILS: ['IrishFishingHub@gmail.com'],
   // Admin password - required for admin accounts
   // [SECURITY WARNING] In a production environment, this should never be hardcoded on the client-side.
   // Use Firebase Authentication's custom claims or a secure backend for admin verification.
   ADMIN_PASSWORD: 'IrishTides2026!',
   // Integration endpoints
-  STRIPE_API_ENDPOINT: window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://api.irishtides.ie'
+  STRIPE_API_ENDPOINT: window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://api.irishfishinghub.com'
 };
 
 // ============================================
