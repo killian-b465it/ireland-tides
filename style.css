@@ -3931,41 +3931,37 @@ input:checked+.toggle-slider:before {
   filter: grayscale(1);
 }
 
-/* Fix map tile lines (all devices) - comprehensive */
-.leaflet-tile,
-.leaflet-tile-container,
-.leaflet-layer,
-.leaflet-tile-pane {
+/* Fix map tile lines (all devices) - Professional Overlap Fix */
+.leaflet-tile {
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
+  /* Aggressive fix for sub-pixel gaps: overlap tiles slightly to hide lines */
+  margin: -1px !important;
+  padding: 1px !important;
+  /* Hardware acceleration & rendering optimization */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  image-rendering: -webkit-optimize-contrast !important;
+  image-rendering: crisp-edges !important;
 }
 
 .leaflet-container {
   border: none !important;
   outline: none !important;
+  /* Darken background so gaps (if any) are black, not white */
+  background: #000 !important;
 }
 
 .leaflet-container img {
   border: none !important;
+  /* Critical for preventing gaps on high-DPI screens */
+  max-width: none !important;
 }
 
-/* Fix community map positioning on mobile */
+/* Specific fix for community map positioning on mobile */
 @media (max-width: 768px) {
   #social-map {
-    margin-top: 30px;
+    margin-top: 45px !important;
   }
-}
-/* Remove white grid lines from map tiles */
-.leaflet-tile-loaded {
-  border: none !important;
-  outline: none !important;
-}
-
-/* Force tile rendering without gaps */
-.leaflet-tile {
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
 }
