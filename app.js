@@ -3946,6 +3946,11 @@ function loadUsersTable() {
         <td>${joinDate}</td>
         <td><span class="badge ${isActive ? 'active' : 'inactive'}">${isActive ? 'Active' : 'Inactive'}</span></td>
         <td style="display: flex; gap: 5px;">
+          <button class="btn btn-xs btn-outline" 
+                  onclick="openUsernameEditor('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}', '${u.email}')" 
+                  title="Edit Username">
+            ✏️ Edit
+          </button>
           <button class="btn btn-xs ${isActive ? 'btn-danger' : 'btn-success'}" 
                   onclick="toggleUserStatus('${u.id}')">
             ${isActive ? 'Deactivate' : 'Activate'}
