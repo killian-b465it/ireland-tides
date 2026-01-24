@@ -1029,16 +1029,38 @@ window.getDirections = (lat, lon) => {
   window.open(url, '_blank');
 };
 
-// ============================================
-// Collapsible Filter Panel Functions
-// ============================================
+// Helper to update the filter button state
+window.updateFilterButton = (mode) => {
+  const btn = document.getElementById('filter-toggle-btn');
+  if (!btn) return;
+
+  if (mode === 'confirm') {
+    btn.classList.add('confirm-mode');
+    btn.innerHTML = '<span class="filter-toggle-icon">✅</span><span class="filter-toggle-text">Confirm</span>';
+  } else if (mode === 'sea') {
+    btn.classList.remove('confirm-mode');
+    btn.innerHTML = '<span class="filter-toggle-icon">🗺️</span><span class="filter-toggle-text">Map Layers</span>';
+  } else if (mode === 'freshwater') {
+    btn.classList.remove('confirm-mode');
+    btn.innerHTML = '<span class="filter-toggle-icon">🏞️</span><span class="filter-toggle-text">Filters</span>';
+  }
+};
+
 window.toggleFilterPanel = () => {
   const sidebar = document.getElementById('filter-sidebar');
   const overlay = document.getElementById('filter-overlay');
 
   if (sidebar && overlay) {
-    sidebar.classList.toggle('open');
-    overlay.classList.toggle('active');
+    const isOpen = sidebar.classList.contains('open');
+    if (isOpen) {
+      // If open, button acts as Apply
+      applyFilters();
+    } else {
+      // If closed, open and change button to Confirm
+      sidebar.classList.add('open');
+      overlay.classList.add('active');
+      updateFilterButton('confirm');
+    }
   }
 };
 
@@ -1048,9 +1070,13 @@ window.closeFilterPanel = () => {
 
   if (sidebar) sidebar.classList.remove('open');
   if (overlay) overlay.classList.remove('active');
+  updateFilterButton('sea');
 };
 
 window.applyFilters = (closePanel = true) => {
+  if (closePanel) {
+    closeFilterPanel();
+  }
   // Read checkbox states
   const filters = {
     stations: document.getElementById('filter-stations')?.checked ?? true,
@@ -2690,7 +2716,7 @@ function updateMapForFishingMode() {
     // Toggle filter button to sea filters
     if (seaFilterBtn) {
       seaFilterBtn.onclick = () => toggleFilterPanel();
-      seaFilterBtn.innerHTML = '<span class="filter-toggle-icon">🗺️</span><span class="filter-toggle-text">Filters</span>';
+      updateFilterButton('sea');
     }
     if (fwFilterSidebar) fwFilterSidebar.style.display = 'none';
   } else {
@@ -2714,7 +2740,7 @@ function updateMapForFishingMode() {
     // Toggle filter button to freshwater filters
     if (seaFilterBtn) {
       seaFilterBtn.onclick = () => toggleFreshwaterFilterPanel();
-      seaFilterBtn.innerHTML = '<span class="filter-toggle-icon">🏞️</span><span class="filter-toggle-text">Filters</span>';
+      updateFilterButton('freshwater');
     }
     if (fwFilterSidebar) fwFilterSidebar.style.display = '';
     if (seaFilterSidebar) seaFilterSidebar.classList.remove('open');
@@ -2882,8 +2908,14 @@ window.toggleFreshwaterFilterPanel = () => {
   const sidebar = document.getElementById('freshwater-filter-sidebar');
   const overlay = document.getElementById('freshwater-filter-overlay');
   if (sidebar && overlay) {
-    sidebar.classList.toggle('open');
-    overlay.classList.toggle('active');
+    const isOpen = sidebar.classList.contains('open');
+    if (isOpen) {
+      applyFreshwaterFilters();
+    } else {
+      sidebar.classList.add('open');
+      overlay.classList.add('active');
+      updateFilterButton('confirm');
+    }
   }
 };
 
@@ -2892,9 +2924,13 @@ window.closeFreshwaterFilterPanel = () => {
   const overlay = document.getElementById('freshwater-filter-overlay');
   if (sidebar) sidebar.classList.remove('open');
   if (overlay) overlay.classList.remove('active');
+  updateFilterButton('freshwater');
 };
 
 window.applyFreshwaterFilters = (closePanel = true) => {
+  if (closePanel) {
+    closeFreshwaterFilterPanel();
+  }
   const showSpots = document.getElementById('filter-fw-spots')?.checked ?? true;
   const showParks = document.getElementById('filter-fw-parks')?.checked ?? true;
   const showRamps = document.getElementById('filter-fw-ramps')?.checked ?? true;
