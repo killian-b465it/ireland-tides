@@ -1302,11 +1302,11 @@ function loadStationList() {
           ${stations.map(station => {
       const { level, direction } = calculateTideLevel(now, station);
       const arrow = direction === 'rising' ? '↑' : direction === 'falling' ? '↓' : '';
-      const liveIndicator = station.live ? '<span class="live-badge">LIVE</span>' : '';
+      // LIVE badge will be added dynamically when API data is received
       return `
               <div class="station-item" data-station="${station.id}" data-station-index="${CONFIG.stations.indexOf(station)}">
                 <div class="station-indicator ${station.status === 'offline' ? 'offline' : ''}"></div>
-                <span class="station-name">${station.name}${liveIndicator}</span>
+                <span class="station-name">${station.name}<span id="live-badge-${station.id}"></span></span>
                 <span class="station-level" id="level-${station.id}">${level.toFixed(1)}m ${arrow}</span>
               </div>
             `;
@@ -1397,6 +1397,13 @@ async function fetchAllLiveStationData() {
         const icon = dir === 'rising' ? '↑' : dir === 'falling' ? '↓' : '';
         sidebarLevel.innerHTML = `${level.toFixed(1)}m ${icon}`;
         state.tideData[station.id] = stationData;
+
+        // Add LIVE badge since we have real API data
+        const liveBadge = document.getElementById(`live-badge-${station.id}`);
+        if (liveBadge && !liveBadge.innerHTML) {
+          liveBadge.innerHTML = '<span class="live-badge">LIVE</span>';
+        }
+
         updatedCount++;
       } else {
         console.warn(`No API data for station: ${station.id}`);
