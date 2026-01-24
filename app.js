@@ -4848,6 +4848,21 @@ window.closePrivacyModal = () => {
   document.getElementById('privacy-modal').classList.remove('active');
 };
 
+window.togglePasswordVisibility = () => {
+  const passwordInput = document.getElementById('auth-password');
+  const toggleBtn = document.getElementById('password-toggle-btn');
+
+  if (passwordInput.type === 'password') {
+    passwordInput.type = 'text';
+    toggleBtn.textContent = '🙈'; // Hide icon
+    toggleBtn.title = 'Hide Password';
+  } else {
+    passwordInput.type = 'password';
+    toggleBtn.textContent = '👁️'; // Show icon
+    toggleBtn.title = 'Show Password';
+  }
+};
+
 // ============================================
 // Username Editor (Admin)
 // ============================================
