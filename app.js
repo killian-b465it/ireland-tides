@@ -862,7 +862,10 @@ function checkPaymentStatus() {
 function initMap() {
   state.map = L.map('map', {
     zoomControl: true,
-    attributionControl: true
+    attributionControl: true,
+    zoomSnap: 0,
+    zoomDelta: 0.25,
+    wheelPxPerZoomLevel: 60
   }).setView(CONFIG.mapCenter, CONFIG.mapZoom);
 
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -2171,7 +2174,11 @@ function startAutoUpdate() {
 // Community Logic
 // ============================================
 function initCommunityMap() {
-  state.communityMap = L.map('social-map').setView([53.5, -8], 7);
+  state.communityMap = L.map('social-map', {
+    zoomSnap: 0,
+    zoomDelta: 0.25,
+    wheelPxPerZoomLevel: 60
+  }).setView([53.5, -8], 7);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; CARTO',
     subdomains: 'abcd',
@@ -4936,7 +4943,11 @@ function initAdminMap() {
   const mapContainer = document.getElementById('admin-map');
   if (!mapContainer) return;
 
-  adminMap = L.map('admin-map').setView([53.5, -8.0], 7);
+  adminMap = L.map('admin-map', {
+    zoomSnap: 0,
+    zoomDelta: 0.25,
+    wheelPxPerZoomLevel: 60
+  }).setView([53.5, -8.0], 7);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
   }).addTo(adminMap);

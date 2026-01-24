@@ -3931,32 +3931,32 @@ input:checked+.toggle-slider:before {
   filter: grayscale(1);
 }
 
-/* Fix map tile lines (all devices) - Professional Overlap Fix */
+/* Fix map tile lines (all devices) - Shadow Gap-Filler Fix */
 .leaflet-tile {
   border: none !important;
   outline: none !important;
-  box-shadow: none !important;
-  /* Aggressive fix for sub-pixel gaps: overlap tiles slightly to hide lines */
-  margin: -1px !important;
-  padding: 1px !important;
+  /* Use a dark shadow to fill any sub-pixel gaps between tiles */
+  box-shadow: 0 0 1px #060606 !important;
   /* Hardware acceleration & rendering optimization */
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
-  image-rendering: -webkit-optimize-contrast !important;
-  image-rendering: crisp-edges !important;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .leaflet-container {
   border: none !important;
   outline: none !important;
-  /* Darken background so gaps (if any) are black, not white */
+  /* Black background to hide gaps if shadows fail */
   background: #000 !important;
 }
 
 .leaflet-container img {
   border: none !important;
-  /* Critical for preventing gaps on high-DPI screens */
+  /* Prevent rounding errors on high-DPI screens */
   max-width: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 /* Specific fix for community map positioning on mobile */
