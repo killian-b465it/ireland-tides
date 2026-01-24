@@ -3930,3 +3930,20 @@ input:checked+.toggle-slider:before {
   cursor: not-allowed;
   filter: grayscale(1);
 }
+
+/* Fix map tile lines (all devices) */
+.leaflet-tile {
+  border: none !important;
+  outline: none !important;
+}
+
+.leaflet-container {
+  border: none !important;
+}
+
+/* Fix community map positioning on mobile */
+@media (max-width: 768px) {
+  #social-map {
+    margin-top: 10px;
+  }
+}
