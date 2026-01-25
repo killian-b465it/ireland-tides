@@ -4340,6 +4340,9 @@ window.sendAdminReply = () => {
     readByUser: false
   };
 
+  // Sync to Firebase (Real-time listener handles UI and localStorage)
+  syncMessageToFirebase(msg);
+
   input.value = '';
 };
 
