@@ -805,7 +805,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }, 6500); // 1s delay + 5s fill animation
 });
 
-// [BETA BANNER LOGIC REMOVED FOR V1.0.0]
+// [BETA BANNER LOGIC REMOVED FOR V1.1.0]
 
 /**
  * Handle Stripe redirect parameters (success/cancel)

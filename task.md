@@ -1,10 +1,10 @@
 # Firebase Integration & Community Sync - Irish Fishing Hub
 
-# Walkthrough - Irish Fishing Hub v1.0.0
+# Walkthrough - Irish Fishing Hub v1.1.0
 
 The application has officially reached Version 1.0.0 (v1). This release consolidates UI improvements, security hardening, and core community features into a stable production-ready state.
 
-## Core Features (v1.0.0)
+## Core Features (v1.1.0)
 
 ## Tasks
 
@@ -20,7 +20,7 @@ The application has officially reached Version 1.0.0 (v1). This release consolid
     - [x] Real-time updates for all users
 - [x] Push changes to GitHub
 - [x] Release Version 1.0.0 (v1)
-  - [x] Tag repository with `v1.0.0`
+  - [x] Tag repository with `v1.1.0`
   - [x] Update documentation and release notes
   - [x] Finalize stable build artifacts
 - [/] Unify Emoji Aesthetics: Matching icons and standardized sizes
