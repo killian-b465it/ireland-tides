@@ -507,6 +507,12 @@ function loadMessagesFromFirebase() {
     // Refresh relevant UIs
     if (document.getElementById('page-admin').style.display === 'block') {
       loadAdminMessages();
+
+      // Also refresh active reply thread if open
+      if (document.getElementById('admin-reply-modal').classList.contains('active') && state.currentReplyUserId) {
+        const thread = state.supportMessages.filter(m => m.userId === state.currentReplyUserId);
+        renderAdminReplyThread(thread);
+      }
     }
     if (document.getElementById('support-modal').classList.contains('active')) {
       renderUserSupportThread();
