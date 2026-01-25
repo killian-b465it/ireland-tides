@@ -5268,7 +5268,7 @@ window.saveLocation = async (event) => {
   const isNewOrBuiltIn = !existingId || (editingLocation && editingLocation.source === 'static');
 
   const locationData = {
-    id: isNewOrBuiltIn ? `loc_${Date.now()} ` : existingId,
+    id: isNewOrBuiltIn ? `loc_${Date.now()}` : existingId,
     name: document.getElementById('location-name').value,
     lat: parseFloat(document.getElementById('location-lat').value),
     lon: parseFloat(document.getElementById('location-lon').value),
@@ -5282,8 +5282,8 @@ window.saveLocation = async (event) => {
 
   try {
     // Save to Firebase
-    const path = `locations / ${locationData.mode} /${locationData.type}s/${locationData.id} `;
-    await firebase.database().ref(path).set(locationData);
+    const path = `locations/${locationData.mode}/${locationData.type}s/${locationData.id}`;
+    await firebaseDB.ref(path).set(locationData);
 
     // Update local state
     const typeKey = locationData.type + 's';
@@ -5313,8 +5313,8 @@ window.deleteLocation = async () => {
   if (!confirm(`Are you sure you want to delete "${editingLocation.name}" ? `)) return;
 
   try {
-    const path = `locations / ${editingLocation.mode || adminMapMode} /${editingLocation.type}s/${editingLocation.id} `;
-    await firebase.database().ref(path).remove();
+    const path = `locations/${editingLocation.mode || adminMapMode}/${editingLocation.type}s/${editingLocation.id}`;
+    await firebaseDB.ref(path).remove();
 
     // Remove from local state
     const typeKey = editingLocation.type + 's';
