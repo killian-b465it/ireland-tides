@@ -761,9 +761,6 @@ function loadUsersFromFirebase(callback) {
 // Initialization
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialize beta banner
-  initBetaBanner();
-
   // Verify if current session is still active (not deactivated by admin)
   verifySessionStatus();
 
@@ -808,26 +805,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }, 6500); // 1s delay + 5s fill animation
 });
 
-// Beta Banner Functions
-function initBetaBanner() {
-  const banner = document.getElementById('beta-banner');
-  const dismissed = sessionStorage.getItem('beta_banner_dismissed');
-
-  if (dismissed) {
-    if (banner) banner.classList.add('hidden');
-  } else {
-    document.body.classList.add('has-beta-banner');
-  }
-}
-
-window.closeBetaBanner = () => {
-  const banner = document.getElementById('beta-banner');
-  if (banner) {
-    banner.classList.add('hidden');
-    document.body.classList.remove('has-beta-banner');
-    sessionStorage.setItem('beta_banner_dismissed', 'true');
-  }
-};
+// [BETA BANNER LOGIC REMOVED FOR V1.0.0]
 
 /**
  * Handle Stripe redirect parameters (success/cancel)
