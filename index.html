@@ -97,6 +97,7 @@
       <a href="#" class="mobile-menu-link" onclick="showPage('directory'); closeMobileMenu()">Shop Directory</a>
       <a href="#" class="mobile-menu-link admin-only" id="mobile-nav-admin"
         onclick="showPage('admin'); closeMobileMenu()" style="display: none;">🛡️ Admin</a>
+      <a href="#" class="mobile-menu-link" onclick="openSupportChoiceModal(); closeMobileMenu()">💬 Contact Support</a>
       <a href="#" class="mobile-menu-link" onclick="openTermsModal(); closeMobileMenu()">⚖️ Terms & Conditions</a>
       <a href="#" class="mobile-menu-link" onclick="openPrivacyModal(); closeMobileMenu()">🛡️ Privacy Policy</a>
     </div>
@@ -229,6 +230,8 @@
           </div>
         </div>
         <div class="sidebar-footer">
+          <a href="#" onclick="openSupportChoiceModal()">Contact Support</a>
+          <span>•</span>
           <a href="#" onclick="openTermsModal()">Terms & Conditions</a>
           <span>•</span>
           <a href="#" onclick="openPrivacyModal()">Privacy Policy</a>
@@ -338,6 +341,8 @@
           </div>
         </div>
         <div class="sidebar-footer">
+          <a href="#" onclick="openSupportChoiceModal()">Contact Support</a>
+          <span>•</span>
           <a href="#" onclick="openTermsModal()">Terms & Conditions</a>
           <span>•</span>
           <a href="#" onclick="openPrivacyModal()">Privacy Policy</a>
@@ -1208,6 +1213,38 @@
   </div>
 
   <!-- Scripts -->
+  <!-- Support Choice Modal -->
+  <div class="modal" id="support-choice-modal">
+    <div class="modal-content support-choice-card">
+      <div class="modal-header">
+        <h2>💬 Contact Support</h2>
+        <button class="modal-close-btn-inline" onclick="closeSupportChoiceModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 25px;">
+          How would you like to contact us?
+        </p>
+        <div class="support-options-grid">
+          <button class="support-option-btn" onclick="handleInAppSupport()">
+            <div class="support-option-icon">💬</div>
+            <div class="support-option-info">
+              <span class="support-option-title">In-App Chat</span>
+              <span class="support-option-desc">Message us directly in the app</span>
+            </div>
+          </button>
+
+          <a href="mailto:irishfishinghub@gmail.com" class="support-option-btn" style="text-decoration: none;">
+            <div class="support-option-icon">📧</div>
+            <div class="support-option-info">
+              <span class="support-option-title">Email Support</span>
+              <span class="support-option-desc">irishfishinghub@gmail.com</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.min.js"></script>

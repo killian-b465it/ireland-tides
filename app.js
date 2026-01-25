@@ -4533,6 +4533,20 @@ window.openSupportModal = () => {
   document.getElementById('support-modal').classList.add('active');
 };
 
+// Support Choice Modal Logic
+window.openSupportChoiceModal = () => {
+  document.getElementById('support-choice-modal').classList.add('active');
+};
+
+window.closeSupportChoiceModal = () => {
+  document.getElementById('support-choice-modal').classList.remove('active');
+};
+
+window.handleInAppSupport = () => {
+  closeSupportChoiceModal();
+  openSupportModal();
+};
+
 // ============================================
 // National Directory (Tackle Shops)
 // ============================================
