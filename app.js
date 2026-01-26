@@ -1278,8 +1278,14 @@ function fetchNearbyShops(station) {
 
   shopList.innerHTML = nearbyShops.slice(0, 5).map(shop => {
     const dist = getDistanceKm(station.lat, station.lon, shop.lat, shop.lng || shop.lon).toFixed(1);
+    const lat = shop.lat;
+    const lon = shop.lng || shop.lon;
+    const name = shop.name.replace(/'/g, "\\'");
+    const addr = (shop.address || '').replace(/'/g, "\\'");
+    const phone = (shop.phone || '').replace(/'/g, "\\'");
+
     return `
-    <div class="shop-item" onclick="showShopDetails('${shop.name}')">
+    <div class="shop-item" onclick="openShopDetails(${lat}, ${lon}, '${name}', '${addr}', '', '${phone}', '')">
       <div class="shop-name">${shop.name}</div>
       <div class="shop-meta">
         <span>📍 ${dist}km away</span>
@@ -2047,122 +2053,7 @@ function updateFishingConditions(station, data) {
   }
 }
 
-// ============================================
-// Bait Shops logic
-// ============================================
-window.openShopDetails = (lat, lon, name, street, city, phone) => {
-  const modal = document.getElementById('shop-details-modal');
-  const img = document.getElementById('street-view-image');
-  const loading = document.getElementById('sv-loading');
-  const fallback = document.getElementById('sv-fallback');
-  const dirBtn = document.getElementById('shop-details-directions-btn');
 
-  img.style.display = 'none';
-  loading.style.display = 'flex';
-  fallback.style.display = 'none';
-
-  document.getElementById('shop-details-name').innerText = name || 'Tackle Shop';
-  document.getElementById('shop-details-address').innerText = `📍 ${street ? street + ', ' : ''}${city || 'Ireland'}`;
-  document.getElementById('shop-details-phone').innerText = phone ? `📞 ${phone}` : '📞 Phone not available';
-
-  dirBtn.onclick = () => getDirections(lat, lon);
-
-  // Street View Static Image URL
-  // Street View Logic with improved fallback
-  const apiKey = CONFIG.API_KEYS.streetView;
-  const svUrl = `https://maps.googleapis.com/maps/api/streetview?size=800x400&location=${lat},${lon}&fov=90&heading=0&pitch=0&key=${apiKey}`;
-
-  img.src = svUrl;
-
-  // If no valid key or error, ensure fallback shows
-  img.onerror = () => {
-    loading.style.display = 'none';
-    img.style.display = 'none';
-    fallback.style.display = 'flex';
-  };
-
-  // If using placeholder, trigger error handler manually after timeout if it doesn't fail fast
-  if (apiKey.includes('PLACEHOLDER')) {
-    setTimeout(() => img.onerror(), 500);
-  }
-
-  modal.classList.add('active');
-};
-
-window.closeShopDetails = () => {
-  document.getElementById('shop-details-modal').classList.remove('active');
-};
-
-async function fetchNearbyShops(station) {
-  const container = document.getElementById('shop-list');
-  if (state.shopMarkers) state.shopMarkers.clearLayers();
-  container.innerHTML = `<div class="loading"><div class="loading-spinner"></div><span>Searching...</span></div>`;
-
-  try {
-    const q = `[out:json][timeout:25];(node["shop"="fishing"](around:20000,${station.lat},${station.lon});way["shop"="fishing"](around:20000,${station.lat},${station.lon}););out body center;`;
-    const res = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(q)}`);
-    const data = await res.json();
-    displayShops(station, data.elements);
-
-  } catch (err) {
-    console.error('Shop search failed:', err);
-    container.innerHTML = `
-      <div class="error-message fade-in">
-        <p>Could not search for local shops.</p>
-        <button class="btn btn-sm btn-outline" onclick="fetchNearbyShops(state.selectedStation)" style="margin-top:8px">Retry</button>
-      </div>`;
-  }
-}
-
-function displayShops(station, shops) {
-  const container = document.getElementById('shop-list');
-  if (!shops || shops.length === 0) {
-    container.innerHTML = `<p style="padding:15px; color:var(--text-muted)">No specialized tackle shops found within 20km.</p>`;
-    return;
-  }
-
-  const sorted = shops.map(s => {
-    const lat = s.lat || s.center.lat, lon = s.lon || s.center.lon;
-    return { ...s, lat, lon, dist: calculateDistance(station.lat, station.lon, lat, lon) };
-  }).sort((a, b) => a.dist - b.dist);
-
-  container.innerHTML = sorted.map(s => {
-    addShopMarker(s);
-    const tags = s.tags || {};
-    const name = tags.name || 'Tackle Shop';
-    const street = tags['addr:street'] || tags['addr:city'] || '';
-    const city = tags['addr:city'] || '';
-    const phone = tags.phone || tags['contact:phone'] || '';
-    const email = tags.email || '';
-
-    return `
-      <div class="shop-item fade-in" onclick="openShopDetails(${s.lat}, ${s.lon}, \`${sanitizeHTML(name).replace(/`/g, '\\`')}\`, \`${sanitizeHTML(street).replace(/`/g, '\\`')}\`, \`${sanitizeHTML(city).replace(/`/g, '\\`')}\`, \`${sanitizeHTML(phone).replace(/`/g, '\\`')}\`, \`${sanitizeHTML(email).replace(/`/g, '\\`')}\`)">
-        <span class="shop-name">${sanitizeHTML(name)}</span>
-        <div class="shop-detail">
-          <span class="shop-dist">${s.dist.toFixed(1)} km</span>
-          <span>${sanitizeHTML(street) || 'Local area'}</span>
-        </div>
-        <div class="shop-actions">
-          <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); getDirections(${s.lat},${s.lon})">Directions</button>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-function addShopMarker(s) {
-  const icon = L.divIcon({ className: 'shop-marker', html: '🏪', iconSize: [28, 28], iconAnchor: [14, 14] });
-  const name = s.tags.name || 'Tackle Shop';
-  const street = s.tags['addr:street'] || s.tags['addr:city'] || '';
-  const popupContent = `
-    <div class="freshwater-popup">
-      <h3>🏪 ${name}</h3>
-      ${street ? `<p><strong>Address:</strong> ${street}</p>` : ''}
-      <a href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}" target="_blank" class="directions-btn">📍 Get Directions</a>
-    </div>
-  `;
-  L.marker([s.lat, s.lon], { icon }).bindPopup(popupContent).addTo(state.shopMarkers);
-}
 
 window.getDirections = (lat, lon) => {
   window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`, '_blank');
