@@ -2423,15 +2423,35 @@ function renderCatchFeed() {
     if ((index + 1) % 4 === 0) {
       const adContainer = document.createElement('div');
       adContainer.className = 'catch-card feed-ad-item';
-      adContainer.style.background = 'rgba(0, 212, 255, 0.02)';
-      adContainer.style.border = '1px dashed rgba(0, 212, 255, 0.2)';
+      adContainer.style.background = 'rgba(255, 255, 255, 0.02)';
+      adContainer.style.textAlign = 'center';
+      adContainer.style.padding = '20px 0';
       adContainer.innerHTML = `
-        <div class="card-header">
-          <span class="card-title">📢 ADS TO KEEP OUR PLATFORM FREE</span>
+        <div class="card-header" style="justify-content: center;">
+          <span class="card-title" style="font-size: 0.7rem; color: var(--text-muted);">📢 ADS TO KEEP OUR PLATFORM FREE</span>
         </div>
-        <div id="container-community-feed-ad"></div>
+        <div id="ad-300-250-${index}"></div>
       `;
       feed.appendChild(adContainer);
+
+      // Inject the script manually to ensure it executes
+      const adDiv = document.getElementById(`ad-300-250-${index}`);
+
+      const scriptOptions = document.createElement('script');
+      scriptOptions.innerHTML = `
+        atOptions = {
+          'key' : '9f4ccd6e67ab1bb552203881fb79a9cb',
+          'format' : 'iframe',
+          'height' : 250,
+          'width' : 300,
+          'params' : {}
+        };
+      `;
+      adDiv.appendChild(scriptOptions);
+
+      const scriptInvoke = document.createElement('script');
+      scriptInvoke.src = 'https://www.highperformanceformat.com/9f4ccd6e67ab1bb552203881fb79a9cb/invoke.js';
+      adDiv.appendChild(scriptInvoke);
     }
   });
 }
