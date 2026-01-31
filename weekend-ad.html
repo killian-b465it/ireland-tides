@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Irish Fishing Hub - Weekend Advertisement</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --ad-width: 1080px;
+            --ad-height: 1920px;
+        }
+
+        body {
+            background: #000;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding-top: 0;
+            /* Reset body padding for ad */
+            overflow: auto;
+        }
+
+        .ad-container {
+            width: var(--ad-width);
+            height: var(--ad-height);
+            background: var(--bg-dark);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 100px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Background Layer */
+        .ad-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.6) contrast(1.1);
+            z-index: 1;
+        }
+
+        .ad-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom,
+                    rgba(10, 17, 32, 0.4) 0%,
+                    transparent 30%,
+                    transparent 70%,
+                    rgba(10, 17, 32, 0.95) 100%);
+            z-index: 2;
+        }
+
+        /* Branding */
+        .ad-header {
+            position: relative;
+            z-index: 10;
+            padding: 80px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .ad-logo {
+            width: 80px;
+            height: 80px;
+        }
+
+        .ad-brand-name {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--accent-primary);
+            text-shadow: 0 4px 20px rgba(0, 212, 255, 0.5);
+        }
+
+        /* Main Content */
+        .ad-content {
+            position: relative;
+            z-index: 10;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 80px;
+            gap: 40px;
+        }
+
+        .weekend-headline {
+            font-size: 6rem;
+            font-weight: 900;
+            line-height: 0.9;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            margin-bottom: 20px;
+        }
+
+        .weekend-headline span {
+            color: var(--accent-primary);
+            display: block;
+        }
+
+        .weekend-dates {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--accent-warning);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 171, 0, 0.1);
+            padding: 10px 25px;
+            border-radius: 50px;
+            width: fit-content;
+            border: 1px solid rgba(255, 171, 0, 0.3);
+        }
+
+        /* App UI Mockup */
+        .ui-mockup {
+            margin-top: 60px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .mock-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 32px;
+            padding: 50px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .mock-card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .mock-tide-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .mock-tide-level {
+            font-size: 8rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .mock-tide-unit {
+            font-size: 2.5rem;
+            color: var(--text-muted);
+            margin-left: 10px;
+        }
+
+        .mock-status {
+            font-size: 2rem;
+            padding: 15px 35px;
+            border-radius: 50px;
+            font-weight: 700;
+        }
+
+        .mock-status.rising {
+            background: rgba(0, 255, 136, 0.15);
+            color: var(--accent-success);
+        }
+
+        /* Footer */
+        .ad-footer {
+            position: relative;
+            z-index: 10;
+            padding: 80px;
+            text-align: center;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--accent-primary);
+            color: var(--bg-dark);
+            font-size: 2.5rem;
+            font-weight: 800;
+            padding: 30px 80px;
+            border-radius: 60px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.4);
+        }
+
+        .app-url {
+            margin-top: 40px;
+            font-size: 1.8rem;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+        }
+
+        /* Pulse Animation for Live */
+        .live-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--accent-success);
+            font-weight: 800;
+            font-size: 1.5rem;
+        }
+
+        .live-dot {
+            width: 15px;
+            height: 15px;
+            background: currentColor;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(1.3);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="ad-container">
+        <!-- Replace with actual path later, for now using a placeholder or local reference -->
+        <img src="C:/Users/killi/.gemini/antigravity/brain/459e50c4-a2f6-40bb-965d-1f4280d89ebb/weekend_fishing_background_1769798056940.png"
+            alt="Fishing Background" class="ad-background">
+        <div class="ad-overlay"></div>
+
+        <header class="ad-header">
+            <img src="assets/logo.png" alt="Logo" class="ad-logo">
+            <span class="ad-brand-name">Irish Fishing Hub</span>
+        </header>
+
+        <main class="ad-content">
+            <div class="weekend-container">
+                <h1 class="weekend-headline">
+                    READY FOR THE<br>
+                    <span>WEEKEND?</span>
+                </h1>
+                <div class="weekend-dates">
+                    📅 JAN 31 - FEB 1
+                </div>
+            </div>
+
+            <div class="ui-mockup">
+                <!-- Location Info Item -->
+                <div class="mock-card">
+                    <div class="mock-card-title">📍 Selected Location</div>
+                    <div style="font-size: 3rem; font-weight: 800;">Galway Bay</div>
+                    <div style="font-size: 1.5rem; color: var(--text-secondary); margin-top: 10px;">Western Region •
+                        Open Coast</div>
+                </div>
+
+                <!-- Live Tide Item -->
+                <div class="mock-card">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                        <div class="mock-card-title" style="margin-bottom: 0;">🌊 Live Tide</div>
+                        <div class="live-label"><span class="live-dot"></span> LIVE</div>
+                    </div>
+                    <div class="mock-tide-row">
+                        <div class="mock-tide-level">
+                            3.8<span class="mock-tide-unit">m</span>
+                        </div>
+                        <div class="mock-status rising">
+                            Rising High ▲
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fishing Conditions Item -->
+                <div class="mock-card">
+                    <div class="mock-card-title">🎣 Fishing Conditions</div>
+                    <div style="display: flex; align-items: center; gap: 30px;">
+                        <div style="font-size: 6rem;">8.5<span>/10</span></div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 1.8rem; font-weight: 700; color: var(--accent-success);">PRIME TIME
+                            </div>
+                            <div style="font-size: 1.4rem; color: var(--text-secondary);">Ideal water levels and wind
+                                conditions predicted for sunrise.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="ad-footer">
+            <a href="#" class="cta-button">OPEN DASHBOARD</a>
+            <div class="app-url">WWW.IRISHFISHINGHUB.COM</div>
+        </footer>
+    </div>
+
+</body>
+
+</html>
