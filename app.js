@@ -2346,7 +2346,7 @@ function renderCatchFeed() {
     return;
   }
 
-  catchesToShow.forEach(c => {
+  catchesToShow.forEach((c, index) => {
     // Use c.id as timestamp since that's how submitCatch creates it
     const timeAgo = getTimeAgo(c.id);
     const isLiked = c.likedBy && state.user && c.likedBy.includes(state.user.id);
@@ -2418,6 +2418,21 @@ function renderCatchFeed() {
       </div>
     `;
     feed.appendChild(item);
+
+    // [MONETIZATION] Inject Ad Slot every 4 posts
+    if ((index + 1) % 4 === 0) {
+      const adContainer = document.createElement('div');
+      adContainer.className = 'catch-card feed-ad-item';
+      adContainer.style.background = 'rgba(0, 212, 255, 0.02)';
+      adContainer.style.border = '1px dashed rgba(0, 212, 255, 0.2)';
+      adContainer.innerHTML = `
+        <div class="card-header">
+          <span class="card-title">📢 ADS TO KEEP OUR PLATFORM FREE</span>
+        </div>
+        <div id="container-community-feed-ad"></div>
+      `;
+      feed.appendChild(adContainer);
+    }
   });
 }
 
