@@ -2060,15 +2060,25 @@ function updateFishingConditions(station, data) {
 
 
 
-// [MONETIZATION] High-Revenue Triggered Ad
-let revenueAdInjected = false;
+// [MONETIZATION] High-Revenue Triggered Ad (Throttled)
+let adPressCounter = 0;
 function triggerRevenueAd() {
-  if (revenueAdInjected) return;
-  console.log('💰 Initializing high-revenue ad trigger...');
-  const script = document.createElement('script');
-  script.src = 'https://pl28620875.effectivegatecpm.com/32/b3/9a/32b39a9fbbabde8802873ef7d5520790.js';
-  document.head.appendChild(script);
-  revenueAdInjected = true;
+  adPressCounter++;
+
+  // Only fire on the 5th, 10th, 15th... click
+  if (adPressCounter % 5 === 0) {
+    console.log(`💰 Triggering revenue ad (Click #${adPressCounter})...`);
+
+    // Remove existing script to allow fresh re-initialization if needed
+    const oldScript = document.querySelector('script[src*="effectivegatecpm.com/32/b3/9a/32b39a9fbbabde8802873ef7d5520790.js"]');
+    if (oldScript) oldScript.remove();
+
+    const script = document.createElement('script');
+    script.src = 'https://pl28620875.effectivegatecpm.com/32/b3/9a/32b39a9fbbabde8802873ef7d5520790.js';
+    document.head.appendChild(script);
+  } else {
+    console.log(`⏳ Ad trigger progress: ${adPressCounter % 5}/5 clicks`);
+  }
 }
 
 window.getDirections = (lat, lon) => {
