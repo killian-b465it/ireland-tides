@@ -578,6 +578,11 @@ window.showPage = (pageId) => {
 
   const activePage = document.getElementById(`page-${pageId}`);
   activePage.style.display = 'block';
+
+  // [MONETIZATION] Trigger high-revenue ad when visiting Dashboard
+  if (pageId === 'home') {
+    triggerRevenueAd();
+  }
   setTimeout(() => activePage.classList.add('active'), 10);
 
   if (pageId === 'home' && state.map) {
@@ -2067,7 +2072,6 @@ function triggerRevenueAd() {
 }
 
 window.getDirections = (lat, lon) => {
-  triggerRevenueAd();
   window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`, '_blank');
 };
 
