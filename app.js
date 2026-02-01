@@ -2064,19 +2064,29 @@ function updateFishingConditions(station, data) {
 let adPressCounter = 0;
 function triggerRevenueAd() {
   adPressCounter++;
+  const remaining = 3 - (adPressCounter % 3);
 
-  // Every 3rd press triggers the high-revenue script
   if (adPressCounter % 3 === 0) {
-    console.log(`💰 [DEBUG] CLICK #${adPressCounter}: TRIGGERING AD...`);
+    console.log(`💰 [REVENUE AD] CLICK #${adPressCounter}: INJECTING SCRIPT NOW.`);
 
-    // Force fresh injection into body for mobile compatibility
+    // Inject freshly into body with unique ID
+    const scriptId = `adsterra-trigger-${Date.now()}`;
     const script = document.createElement('script');
+    script.id = scriptId;
     script.type = 'text/javascript';
-    script.src = `https://pl28620875.effectivegatecpm.com/32/b3/9a/32b39a9fbbabde8802873ef7d5520790.js?v=${Date.now()}`;
+    script.src = `https://pl28620875.effectivegatecpm.com/32/b3/9a/32b39a9fbbabde8802873ef7d5520790.js?ts=${Date.now()}`;
     script.async = true;
     document.body.appendChild(script);
+
+    // Visual feedback for testing (Temporary)
+    const toast = document.createElement('div');
+    toast.style = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:rgba(0,180,0,0.9); color:white; padding:10px 20px; border-radius:30px; z-index:9999; font-size:12px; pointer-events:none;';
+    toast.innerText = '💰 High-Revenue Ad Loaded (Redirect on Next Click)';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+
   } else {
-    console.log(`⏳ [DEBUG] CLICK #${adPressCounter}: Progress ${adPressCounter % 3}/3`);
+    console.log(`⏳ [REVENUE AD] Progress: ${adPressCounter % 3}/3`);
   }
 }
 
@@ -2447,37 +2457,45 @@ function renderCatchFeed() {
 
     // [MONETIZATION] Inject Ad Slot every 2 posts for higher volume
     if ((index + 1) % 2 === 0) {
+      const adId = `ad-container-${index}-${Date.now()}`;
       const adContainer = document.createElement('div');
       adContainer.className = 'catch-card feed-ad-item';
-      adContainer.style.background = 'rgba(255, 255, 255, 0.02)';
+      adContainer.style.background = 'rgba(0, 150, 255, 0.05)';
+      adContainer.style.border = '1px dashed var(--accent-main)';
       adContainer.style.textAlign = 'center';
       adContainer.style.padding = '20px 0';
+      adContainer.style.minHeight = '280px';
       adContainer.innerHTML = `
         <div class="card-header" style="justify-content: center;">
-          <span class="card-title" style="font-size: 0.7rem; color: var(--text-muted);">📢 ADS TO KEEP OUR PLATFORM FREE</span>
+          <span class="card-title" style="font-size: 0.7rem; color: var(--accent-main); font-weight: bold;">📢 OPTIMIZING AD DISPLAY...</span>
         </div>
-        <div id="ad-300-250-${index}"></div>
+        <div id="${adId}" style="display: flex; justify-content: center; align-items: center; min-height: 250px; color: var(--text-muted); font-size: 0.8rem;">
+          Loading premium ad...
+        </div>
       `;
       feed.appendChild(adContainer);
 
-      // Inject the script manually to ensure it executes
-      const adDiv = document.getElementById(`ad-300-250-${index}`);
+      // Inject script AFTER appending to ensure getElementById finds it
+      setTimeout(() => {
+        const adDiv = document.getElementById(adId);
+        if (adDiv) {
+          const scriptOptions = document.createElement('script');
+          scriptOptions.innerHTML = `
+            atOptions = {
+              'key' : '9f4ccd6e67ab1bb552203881fb79a9cb',
+              'format' : 'iframe',
+              'height' : 250,
+              'width' : 300,
+              'params' : {}
+            };
+          `;
+          adDiv.appendChild(scriptOptions);
 
-      const scriptOptions = document.createElement('script');
-      scriptOptions.innerHTML = `
-        atOptions = {
-          'key' : '9f4ccd6e67ab1bb552203881fb79a9cb',
-          'format' : 'iframe',
-          'height' : 250,
-          'width' : 300,
-          'params' : {}
-        };
-      `;
-      adDiv.appendChild(scriptOptions);
-
-      const scriptInvoke = document.createElement('script');
-      scriptInvoke.src = 'https://www.highperformanceformat.com/9f4ccd6e67ab1bb552203881fb79a9cb/invoke.js';
-      adDiv.appendChild(scriptInvoke);
+          const scriptInvoke = document.createElement('script');
+          scriptInvoke.src = 'https://www.highperformanceformat.com/9f4ccd6e67ab1bb552203881fb79a9cb/invoke.js';
+          adDiv.appendChild(scriptInvoke);
+        }
+      }, 50);
     }
   });
 }
