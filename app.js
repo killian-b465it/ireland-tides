@@ -2065,18 +2065,18 @@ let adPressCounter = 0;
 function triggerRevenueAd() {
   adPressCounter++;
 
-  // Every 5th press triggers the high-revenue script
-  if (adPressCounter % 5 === 0) {
-    console.log(`💰 [DEBUG] Triggering revenue ad - Click #${adPressCounter}`);
+  // Every 3rd press triggers the high-revenue script
+  if (adPressCounter % 3 === 0) {
+    console.log(`💰 [DEBUG] CLICK #${adPressCounter}: TRIGGERING AD...`);
 
-    // Inject freshly into body for better mobile overlay compatibility
-    // Adding a timestamp (cb) prevents the browser from using a cached version
+    // Force fresh injection into body for mobile compatibility
     const script = document.createElement('script');
     script.type = 'text/javascript';
-    script.src = `https://pl28620875.effectivegatecpm.com/32/b3/9a/32b39a9fbbabde8802873ef7d5520790.js?cb=${Date.now()}`;
+    script.src = `https://pl28620875.effectivegatecpm.com/32/b3/9a/32b39a9fbbabde8802873ef7d5520790.js?v=${Date.now()}`;
+    script.async = true;
     document.body.appendChild(script);
   } else {
-    console.log(`⏳ [DEBUG] Ad progress: ${adPressCounter % 5}/5 clicks`);
+    console.log(`⏳ [DEBUG] CLICK #${adPressCounter}: Progress ${adPressCounter % 3}/3`);
   }
 }
 
