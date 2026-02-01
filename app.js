@@ -2060,21 +2060,20 @@ function updateFishingConditions(station, data) {
 
 
 
-// [MONETIZATION] High-Revenue Triggered Ad (Throttled for Mobile)
+// [MONETIZATION] High-Revenue Triggered Ad (Throttled for Mobile & Standalone)
 let adPressCounter = 0;
 function triggerRevenueAd() {
   adPressCounter++;
 
   if (adPressCounter % 3 === 0) {
-    console.log(`💰 [DEBUG] Click #${adPressCounter}: Injecting High-Revenue Script`);
+    console.log(`💰 [REVENUE] CLICK #${adPressCounter}: OPENING SMARTLINK`);
 
-    // Inject freshly with cache-buster
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = `https://pl28620875.effectivegatecpm.com/32/b3/9a/32b39a9fbbabde8802873ef7d5520790.js?cb=${Date.now()}`;
-    document.body.appendChild(script);
+    // Direct link opening is the most reliable way to force a redirect 
+    // in "Add to Home Screen" standalone apps.
+    const smartLink = 'https://www.effectivegatecpm.com/wt6vw2m7?key=63cbc38cc78fcf2b480fba1e6f7f3ec4';
+    window.open(smartLink, '_blank');
 
-    // Visual toast for mobile testing
+    // Visual toast for mobile testing (Temporary)
     const toast = document.createElement('div');
     toast.style = 'position:fixed; bottom:70px; left:50%; transform:translateX(-50%); background:#ffab00; color:black; padding:10px 20px; border-radius:30px; z-index:9999; font-size:12px; font-weight:bold; box-shadow:0 4px 15px rgba(0,0,0,0.4); pointer-events:none;';
     toast.innerHTML = '⚡️ REVENUE BOOST ACTIVE ⚡️';
