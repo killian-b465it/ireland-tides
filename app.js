@@ -5367,15 +5367,15 @@ let emailTarget = null;
 const EMAIL_TEMPLATES = {
   welcome: {
     subject: "Welcome to Irish Fishing Hub! 🎣",
-    body: "Hi there,\n\nWelcome to the Irish Fishing Hub community! We're thrilled to have you on board.\n\nAs a member, you now have access to:\n- Real-time Tide Data for stations across Ireland\n- Accurate Sea & Coastal Weather Forecasts\n- Our community Catch Feed to share your success\n- A detailed Directory of local fishing shops and services\n\nIf you're looking to take your angling to the next level, check out our PRO features in your profile settings.\n\nTight lines!\nThe Irish Fishing Hub Team"
+    body: "Hi there,\n\nWelcome to the Irish Fishing Hub community! We're thrilled to have you on board.\n\nAs a member, you now have access to:\n- Real-time Tide Data for stations across Ireland\n- Sea & Coastal Weather Forecasts\n- Our community Catch Feed to share your success\n- A detailed Directory of local fishing shops and services\n\nYou can review our Terms & Conditions and Privacy Policy at any time via the links at the bottom of our website.\n\nTight lines!\nThe Irish Fishing Hub Team"
   },
   update: {
     subject: "Irish Fishing Hub App Update 🚀",
-    body: "Hello Anglers,\n\nWe've just pushed a small update to improve your experience on the Hub! \n\nWhat's new:\n- Refined mobile navigation and performance\n- New \"Utilities\" dashboard for faster account management\n- Updated legal disclosures for full transparency\n\nRefresh your app now to see the latest version. We're constantly working to build the ultimate tool for Irish fishers.\n\nHappy Fishing!"
+    body: "Hello Anglers,\n\nWe've just pushed a small update to improve your experience on the Hub! \n\nWhat's new:\n- Refined mobile navigation and performance\n- New \"Utilities\" dashboard for faster account management\n- Updated legal disclosures\n\nYou can check out our latest Terms and Privacy Policy at the bottom of the page. Refresh your app now to see the latest version.\n\nHappy Fishing!"
   },
   legal: {
     subject: "Important: Updates to our Privacy and Terms ⚖️",
-    body: "Dear Member,\n\nWe've recently updated our Privacy Policy and Terms & Conditions (Effective Feb 1, 2026).\n\nKey changes include:\n- Clearer disclosures regarding advertising redirects (SmartLinks) that help keep our core features free for everyone\n- Updated data protection and usage policies\n\nYou can review the full documents in the \"Safety & Privacy\" section of your app settings.\n\nThank you for being part of our community and helping us keep the Hub running."
+    body: "Dear Member,\n\nWe've recently updated our Privacy Policy and Terms & Conditions (Effective Feb 1, 2026).\n\nKey changes include:\n- Clearer disclosures regarding advertising redirects (SmartLinks) that help keep our core features free for everyone\n- Updated data protection policies\n\nYou can review the updated documents via the links in the footer at the bottom of our website.\n\nThank you for being part of our community and helping us keep the Hub running."
   },
   custom: { subject: "", body: "" }
 };
