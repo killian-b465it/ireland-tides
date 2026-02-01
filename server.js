@@ -1,11 +1,21 @@
 require('dotenv').config();
 const express = require('express');
+const nodemailer = require('nodemailer');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const cors = require('cors');
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// Set up Nodemailer transporter
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'irishfishinghub@gmail.com',
+        pass: process.env.EMAIL_PASS // Secure App Password from .env
+    }
+});
 
 // Create a Checkout Session
 // In a real app, you would get the priceId from your Stripe Dashboard
@@ -64,6 +74,32 @@ app.post('/create-portal-session', async (req, res) => {
     } catch (error) {
         console.error('Error creating portal session:', error);
         res.status(500).json({ error: error.message });
+    }
+});
+
+// Broadcast Email endpoint
+app.post('/send-broadcast-email', async (req, res) => {
+    try {
+        const { to, subject, body } = req.body;
+
+        if (!to || !subject || !body) {
+            return res.status(400).json({ error: 'Missing required fields: to, subject, or body' });
+        }
+
+        const mailOptions = {
+            from: '"Irish Fishing Hub" <irishfishinghub@gmail.com>',
+            to: to, // Can be a single email or a comma-separated list
+            subject: subject,
+            text: body,
+            html: body.replace(/\n/g, '<br>') // Basic text-to-html conversion
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+        console.log('Email sent: ' + info.response);
+        res.json({ success: true, messageId: info.messageId });
+    } catch (error) {
+        console.error('Error sending email:', error);
+        res.status(500).json({ error: 'Failed to send email: ' + error.message });
     }
 });
 
