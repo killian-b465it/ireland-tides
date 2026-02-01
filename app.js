@@ -2064,29 +2064,22 @@ function updateFishingConditions(station, data) {
 let adPressCounter = 0;
 function triggerRevenueAd() {
   adPressCounter++;
-  const remaining = 3 - (adPressCounter % 3);
 
   if (adPressCounter % 3 === 0) {
-    console.log(`💰 [REVENUE AD] CLICK #${adPressCounter}: INJECTING SCRIPT NOW.`);
+    console.log(`💰 [DEBUG] Click #${adPressCounter}: Injecting High-Revenue Script`);
 
-    // Inject freshly into body with unique ID
-    const scriptId = `adsterra-trigger-${Date.now()}`;
+    // Inject freshly with cache-buster
     const script = document.createElement('script');
-    script.id = scriptId;
     script.type = 'text/javascript';
-    script.src = `https://pl28620875.effectivegatecpm.com/32/b3/9a/32b39a9fbbabde8802873ef7d5520790.js?ts=${Date.now()}`;
-    script.async = true;
+    script.src = `https://pl28620875.effectivegatecpm.com/32/b3/9a/32b39a9fbbabde8802873ef7d5520790.js?cb=${Date.now()}`;
     document.body.appendChild(script);
 
-    // Visual feedback for testing (Temporary)
+    // Visual toast for mobile testing
     const toast = document.createElement('div');
-    toast.style = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:rgba(0,180,0,0.9); color:white; padding:10px 20px; border-radius:30px; z-index:9999; font-size:12px; pointer-events:none;';
-    toast.innerText = '💰 High-Revenue Ad Loaded (Redirect on Next Click)';
+    toast.style = 'position:fixed; bottom:70px; left:50%; transform:translateX(-50%); background:#ffab00; color:black; padding:10px 20px; border-radius:30px; z-index:9999; font-size:12px; font-weight:bold; box-shadow:0 4px 15px rgba(0,0,0,0.4); pointer-events:none;';
+    toast.innerHTML = '⚡️ REVENUE BOOST ACTIVE ⚡️';
     document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
-
-  } else {
-    console.log(`⏳ [REVENUE AD] Progress: ${adPressCounter % 3}/3`);
+    setTimeout(() => toast.remove(), 4000);
   }
 }
 
@@ -2457,45 +2450,43 @@ function renderCatchFeed() {
 
     // [MONETIZATION] Inject Ad Slot every 2 posts for higher volume
     if ((index + 1) % 2 === 0) {
-      const adId = `ad-container-${index}-${Date.now()}`;
       const adContainer = document.createElement('div');
       adContainer.className = 'catch-card feed-ad-item';
-      adContainer.style.background = 'rgba(0, 150, 255, 0.05)';
-      adContainer.style.border = '1px dashed var(--accent-main)';
+      adContainer.style.background = 'rgba(255, 255, 255, 0.02)';
       adContainer.style.textAlign = 'center';
-      adContainer.style.padding = '20px 0';
+      adContainer.style.padding = '15px 0';
       adContainer.style.minHeight = '280px';
+
+      const adId = `ad-300-250-${index}-${Date.now()}`;
       adContainer.innerHTML = `
-        <div class="card-header" style="justify-content: center;">
-          <span class="card-title" style="font-size: 0.7rem; color: var(--accent-main); font-weight: bold;">📢 OPTIMIZING AD DISPLAY...</span>
+        <div class="card-header" style="justify-content: center; border-bottom: none; margin-bottom: 10px;">
+          <span class="card-title" style="font-size: 0.7rem; color: var(--text-muted);">📢 ADS TO KEEP OUR PLATFORM FREE</span>
         </div>
-        <div id="${adId}" style="display: flex; justify-content: center; align-items: center; min-height: 250px; color: var(--text-muted); font-size: 0.8rem;">
-          Loading premium ad...
-        </div>
+        <div id="${adId}" style="display:inline-block; margin:0 auto;"></div>
       `;
       feed.appendChild(adContainer);
 
-      // Inject script AFTER appending to ensure getElementById finds it
-      setTimeout(() => {
+      // Inject the Adsterra 300x250 script
+      try {
         const adDiv = document.getElementById(adId);
-        if (adDiv) {
-          const scriptOptions = document.createElement('script');
-          scriptOptions.innerHTML = `
-            atOptions = {
-              'key' : '9f4ccd6e67ab1bb552203881fb79a9cb',
-              'format' : 'iframe',
-              'height' : 250,
-              'width' : 300,
-              'params' : {}
-            };
-          `;
-          adDiv.appendChild(scriptOptions);
+        const scriptOptions = document.createElement('script');
+        scriptOptions.innerHTML = `
+          atOptions = {
+            'key' : '9f4ccd6e67ab1bb552203881fb79a9cb',
+            'format' : 'iframe',
+            'height' : 250,
+            'width' : 300,
+            'params' : {}
+          };
+        `;
+        adDiv.appendChild(scriptOptions);
 
-          const scriptInvoke = document.createElement('script');
-          scriptInvoke.src = 'https://www.highperformanceformat.com/9f4ccd6e67ab1bb552203881fb79a9cb/invoke.js';
-          adDiv.appendChild(scriptInvoke);
-        }
-      }, 50);
+        const scriptInvoke = document.createElement('script');
+        scriptInvoke.src = 'https://www.highperformanceformat.com/9f4ccd6e67ab1bb552203881fb79a9cb/invoke.js';
+        adDiv.appendChild(scriptInvoke);
+      } catch (err) {
+        console.warn('Ad injection error:', err);
+      }
     }
   });
 }
