@@ -2445,8 +2445,8 @@ function renderCatchFeed() {
     `;
     feed.appendChild(item);
 
-    // [MONETIZATION] Inject Ad Slot every 4 posts
-    if ((index + 1) % 4 === 0) {
+    // [MONETIZATION] Inject Ad Slot every 2 posts for higher volume
+    if ((index + 1) % 2 === 0) {
       const adContainer = document.createElement('div');
       adContainer.className = 'catch-card feed-ad-item';
       adContainer.style.background = 'rgba(255, 255, 255, 0.02)';
