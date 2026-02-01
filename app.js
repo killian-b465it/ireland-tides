@@ -5350,21 +5350,32 @@ document.addEventListener('click', (e) => {
   }
 });
 
+window.toggleAdminSearch = () => {
+  const container = document.getElementById('admin-search-container');
+  const input = document.getElementById('admin-user-search');
+  if (container) {
+    container.classList.toggle('active');
+    if (container.classList.contains('active')) {
+      input.focus();
+    }
+  }
+};
+
 // [ADMIN] Global admin state
 let emailTarget = null;
 
 const EMAIL_TEMPLATES = {
   welcome: {
     subject: "Welcome to Irish Fishing Hub! 🎣",
-    body: "Hi there,\n\nWelcome to the Irish Fishing Hub community! We're thrilled to have you on board.\n\nAs a member, you now have access to real-time tide data, weather forecasts, and our community fishing feed. If you're looking to take your angling to the next level, check out our PRO features in your profile settings.\n\nTight lines!\nThe Irish Fishing Hub Team"
+    body: "Hi there,\n\nWelcome to the Irish Fishing Hub community! We're thrilled to have you on board.\n\nAs a member, you now have access to:\n- Real-time Tide Data for stations across Ireland\n- Accurate Sea & Coastal Weather Forecasts\n- Our community Catch Feed to share your success\n- A detailed Directory of local fishing shops and services\n\nIf you're looking to take your angling to the next level, check out our PRO features in your profile settings.\n\nTight lines!\nThe Irish Fishing Hub Team"
   },
   update: {
-    subject: "New Features in Irish Fishing Hub v1.1.2 🚀",
-    body: "Hello Anglers,\n\nWe've just pushed a significant update to the app! \n\nWhat's new:\n- Improved mobile performance\n- New \"Utilities\" dashboard for faster profile management\n- Updated legal disclosures for transparency\n\nRefresh your app now to see the changes. We're constantly working to make this the best tool for Irish fishers.\n\nHappy Fishing!"
+    subject: "Irish Fishing Hub App Update 🚀",
+    body: "Hello Anglers,\n\nWe've just pushed a small update to improve your experience on the Hub! \n\nWhat's new:\n- Refined mobile navigation and performance\n- New \"Utilities\" dashboard for faster account management\n- Updated legal disclosures for full transparency\n\nRefresh your app now to see the latest version. We're constantly working to build the ultimate tool for Irish fishers.\n\nHappy Fishing!"
   },
   legal: {
     subject: "Important: Updates to our Privacy and Terms ⚖️",
-    body: "Dear Member,\n\nWe've recently updated our Privacy Policy and Terms & Conditions (Effective Feb 1, 2026). \n\nThese updates include clearer disclosures regarding:\n- Advertising redirects (SmartLinks) that help keep our platform free\n- How we use and protect your data\n\nYou can review the full changes in the \"Safety & Privacy\" section of your app settings.\n\nThank you for being a part of our community."
+    body: "Dear Member,\n\nWe've recently updated our Privacy Policy and Terms & Conditions (Effective Feb 1, 2026).\n\nKey changes include:\n- Clearer disclosures regarding advertising redirects (SmartLinks) that help keep our core features free for everyone\n- Updated data protection and usage policies\n\nYou can review the full documents in the \"Safety & Privacy\" section of your app settings.\n\nThank you for being part of our community and helping us keep the Hub running."
   },
   custom: { subject: "", body: "" }
 };

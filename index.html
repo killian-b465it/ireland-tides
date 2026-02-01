@@ -728,9 +728,11 @@
           <div class="admin-card-header" style="justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 15px;">
               <h3>👥 User Accounts</h3>
-              <input type="text" id="admin-user-search" placeholder="Search email/username..."
-                class="admin-search-input" oninput="loadUsersTable()"
-                style="padding: 4px 10px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-color); font-size: 0.85rem; min-width: 200px;">
+              <div class="admin-search-wrapper" id="admin-search-container">
+                <button class="admin-search-toggle" onclick="toggleAdminSearch()" title="Toggle Search">🔍</button>
+                <input type="text" id="admin-user-search" placeholder="Search accounts..."
+                  class="admin-search-input-collapsible" oninput="loadUsersTable()">
+              </div>
             </div>
             <div style="display: flex; align-items: center; gap: 10px;">
               <button class="btn btn-sm btn-primary" onclick="openEmailCenter()">📨 Global Broadcast</button>

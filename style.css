@@ -4357,3 +4357,74 @@ input:checked+.toggle-slider:before {
     min-width: 130px;
   }
 }
+
+
+/* Collapsible Admin Search */
+.admin-search-wrapper {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 0 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  max-width: 38px;
+  height: 34px;
+}
+
+.admin-search-wrapper.active {
+  max-width: 250px;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 0 12px;
+  border-color: var(--primary-color);
+}
+
+.admin-search-toggle {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: 0.95rem;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.admin-search-toggle:hover {
+  opacity: 1;
+}
+
+.admin-search-input-collapsible {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 0.85rem;
+  padding: 4px 8px;
+  width: 0;
+  opacity: 0;
+  transition: all 0.3s ease;
+  outline: none;
+  visibility: hidden;
+}
+
+.admin-search-wrapper.active .admin-search-input-collapsible {
+  width: 180px;
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (max-width: 600px) {
+  .admin-card-header h3 {
+    font-size: 1rem;
+  }
+  .admin-search-wrapper.active {
+    max-width: 150px;
+  }
+  .admin-search-wrapper.active .admin-search-input-collapsible {
+    width: 100px;
+  }
+}
