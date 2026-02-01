@@ -2060,24 +2060,23 @@ function updateFishingConditions(station, data) {
 
 
 
-// [MONETIZATION] High-Revenue Triggered Ad (Throttled)
+// [MONETIZATION] High-Revenue Triggered Ad (Throttled for Mobile)
 let adPressCounter = 0;
 function triggerRevenueAd() {
   adPressCounter++;
 
-  // Only fire on the 5th, 10th, 15th... click
+  // Every 5th press triggers the high-revenue script
   if (adPressCounter % 5 === 0) {
-    console.log(`💰 Triggering revenue ad (Click #${adPressCounter})...`);
+    console.log(`💰 [DEBUG] Triggering revenue ad - Click #${adPressCounter}`);
 
-    // Remove existing script to allow fresh re-initialization if needed
-    const oldScript = document.querySelector('script[src*="effectivegatecpm.com/32/b3/9a/32b39a9fbbabde8802873ef7d5520790.js"]');
-    if (oldScript) oldScript.remove();
-
+    // Inject freshly into body for better mobile overlay compatibility
+    // Adding a timestamp (cb) prevents the browser from using a cached version
     const script = document.createElement('script');
-    script.src = 'https://pl28620875.effectivegatecpm.com/32/b3/9a/32b39a9fbbabde8802873ef7d5520790.js';
-    document.head.appendChild(script);
+    script.type = 'text/javascript';
+    script.src = `https://pl28620875.effectivegatecpm.com/32/b3/9a/32b39a9fbbabde8802873ef7d5520790.js?cb=${Date.now()}`;
+    document.body.appendChild(script);
   } else {
-    console.log(`⏳ Ad trigger progress: ${adPressCounter % 5}/5 clicks`);
+    console.log(`⏳ [DEBUG] Ad progress: ${adPressCounter % 5}/5 clicks`);
   }
 }
 
