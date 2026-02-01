@@ -4204,13 +4204,24 @@ input:checked+.toggle-slider:before {
 @media (max-width: 850px) {
   .email-center-grid {
     grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .email-editor-panel {
+    padding: 15px;
+  }
+
+  .broadcast-stats {
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 15px;
   }
 }
 
 .template-selector {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .template-btn {
@@ -4327,4 +4338,22 @@ input:checked+.toggle-slider:before {
   font-weight: 800;
   font-size: 1.2rem;
   color: #ffab00;
+}
+
+/* Admin Table Mobile Refinement */
+@media (max-width: 1024px) {
+  .admin-table-scroll-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
+    margin: 5px 0;
+  }
+
+  #page-admin .admin-card {
+    padding: 15px 12px;
+  }
+
+  .admin-actions-cell {
+    min-width: 130px;
+  }
 }

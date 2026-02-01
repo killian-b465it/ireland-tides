@@ -4007,6 +4007,7 @@ function loadUsersTable() {
               ⚙️ Utilities ▾
             </button>
             <div class="util-dropdown-content">
+              <button onclick="openEmailCenter('${u.email}')">📧 Email Member</button>
               <button onclick="openUsernameEditor('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}', '${u.email}')">✏️ Edit Username</button>
               <button onclick="changeUserPassword('${u.id}')">🔑 Change Password</button>
               <button onclick="toggleUserStatus('${u.id}')">${isActive ? '🔴 Deactivate' : '🟢 Activate'}</button>
@@ -5349,6 +5350,9 @@ document.addEventListener('click', (e) => {
   }
 });
 
+// [ADMIN] Global admin state
+let emailTarget = null;
+
 const EMAIL_TEMPLATES = {
   welcome: {
     subject: "Welcome to Irish Fishing Hub! 🎣",
@@ -5365,12 +5369,20 @@ const EMAIL_TEMPLATES = {
   custom: { subject: "", body: "" }
 };
 
-window.openEmailCenter = () => {
+window.openEmailCenter = (email = null) => {
   const center = document.getElementById('admin-email-center');
   if (center) {
     center.style.display = 'block';
-    document.getElementById('email-total-members').textContent = `${state.allUsers.length} Members`;
-    loadEmailTemplate('update');
+    emailTarget = email;
+
+    if (email) {
+      document.getElementById('email-total-members').innerHTML = `Single Recipient: <span style="color:var(--primary-color)">${email}</span>`;
+      loadEmailTemplate('welcome');
+    } else {
+      document.getElementById('email-total-members').textContent = `${state.allUsers.length} Members`;
+      loadEmailTemplate('update');
+    }
+
     center.scrollIntoView({ behavior: 'smooth' });
   }
 };
@@ -5397,18 +5409,34 @@ window.broadcastEmailToAll = async () => {
   const subject = document.getElementById('email-subject').value.trim();
   const body = document.getElementById('email-body').value.trim();
   const statusEl = document.getElementById('email-status-text');
+
   if (!subject || !body) { alert('Please provide both a subject and a message body.'); return; }
-  if (!confirm(`🚀 BROADCAST TO ALL MEMBERS\n\nAre you sure you want to send this email to all ${state.allUsers.length} registered members?`)) return;
-  statusEl.textContent = '🚀 Preparing broadcast...';
-  let successCount = 0;
-  for (const user of state.allUsers) {
-    successCount++;
-    statusEl.textContent = `📤 Sending: ${successCount} / ${state.allUsers.length}...`;
-    if (successCount % 10 === 0) await new Promise(r => setTimeout(r, 50));
+
+  if (emailTarget) {
+    if (!confirm(`📤 SEND TO MEMBER\n\nSend this email to ${emailTarget}?`)) return;
+    statusEl.textContent = '📨 Sending to member...';
+    console.log(`📡 [MOCK EMAIL] To: ${emailTarget} | Subject: ${subject}`);
+    await new Promise(r => setTimeout(r, 800));
+    statusEl.textContent = `✅ Email sent to ${emailTarget}`;
+    alert(`Success! Email sent to ${emailTarget}.`);
+  } else {
+    if (!confirm(`🚀 BROADCAST TO ALL MEMBERS\n\nAre you sure you want to send this email to all ${state.allUsers.length} registered members?`)) return;
+
+    statusEl.textContent = '🚀 Preparing broadcast...';
+    let successCount = 0;
+
+    for (const user of state.allUsers) {
+      console.log(`📡 [MOCK EMAIL] To: ${user.email} | Subject: ${subject}`);
+      successCount++;
+      statusEl.textContent = `📤 Sending: ${successCount} / ${state.allUsers.length}...`;
+      if (successCount % 10 === 0) await new Promise(r => setTimeout(r, 50));
+    }
+
+    statusEl.textContent = `✅ Successfully broadcast to ${successCount} members!`;
+    alert(`Broadcast Complete!\n\nSuccessfully sent to ${successCount} members.`);
   }
-  statusEl.textContent = `✅ Successfully broadcast to ${successCount} members!`;
+
   document.getElementById('email-last-sent').textContent = new Date().toLocaleString('en-GB');
-  alert(`Broadcast Complete!\n\nSuccessfully sent to ${successCount} members.`);
 };
 
 window.testEmailPreview = () => {
