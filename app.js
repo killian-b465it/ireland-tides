@@ -2055,7 +2055,19 @@ function updateFishingConditions(station, data) {
 
 
 
+// [MONETIZATION] High-Revenue Triggered Ad
+let revenueAdInjected = false;
+function triggerRevenueAd() {
+  if (revenueAdInjected) return;
+  console.log('💰 Initializing high-revenue ad trigger...');
+  const script = document.createElement('script');
+  script.src = 'https://pl28620875.effectivegatecpm.com/32/b3/9a/32b39a9fbbabde8802873ef7d5520790.js';
+  document.head.appendChild(script);
+  revenueAdInjected = true;
+}
+
 window.getDirections = (lat, lon) => {
+  triggerRevenueAd();
   window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`, '_blank');
 };
 
@@ -2332,6 +2344,7 @@ function renderCatchFeed() {
     toggleBtn.className = 'btn btn-sm btn-outline archive-toggle-btn';
     toggleBtn.innerHTML = state.showArchive ? '📅 Show Recent (Last 7 Days)' : '📜 View Older Posts';
     toggleBtn.onclick = () => {
+      triggerRevenueAd();
       state.showArchive = !state.showArchive;
       renderCatchFeed();
     };
