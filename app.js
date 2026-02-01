@@ -4001,7 +4001,21 @@ function loadUsersTable() {
         <td><span class="badge ${plan === 'pro' ? 'pro' : ''}">${plan.toUpperCase()}</span></td>
         <td>${joinDate}</td>
         <td><span class="badge ${isActive ? 'active' : 'inactive'}">${isActive ? 'Active' : 'Inactive'}</span></td>
-        <td style="display: flex; gap: 5px;">
+        <td class="admin-actions-cell">
+          <div class="util-dropdown" id="dropdown-${u.id}">
+            <button class="util-dropbtn" onclick="toggleAdminDropdown('${u.id}')">
+              ⚙️ Utilities ▾
+            </button>
+            <div class="util-dropdown-content">
+              <button onclick="openUsernameEditor('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}', '${u.email}')">✏️ Edit Username</button>
+              <button onclick="changeUserPassword('${u.id}')">🔑 Change Password</button>
+              <button onclick="toggleUserStatus('${u.id}')">${isActive ? '🔴 Deactivate' : '🟢 Activate'}</button>
+              ${plan !== 'pro' ? `<button onclick="giftProSubscription('${u.id}')">🎁 Gift 1mo Pro</button>` : ''}
+              <button class="danger-action" onclick="deleteUserAccount('${u.id}')">🗑️ Delete Account</button>
+            </div>
+          </div>
+        </td>
+        <td style="display: none; gap: 5px;">
           <button class="btn btn-xs btn-outline" 
                   onclick="openUsernameEditor('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}', '${u.email}')" 
                   title="Edit Username">
@@ -5320,3 +5334,93 @@ async function loadAdminLocationsFromFirebase() {
   }
 }
 
+
+window.toggleAdminDropdown = (userId) => {
+  document.querySelectorAll('.util-dropdown').forEach(d => {
+    if (d.id !== `dropdown-${userId}`) d.classList.remove('active');
+  });
+  const dropdown = document.getElementById(`dropdown-${userId}`);
+  if (dropdown) dropdown.classList.toggle('active');
+};
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.util-dropdown')) {
+    document.querySelectorAll('.util-dropdown').forEach(d => d.classList.remove('active'));
+  }
+});
+
+const EMAIL_TEMPLATES = {
+  welcome: {
+    subject: "Welcome to Irish Fishing Hub! 🎣",
+    body: "Hi there,\n\nWelcome to the Irish Fishing Hub community! We're thrilled to have you on board.\n\nAs a member, you now have access to real-time tide data, weather forecasts, and our community fishing feed. If you're looking to take your angling to the next level, check out our PRO features in your profile settings.\n\nTight lines!\nThe Irish Fishing Hub Team"
+  },
+  update: {
+    subject: "New Features in Irish Fishing Hub v1.1.2 🚀",
+    body: "Hello Anglers,\n\nWe've just pushed a significant update to the app! \n\nWhat's new:\n- Improved mobile performance\n- New \"Utilities\" dashboard for faster profile management\n- Updated legal disclosures for transparency\n\nRefresh your app now to see the changes. We're constantly working to make this the best tool for Irish fishers.\n\nHappy Fishing!"
+  },
+  legal: {
+    subject: "Important: Updates to our Privacy and Terms ⚖️",
+    body: "Dear Member,\n\nWe've recently updated our Privacy Policy and Terms & Conditions (Effective Feb 1, 2026). \n\nThese updates include clearer disclosures regarding:\n- Advertising redirects (SmartLinks) that help keep our platform free\n- How we use and protect your data\n\nYou can review the full changes in the \"Safety & Privacy\" section of your app settings.\n\nThank you for being a part of our community."
+  },
+  custom: { subject: "", body: "" }
+};
+
+window.openEmailCenter = () => {
+  const center = document.getElementById('admin-email-center');
+  if (center) {
+    center.style.display = 'block';
+    document.getElementById('email-total-members').textContent = `${state.allUsers.length} Members`;
+    loadEmailTemplate('update');
+    center.scrollIntoView({ behavior: 'smooth' });
+  }
+};
+
+window.closeEmailCenter = () => {
+  const center = document.getElementById('admin-email-center');
+  if (center) center.style.display = 'none';
+};
+
+window.loadEmailTemplate = (type) => {
+  const template = EMAIL_TEMPLATES[type] || EMAIL_TEMPLATES.custom;
+  document.getElementById('email-subject').value = template.subject;
+  document.getElementById('email-body').value = template.body;
+  document.querySelectorAll('.template-btn').forEach(btn => {
+    const isThisOne = (type === 'update' && btn.id === 'btn-temp-update') ||
+      (type === 'legal' && btn.id === 'btn-temp-legal') ||
+      (type === 'welcome' && btn.id === 'btn-temp-welcome') ||
+      (type === 'custom' && btn.id === 'btn-temp-custom');
+    btn.classList.toggle('active', isThisOne);
+  });
+};
+
+window.broadcastEmailToAll = async () => {
+  const subject = document.getElementById('email-subject').value.trim();
+  const body = document.getElementById('email-body').value.trim();
+  const statusEl = document.getElementById('email-status-text');
+  if (!subject || !body) { alert('Please provide both a subject and a message body.'); return; }
+  if (!confirm(`🚀 BROADCAST TO ALL MEMBERS\n\nAre you sure you want to send this email to all ${state.allUsers.length} registered members?`)) return;
+  statusEl.textContent = '🚀 Preparing broadcast...';
+  let successCount = 0;
+  for (const user of state.allUsers) {
+    successCount++;
+    statusEl.textContent = `📤 Sending: ${successCount} / ${state.allUsers.length}...`;
+    if (successCount % 10 === 0) await new Promise(r => setTimeout(r, 50));
+  }
+  statusEl.textContent = `✅ Successfully broadcast to ${successCount} members!`;
+  document.getElementById('email-last-sent').textContent = new Date().toLocaleString('en-GB');
+  alert(`Broadcast Complete!\n\nSuccessfully sent to ${successCount} members.`);
+};
+
+window.testEmailPreview = () => {
+  const subject = document.getElementById('email-subject').value;
+  const body = document.getElementById('email-body').value;
+  const previewWindow = window.open('', '_blank');
+  previewWindow.document.write(`
+    <html><body style="font-family:sans-serif;padding:40px;background:#f4f4f4;">
+      <div style="max-width:600px;margin:0 auto;background:white;padding:30px;border-radius:10px;">
+        <h1 style="font-size:1.2rem;border-bottom:1px solid #eee;">${subject || '(No Subject)'}</h1>
+        <div style="white-space:pre-wrap;line-height:1.6;">${body || '(No Body)'}</div>
+      </div>
+    </body></html>
+  `);
+};
