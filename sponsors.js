@@ -192,22 +192,48 @@ window.saveSponsor = async () => {
         return;
     }
 
-    if (!logoUrl) {
-        alert('Please provide a logo URL');
+    if (!selectedLogoFile && !logoUrl) {
+        alert('Please upload a logo or provide a logo URL');
         return;
     }
 
     // Basic URL validation (only if URLs are provided)
     try {
-        new URL(logoUrl);
+        if (logoUrl) new URL(logoUrl);
         if (websiteUrl) new URL(websiteUrl);
     } catch (e) {
         alert('Please enter valid URLs');
         return;
     }
 
+    const saveBtn = document.getElementById('save-sponsor-btn');
+    const originalBtnText = saveBtn.textContent;
+
     try {
         const sponsorId = editingSponsorId || firebase.database().ref('sponsors').push().key;
+        let finalLogoUrl = logoUrl;
+
+        // Upload logo if file is selected
+        if (selectedLogoFile) {
+            saveBtn.textContent = 'Uploading...';
+            saveBtn.disabled = true;
+
+            try {
+                // Add timeout to prevent infinite hang
+                const uploadPromise = uploadLogoToStorage(selectedLogoFile, sponsorId);
+                const timeoutPromise = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('Upload timed out after 30 seconds')), 30000)
+                );
+
+                finalLogoUrl = await Promise.race([uploadPromise, timeoutPromise]);
+            } catch (uploadError) {
+                console.error('Upload error:', uploadError);
+                saveBtn.textContent = originalBtnText;
+                saveBtn.disabled = false;
+                alert('Error uploading logo: ' + uploadError.message);
+                return;
+            }
+        }
 
         const sponsorData = {
             name,
@@ -220,29 +246,25 @@ window.saveSponsor = async () => {
             addedBy: window.currentUser ? window.currentUser.uid : 'unknown'
         };
 
-        console.log('Saving sponsor data:', sponsorData);
+        saveBtn.textContent = 'Saving...';
+        saveBtn.disabled = true;
 
-        try {
-            if (editingSponsorId) {
-                console.log('Updating sponsor:', editingSponsorId);
-                await firebase.database().ref(`sponsors/${editingSponsorId}`).update(sponsorData);
-                alert('Sponsor updated successfully!');
-            } else {
-                console.log('Creating new sponsor:', sponsorId);
-                await firebase.database().ref(`sponsors/${sponsorId}`).set(sponsorData);
-                alert('Sponsor added successfully!');
-            }
-
-            closeSponsorModal();
-            await loadSponsors();
-        } catch (dbError) {
-            console.error('Database save error:', dbError);
-            console.error('Error details:', dbError.message, dbError.code);
-            alert('Error saving sponsor to database: ' + dbError.message);
+        if (editingSponsorId) {
+            await firebase.database().ref(`sponsors/${editingSponsorId}`).update(sponsorData);
+            alert('Sponsor updated successfully!');
+        } else {
+            await firebase.database().ref(`sponsors/${sponsorId}`).set(sponsorData);
+            alert('Sponsor added successfully!');
         }
+
+        closeSponsorModal();
+        await loadSponsors();
     } catch (error) {
         console.error('Error saving sponsor:', error);
-        alert('Error saving sponsor. Please try again.');
+        alert('Error saving sponsor: ' + error.message);
+    } finally {
+        saveBtn.textContent = originalBtnText;
+        saveBtn.disabled = false;
     }
 };
 
