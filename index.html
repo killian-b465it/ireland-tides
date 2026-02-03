@@ -681,10 +681,18 @@
       </div>
 
       <div class="form-group">
-        <label>Logo URL *</label>
+        <label>Logo *</label>
+        <div class="logo-upload-section">
+          <input type="file" id="sponsor-logo-file" accept="image/*" style="display: none;"
+            onchange="handleLogoFileSelect(this)">
+          <button type="button" class="btn btn-outline"
+            onclick="document.getElementById('sponsor-logo-file').click()">📁 Upload Logo</button>
+          <span id="logo-file-name" style="margin-left: 10px; color: var(--text-muted); font-size: 0.9rem;">No file
+            selected</span>
+        </div>
+        <div style="margin: 10px 0; text-align: center; color: var(--text-muted);">— OR —</div>
         <input type="url" id="sponsor-logo-url" class="auth-input" placeholder="https://example.com/logo.png">
-        <small style="color: var(--text-muted); font-size: 0.85rem;">Paste a direct link to the sponsor's logo
-          image</small>
+        <small style="color: var(--text-muted); font-size: 0.85rem;">Upload a file or paste a URL</small>
       </div>
 
       <div class="form-group">
