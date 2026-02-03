@@ -230,6 +230,7 @@ window.saveSponsor = async () => {
             uploadBtn.disabled = false;
         }
 
+
         const sponsorData = {
             name,
             logoUrl: finalLogoUrl,
@@ -238,19 +239,29 @@ window.saveSponsor = async () => {
             websiteUrl,
             description,
             addedAt: editingSponsorId ? window.state.sponsors.find(s => s.id === editingSponsorId).addedAt : Date.now(),
-            addedBy: window.currentUser.uid
+            addedBy: window.currentUser ? window.currentUser.uid : 'unknown'
         };
 
-        if (editingSponsorId) {
-            await firebase.database().ref(`sponsors/${editingSponsorId}`).update(sponsorData);
-            alert('Sponsor updated successfully!');
-        } else {
-            await firebase.database().ref(`sponsors/${sponsorId}`).set(sponsorData);
-            alert('Sponsor added successfully!');
-        }
+        console.log('Saving sponsor data:', sponsorData);
 
-        closeSponsorModal();
-        await loadSponsors();
+        try {
+            if (editingSponsorId) {
+                console.log('Updating sponsor:', editingSponsorId);
+                await firebase.database().ref(`sponsors/${editingSponsorId}`).update(sponsorData);
+                alert('Sponsor updated successfully!');
+            } else {
+                console.log('Creating new sponsor:', sponsorId);
+                await firebase.database().ref(`sponsors/${sponsorId}`).set(sponsorData);
+                alert('Sponsor added successfully!');
+            }
+
+            closeSponsorModal();
+            await loadSponsors();
+        } catch (dbError) {
+            console.error('Database save error:', dbError);
+            console.error('Error details:', dbError.message, dbError.code);
+            alert('Error saving sponsor to database: ' + dbError.message);
+        }
     } catch (error) {
         console.error('Error saving sponsor:', error);
         alert('Error saving sponsor. Please try again.');
