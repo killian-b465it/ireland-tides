@@ -211,7 +211,7 @@ window.saveSponsor = async () => {
 
         const sponsorData = {
             name,
-            logoUrl: logoUrl,
+            logoUrl: finalLogoUrl,
             email,
             phone,
             websiteUrl,
