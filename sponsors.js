@@ -23,13 +23,27 @@ window.handleLogoFileSelect = (input) => {
 // Upload logo to Firebase Storage
 async function uploadLogoToStorage(file, sponsorId) {
     try {
+        // Check if Firebase Storage is available
+        if (!firebase.storage) {
+            console.error('Firebase Storage is not available');
+            throw new Error('Firebase Storage is not configured. Please use a logo URL instead.');
+        }
+
+        console.log('Starting upload for:', file.name);
         const storageRef = firebase.storage().ref();
         const logoRef = storageRef.child(`sponsors/${sponsorId}/${file.name}`);
+
+        console.log('Uploading to path:', `sponsors/${sponsorId}/${file.name}`);
         const snapshot = await logoRef.put(file);
+
+        console.log('Upload complete, getting download URL...');
         const downloadURL = await snapshot.ref.getDownloadURL();
+
+        console.log('Download URL obtained:', downloadURL);
         return downloadURL;
     } catch (error) {
         console.error('Error uploading logo:', error);
+        console.error('Error details:', error.message, error.code);
         throw error;
     }
 }
