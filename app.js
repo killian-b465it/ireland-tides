@@ -3361,7 +3361,9 @@ window.handleAuthSubmit = async () => {
           plan: userData.plan || 'pro', // Beta = free Pro
           remember: remember,
           betaProUser: userData.betaProUser || true,
-          joinDate: userData.joinDate
+          joinDate: userData.joinDate,
+          avatar: userData.avatar || null,
+          bio: userData.bio || ''
         };
 
       } else {
@@ -5420,29 +5422,29 @@ window.broadcastEmailToAll = async () => {
   const subject = document.getElementById('email-subject').value.trim();
   const body = document.getElementById('email-body').value.trim();
   const statusEl = document.getElementById('email-status-text');
-  
+
   if (!subject || !body) { alert('Please provide both a subject and a message body.'); return; }
-  
+
   if (emailTarget) {
     // Single member email
     if (!confirm(`📤 SEND TO MEMBER\n\nThis will open Gmail with a pre-filled email to ${emailTarget}.\n\nClick OK to continue.`)) return;
-    
+
     const mailtoLink = `mailto:${emailTarget}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailtoLink;
-    
+
     statusEl.textContent = `✅ Gmail opened for ${emailTarget}`;
     document.getElementById('email-last-sent').textContent = new Date().toLocaleString('en-GB');
   } else {
     // Broadcast to all members
     if (!confirm(`🚀 BROADCAST TO ALL MEMBERS\n\nThis will open Gmail with ${state.allUsers.length} recipients in BCC.\n\nYou'll be able to review and send from Gmail.\n\nClick OK to continue.`)) return;
-    
+
     // Collect all email addresses
     const allEmails = state.allUsers.map(u => u.email).join(',');
-    
+
     // Use BCC to hide recipients from each other
     const mailtoLink = `mailto:?bcc=${encodeURIComponent(allEmails)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailtoLink;
-    
+
     statusEl.textContent = `✅ Gmail opened with ${state.allUsers.length} recipients in BCC`;
     document.getElementById('email-last-sent').textContent = new Date().toLocaleString('en-GB');
   }
