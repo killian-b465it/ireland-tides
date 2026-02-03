@@ -5461,3 +5461,182 @@ window.testEmailPreview = () => {
     </body></html>
   `);
 };
+
+// ========================================
+// Sponsor Management System
+// ========================================
+
+// State for sponsors
+if (!state.sponsors) state.sponsors = [];
+let editingSponsorId = null;
+
+// Load sponsors from Firebase
+window.loadSponsors = async () => {
+  try {
+    const sponsorsRef = firebase.database().ref('sponsors');
+    const snapshot = await sponsorsRef.once('value');
+    const sponsorsData = snapshot.val() || {};
+    
+    state.sponsors = Object.keys(sponsorsData).map(id => ({
+      id,
+      ...sponsorsData[id]
+    }));
+    
+    renderSponsorsGrid();
+    if (currentUser && currentUser.isAdmin) {
+      loadAdminSponsors();
+    }
+  } catch (error) {
+    console.error('Error loading sponsors:', error);
+  }
+};
+
+// Render sponsors on public page
+window.renderSponsorsGrid = () => {
+  const grid = document.getElementById('sponsors-grid');
+  if (!grid) return;
+  
+  if (state.sponsors.length === 0) {
+    grid.innerHTML = '<div class=\"empty-state\"><p>No sponsors yet. Check back soon!</p></div>';
+    return;
+  }
+  
+  grid.innerHTML = state.sponsors.map(sponsor => \
+    <a href=\"\\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"sponsor-card\">
+      <img src=\"\\" alt=\"\\" class=\"sponsor-logo\" onerror=\"this.src='assets/logo.png'\">
+      <h3 class=\"sponsor-name\">\</h3>
+    </a>
+  \).join('');
+};
+
+// Load sponsors in admin table
+window.loadAdminSponsors = () => {
+  const tbody = document.getElementById('sponsors-table-body');
+  if (!tbody) return;
+  
+  if (state.sponsors.length === 0) {
+    tbody.innerHTML = '<tr><td colspan=\"5\" class=\"empty-state\"><p>No sponsors yet. Click \"Add New Sponsor\" to get started.</p></td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = state.sponsors.map(sponsor => \
+    <tr>
+      <td><img src=\"\\" alt=\"\\" class=\"sponsor-table-logo\" onerror=\"this.src='assets/logo.png'\"></td>
+      <td>\</td>
+      <td><a href=\"\\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"color: var(--accent-primary);\">\</a></td>
+      <td>\</td>
+      <td>
+        <button class=\"btn btn-sm btn-outline\" onclick=\"editSponsor('\')\">✏️ Edit</button>
+        <button class=\"btn btn-sm btn-danger\" onclick=\"deleteSponsor('\')\">🗑️ Delete</button>
+      </td>
+    </tr>
+  \).join('');
+};
+
+// Open add sponsor modal
+window.openAddSponsorModal = () => {
+  editingSponsorId = null;
+  document.getElementById('sponsor-modal-title').textContent = '➕ Add New Sponsor';
+  document.getElementById('save-sponsor-btn').textContent = 'Add Sponsor';
+  document.getElementById('sponsor-name-input').value = '';
+  document.getElementById('sponsor-logo-input').value = '';
+  document.getElementById('sponsor-website-input').value = '';
+  document.getElementById('sponsor-modal').style.display = 'flex';
+};
+
+// Open edit sponsor modal
+window.editSponsor = (sponsorId) => {
+  const sponsor = state.sponsors.find(s => s.id === sponsorId);
+  if (!sponsor) return;
+  
+  editingSponsorId = sponsorId;
+  document.getElementById('sponsor-modal-title').textContent = '✏️ Edit Sponsor';
+  document.getElementById('save-sponsor-btn').textContent = 'Save Changes';
+  document.getElementById('sponsor-name-input').value = sponsor.name;
+  document.getElementById('sponsor-logo-input').value = sponsor.logoUrl;
+  document.getElementById('sponsor-website-input').value = sponsor.websiteUrl;
+  document.getElementById('sponsor-modal').style.display = 'flex';
+};
+
+// Close sponsor modal
+window.closeSponsorModal = () => {
+  document.getElementById('sponsor-modal').style.display = 'none';
+  editingSponsorId = null;
+};
+
+// Save sponsor (add or update)
+window.saveSponsor = async () => {
+  const name = document.getElementById('sponsor-name-input').value.trim();
+  const logoUrl = document.getElementById('sponsor-logo-input').value.trim();
+  const websiteUrl = document.getElementById('sponsor-website-input').value.trim();
+  
+  if (!name || !logoUrl || !websiteUrl) {
+    alert('Please fill in all fields');
+    return;
+  }
+  
+  // Basic URL validation
+  try {
+    new URL(logoUrl);
+    new URL(websiteUrl);
+  } catch (e) {
+    alert('Please enter valid URLs for logo and website');
+    return;
+  }
+  
+  try {
+    const sponsorData = {
+      name,
+      logoUrl,
+      websiteUrl,
+      addedAt: editingSponsorId ? state.sponsors.find(s => s.id === editingSponsorId).addedAt : Date.now(),
+      addedBy: currentUser.uid
+    };
+    
+    if (editingSponsorId) {
+      // Update existing sponsor
+      await firebase.database().ref(\sponsors/\\).update(sponsorData);
+      alert('Sponsor updated successfully!');
+    } else {
+      // Add new sponsor
+      const newSponsorRef = firebase.database().ref('sponsors').push();
+      await newSponsorRef.set(sponsorData);
+      alert('Sponsor added successfully!');
+    }
+    
+    closeSponsorModal();
+    await loadSponsors();
+  } catch (error) {
+    console.error('Error saving sponsor:', error);
+    alert('Error saving sponsor. Please try again.');
+  }
+};
+
+// Delete sponsor
+window.deleteSponsor = async (sponsorId) => {
+  const sponsor = state.sponsors.find(s => s.id === sponsorId);
+  if (!sponsor) return;
+  
+  if (!confirm(\Are you sure you want to delete \?\)) return;
+  
+  try {
+    await firebase.database().ref(\sponsors/\\).remove();
+    alert('Sponsor deleted successfully!');
+    await loadSponsors();
+  } catch (error) {
+    console.error('Error deleting sponsor:', error);
+    alert('Error deleting sponsor. Please try again.');
+  }
+};
+
+// Load sponsors on app init
+if (typeof initApp !== 'undefined') {
+  const originalInitApp = initApp;
+  window.initApp = async () => {
+    await originalInitApp();
+    await loadSponsors();
+  };
+} else {
+  // If initApp doesn't exist yet, just load sponsors
+  loadSponsors();
+}

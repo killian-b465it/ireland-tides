@@ -53,8 +53,8 @@
   <nav class="navbar">
     <div class="nav-container">
       <div class="nav-links">
-        <a href="#" class="nav-link active" id="nav-home" onclick="showPage('home')">Dashboard</a>
         <a href="#" class="nav-link" id="nav-community" onclick="showPage('community')">Community</a>
+        <a href="#" class="nav-link" id="nav-sponsors" onclick="showPage('sponsors')">Sponsors</a>
         <a href="#" class="nav-link" id="nav-directory" onclick="showPage('directory')">Shop Directory</a>
         <a href="#" class="nav-link admin-only" id="nav-admin" onclick="showPage('admin')" style="display: none;">🛡️
           Admin</a>
@@ -100,6 +100,7 @@
     <div class="mobile-menu" id="mobile-menu">
       <a href="#" class="mobile-menu-link" onclick="showPage('home'); closeMobileMenu()">Dashboard</a>
       <a href="#" class="mobile-menu-link" onclick="showPage('community'); closeMobileMenu()">Community</a>
+      <a href="#" class="mobile-menu-link" onclick="showPage('sponsors'); closeMobileMenu()">Sponsors</a>
       <a href="#" class="mobile-menu-link" onclick="showPage('directory'); closeMobileMenu()">Shop Directory</a>
       <a href="#" class="mobile-menu-link admin-only" id="mobile-nav-admin"
         onclick="showPage('admin'); closeMobileMenu()" style="display: none;">🛡️ Admin</a>
@@ -392,6 +393,22 @@
     </div>
   </main>
 
+  <!-- Sponsors Page -->
+  <main class="page" id="page-sponsors" style="display: none;">
+    <div class="directory-container">
+      <div class="directory-hero">
+        <h1>🤝 Our Sponsors</h1>
+        <p>Supporting the Irish Fishing Hub community</p>
+      </div>
+
+      <div class="sponsors-grid" id="sponsors-grid">
+        <div class="empty-state">
+          <p>No sponsors yet. Check back soon!</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
   <!-- Directory Page (National Shop List) -->
   <main class="page" id="page-directory" style="display: none;">
     <div class="directory-container">
@@ -640,6 +657,38 @@
     </div>
   </div>
 
+  <!-- Sponsor Modal -->
+  <div class="modal" id="sponsor-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="sponsor-modal-title">➕ Add New Sponsor</h2>
+        <button class="modal-close-btn-inline" onclick="closeSponsorModal()">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label>Sponsor Name *</label>
+        <input type="text" id="sponsor-name-input" class="auth-input" placeholder="e.g. Fishing Tackle Ireland">
+      </div>
+
+      <div class="form-group">
+        <label>Logo URL *</label>
+        <input type="url" id="sponsor-logo-input" class="auth-input" placeholder="https://example.com/logo.png">
+        <small style="color: var(--text-muted); font-size: 0.85rem;">Paste a direct link to the sponsor's logo
+          image</small>
+      </div>
+
+      <div class="form-group">
+        <label>Website URL *</label>
+        <input type="url" id="sponsor-website-input" class="auth-input" placeholder="https://sponsor-website.com">
+      </div>
+
+      <div class="modal-actions" style="margin-top: 20px;">
+        <button class="btn btn-outline" onclick="closeSponsorModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveSponsor()" id="save-sponsor-btn">Add Sponsor</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Admin Dashboard Page -->
   <main class="page" id="page-admin" style="display: none;">
     <div class="admin-container">
@@ -796,6 +845,36 @@
               <div class="empty-state">
                 <p>Loading reports...</p>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sponsor Management -->
+        <div class="admin-card admin-card-full">
+          <div class="admin-card-header">
+            <h3>🤝 Sponsor Management</h3>
+            <button class="btn btn-sm btn-primary" onclick="openAddSponsorModal()">➕ Add New Sponsor</button>
+          </div>
+          <div class="admin-card-body">
+            <div class="admin-table-scroll-wrapper">
+              <table class="sponsor-table">
+                <thead>
+                  <tr>
+                    <th>Logo</th>
+                    <th>Name</th>
+                    <th>Website</th>
+                    <th>Added</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="sponsors-table-body">
+                  <tr>
+                    <td colspan="5" class="empty-state">
+                      <p>No sponsors yet. Click "Add New Sponsor" to get started.</p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
