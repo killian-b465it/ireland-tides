@@ -173,8 +173,8 @@ window.saveSponsor = async () => {
     const websiteUrl = document.getElementById('sponsor-website-input').value.trim();
     const description = document.getElementById('sponsor-description-input').value.trim();
 
-    if (!name || !email || !websiteUrl) {
-        alert('Please fill in required fields: Name, Email, and Website');
+    if (!name || !websiteUrl) {
+        alert('Please fill in required fields: Name and Website');
         return;
     }
 
