@@ -173,8 +173,8 @@ window.saveSponsor = async () => {
     const websiteUrl = document.getElementById('sponsor-website-input').value.trim();
     const description = document.getElementById('sponsor-description-input').value.trim();
 
-    if (!name || !websiteUrl) {
-        alert('Please fill in required fields: Name and Website');
+    if (!name) {
+        alert('Please enter a sponsor name');
         return;
     }
 
@@ -183,10 +183,10 @@ window.saveSponsor = async () => {
         return;
     }
 
-    // Basic URL validation
+    // Basic URL validation (only if URLs are provided)
     try {
         if (logoUrl) new URL(logoUrl);
-        new URL(websiteUrl);
+        if (websiteUrl) new URL(websiteUrl);
     } catch (e) {
         alert('Please enter valid URLs');
         return;
@@ -202,7 +202,15 @@ window.saveSponsor = async () => {
             uploadBtn.textContent = 'Uploading...';
             uploadBtn.disabled = true;
 
-            finalLogoUrl = await uploadLogoToStorage(selectedLogoFile, sponsorId);
+            try {
+                finalLogoUrl = await uploadLogoToStorage(selectedLogoFile, sponsorId);
+            } catch (uploadError) {
+                console.error('Upload error:', uploadError);
+                uploadBtn.textContent = editingSponsorId ? 'Save Changes' : 'Add Sponsor';
+                uploadBtn.disabled = false;
+                alert('Error uploading logo. Please try using a URL instead or check your Firebase Storage configuration.');
+                return;
+            }
 
             uploadBtn.textContent = editingSponsorId ? 'Save Changes' : 'Add Sponsor';
             uploadBtn.disabled = false;
