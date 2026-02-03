@@ -4609,3 +4609,98 @@ input:checked+.toggle-slider:before {
     max-height: 35px;
   }
 }
+/* ========================================
+   Sponsor Info Modal & Logo Upload
+   ======================================== */
+
+.sponsor-info-content {
+  text-align: center;
+  padding: var(--space-lg) 0;
+}
+
+.sponsor-info-logo-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-lg);
+}
+
+.sponsor-info-logo {
+  max-width: 200px;
+  max-height: 150px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+.sponsor-info-name {
+  font-size: 1.5rem;
+  color: var(--text-main);
+  margin: var(--space-md) 0;
+}
+
+.sponsor-info-description {
+  color: var(--text-secondary);
+  margin: var(--space-md) 0;
+  padding: var(--space-md);
+  background: rgba(0, 212, 255, 0.05);
+  border-radius: 8px;
+  line-height: 1.6;
+}
+
+.sponsor-info-contacts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+  align-items: center;
+}
+
+.sponsor-contact-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--glass);
+  border: 1px solid var(--border-glass);
+  border-radius: 8px;
+  min-width: 250px;
+  justify-content: flex-start;
+}
+
+.contact-icon {
+  font-size: 1.2rem;
+}
+
+.contact-link {
+  color: var(--accent-primary);
+  text-decoration: none;
+  transition: var(--transition-normal);
+}
+
+.contact-link:hover {
+  color: var(--text-main);
+  text-decoration: underline;
+}
+
+.logo-upload-section {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+@media (max-width: 768px) {
+  .sponsor-info-logo {
+    max-width: 150px;
+    max-height: 100px;
+  }
+  
+  .sponsor-info-name {
+    font-size: 1.2rem;
+  }
+  
+  .sponsor-contact-item {
+    min-width: 200px;
+  }
+}
