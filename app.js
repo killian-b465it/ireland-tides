@@ -579,6 +579,11 @@ window.showPage = (pageId) => {
   const activePage = document.getElementById(`page-${pageId}`);
   activePage.style.display = 'block';
 
+  // Refresh admin sponsor table on tab switch
+  if (pageId === 'admin' && isAdmin() && window.loadAdminSponsors) {
+    window.loadAdminSponsors();
+  }
+
   // [MONETIZATION] Trigger high-revenue ad when visiting Dashboard
   if (pageId === 'home') {
     triggerRevenueAd();
@@ -4072,22 +4077,45 @@ window.deleteUserAccount = async (userId) => {
 async function verifySessionStatus() {
   if (!state.user || !firebaseDB) return;
 
-  // Root admins are exempt from deactivation check
-  if (state.user.id.includes('_main_root')) return;
+  // Root admins are exempt from deactivation check but still benefit from sync
+  const userRef = firebaseDB.ref('users/' + state.user.id);
 
   try {
-    const userRef = firebaseDB.ref('users/' + state.user.id);
-
-    // Switch to real-time listener for immediate deactivation response
+    // Switch to real-time listener for immediate deactivation response and profile sync
     userRef.on('value', (snapshot) => {
       const userData = snapshot.val();
+      if (!userData) return;
 
-      if (userData && userData.active === false) {
+      if (userData.active === false && !state.user.id.includes('_main_root')) {
         // Stop listening before logging out to avoid infinite loop or errors
         userRef.off('value');
-
         alert('Your account has been deactivated. Please contact irishfishinghub@gmail.com if you believe this is a mistake.');
         logout();
+      } else {
+        // Sync profile data from Firebase to local state
+        let changed = false;
+        if (userData.avatar && state.user.avatar !== userData.avatar) {
+          state.user.avatar = userData.avatar;
+          changed = true;
+        }
+        if (userData.bio !== undefined && state.user.bio !== userData.bio) {
+          state.user.bio = userData.bio;
+          changed = true;
+        }
+        if (userData.name && state.user.name !== userData.name) {
+          state.user.name = userData.name;
+          changed = true;
+        }
+
+        if (changed) {
+          persistUserData();
+          updateAuthUI();
+          // If we are currently viewing the profile modal, update the preview
+          const preview = document.getElementById('profile-avatar-preview');
+          if (preview && state.user.avatar) {
+            preview.src = state.user.avatar;
+          }
+        }
       }
     });
 

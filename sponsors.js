@@ -1,52 +1,12 @@
 // ========================================
-// Sponsor Management System - Enhanced
+// Sponsor Management System - Refined
 // ========================================
 
 // State for sponsors
 if (!window.state) window.state = {};
 if (!window.state.sponsors) window.state.sponsors = [];
 let editingSponsorId = null;
-let selectedLogoFile = null;
 let currentSponsorWebsite = '';
-
-// Handle logo file selection
-window.handleLogoFileSelect = (input) => {
-    const file = input.files[0];
-    if (file) {
-        selectedLogoFile = file;
-        document.getElementById('logo-file-name').textContent = file.name;
-        // Clear URL input if file is selected
-        document.getElementById('sponsor-logo-url').value = '';
-    }
-};
-
-// Upload logo to Firebase Storage
-async function uploadLogoToStorage(file, sponsorId) {
-    try {
-        // Check if Firebase Storage is available
-        if (!firebase.storage) {
-            console.error('Firebase Storage is not available');
-            throw new Error('Firebase Storage is not configured. Please use a logo URL instead.');
-        }
-
-        console.log('Starting upload for:', file.name);
-        const storageRef = firebase.storage().ref();
-        const logoRef = storageRef.child(`sponsors/${sponsorId}/${file.name}`);
-
-        console.log('Uploading to path:', `sponsors/${sponsorId}/${file.name}`);
-        const snapshot = await logoRef.put(file);
-
-        console.log('Upload complete, getting download URL...');
-        const downloadURL = await snapshot.ref.getDownloadURL();
-
-        console.log('Download URL obtained:', downloadURL);
-        return downloadURL;
-    } catch (error) {
-        console.error('Error uploading logo:', error);
-        console.error('Error details:', error.message, error.code);
-        throw error;
-    }
-}
 
 // Load sponsors from Firebase
 window.loadSponsors = async () => {
@@ -70,7 +30,7 @@ window.loadSponsors = async () => {
     }
 };
 
-// Render sponsors on public page (click opens info modal)
+// Render sponsors on public page
 window.renderSponsorsGrid = () => {
     const grid = document.getElementById('sponsors-grid');
     if (!grid) return;
@@ -88,7 +48,7 @@ window.renderSponsorsGrid = () => {
   `).join('');
 };
 
-// Render sponsor banner on dashboard (click opens info modal)
+// Render sponsor banner on dashboard
 window.renderSponsorBanner = () => {
     const wrapper = document.getElementById('sponsor-banner-wrapper');
     const track = document.getElementById('sponsor-banner-track');
@@ -124,7 +84,7 @@ window.loadAdminSponsors = () => {
     <tr>
       <td><img src="${sponsor.logoUrl}" alt="${sponsor.name}" class="sponsor-table-logo" onerror="this.src='assets/logo.png'"></td>
       <td>${sponsor.name}</td>
-      <td><a href="${sponsor.websiteUrl}" target="_blank" rel="noopener noreferrer" style="color: var(--accent-primary);">${sponsor.websiteUrl}</a></td>
+      <td><a href="${sponsor.websiteUrl}" target="_blank" rel="noopener noreferrer" style="color: var(--accent-primary);">${sponsor.websiteUrl || 'N/A'}</a></td>
       <td>${new Date(sponsor.addedAt).toLocaleDateString('en-GB')}</td>
       <td>
         <button class="btn btn-sm btn-outline" onclick="editSponsor('${sponsor.id}')">✏️ Edit</button>
@@ -137,7 +97,6 @@ window.loadAdminSponsors = () => {
 // Open add sponsor modal
 window.openAddSponsorModal = () => {
     editingSponsorId = null;
-    selectedLogoFile = null;
     document.getElementById('sponsor-modal-title').textContent = '➕ Add New Sponsor';
     document.getElementById('save-sponsor-btn').textContent = 'Add Sponsor';
     document.getElementById('sponsor-name-input').value = '';
@@ -146,8 +105,6 @@ window.openAddSponsorModal = () => {
     document.getElementById('sponsor-phone-input').value = '';
     document.getElementById('sponsor-website-input').value = '';
     document.getElementById('sponsor-description-input').value = '';
-    document.getElementById('logo-file-name').textContent = 'No file selected';
-    document.getElementById('sponsor-logo-file').value = '';
     document.getElementById('sponsor-modal').style.display = 'flex';
 };
 
@@ -157,17 +114,14 @@ window.editSponsor = (sponsorId) => {
     if (!sponsor) return;
 
     editingSponsorId = sponsorId;
-    selectedLogoFile = null;
     document.getElementById('sponsor-modal-title').textContent = '✏️ Edit Sponsor';
     document.getElementById('save-sponsor-btn').textContent = 'Save Changes';
     document.getElementById('sponsor-name-input').value = sponsor.name;
     document.getElementById('sponsor-logo-url').value = sponsor.logoUrl || '';
     document.getElementById('sponsor-email-input').value = sponsor.email || '';
     document.getElementById('sponsor-phone-input').value = sponsor.phone || '';
-    document.getElementById('sponsor-website-input').value = sponsor.websiteUrl;
+    document.getElementById('sponsor-website-input').value = sponsor.websiteUrl || '';
     document.getElementById('sponsor-description-input').value = sponsor.description || '';
-    document.getElementById('logo-file-name').textContent = 'No file selected';
-    document.getElementById('sponsor-logo-file').value = '';
     document.getElementById('sponsor-modal').style.display = 'flex';
 };
 
@@ -175,7 +129,6 @@ window.editSponsor = (sponsorId) => {
 window.closeSponsorModal = () => {
     document.getElementById('sponsor-modal').style.display = 'none';
     editingSponsorId = null;
-    selectedLogoFile = null;
 };
 
 // Save sponsor (add or update)
@@ -192,14 +145,14 @@ window.saveSponsor = async () => {
         return;
     }
 
-    if (!selectedLogoFile && !logoUrl) {
-        alert('Please upload a logo or provide a logo URL');
+    if (!logoUrl) {
+        alert('Please provide a logo URL');
         return;
     }
 
-    // Basic URL validation (only if URLs are provided)
+    // Basic URL validation
     try {
-        if (logoUrl) new URL(logoUrl);
+        new URL(logoUrl);
         if (websiteUrl) new URL(websiteUrl);
     } catch (e) {
         alert('Please enter valid URLs');
@@ -210,34 +163,14 @@ window.saveSponsor = async () => {
     const originalBtnText = saveBtn.textContent;
 
     try {
+        saveBtn.textContent = 'Saving...';
+        saveBtn.disabled = true;
+
         const sponsorId = editingSponsorId || firebase.database().ref('sponsors').push().key;
-        let finalLogoUrl = logoUrl;
-
-        // Upload logo if file is selected
-        if (selectedLogoFile) {
-            saveBtn.textContent = 'Uploading...';
-            saveBtn.disabled = true;
-
-            try {
-                // Add timeout to prevent infinite hang
-                const uploadPromise = uploadLogoToStorage(selectedLogoFile, sponsorId);
-                const timeoutPromise = new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error('Upload timed out after 30 seconds')), 30000)
-                );
-
-                finalLogoUrl = await Promise.race([uploadPromise, timeoutPromise]);
-            } catch (uploadError) {
-                console.error('Upload error:', uploadError);
-                saveBtn.textContent = originalBtnText;
-                saveBtn.disabled = false;
-                alert('Error uploading logo: ' + uploadError.message);
-                return;
-            }
-        }
 
         const sponsorData = {
             name,
-            logoUrl: finalLogoUrl,
+            logoUrl: logoUrl,
             email,
             phone,
             websiteUrl,
@@ -245,9 +178,6 @@ window.saveSponsor = async () => {
             addedAt: editingSponsorId ? window.state.sponsors.find(s => s.id === editingSponsorId).addedAt : Date.now(),
             addedBy: window.currentUser ? window.currentUser.uid : 'unknown'
         };
-
-        saveBtn.textContent = 'Saving...';
-        saveBtn.disabled = true;
 
         if (editingSponsorId) {
             await firebase.database().ref(`sponsors/${editingSponsorId}`).update(sponsorData);
@@ -328,8 +258,13 @@ window.openSponsorInfoModal = (sponsorId) => {
 
     // Website
     const websiteLink = document.getElementById('sponsor-website-link');
-    websiteLink.href = sponsor.websiteUrl;
-    websiteLink.textContent = sponsor.websiteUrl;
+    if (sponsor.websiteUrl) {
+        websiteLink.href = sponsor.websiteUrl;
+        websiteLink.textContent = sponsor.websiteUrl;
+        websiteLink.parentElement.style.display = 'flex';
+    } else {
+        websiteLink.parentElement.style.display = 'none';
+    }
 
     document.getElementById('sponsor-info-modal').style.display = 'flex';
 };
