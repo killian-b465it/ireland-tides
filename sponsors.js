@@ -20,6 +20,7 @@ window.loadSponsors = async () => {
         }));
 
         renderSponsorsGrid();
+        renderSponsorBanner();
         if (window.currentUser && window.currentUser.isAdmin) {
             loadAdminSponsors();
         }
@@ -172,3 +173,28 @@ setTimeout(() => {
         loadSponsors();
     }
 }, 2000);
+
+// Render sponsor banner on dashboard (infinite scroll)
+window.renderSponsorBanner = () => {
+  const wrapper = document.getElementById('sponsor-banner-wrapper');
+  const track = document.getElementById('sponsor-banner-track');
+  if (!wrapper || !track) return;
+  
+  if (window.state.sponsors.length === 0) {
+    wrapper.style.display = 'none';
+    return;
+  }
+  
+  // Show the banner
+  wrapper.style.display = 'block';
+  
+  // Create sponsor items (duplicate for seamless loop)
+  const sponsorItems = window.state.sponsors.map(sponsor => `
+    <a href="${sponsor.websiteUrl}" target="_blank" rel="noopener noreferrer" class="sponsor-banner-item">
+      <img src="${sponsor.logoUrl}" alt="${sponsor.name}" class="sponsor-banner-logo" onerror="this.src='assets/logo.png'">
+    </a>
+  `).join('');
+  
+  // Duplicate the items for seamless infinite scroll
+  track.innerHTML = sponsorItems + sponsorItems;
+};

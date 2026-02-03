@@ -4421,9 +4421,11 @@ input:checked+.toggle-slider:before {
   .admin-card-header h3 {
     font-size: 1rem;
   }
+
   .admin-search-wrapper.active {
     max-width: 150px;
   }
+
   .admin-search-wrapper.active .admin-search-input-collapsible {
     width: 100px;
   }
@@ -4511,13 +4513,99 @@ input:checked+.toggle-slider:before {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: var(--space-md);
   }
-  
+
   .sponsor-card {
     min-height: 150px;
     padding: var(--space-md);
   }
-  
+
   .sponsor-logo {
     max-height: 80px;
+  }
+}
+
+/* ========================================
+   Sponsor Banner (Dashboard)
+   ======================================== */
+
+.sponsor-banner-wrapper {
+  width: 100%;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.05) 0%, rgba(0, 150, 255, 0.05) 100%);
+  border-bottom: 1px solid var(--border-glass);
+  padding: var(--space-md) 0;
+  margin-bottom: var(--space-lg);
+  overflow: hidden;
+}
+
+.sponsor-banner {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.sponsor-banner-track {
+  display: flex;
+  gap: var(--space-xl);
+  animation: scroll-sponsors 30s linear infinite;
+  will-change: transform;
+}
+
+.sponsor-banner-track:hover {
+  animation-play-state: paused;
+}
+
+.sponsor-banner-item {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--glass);
+  border: 1px solid var(--border-glass);
+  border-radius: 12px;
+  transition: var(--transition-normal);
+  cursor: pointer;
+  min-width: 150px;
+  height: 60px;
+}
+
+.sponsor-banner-item:hover {
+  border-color: var(--accent-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 212, 255, 0.2);
+}
+
+.sponsor-banner-logo {
+  max-width: 120px;
+  max-height: 45px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+@keyframes scroll-sponsors {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 768px) {
+  .sponsor-banner-wrapper {
+    padding: var(--space-sm) 0;
+  }
+
+  .sponsor-banner-item {
+    min-width: 120px;
+    height: 50px;
+    padding: var(--space-xs) var(--space-md);
+  }
+
+  .sponsor-banner-logo {
+    max-width: 100px;
+    max-height: 35px;
   }
 }
