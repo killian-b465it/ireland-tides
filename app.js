@@ -5403,6 +5403,10 @@ const EMAIL_TEMPLATES = {
     subject: "Irish Fishing Hub App Update 🚀",
     body: "Hello Anglers,\n\nWe've just pushed a small update to improve your experience on the Hub! \n\nWhat's new:\n- Refined mobile navigation and performance\n- New \"Utilities\" dashboard for faster account management\n- Updated legal disclosures\n\nYou can check out our latest Terms and Privacy Policy at the bottom of the page. Refresh your app now to see the latest version.\n\nHappy Fishing!"
   },
+  sponsorship: {
+    subject: "🌊 Big Update & Exciting Sponsorship Opportunities! 🎣",
+    body: "Hi Anglers,\n\nWe've just pushed a significant update to the Irish Fishing Hub!\n\nWhat's New:\n- 🤝 New Sponsor Banner: A sleek, scrolling display on the main dashboard showcasing local fishing businesses.\n- ⚡ Performance Boost: Faster load times for tide charts and community catches.\n- 📱 Refined Dashboard Layout: Our dashboard banner now spans the full screen with a modern, pill-shaped design.\n\n🤝 WE ARE OPEN FOR SPONSORS!\nAre you a local fishing shop, charter boat, or outdoor brand? We are now officially looking for sponsors to join our growing community of thousands of active Irish anglers.\n\nWhat sponsors get:\n- High-visibility dashboard placement.\n- Dedicated brand profiles with direct contact links.\n- Direct engagement with a targeted audience.\n\nIf you're interested in partnering with us, simply reply to this email or contact us at irishfishinghub@gmail.com!\n\nTight lines,\nThe Irish Fishing Hub Team"
+  },
   legal: {
     subject: "Important: Updates to our Privacy and Terms ⚖️",
     body: "Dear Member,\n\nWe've recently updated our Privacy Policy and Terms & Conditions (Effective Feb 1, 2026).\n\nKey changes include:\n- Clearer disclosures regarding advertising redirects (SmartLinks) that help keep our core features free for everyone\n- Updated data protection policies\n\nYou can review the updated documents via the links in the footer at the bottom of our website.\n\nThank you for being part of our community and helping us keep the Hub running."
@@ -5441,6 +5445,7 @@ window.loadEmailTemplate = (type) => {
     const isThisOne = (type === 'update' && btn.id === 'btn-temp-update') ||
       (type === 'legal' && btn.id === 'btn-temp-legal') ||
       (type === 'welcome' && btn.id === 'btn-temp-welcome') ||
+      (type === 'sponsorship' && btn.id === 'btn-temp-sponsor') ||
       (type === 'custom' && btn.id === 'btn-temp-custom');
     btn.classList.toggle('active', isThisOne);
   });
