@@ -192,14 +192,14 @@ window.saveSponsor = async () => {
         return;
     }
 
-    if (!selectedLogoFile && !logoUrl) {
-        alert('Please upload a logo or provide a logo URL');
+    if (!logoUrl) {
+        alert('Please provide a logo URL');
         return;
     }
 
     // Basic URL validation (only if URLs are provided)
     try {
-        if (logoUrl) new URL(logoUrl);
+        new URL(logoUrl);
         if (websiteUrl) new URL(websiteUrl);
     } catch (e) {
         alert('Please enter valid URLs');
@@ -208,32 +208,10 @@ window.saveSponsor = async () => {
 
     try {
         const sponsorId = editingSponsorId || firebase.database().ref('sponsors').push().key;
-        let finalLogoUrl = logoUrl;
-
-        // Upload logo if file is selected
-        if (selectedLogoFile) {
-            const uploadBtn = document.getElementById('save-sponsor-btn');
-            uploadBtn.textContent = 'Uploading...';
-            uploadBtn.disabled = true;
-
-            try {
-                finalLogoUrl = await uploadLogoToStorage(selectedLogoFile, sponsorId);
-            } catch (uploadError) {
-                console.error('Upload error:', uploadError);
-                uploadBtn.textContent = editingSponsorId ? 'Save Changes' : 'Add Sponsor';
-                uploadBtn.disabled = false;
-                alert('Error uploading logo. Please try using a URL instead or check your Firebase Storage configuration.');
-                return;
-            }
-
-            uploadBtn.textContent = editingSponsorId ? 'Save Changes' : 'Add Sponsor';
-            uploadBtn.disabled = false;
-        }
-
 
         const sponsorData = {
             name,
-            logoUrl: finalLogoUrl,
+            logoUrl: logoUrl,
             email,
             phone,
             websiteUrl,
