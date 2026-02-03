@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Irish Fishing Hub - Real-Time Fishing Tide Data
  * Main Application Logic
  */
@@ -65,7 +65,7 @@ const CONFIG = {
     { id: 'Roonagh Pier', name: 'Roonagh (Clare Island)', lat: 53.7597, lon: -9.9036, region: 'West Coast', live: true },
     { id: 'Ballyglass Harbour', name: 'Ballyglass', lat: 54.2500, lon: -9.8833, region: 'West Coast', live: true },
     { id: 'Sligo', name: 'Sligo', lat: 54.2697, lon: -8.4761, region: 'West Coast', live: true },
-    { id: 'Inishmore', name: 'Inis M�r (Aran Islands)', lat: 53.0647, lon: -9.6647, region: 'West Coast', live: true },
+    { id: 'Inishmore', name: 'Inis Mór (Aran Islands)', lat: 53.0647, lon: -9.6647, region: 'West Coast', live: true },
 
     // North West - LIVE DATA
     { id: 'Killybegs Port', name: 'Killybegs', lat: 54.6364, lon: -8.4400, region: 'North West', live: true },
@@ -882,7 +882,7 @@ function initMap() {
   PIERS.forEach(pier => {
     const icon = L.divIcon({
       className: 'pier-marker-wrapper',
-      html: `<div class="pier-marker" title="${pier.name}">??</div>`,
+      html: `<div class="pier-marker" title="${pier.name}">🎣</div>`,
       iconSize: [28, 28],
       iconAnchor: [14, 14]
     });
@@ -891,7 +891,7 @@ function initMap() {
         <div class="popup-content">
           <strong>${pier.name}</strong>
           <span class="popup-type">Fishing Pier</span>
-          <button class="popup-directions-btn" onclick="getDirections(${pier.lat}, ${pier.lon})">?? Get Directions</button>
+          <button class="popup-directions-btn" onclick="getDirections(${pier.lat}, ${pier.lon})">📍 Get Directions</button>
         </div>
       `);
     state.pierMarkers.addLayer(marker);
@@ -901,7 +901,7 @@ function initMap() {
   BOAT_RAMPS.forEach(ramp => {
     const icon = L.divIcon({
       className: 'ramp-marker-wrapper',
-      html: `<div class="ramp-marker" title="${ramp.name}">??</div>`,
+      html: `<div class="ramp-marker" title="${ramp.name}">🚤</div>`,
       iconSize: [28, 28],
       iconAnchor: [14, 14]
     });
@@ -910,7 +910,7 @@ function initMap() {
         <div class="popup-content">
           <strong>${ramp.name}</strong>
           <span class="popup-type">Boat Ramp / Slipway</span>
-          <button class="popup-directions-btn" onclick="getDirections(${ramp.lat}, ${ramp.lon})">?? Get Directions</button>
+          <button class="popup-directions-btn" onclick="getDirections(${ramp.lat}, ${ramp.lon})">📍 Get Directions</button>
         </div>
       `);
     state.rampMarkers.addLayer(marker);
@@ -920,7 +920,7 @@ function initMap() {
   HARBOURS.forEach(harbour => {
     const icon = L.divIcon({
       className: 'harbour-marker-wrapper',
-      html: `<div class="harbour-marker" title="${harbour.name}">???</div>`,
+      html: `<div class="harbour-marker" title="${harbour.name}">🛥️</div>`,
       iconSize: [28, 28],
       iconAnchor: [14, 14]
     });
@@ -929,7 +929,7 @@ function initMap() {
         <div class="popup-content">
           <strong>${harbour.name}</strong>
           <span class="popup-type">Harbour</span>
-          <button class="popup-directions-btn" onclick="getDirections(${harbour.lat}, ${harbour.lon})">?? Get Directions</button>
+          <button class="popup-directions-btn" onclick="getDirections(${harbour.lat}, ${harbour.lon})">📍 Get Directions</button>
         </div>
       `);
     state.harbourMarkers.addLayer(marker);
@@ -957,7 +957,7 @@ async function loadShopsToMainMap() {
   TACKLE_SHOPS.forEach(shop => {
     const icon = L.divIcon({
       className: 'shop-marker-wrapper',
-      html: '<div class="shop-marker">??</div>',
+      html: '<div class="shop-marker">🏪</div>',
       iconSize: [28, 28],
       iconAnchor: [14, 14]
     });
@@ -967,8 +967,8 @@ async function loadShopsToMainMap() {
           <strong>${shop.name}</strong>
           <span class="popup-type">Tackle Shop</span>
           ${shop.address ? `<p style="font-size:0.8rem;margin:4px 0">${shop.address}</p>` : ''}
-          ${shop.phone ? `<a href="tel:${shop.phone}" style="font-size:0.8rem">?? ${shop.phone}</a>` : ''}
-          <button class="popup-directions-btn" onclick="getDirections(${shop.lat}, ${shop.lng || shop.lon})">?? Get Directions</button>
+          ${shop.phone ? `<a href="tel:${shop.phone}" style="font-size:0.8rem">📞 ${shop.phone}</a>` : ''}
+          <button class="popup-directions-btn" onclick="getDirections(${shop.lat}, ${shop.lng || shop.lon})">📍 Get Directions</button>
         </div>
       `);
     state.shopMarkers.addLayer(marker);
@@ -1000,7 +1000,7 @@ async function loadShopsToMainMap() {
 function addFirebaseShopMarker(shop) {
   const icon = L.divIcon({
     className: 'shop-marker-wrapper',
-    html: '<div class="shop-marker">??</div>',
+    html: '<div class="shop-marker">🏪</div>',
     iconSize: [28, 28],
     iconAnchor: [14, 14]
   });
@@ -1010,7 +1010,7 @@ function addFirebaseShopMarker(shop) {
         <strong>${shop.name}</strong>
         <span class="popup-type">Tackle Shop</span>
         ${shop.description ? `<p style="font-size:0.8rem;margin:4px 0">${shop.description}</p>` : ''}
-        <button class="popup-directions-btn" onclick="getDirections(${shop.lat}, ${shop.lon})">?? Get Directions</button>
+        <button class="popup-directions-btn" onclick="getDirections(${shop.lat}, ${shop.lon})">📍 Get Directions</button>
       </div>
     `);
   state.shopMarkers.addLayer(marker);
@@ -1029,13 +1029,13 @@ window.updateFilterButton = (mode) => {
 
   if (mode === 'confirm') {
     btn.classList.add('confirm-mode');
-    btn.innerHTML = '<span class="filter-toggle-icon">?</span><span class="filter-toggle-text">Confirm</span>';
+    btn.innerHTML = '<span class="filter-toggle-icon">✅</span><span class="filter-toggle-text">Confirm</span>';
   } else if (mode === 'sea') {
     btn.classList.remove('confirm-mode');
-    btn.innerHTML = '<span class="filter-toggle-icon">???</span><span class="filter-toggle-text">Map Layers</span>';
+    btn.innerHTML = '<span class="filter-toggle-icon">🗺️</span><span class="filter-toggle-text">Map Layers</span>';
   } else if (mode === 'freshwater') {
     btn.classList.remove('confirm-mode');
-    btn.innerHTML = '<span class="filter-toggle-icon">???</span><span class="filter-toggle-text">Filters</span>';
+    btn.innerHTML = '<span class="filter-toggle-icon">🏞️</span><span class="filter-toggle-text">Filters</span>';
   }
 };
 
@@ -1131,10 +1131,10 @@ window.toggleStationList = () => {
   if (list && icon) {
     if (list.classList.contains('collapsed')) {
       list.classList.remove('collapsed');
-      icon.textContent = '?';
+      icon.textContent = '▲';
     } else {
       list.classList.add('collapsed');
-      icon.textContent = '?';
+      icon.textContent = '▼';
     }
   }
 };
@@ -1206,7 +1206,7 @@ window.toggleMapFilter = (layerName) => {
 function addStationMarker(station) {
   const icon = L.divIcon({
     className: 'tide-marker-wrapper',
-    html: `<div class="tide-marker ${station.status === 'offline' ? 'offline' : ''}" data-station="${station.id}">??</div>`,
+    html: `<div class="tide-marker ${station.status === 'offline' ? 'offline' : ''}" data-station="${station.id}">🌊</div>`,
     iconSize: [28, 28],
     iconAnchor: [14, 14]
   });
@@ -1273,7 +1273,7 @@ function fetchNearbyShops(station) {
   if (nearbyShops.length === 0) {
     shopList.innerHTML = `
       <div class="empty-state">
-        <div class="empty-state-icon">??</div>
+        <div class="empty-state-icon">🏪</div>
         <p>No tackle shops found within 60km.</p>
         <button class="btn btn-sm btn-outline" onclick="loadPage('directory')">View National Directory</button>
       </div>
@@ -1293,8 +1293,8 @@ function fetchNearbyShops(station) {
     <div class="shop-item" onclick="openShopDetails(${lat}, ${lon}, '${name}', '${addr}', '', '${phone}', '')">
       <div class="shop-name">${shop.name}</div>
       <div class="shop-meta">
-        <span>?? ${dist}km away</span>
-        <span>${shop.phone ? '?? ' + shop.phone : ''}</span>
+        <span>📍 ${dist}km away</span>
+        <span>${shop.phone ? '📞 ' + shop.phone : ''}</span>
       </div>
     </div>
   `}).join('');
@@ -1358,12 +1358,12 @@ function loadStationList() {
       <div class="region-group collapsed">
         <div class="region-header" onclick="toggleRegion(this)">
           <span class="region-title">${region}</span>
-          <span class="region-chevron">?</span>
+          <span class="region-chevron">▼</span>
         </div>
         <div class="region-content">
           ${stations.map(station => {
       const { level, direction } = calculateTideLevel(now, station);
-      const arrow = direction === 'rising' ? '?' : direction === 'falling' ? '?' : '';
+      const arrow = direction === 'rising' ? '↑' : direction === 'falling' ? '↓' : '';
       // LIVE badge will be added dynamically when API data is received
       return `
               <div class="station-item" data-station="${station.id}" data-station-index="${CONFIG.stations.indexOf(station)}">
@@ -1400,7 +1400,7 @@ function updateAllStationLevels() {
     const levelEl = document.getElementById(`level-${station.id}`);
     if (levelEl && !state.tideData[station.id]) {
       const { level, direction } = calculateTideLevel(now, station);
-      const arrow = direction === 'rising' ? '?' : direction === 'falling' ? '?' : '';
+      const arrow = direction === 'rising' ? '↑' : direction === 'falling' ? '↓' : '';
       levelEl.textContent = `${level.toFixed(1)}m ${arrow}`;
     }
   });
@@ -1408,7 +1408,7 @@ function updateAllStationLevels() {
 
 // Fetch real tide data for all live stations and sync sidebar
 async function fetchAllLiveStationData() {
-  console.log('?? fetchAllLiveStationData() called');
+  console.log('🔄 fetchAllLiveStationData() called');
   try {
     const now = new Date();
     const past24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -1456,7 +1456,7 @@ async function fetchAllLiveStationData() {
             dir = level > prev ? 'rising' : level < prev ? 'falling' : 'stable';
           }
         }
-        const icon = dir === 'rising' ? '?' : dir === 'falling' ? '?' : '';
+        const icon = dir === 'rising' ? '↑' : dir === 'falling' ? '↓' : '';
         sidebarLevel.innerHTML = `${level.toFixed(1)}m ${icon}`;
         state.tideData[station.id] = stationData;
 
@@ -1486,7 +1486,7 @@ function updateLocationInfo(station) {
     const m = station.maintenance || { reason: 'Offline', duration: 'Unknown', restoration: 'TBD' };
     maintHtml = `
       <div class="maintenance-info fade-in">
-        <div class="maintenance-icon">??</div>
+        <div class="maintenance-icon">⚠️</div>
         <div class="maintenance-text">
           <div class="maintenance-title"><span class="maintenance-dot"></span>OFFLINE</div>
           <div class="maintenance-detail"><strong>Reason:</strong> ${m.reason}</div>
@@ -1498,7 +1498,7 @@ function updateLocationInfo(station) {
 
   container.innerHTML = `
     <h2 class="location-name">${station.name}</h2>
-    <div class="location-coords">${station.lat.toFixed(4)}�N, ${Math.abs(station.lon).toFixed(4)}�W</div>
+    <div class="location-coords">${station.lat.toFixed(4)}°N, ${Math.abs(station.lon).toFixed(4)}°W</div>
     ${maintHtml}
     `;
 }
@@ -1556,7 +1556,7 @@ function displayTideData(station, data) {
     dir = level > prev ? 'rising' : level < prev ? 'falling' : 'stable';
   }
 
-  const icon = dir === 'rising' ? '?' : dir === 'falling' ? '?' : '?';
+  const icon = dir === 'rising' ? '↑' : dir === 'falling' ? '↓' : '→';
   container.innerHTML = `
     <div class="tide-level">${level.toFixed(2)}<span class="tide-unit">m</span></div>
     <div class="tide-status ${dir}">${icon} ${dir.toUpperCase()}</div>
@@ -1628,8 +1628,8 @@ function updateForecastHeaders() {
   const weatherTitle = document.getElementById('weather-card-title');
   const tideTitle = document.getElementById('tide-card-title');
 
-  if (weatherTitle) weatherTitle.innerText = state.forecastOffset === 0 ? "??? Local Weather" : `??? Weather(${dateStr})`;
-  if (tideTitle) tideTitle.innerText = state.forecastOffset === 0 ? "? Today's Tides" : `? Tides(${dateStr})`;
+  if (weatherTitle) weatherTitle.innerText = state.forecastOffset === 0 ? "🌦️ Local Weather" : `🌦️ Weather(${dateStr})`;
+  if (tideTitle) tideTitle.innerText = state.forecastOffset === 0 ? "⏰ Today's Tides" : `⏰ Tides(${dateStr})`;
 }
 
 function renderForecastView() {
@@ -1649,9 +1649,9 @@ function renderForecastView() {
         <div class="weather-temp-section">
           <div class="weather-icon">${w.icon}</div>
           <div>
-            <div class="weather-temp">${Math.round(d.temperature_2m_max[idx])}�C</div>
+            <div class="weather-temp">${Math.round(d.temperature_2m_max[idx])}°C</div>
             <div class="weather-condition">${w.description}</div>
-            <div class="weather-label">Low: ${Math.round(d.temperature_2m_min[idx])}�C</div>
+            <div class="weather-label">Low: ${Math.round(d.temperature_2m_min[idx])}°C</div>
           </div>
         </div>
       </div >
@@ -1824,12 +1824,12 @@ function displayCalculatedTides(station) {
   const container = document.getElementById('tide-current');
   const now = new Date();
   const { level, direction } = calculateTideLevel(now, station);
-  const icon = direction === 'rising' ? '?' : direction === 'falling' ? '?' : '?';
+  const icon = direction === 'rising' ? '↑' : direction === 'falling' ? '↓' : '→';
 
   container.innerHTML = `
     <div class="tide-level">${level.toFixed(2)}<span class="tide-unit">m</span></div>
     <div class="tide-status ${direction}">${icon} ${direction.toUpperCase()}</div>
-    <div style="font-size: 0.75rem; color: var(--accent-warning); margin-top: 8px;">?? Estimated</div>
+    <div style="font-size: 0.75rem; color: var(--accent-warning); margin-top: 8px;">⚠️ Estimated</div>
     `;
 
   // Sync sidebar list with calculated data
@@ -1864,7 +1864,7 @@ async function fetchWeatherData(station) {
     console.warn(`Weather fetch failed for ${station.id}:`, err);
     container.innerHTML = `
       <div class="error-message fade-in">
-        <span>?? Weather unavailable</span>
+        <span>⚠️ Weather unavailable</span>
         <button class="btn btn-sm btn-outline" onclick="fetchWeatherData(state.selectedStation)" style="margin-top:8px">Retry</button>
       </div>`;
   }
@@ -1891,8 +1891,8 @@ window.openForecastModal = () => {
         <div class="forecast-weather">
           <span class="f-icon">${w.icon}</span>
           <div class="f-temps">
-            <span class="f-high">${maxT}�</span>
-            <span class="f-low">${minT}�</span>
+            <span class="f-high">${maxT}°</span>
+            <span class="f-low">${minT}°</span>
           </div>
         </div>
       `;
@@ -1936,16 +1936,16 @@ function displayWeatherData(d) {
       <div class="weather-temp-section">
         <div class="weather-icon">${w.icon}</div>
         <div>
-          <div class="weather-temp">${Math.round(d.temperature_2m)}�C</div>
+          <div class="weather-temp">${Math.round(d.temperature_2m)}°C</div>
           <div class="weather-condition">${w.description}</div>
-          <div class="weather-label">Feels like ${Math.round(d.apparent_temperature)}�C</div>
+          <div class="weather-label">Feels like ${Math.round(d.apparent_temperature)}°C</div>
         </div>
       </div>
     </div>
     <div class="weather-grid fade-in" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px;">
       <div class="weather-item">
         <span class="weather-label">Wind</span>
-        <span class="weather-value"><span style="display:inline-block; transform:rotate(${d.wind_direction_10m}deg)">?</span> ${Math.round(d.wind_speed_10m)} km/h</span>
+        <span class="weather-value"><span style="display:inline-block; transform:rotate(${d.wind_direction_10m}deg)">⬆</span> ${Math.round(d.wind_speed_10m)} km/h</span>
       </div>
       <div class="weather-item">
         <span class="weather-label">Humidity</span>
@@ -1957,34 +1957,34 @@ function displayWeatherData(d) {
 
 function mapWeatherCode(c) {
   const map = {
-    0: '?? Clear Sky',
-    1: '??? Mostly Clear',
-    2: '? Partly Cloudy',
-    3: '?? Overcast',
-    45: '??? Fog',
-    48: '??? Rime Fog',
-    51: '??? Light Drizzle',
-    53: '??? Drizzle',
-    55: '??? Heavy Drizzle',
-    56: '??? Freezing Drizzle',
-    57: '??? Heavy Freezing Drizzle',
-    61: '??? Slight Rain',
-    63: '??? Moderate Rain',
-    65: '??? Heavy Rain',
-    66: '??? Light Freezing Rain',
-    67: '??? Heavy Freezing Rain',
-    71: '?? Slight Snow',
-    73: '?? Moderate Snow',
-    75: '?? Heavy Snow',
-    77: '?? Snow Grains',
-    80: '??? Slight Showers',
-    81: '??? Moderate Showers',
-    82: '??? Violent Showers',
-    85: '?? Snow Showers',
-    86: '?? Heavy Snow Showers',
-    95: '?? Thunderstorm',
-    96: '?? Thunderstorm & Hail',
-    99: '?? Heavy Thunderstorm & Hail'
+    0: '☀️ Clear Sky',
+    1: '🌤️ Mostly Clear',
+    2: '⛅ Partly Cloudy',
+    3: '☁️ Overcast',
+    45: '🌫️ Fog',
+    48: '🌫️ Rime Fog',
+    51: '🌦️ Light Drizzle',
+    53: '🌦️ Drizzle',
+    55: '🌦️ Heavy Drizzle',
+    56: '🌨️ Freezing Drizzle',
+    57: '🌨️ Heavy Freezing Drizzle',
+    61: '🌧️ Slight Rain',
+    63: '🌧️ Moderate Rain',
+    65: '🌧️ Heavy Rain',
+    66: '🌨️ Light Freezing Rain',
+    67: '🌨️ Heavy Freezing Rain',
+    71: '❄️ Slight Snow',
+    73: '❄️ Moderate Snow',
+    75: '❄️ Heavy Snow',
+    77: '❄️ Snow Grains',
+    80: '🌦️ Slight Showers',
+    81: '🌦️ Moderate Showers',
+    82: '🌧️ Violent Showers',
+    85: '❄️ Snow Showers',
+    86: '❄️ Heavy Snow Showers',
+    95: '⛈️ Thunderstorm',
+    96: '⛈️ Thunderstorm & Hail',
+    99: '⛈️ Heavy Thunderstorm & Hail'
   };
   const desc = map[c] || 'Unknown';
   return { icon: desc.split(' ')[0], description: desc.split(' ').slice(1).join(' ') };
@@ -2049,7 +2049,7 @@ function updateFishingConditions(station, data) {
   const moonEl = document.getElementById('moon-phase');
   if (moonEl) {
     moonEl.innerHTML = `
-      <div class="moon-icon">??</div>
+      <div class="moon-icon">🌖</div>
       <div class="moon-info">
         <div class="moon-name">Moon Phase</div>
         <div class="moon-detail">${Math.round(moon.fraction * 100)}% illuminated</div>
@@ -2066,7 +2066,7 @@ function triggerRevenueAd() {
   adPressCounter++;
 
   if (adPressCounter % 3 === 0) {
-    console.log(`?? [REVENUE] CLICK #${adPressCounter}: OPENING SMARTLINK`);
+    console.log(`💰 [REVENUE] CLICK #${adPressCounter}: OPENING SMARTLINK`);
 
     // Direct link opening is the most reliable way to force a redirect 
     // in "Add to Home Screen" standalone apps.
@@ -2076,7 +2076,7 @@ function triggerRevenueAd() {
     // Visual toast for mobile testing (Temporary)
     const toast = document.createElement('div');
     toast.style = 'position:fixed; bottom:70px; left:50%; transform:translateX(-50%); background:#ffab00; color:black; padding:10px 20px; border-radius:30px; z-index:9999; font-size:12px; font-weight:bold; box-shadow:0 4px 15px rgba(0,0,0,0.4); pointer-events:none;';
-    toast.innerHTML = '?? REVENUE BOOST ACTIVE ??';
+    toast.innerHTML = '⚡️ REVENUE BOOST ACTIVE ⚡️';
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 4000);
   }
@@ -2138,14 +2138,14 @@ window.openPostModal = (latlng) => {
 
   if (latlng) {
     // Catch Report (Map Click)
-    modalTitle.innerText = "?? Share Your Catch";
+    modalTitle.innerText = "🎣 Share Your Catch";
     if (speciesLabel) speciesLabel.innerText = "What did you catch?";
     if (detailsLabel) detailsLabel.innerText = "Details";
     document.getElementById('catch-species').placeholder = "e.g., Sea Bass, Mackerel";
     document.getElementById('catch-details').placeholder = "How was the fight? What bait did you use?";
   } else {
     // General Update (Button Click)
-    modalTitle.innerText = "?? Share Update";
+    modalTitle.innerText = "📝 Share Update";
     if (speciesLabel) speciesLabel.innerText = "Title / Topic";
     if (detailsLabel) detailsLabel.innerText = "Message";
     document.getElementById('catch-species').placeholder = "e.g., Heading out to Howth";
@@ -2166,14 +2166,14 @@ window.openPostModal = (latlng) => {
 
   if (latlng) {
     // Catch Report (Map Click)
-    modalTitle.innerText = "?? Share Your Catch";
+    modalTitle.innerText = "🎣 Share Your Catch";
     if (speciesLabel) speciesLabel.innerText = "What did you catch?";
     if (detailsLabel) detailsLabel.innerText = "Details";
     document.getElementById('catch-species').placeholder = "e.g., Sea Bass, Mackerel";
     document.getElementById('catch-details').placeholder = "How was the fight? What bait did you use?";
   } else {
     // General Update (Button Click)
-    modalTitle.innerText = "?? Share Update";
+    modalTitle.innerText = "📝 Share Update";
     if (speciesLabel) speciesLabel.innerText = "Title / Topic";
     if (detailsLabel) detailsLabel.innerText = "Message";
     document.getElementById('catch-species').placeholder = "e.g., Heading out to Howth";
@@ -2308,7 +2308,7 @@ function addCommunityMarker(c) {
 
   const icon = L.divIcon({
     className: 'social-marker',
-    html: '??',
+    html: '📸',
     iconSize: [24, 24],
     iconAnchor: [12, 12]
   });
@@ -2357,7 +2357,7 @@ function renderCatchFeed() {
   if (hasOlderPosts || state.showArchive) {
     const toggleBtn = document.createElement('button');
     toggleBtn.className = 'btn btn-sm btn-outline archive-toggle-btn';
-    toggleBtn.innerHTML = state.showArchive ? '?? Show Recent (Last 7 Days)' : '?? View Older Posts';
+    toggleBtn.innerHTML = state.showArchive ? '📅 Show Recent (Last 7 Days)' : '📜 View Older Posts';
     toggleBtn.onclick = () => {
       triggerRevenueAd();
       state.showArchive = !state.showArchive;
@@ -2396,29 +2396,29 @@ function renderCatchFeed() {
       <div class="feed-header catch-header">
         <div class="header-left">
           <span class="feed-user" ${userOnClick} ${nameStyle}>${displayName}</span>
-          ${c.isPinned ? '<span class="pinned-badge">?? Pinned</span>' : ''}
+          ${c.isPinned ? '<span class="pinned-badge">📌 Pinned</span>' : ''}
         </div>
         <div class="header-right">
           <span class="feed-time catch-date">${c.date || timeAgo}</span>
           ${isAdmin ? `
             <button class="pin-post-btn" onclick="togglePinCatch(${c.id})" title="${c.isPinned ? 'Unpin Post' : 'Pin Post'}">
-              ${c.isPinned ? '??' : '??'}
+              ${c.isPinned ? '📍' : '📌'}
             </button>
-            <button class="delete-post-btn" onclick="deleteCatch(${c.id})" title="Delete Post">???</button>
+            <button class="delete-post-btn" onclick="deleteCatch(${c.id})" title="Delete Post">🗑️</button>
           ` : ''}
         </div>
       </div>
       <div class="feed-content">
-        <p class="catch-species"><strong>?? ${sanitizeHTML(c.species || 'Catch')}</strong></p>
+        <p class="catch-species"><strong>🎣 ${sanitizeHTML(c.species || 'Catch')}</strong></p>
         ${displayDetails ? `<p class="catch-details">${displayDetails}</p>` : ''}
         ${displayPhoto ? `<img src="${displayPhoto}" alt="Catch" class="catch-image feed-image" onclick="openImageModal('${displayPhoto}')">` : ''}
       </div>
       <div class="feed-actions catch-card-actions">
         <button class="action-btn social-btn ${isLiked ? 'active liked' : ''}" onclick="likeCatch(${c.id})">
-          ${isLiked ? '??' : '??'} ${c.likes || 0}
+          ${isLiked ? '❤️' : '🤍'} ${c.likes || 0}
         </button>
         <button class="action-btn social-btn" onclick="toggleComments(${c.id})">
-          ?? ${c.comments ? c.comments.length : 0}
+          💬 ${c.comments ? c.comments.length : 0}
         </button>
       </div>
       <div class="comments-section" id="comments-${c.id}">
@@ -2431,10 +2431,10 @@ function renderCatchFeed() {
               </div>
       <div class="comment-actions">
         ${state.user && state.user.id !== comment.authorId ? `
-                  <button class="comment-report-btn" onclick="reportComment(${c.id}, ${commentIndex}, \`${sanitizeHTML(comment.text || '').replace(/`/g, '\\`')}\`, \`${sanitizeHTML(comment.author || 'User').replace(/`/g, '\\`')}\`, '${comment.authorId || ''}')" title="Report Comment">??</button>
+                  <button class="comment-report-btn" onclick="reportComment(${c.id}, ${commentIndex}, \`${sanitizeHTML(comment.text || '').replace(/`/g, '\\`')}\`, \`${sanitizeHTML(comment.author || 'User').replace(/`/g, '\\`')}\`, '${comment.authorId || ''}')" title="Report Comment">⚠️</button>
                 ` : ''}
         ${isAdmin ? `
-                  <button class="comment-delete-btn" onclick="deleteComment(${c.id}, ${commentIndex})" title="Delete Comment">???</button>
+                  <button class="comment-delete-btn" onclick="deleteComment(${c.id}, ${commentIndex})" title="Delete Comment">🗑️</button>
                 ` : ''}
       </div>
     `).join('')}
@@ -2459,7 +2459,7 @@ function renderCatchFeed() {
       const adId = `ad-300-250-${index}-${Date.now()}`;
       adContainer.innerHTML = `
         <div class="card-header" style="justify-content: center; border-bottom: none; margin-bottom: 10px;">
-          <span class="card-title" style="font-size: 0.7rem; color: var(--text-muted);">?? ADS TO KEEP OUR PLATFORM FREE</span>
+          <span class="card-title" style="font-size: 0.7rem; color: var(--text-muted);">📢 ADS TO KEEP OUR PLATFORM FREE</span>
         </div>
         <div id="${adId}" style="display:inline-block; margin:0 auto;"></div>
       `;
@@ -2722,7 +2722,7 @@ function renderFreshwaterSpots() {
   FRESHWATER_SPOTS.forEach(spot => {
     const icon = L.divIcon({
       className: 'freshwater-marker',
-      html: '??', // Standardized to match filter emoji
+      html: '🐟', // Standardized to match filter emoji
       iconSize: [28, 28],
       iconAnchor: [14, 14]
     });
@@ -2734,10 +2734,10 @@ function renderFreshwaterSpots() {
         <p><strong>Species:</strong> ${spot.species.join(', ')}</p>
         ${spot.notes ? `<p><em>${spot.notes}</em></p>` : ''}
         ${spot.licenseRequired
-        ? `<a href="${spot.licenseUrl}" target="_blank" class="license-btn">?? ${spot.licenseType} - Get Info</a>`
-        : '<span class="no-license">? No State License Required</span>'
+        ? `<a href="${spot.licenseUrl}" target="_blank" class="license-btn">🎫 ${spot.licenseType} - Get Info</a>`
+        : '<span class="no-license">✅ No State License Required</span>'
       }
-        <a href="https://www.google.com/maps/dir/?api=1&destination=${spot.lat},${spot.lng}" target="_blank" class="directions-btn">?? Get Directions</a>
+        <a href="https://www.google.com/maps/dir/?api=1&destination=${spot.lat},${spot.lng}" target="_blank" class="directions-btn">📍 Get Directions</a>
       </div>
     `;
 
@@ -2767,19 +2767,19 @@ function renderFreshwaterParks() {
   FRESHWATER_PARKS.forEach(park => {
     const icon = L.divIcon({
       className: 'freshwater-park-marker',
-      html: '???', // Standardized to match filter emoji
+      html: '🏞️', // Standardized to match filter emoji
       iconSize: [28, 28],
       iconAnchor: [14, 14]
     });
 
     const popupContent = `
       <div class="freshwater-popup">
-        <h3>??? ${park.name}</h3>
+        <h3>🏕️ ${park.name}</h3>
         <p><strong>County:</strong> ${park.county}</p>
         <p><strong>Species:</strong> ${park.species.join(', ')}</p>
         ${park.notes ? `<p><em>${park.notes}</em></p>` : ''}
-        ${park.website ? `<a href="${park.website}" target="_blank" class="license-btn">?? Visit Website</a>` : ''}
-        <a href="https://www.google.com/maps/dir/?api=1&destination=${park.lat},${park.lng}" target="_blank" class="directions-btn">?? Get Directions</a>
+        ${park.website ? `<a href="${park.website}" target="_blank" class="license-btn">🌐 Visit Website</a>` : ''}
+        <a href="https://www.google.com/maps/dir/?api=1&destination=${park.lat},${park.lng}" target="_blank" class="directions-btn">📍 Get Directions</a>
       </div>
     `;
 
@@ -2804,18 +2804,18 @@ function renderFreshwaterRamps() {
   FRESHWATER_RAMPS.forEach(ramp => {
     const icon = L.divIcon({
       className: 'freshwater-ramp-marker',
-      html: '??',
+      html: '🚤',
       iconSize: [28, 28],
       iconAnchor: [14, 14]
     });
 
     const popupContent = `
       <div class="freshwater-popup">
-        <h3>?? ${ramp.name}</h3>
+        <h3>🚤 ${ramp.name}</h3>
         <p><strong>Waterway:</strong> ${ramp.waterway}</p>
         <p><strong>Type:</strong> ${ramp.type}</p>
         ${ramp.notes ? `<p><em>${ramp.notes}</em></p>` : ''}
-        <a href="https://www.google.com/maps/dir/?api=1&destination=${ramp.lat},${ramp.lng}" target="_blank" class="directions-btn">?? Get Directions</a>
+        <a href="https://www.google.com/maps/dir/?api=1&destination=${ramp.lat},${ramp.lng}" target="_blank" class="directions-btn">📍 Get Directions</a>
       </div>
     `;
 
@@ -2840,19 +2840,19 @@ function renderFreshwaterPiers() {
   FRESHWATER_PIERS.forEach(pier => {
     const icon = L.divIcon({
       className: 'freshwater-pier-marker',
-      html: '??',
+      html: '🎣',
       iconSize: [28, 28],
       iconAnchor: [14, 14]
     });
 
-    const accessibleBadge = pier.accessible ? '? Wheelchair Accessible' : '';
+    const accessibleBadge = pier.accessible ? '♿ Wheelchair Accessible' : '';
     const popupContent = `
       <div class="freshwater-popup">
-        <h3>?? ${pier.name}</h3>
+        <h3>🎣 ${pier.name}</h3>
         <p><strong>Waterway:</strong> ${pier.waterway}</p>
-        ${pier.accessible ? `<p class="accessible-badge">? Wheelchair Accessible</p>` : ''}
+        ${pier.accessible ? `<p class="accessible-badge">♿ Wheelchair Accessible</p>` : ''}
         ${pier.notes ? `<p><em>${pier.notes}</em></p>` : ''}
-        <a href="https://www.google.com/maps/dir/?api=1&destination=${pier.lat},${pier.lng}" target="_blank" class="directions-btn">?? Get Directions</a>
+        <a href="https://www.google.com/maps/dir/?api=1&destination=${pier.lat},${pier.lng}" target="_blank" class="directions-btn">📍 Get Directions</a>
       </div>
     `;
 
@@ -3478,7 +3478,7 @@ function updateAuthUI() {
     navAvatar.style.backgroundImage = `url(${state.user.avatar})`;
     navAvatar.style.backgroundSize = 'cover';
   } else if (navAvatar) {
-    navAvatar.innerHTML = '??';
+    navAvatar.innerHTML = '👤';
     navAvatar.style.backgroundImage = 'none';
   }
 
@@ -3519,7 +3519,7 @@ window.openProfileModal = () => {
   if (state.user.plan === 'pro') {
     badge.classList.add('pro');
     // During beta: hide manage subscription since Pro is free
-    upgradeBtn.innerText = '? Pro Features Active';
+    upgradeBtn.innerText = '✓ Pro Features Active';
     upgradeBtn.classList.add('btn-outline');
     upgradeBtn.onclick = () => alert('Pro features are FREE during beta! No subscription to manage yet.');
     upgradeBtn.style.display = 'inline-block';
@@ -3534,7 +3534,7 @@ window.openProfileModal = () => {
       state.user.betaProUser = true;
       persistUserData();
       syncUserToFirebase(state.user);
-      alert('?? Pro features activated for FREE during beta!');
+      alert('🎉 Pro features activated for FREE during beta!');
       closeProfileModal();
       updateAuthUI();
     };
@@ -3604,7 +3604,7 @@ window.logout = () => {
   // Reset nav avatar
   const navAvatar = document.querySelector('.user-avatar');
   if (navAvatar) {
-    navAvatar.innerHTML = '??';
+    navAvatar.innerHTML = '👤';
     navAvatar.style.backgroundImage = 'none';
   }
 };
@@ -3813,7 +3813,7 @@ function loadNationalDirectory() {
       <div class="county-header" onclick="toggleCounty('${c}')">
         <span class="county-name">${c}</span>
         <span class="county-count" id="count-${c}">Click to load</span>
-        <span class="county-chevron">?</span>
+        <span class="county-chevron">▼</span>
       </div>
       <div class="county-shops" id="shops-${c}">
         <div class="loading"><div class="loading-spinner"></div><span>Finding stores...</span></div>
@@ -3847,11 +3847,11 @@ async function fetchShopsByCounty(c) {
 window.openShopDetails = (lat, lon, name, street, city, phone, email) => {
   const modal = document.getElementById('shop-details-modal');
   document.getElementById('shop-details-name').innerText = name;
-  document.getElementById('shop-details-address').innerHTML = `<span class="icon">??</span> ${street}${city ? ', ' + city : ''}`;
+  document.getElementById('shop-details-address').innerHTML = `<span class="icon">📍</span> ${street}${city ? ', ' + city : ''}`;
 
   const phoneEl = document.getElementById('shop-details-phone');
   if (phone && phone !== 'undefined') {
-    phoneEl.innerHTML = `<span class="icon">??</span> ${phone}`;
+    phoneEl.innerHTML = `<span class="icon">📞</span> ${phone}`;
     phoneEl.style.display = 'block';
   } else {
     phoneEl.style.display = 'none';
@@ -3859,7 +3859,7 @@ window.openShopDetails = (lat, lon, name, street, city, phone, email) => {
 
   const emailEl = document.getElementById('shop-details-email');
   if (email && email !== 'undefined' && email !== '') {
-    emailEl.innerHTML = `<span class="icon">??</span> <a href="mailto:${email}" style="color:var(--accent-primary); text-decoration:none">${email}</a>`;
+    emailEl.innerHTML = `<span class="icon">📧</span> <a href="mailto:${email}" style="color:var(--accent-primary); text-decoration:none">${email}</a>`;
     emailEl.style.display = 'block';
   } else {
     emailEl.style.display = 'none';
@@ -3918,8 +3918,8 @@ function renderCountyShops(c, shops) {
             <span class="shop-name">${sanitizeHTML(name)}</span>
           </div>
           <div class="shop-meta">
-            ${street ? `<span>?? ${sanitizeHTML(street)}</span>` : ''}
-            ${city ? `<span>??? ${sanitizeHTML(city)}</span>` : ''}
+            ${street ? `<span>📍 ${sanitizeHTML(street)}</span>` : ''}
+            ${city ? `<span>🏘️ ${sanitizeHTML(city)}</span>` : ''}
           </div>
         </div>
         <button class="btn btn-sm btn-primary">Details</button>
@@ -4004,15 +4004,15 @@ function loadUsersTable() {
         <td class="admin-actions-cell">
           <div class="util-dropdown" id="dropdown-${u.id}">
             <button class="util-dropbtn" onclick="toggleAdminDropdown('${u.id}')">
-              ?? Utilities ?
+              ⚙️ Utilities ▾
             </button>
             <div class="util-dropdown-content">
-              <button onclick="openEmailCenter('${u.email}')">?? Email Member</button>
-              <button onclick="openUsernameEditor('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}', '${u.email}')">?? Edit Username</button>
-              <button onclick="changeUserPassword('${u.id}')">?? Change Password</button>
-              <button onclick="toggleUserStatus('${u.id}')">${isActive ? '?? Deactivate' : '?? Activate'}</button>
-              ${plan !== 'pro' ? `<button onclick="giftProSubscription('${u.id}')">?? Gift 1mo Pro</button>` : ''}
-              <button class="danger-action" onclick="deleteUserAccount('${u.id}')">??? Delete Account</button>
+              <button onclick="openEmailCenter('${u.email}')">📧 Email Member</button>
+              <button onclick="openUsernameEditor('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}', '${u.email}')">✏️ Edit Username</button>
+              <button onclick="changeUserPassword('${u.id}')">🔑 Change Password</button>
+              <button onclick="toggleUserStatus('${u.id}')">${isActive ? '🔴 Deactivate' : '🟢 Activate'}</button>
+              ${plan !== 'pro' ? `<button onclick="giftProSubscription('${u.id}')">🎁 Gift 1mo Pro</button>` : ''}
+              <button class="danger-action" onclick="deleteUserAccount('${u.id}')">🗑️ Delete Account</button>
             </div>
           </div>
         </td>
@@ -4020,21 +4020,21 @@ function loadUsersTable() {
           <button class="btn btn-xs btn-outline" 
                   onclick="openUsernameEditor('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}', '${u.email}')" 
                   title="Edit Username">
-            ?? Edit
+            ✏️ Edit
           </button>
           <button class="btn btn-xs ${isActive ? 'btn-danger' : 'btn-success'}" 
                   onclick="toggleUserStatus('${u.id}')">
             ${isActive ? 'Deactivate' : 'Activate'}
           </button>
           <button class="btn btn-xs btn-primary" onclick="changeUserPassword('${u.id}')" title="Change Password">
-            ?? Change
+            🔑 Change
           </button>
           <button class="btn btn-xs btn-danger" onclick="deleteUserAccount('${u.id}')" title="Permanently Delete Account">
-            ??? Delete
+            🗑️ Delete
           </button>
           ${plan !== 'pro' ? `
             <button class="btn btn-xs btn-primary" onclick="giftProSubscription('${u.id}')" title="Gift 1 Month Free Pro">
-              ?? Gift Pro
+              🎁 Gift Pro
             </button>
           ` : ''}
         </td>
@@ -4047,7 +4047,7 @@ window.deleteUserAccount = async (userId) => {
   const user = state.allUsers.find(u => u.id === userId);
   if (!user) return;
 
-  if (!confirm(`?? PERMANENT DELETE\n\nAre you sure you want to permanently delete the account for ${user.email}?\n\nThis cannot be undone!`)) return;
+  if (!confirm(`⚠️ PERMANENT DELETE\n\nAre you sure you want to permanently delete the account for ${user.email}?\n\nThis cannot be undone!`)) return;
 
   try {
     // Remove from Firebase
@@ -4239,7 +4239,7 @@ function loadAdminMessages() {
     return `
       <div class="message-item ${thread.hasUnread ? 'unread' : ''}" 
            onclick="openAdminReply('${thread.userId}')">
-        <div class="message-avatar">??</div>
+        <div class="message-avatar">👤</div>
         <div class="message-content">
           <div class="message-header">
             <span class="message-sender">${thread.userName}</span>
@@ -4247,7 +4247,7 @@ function loadAdminMessages() {
           </div>
           <div class="message-preview">${lastMsg.text}</div>
         </div>
-        <button class="delete-thread-btn" onclick="event.stopPropagation(); deleteSupportThread('${thread.userId}')" title="Delete thread">???</button>
+        <button class="delete-thread-btn" onclick="event.stopPropagation(); deleteSupportThread('${thread.userId}')" title="Delete thread">🗑️</button>
       </div>
     `;
   }).join('');
@@ -4650,7 +4650,7 @@ async function loadNationalDirectory() {
     html += `
       <div class="county-card">
         <div class="county-header">
-          <h3>?? ${county}</h3>
+          <h3>📍 ${county}</h3>
           <span class="shop-count">${shops.length} shop${shops.length > 1 ? 's' : ''}</span>
         </div>
         <div class="shop-list">
@@ -4658,7 +4658,7 @@ async function loadNationalDirectory() {
 
     shops.forEach(shop => {
       const rating = shop.rating || 4.5;
-      const stars = '?'.repeat(Math.round(rating));
+      const stars = '⭐'.repeat(Math.round(rating));
       const lat = shop.lat;
       const lng = shop.lng || shop.lon;
       const shopData = JSON.stringify({ ...shop, lng }).replace(/"/g, '&quot;');
@@ -4669,13 +4669,13 @@ async function loadNationalDirectory() {
           <div class="shop-address">${shop.address || 'Address on map'}</div>
           <div class="shop-meta">
             <span class="shop-rating">${rating} ${stars}</span>
-            ${shop.phone ? `<a href="tel:${shop.phone}" class="shop-phone" onclick="event.stopPropagation()">?? ${shop.phone}</a>` : ''}
+            ${shop.phone ? `<a href="tel:${shop.phone}" class="shop-phone" onclick="event.stopPropagation()">📞 ${shop.phone}</a>` : ''}
           </div>
-          ${shop.website ? `<a href="${shop.website}" target="_blank" class="shop-website" onclick="event.stopPropagation()">?? Visit Website</a>` : ''}
+          ${shop.website ? `<a href="${shop.website}" target="_blank" class="shop-website" onclick="event.stopPropagation()">🌐 Visit Website</a>` : ''}
           ${adminUser ? `
             <div class="shop-admin-actions" onclick="event.stopPropagation()">
-              <button class="btn btn-sm btn-outline" onclick="openShopEditor(${shopData})">?? Edit</button>
-              ${shop.id ? `<button class="btn btn-sm btn-danger" onclick="deleteShopFromDirectory('${shop.id}', '${shop.mode || 'sea'}')">??? Delete</button>` : ''}
+              <button class="btn btn-sm btn-outline" onclick="openShopEditor(${shopData})">✏️ Edit</button>
+              ${shop.id ? `<button class="btn btn-sm btn-danger" onclick="deleteShopFromDirectory('${shop.id}', '${shop.mode || 'sea'}')">🗑️ Delete</button>` : ''}
             </div>
           ` : ''}
         </div>
@@ -4703,12 +4703,12 @@ async function loadNationalDirectory() {
         <span class="stat-label">Counties</span>
       </div>
       <div class="stat-item">
-        <span class="stat-value">? ${avgRating}</span>
+        <span class="stat-value">⭐ ${avgRating}</span>
         <span class="stat-label">Avg Rating</span>
       </div>
       ${adminUser ? `
         <div class="stat-item">
-          <button class="btn btn-primary btn-sm" onclick="openShopEditor(null)">? Add New Shop</button>
+          <button class="btn btn-primary btn-sm" onclick="openShopEditor(null)">➕ Add New Shop</button>
         </div>
       ` : ''}
     </div>
@@ -4727,7 +4727,7 @@ window.showShopOnMap = (lat, lng, name) => {
     // Add a temporary marker
     const shopIcon = L.divIcon({
       className: 'shop-marker',
-      html: '??',
+      html: '🏪',
       iconSize: [30, 30],
       iconAnchor: [15, 15]
     });
@@ -4942,11 +4942,11 @@ window.togglePasswordVisibility = () => {
 
   if (passwordInput.type === 'password') {
     passwordInput.type = 'text';
-    toggleBtn.textContent = '??'; // Hide icon
+    toggleBtn.textContent = '🙈'; // Hide icon
     toggleBtn.title = 'Hide Password';
   } else {
     passwordInput.type = 'password';
-    toggleBtn.textContent = '???'; // Show icon
+    toggleBtn.textContent = '👁️'; // Show icon
     toggleBtn.title = 'Show Password';
   }
 };
@@ -5056,18 +5056,18 @@ window.setAdminMapMode = (mode) => {
   const typeSelect = document.getElementById('admin-location-type');
   if (mode === 'sea') {
     typeSelect.innerHTML = `
-      <option value="pier">?? Pier</option>
-      <option value="ramp">?? Boat Ramp</option>
-      <option value="harbour">??? Harbour</option>
-      <option value="shop">?? Tackle Shop</option>
+      <option value="pier">🎣 Pier</option>
+      <option value="ramp">🚤 Boat Ramp</option>
+      <option value="harbour">🛥️ Harbour</option>
+      <option value="shop">🏠 Tackle Shop</option>
     `;
   } else {
     typeSelect.innerHTML = `
-      <option value="spot">?? Fishing Spot</option>
-      <option value="park">?? Park</option>
-      <option value="ramp">?? Boat Ramp</option>
-      <option value="pier">?? Pier</option>
-      <option value="shop">?? Tackle Shop</option>
+      <option value="spot">🐟 Fishing Spot</option>
+      <option value="park">🌲 Park</option>
+      <option value="ramp">🚤 Boat Ramp</option>
+      <option value="pier">🎣 Pier</option>
+      <option value="shop">🏠 Tackle Shop</option>
     `;
   }
 
@@ -5078,8 +5078,8 @@ function loadAdminLocations() {
   adminMarkers.clearLayers();
 
   const typeIcons = {
-    pier: '??', ramp: '??', harbour: '???',
-    spot: '??', park: '??', shop: '??'
+    pier: '🎣', ramp: '🚤', harbour: '🛥️',
+    spot: '🐟', park: '🌲', shop: '🏪'
   };
 
   // Get source arrays based on mode
@@ -5116,7 +5116,7 @@ function loadAdminLocations() {
 
     const icon = L.divIcon({
       className: 'admin-marker',
-      html: `<div class="admin-marker-icon" data-source="${loc.source}">${typeIcons[loc.type] || '??'}</div>`,
+      html: `<div class="admin-marker-icon" data-source="${loc.source}">${typeIcons[loc.type] || '📍'}</div>`,
       iconSize: [28, 28],
       iconAnchor: [14, 14]
     });
@@ -5139,7 +5139,7 @@ function loadAdminLocations() {
 
 function renderAdminLocationList(locations) {
   const container = document.getElementById('admin-location-list');
-  const typeIcons = { pier: '??', ramp: '??', harbour: '???', spot: '??', park: '??', shop: '??' };
+  const typeIcons = { pier: '🎣', ramp: '🚤', harbour: '🛥️', spot: '🐟', park: '🌲', shop: '🏪' };
 
   container.innerHTML = locations.map(loc => {
     const longitude = loc.lon || loc.lng;
@@ -5147,14 +5147,14 @@ function renderAdminLocationList(locations) {
     return `
     <div class="location-list-item" onclick="flyToLocation(${loc.lat}, ${longitude})">
       <div class="location-info">
-        <span>${typeIcons[loc.type] || '??'}</span>
+        <span>${typeIcons[loc.type] || '📍'}</span>
         <div>
           <div class="location-name">${loc.name}</div>
           <div class="location-type">${loc.type} ${loc.source === 'firebase' ? '(custom)' : '(built-in)'}</div>
         </div>
       </div>
       <div class="location-actions">
-        <button class="action-btn" onclick="event.stopPropagation(); openLocationEditor(${JSON.stringify(normalizedLoc).replace(/"/g, '&quot;')})">??</button>
+        <button class="action-btn" onclick="event.stopPropagation(); openLocationEditor(${JSON.stringify(normalizedLoc).replace(/"/g, '&quot;')})">✏️</button>
       </div>
     </div>
   `;
@@ -5191,18 +5191,18 @@ window.openLocationEditor = (location, lat, lon) => {
   // Set type options based on current mode
   if (adminMapMode === 'sea') {
     typeSelect.innerHTML = `
-    < option value = "pier" >?? Pier</option >
-      <option value="ramp">?? Boat Ramp</option>
-      <option value="harbour">??? Harbour</option>
-      <option value="shop">?? Tackle Shop</option>
+    < option value = "pier" >🎣 Pier</option >
+      <option value="ramp">🚤 Boat Ramp</option>
+      <option value="harbour">🛥️ Harbour</option>
+      <option value="shop">🏠 Tackle Shop</option>
   `;
   } else {
     typeSelect.innerHTML = `
-    < option value = "spot" >?? Fishing Spot</option >
-      <option value="park">?? Park</option>
-      <option value="ramp">?? Boat Ramp</option>
-      <option value="pier">?? Pier</option>
-      <option value="shop">?? Tackle Shop</option>
+    < option value = "spot" >🐟 Fishing Spot</option >
+      <option value="park">🌲 Park</option>
+      <option value="ramp">🚤 Boat Ramp</option>
+      <option value="pier">🎣 Pier</option>
+      <option value="shop">🏠 Tackle Shop</option>
   `;
   }
 
@@ -5366,15 +5366,15 @@ let emailTarget = null;
 
 const EMAIL_TEMPLATES = {
   welcome: {
-    subject: "Welcome to Irish Fishing Hub! ??",
+    subject: "Welcome to Irish Fishing Hub! 🎣",
     body: "Hi there,\n\nWelcome to the Irish Fishing Hub community! We're thrilled to have you on board.\n\nAs a member, you now have access to:\n- Real-time Tide Data for stations across Ireland\n- Sea & Coastal Weather Forecasts\n- Our community Catch Feed to share your success\n- A detailed Directory of local fishing shops and services\n\nYou can review our Terms & Conditions and Privacy Policy at any time via the links at the bottom of our website.\n\nTight lines!\nThe Irish Fishing Hub Team"
   },
   update: {
-    subject: "Irish Fishing Hub App Update ??",
+    subject: "Irish Fishing Hub App Update 🚀",
     body: "Hello Anglers,\n\nWe've just pushed a small update to improve your experience on the Hub! \n\nWhat's new:\n- Refined mobile navigation and performance\n- New \"Utilities\" dashboard for faster account management\n- Updated legal disclosures\n\nYou can check out our latest Terms and Privacy Policy at the bottom of the page. Refresh your app now to see the latest version.\n\nHappy Fishing!"
   },
   legal: {
-    subject: "Important: Updates to our Privacy and Terms ??",
+    subject: "Important: Updates to our Privacy and Terms ⚖️",
     body: "Dear Member,\n\nWe've recently updated our Privacy Policy and Terms & Conditions (Effective Feb 1, 2026).\n\nKey changes include:\n- Clearer disclosures regarding advertising redirects (SmartLinks) that help keep our core features free for everyone\n- Updated data protection policies\n\nYou can review the updated documents via the links in the footer at the bottom of our website.\n\nThank you for being part of our community and helping us keep the Hub running."
   },
   custom: { subject: "", body: "" }
@@ -5425,16 +5425,16 @@ window.broadcastEmailToAll = async () => {
   
   if (emailTarget) {
     // Single member email
-    if (!confirm(`?? SEND TO MEMBER\n\nThis will open Gmail with a pre-filled email to ${emailTarget}.\n\nClick OK to continue.`)) return;
+    if (!confirm(`📤 SEND TO MEMBER\n\nThis will open Gmail with a pre-filled email to ${emailTarget}.\n\nClick OK to continue.`)) return;
     
     const mailtoLink = `mailto:${emailTarget}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailtoLink;
     
-    statusEl.textContent = `? Gmail opened for ${emailTarget}`;
+    statusEl.textContent = `✅ Gmail opened for ${emailTarget}`;
     document.getElementById('email-last-sent').textContent = new Date().toLocaleString('en-GB');
   } else {
     // Broadcast to all members
-    if (!confirm(`?? BROADCAST TO ALL MEMBERS\n\nThis will open Gmail with ${state.allUsers.length} recipients in BCC.\n\nYou'll be able to review and send from Gmail.\n\nClick OK to continue.`)) return;
+    if (!confirm(`🚀 BROADCAST TO ALL MEMBERS\n\nThis will open Gmail with ${state.allUsers.length} recipients in BCC.\n\nYou'll be able to review and send from Gmail.\n\nClick OK to continue.`)) return;
     
     // Collect all email addresses
     const allEmails = state.allUsers.map(u => u.email).join(',');
@@ -5443,7 +5443,7 @@ window.broadcastEmailToAll = async () => {
     const mailtoLink = `mailto:?bcc=${encodeURIComponent(allEmails)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailtoLink;
     
-    statusEl.textContent = `? Gmail opened with ${state.allUsers.length} recipients in BCC`;
+    statusEl.textContent = `✅ Gmail opened with ${state.allUsers.length} recipients in BCC`;
     document.getElementById('email-last-sent').textContent = new Date().toLocaleString('en-GB');
   }
 };
@@ -5461,171 +5461,3 @@ window.testEmailPreview = () => {
     </body></html>
   `);
 };
-
-// ========================================
-// Sponsor Management System
-// ========================================
-
-// State for sponsors
-if (!state.sponsors) state.sponsors = [];
-let editingSponsorId = null;
-
-// Load sponsors from Firebase
-window.loadSponsors = async () => {
-  try {
-    const sponsorsRef = firebase.database().ref('sponsors');
-    const snapshot = await sponsorsRef.once('value');
-    const sponsorsData = snapshot.val() || {};
-    
-    state.sponsors = Object.keys(sponsorsData).map(id => ({
-      id,
-      ...sponsorsData[id]
-    }));
-    
-    renderSponsorsGrid();
-    if (currentUser && currentUser.isAdmin) {
-      loadAdminSponsors();
-    }
-  } catch (error) {
-    console.error('Error loading sponsors:', error);
-  }
-};
-
-// Render sponsors on public page
-window.renderSponsorsGrid = () => {
-  const grid = document.getElementById('sponsors-grid');
-  if (!grid) return;
-  
-  if (state.sponsors.length === 0) {
-    grid.innerHTML = '<div class=\"empty-state\"><p>No sponsors yet. Check back soon!</p></div>';
-    return;
-  }
-  
-  grid.innerHTML = state.sponsors.map(sponsor => \
-    <a href=\"\\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"sponsor-card\">
-      <img src=\"\\" alt=\"\\" class=\"sponsor-logo\" onerror=\"this.src='assets/logo.png'\">
-      <h3 class=\"sponsor-name\">\</h3>
-    </a>
-  \).join('');
-};
-
-// Load sponsors in admin table
-window.loadAdminSponsors = () => {
-  const tbody = document.getElementById('sponsors-table-body');
-  if (!tbody) return;
-  
-  if (state.sponsors.length === 0) {
-    tbody.innerHTML = '<tr><td colspan=\"5\" class=\"empty-state\"><p>No sponsors yet. Click \"Add New Sponsor\" to get started.</p></td></tr>';
-    return;
-  }
-  
-  tbody.innerHTML = state.sponsors.map(sponsor => \
-    <tr>
-      <td><img src=\"\\" alt=\"\\" class=\"sponsor-table-logo\" onerror=\"this.src='assets/logo.png'\"></td>
-      <td>\</td>
-      <td><a href=\"\\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"color: var(--accent-primary);\">\</a></td>
-      <td>\</td>
-      <td>
-        <button class=\"btn btn-sm btn-outline\" onclick=\"editSponsor('\')\">?? Edit</button>
-        <button class=\"btn btn-sm btn-danger\" onclick=\"deleteSponsor('\')\">??? Delete</button>
-      </td>
-    </tr>
-  \).join('');
-};
-
-// Open add sponsor modal
-window.openAddSponsorModal = () => {
-  editingSponsorId = null;
-  document.getElementById('sponsor-modal-title').textContent = '? Add New Sponsor';
-  document.getElementById('save-sponsor-btn').textContent = 'Add Sponsor';
-  document.getElementById('sponsor-name-input').value = '';
-  document.getElementById('sponsor-logo-input').value = '';
-  document.getElementById('sponsor-website-input').value = '';
-  document.getElementById('sponsor-modal').style.display = 'flex';
-};
-
-// Open edit sponsor modal
-window.editSponsor = (sponsorId) => {
-  const sponsor = state.sponsors.find(s => s.id === sponsorId);
-  if (!sponsor) return;
-  
-  editingSponsorId = sponsorId;
-  document.getElementById('sponsor-modal-title').textContent = '?? Edit Sponsor';
-  document.getElementById('save-sponsor-btn').textContent = 'Save Changes';
-  document.getElementById('sponsor-name-input').value = sponsor.name;
-  document.getElementById('sponsor-logo-input').value = sponsor.logoUrl;
-  document.getElementById('sponsor-website-input').value = sponsor.websiteUrl;
-  document.getElementById('sponsor-modal').style.display = 'flex';
-};
-
-// Close sponsor modal
-window.closeSponsorModal = () => {
-  document.getElementById('sponsor-modal').style.display = 'none';
-  editingSponsorId = null;
-};
-
-// Save sponsor (add or update)
-window.saveSponsor = async () => {
-  const name = document.getElementById('sponsor-name-input').value.trim();
-  const logoUrl = document.getElementById('sponsor-logo-input').value.trim();
-  const websiteUrl = document.getElementById('sponsor-website-input').value.trim();
-  
-  if (!name || !logoUrl || !websiteUrl) {
-    alert('Please fill in all fields');
-    return;
-  }
-  
-  // Basic URL validation
-  try {
-    new URL(logoUrl);
-    new URL(websiteUrl);
-  } catch (e) {
-    alert('Please enter valid URLs for logo and website');
-    return;
-  }
-  
-  try {
-    const sponsorData = {
-      name,
-      logoUrl,
-      websiteUrl,
-      addedAt: editingSponsorId ? state.sponsors.find(s => s.id === editingSponsorId).addedAt : Date.now(),
-      addedBy: currentUser.uid
-    };
-    
-    if (editingSponsorId) {
-      // Update existing sponsor
-      await firebase.database().ref(\sponsors/\\).update(sponsorData);
-      alert('Sponsor updated successfully!');
-    } else {
-      // Add new sponsor
-      const newSponsorRef = firebase.database().ref('sponsors').push();
-      await newSponsorRef.set(sponsorData);
-      alert('Sponsor added successfully!');
-    }
-    
-    closeSponsorModal();
-    await loadSponsors();
-  } catch (error) {
-    console.error('Error saving sponsor:', error);
-    alert('Error saving sponsor. Please try again.');
-  }
-};
-
-// Delete sponsor
-window.deleteSponsor = async (sponsorId) => {
-  const sponsor = state.sponsors.find(s => s.id === sponsorId);
-  if (!sponsor) return;
-  
-  if (!confirm(\Are you sure you want to delete \?\)) return;
-  
-  try {
-    await firebase.database().ref(\sponsors/\\).remove();
-    alert('Sponsor deleted successfully!');
-    await loadSponsors();
-  } catch (error) {
-    console.error('Error deleting sponsor:', error);
-    alert('Error deleting sponsor. Please try again.');
-  }
-};
-
