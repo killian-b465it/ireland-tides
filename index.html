@@ -24,6 +24,7 @@
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
   <!-- Adsterra Native Banner Integration -->
   <script async="async" data-cfasync="false"
     src="https://pl28620895.effectivegatecpm.com/eebc42a1bc18608e22c241b4e8ae00ec/invoke.js"></script>
@@ -680,10 +681,28 @@
       </div>
 
       <div class="form-group">
-        <label>Logo URL *</label>
-        <input type="url" id="sponsor-logo-input" class="auth-input" placeholder="https://example.com/logo.png">
-        <small style="color: var(--text-muted); font-size: 0.85rem;">Paste a direct link to the sponsor's logo
-          image</small>
+        <label>Logo *</label>
+        <div class="logo-upload-section">
+          <input type="file" id="sponsor-logo-file" accept="image/*" style="display: none;"
+            onchange="handleLogoFileSelect(this)">
+          <button type="button" class="btn btn-outline"
+            onclick="document.getElementById('sponsor-logo-file').click()">📁 Upload Logo</button>
+          <span id="logo-file-name" style="margin-left: 10px; color: var(--text-muted); font-size: 0.9rem;">No file
+            selected</span>
+        </div>
+        <div style="margin: 10px 0; text-align: center; color: var(--text-muted);">— OR —</div>
+        <input type="url" id="sponsor-logo-url" class="auth-input" placeholder="https://example.com/logo.png">
+        <small style="color: var(--text-muted); font-size: 0.85rem;">Upload a file or paste a URL</small>
+      </div>
+
+      <div class="form-group">
+        <label>Email *</label>
+        <input type="email" id="sponsor-email-input" class="auth-input" placeholder="contact@sponsor.com">
+      </div>
+
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="tel" id="sponsor-phone-input" class="auth-input" placeholder="+353 1 234 5678">
       </div>
 
       <div class="form-group">
@@ -691,9 +710,56 @@
         <input type="url" id="sponsor-website-input" class="auth-input" placeholder="https://sponsor-website.com">
       </div>
 
+      <div class="form-group">
+        <label>Description (Optional)</label>
+        <textarea id="sponsor-description-input" class="auth-input" rows="3"
+          placeholder="Brief description of the sponsor..."></textarea>
+      </div>
+
       <div class="modal-actions" style="margin-top: 20px;">
         <button class="btn btn-outline" onclick="closeSponsorModal()">Cancel</button>
         <button class="btn btn-primary" onclick="saveSponsor()" id="save-sponsor-btn">Add Sponsor</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sponsor Info Modal -->
+  <div class="modal" id="sponsor-info-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="sponsor-info-title">Sponsor Information</h2>
+        <button class="modal-close-btn-inline" onclick="closeSponsorInfoModal()">✕</button>
+      </div>
+
+      <div class="sponsor-info-content">
+        <div class="sponsor-info-logo-wrapper">
+          <img id="sponsor-info-logo" src="" alt="Sponsor Logo" class="sponsor-info-logo">
+        </div>
+
+        <h3 id="sponsor-info-name" class="sponsor-info-name"></h3>
+
+        <div id="sponsor-info-description" class="sponsor-info-description" style="display: none;"></div>
+
+        <div class="sponsor-info-contacts">
+          <div class="sponsor-contact-item" id="sponsor-contact-email" style="display: none;">
+            <span class="contact-icon">📧</span>
+            <a id="sponsor-email-link" href="" class="contact-link"></a>
+          </div>
+
+          <div class="sponsor-contact-item" id="sponsor-contact-phone" style="display: none;">
+            <span class="contact-icon">📞</span>
+            <a id="sponsor-phone-link" href="" class="contact-link"></a>
+          </div>
+
+          <div class="sponsor-contact-item">
+            <span class="contact-icon">🌐</span>
+            <a id="sponsor-website-link" href="" target="_blank" rel="noopener noreferrer" class="contact-link"></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="margin-top: 20px;">
+        <button class="btn btn-primary" onclick="visitSponsorWebsite()" id="visit-sponsor-btn">Visit Website →</button>
       </div>
     </div>
   </div>
