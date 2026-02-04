@@ -2426,6 +2426,46 @@ function renderCatchFeed() {
     `;
     feed.appendChild(item);
 
+    // [MONETIZATION] Inject Ad Slot every 2 posts for higher volume
+    if ((index + 1) % 2 === 0) {
+      const adContainer = document.createElement('div');
+      adContainer.className = 'catch-card feed-ad-item';
+      adContainer.style.background = 'rgba(255, 255, 255, 0.02)';
+      adContainer.style.textAlign = 'center';
+      adContainer.style.padding = '15px 0';
+      adContainer.style.minHeight = '280px';
+
+      const adId = `ad-300-250-${index}-${Date.now()}`;
+      adContainer.innerHTML = `
+        <div class="card-header" style="justify-content: center; border-bottom: none; margin-bottom: 10px;">
+          <span class="card-title" style="font-size: 0.7rem; color: var(--text-muted);">📢 ADS TO KEEP OUR PLATFORM FREE</span>
+        </div>
+        <div id="${adId}" style="display:inline-block; margin:0 auto;"></div>
+      `;
+      feed.appendChild(adContainer);
+
+      // Inject the Adsterra 300x250 script
+      try {
+        const adDiv = document.getElementById(adId);
+        const scriptOptions = document.createElement('script');
+        scriptOptions.innerHTML = `
+          atOptions = {
+            'key' : '9f4ccd6e67ab1bb552203881fb79a9cb',
+            'format' : 'iframe',
+            'height' : 250,
+            'width' : 300,
+            'params' : {}
+          };
+        `;
+        adDiv.appendChild(scriptOptions);
+
+        const scriptInvoke = document.createElement('script');
+        scriptInvoke.src = 'https://www.highperformanceformat.com/9f4ccd6e67ab1bb552203881fb79a9cb/invoke.js';
+        adDiv.appendChild(scriptInvoke);
+      } catch (err) {
+        console.warn('Ad injection error:', err);
+      }
+    }
   });
 }
 
