@@ -584,10 +584,6 @@ window.showPage = (pageId) => {
     window.loadAdminSponsors();
   }
 
-  // [MONETIZATION] Trigger high-revenue ad when visiting Dashboard
-  if (pageId === 'home') {
-    triggerRevenueAd();
-  }
   setTimeout(() => activePage.classList.add('active'), 10);
 
   if (pageId === 'home' && state.map) {
@@ -2065,27 +2061,6 @@ function updateFishingConditions(station, data) {
 
 
 
-// [MONETIZATION] High-Revenue Triggered Ad (Throttled for Mobile & Standalone)
-let adPressCounter = 0;
-function triggerRevenueAd() {
-  adPressCounter++;
-
-  if (adPressCounter % 3 === 0) {
-    console.log(`💰 [REVENUE] CLICK #${adPressCounter}: OPENING SMARTLINK`);
-
-    // Direct link opening is the most reliable way to force a redirect 
-    // in "Add to Home Screen" standalone apps.
-    const smartLink = 'https://www.effectivegatecpm.com/wt6vw2m7?key=63cbc38cc78fcf2b480fba1e6f7f3ec4';
-    window.open(smartLink, '_blank');
-
-    // Visual toast for mobile testing (Temporary)
-    const toast = document.createElement('div');
-    toast.style = 'position:fixed; bottom:70px; left:50%; transform:translateX(-50%); background:#ffab00; color:black; padding:10px 20px; border-radius:30px; z-index:9999; font-size:12px; font-weight:bold; box-shadow:0 4px 15px rgba(0,0,0,0.4); pointer-events:none;';
-    toast.innerHTML = '⚡️ REVENUE BOOST ACTIVE ⚡️';
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 4000);
-  }
-}
 
 window.getDirections = (lat, lon) => {
   window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`, '_blank');
@@ -2364,7 +2339,6 @@ function renderCatchFeed() {
     toggleBtn.className = 'btn btn-sm btn-outline archive-toggle-btn';
     toggleBtn.innerHTML = state.showArchive ? '📅 Show Recent (Last 7 Days)' : '📜 View Older Posts';
     toggleBtn.onclick = () => {
-      triggerRevenueAd();
       state.showArchive = !state.showArchive;
       renderCatchFeed();
     };
@@ -2452,46 +2426,6 @@ function renderCatchFeed() {
     `;
     feed.appendChild(item);
 
-    // [MONETIZATION] Inject Ad Slot every 2 posts for higher volume
-    if ((index + 1) % 2 === 0) {
-      const adContainer = document.createElement('div');
-      adContainer.className = 'catch-card feed-ad-item';
-      adContainer.style.background = 'rgba(255, 255, 255, 0.02)';
-      adContainer.style.textAlign = 'center';
-      adContainer.style.padding = '15px 0';
-      adContainer.style.minHeight = '280px';
-
-      const adId = `ad-300-250-${index}-${Date.now()}`;
-      adContainer.innerHTML = `
-        <div class="card-header" style="justify-content: center; border-bottom: none; margin-bottom: 10px;">
-          <span class="card-title" style="font-size: 0.7rem; color: var(--text-muted);">📢 ADS TO KEEP OUR PLATFORM FREE</span>
-        </div>
-        <div id="${adId}" style="display:inline-block; margin:0 auto;"></div>
-      `;
-      feed.appendChild(adContainer);
-
-      // Inject the Adsterra 300x250 script
-      try {
-        const adDiv = document.getElementById(adId);
-        const scriptOptions = document.createElement('script');
-        scriptOptions.innerHTML = `
-          atOptions = {
-            'key' : '9f4ccd6e67ab1bb552203881fb79a9cb',
-            'format' : 'iframe',
-            'height' : 250,
-            'width' : 300,
-            'params' : {}
-          };
-        `;
-        adDiv.appendChild(scriptOptions);
-
-        const scriptInvoke = document.createElement('script');
-        scriptInvoke.src = 'https://www.highperformanceformat.com/9f4ccd6e67ab1bb552203881fb79a9cb/invoke.js';
-        adDiv.appendChild(scriptInvoke);
-      } catch (err) {
-        console.warn('Ad injection error:', err);
-      }
-    }
   });
 }
 
@@ -5409,7 +5343,7 @@ const EMAIL_TEMPLATES = {
   },
   legal: {
     subject: "Important: Updates to our Privacy and Terms ⚖️",
-    body: "Dear Member,\n\nWe've recently updated our Privacy Policy and Terms & Conditions (Effective Feb 1, 2026).\n\nKey changes include:\n- Clearer disclosures regarding advertising redirects (SmartLinks) that help keep our core features free for everyone\n- Updated data protection policies\n\nYou can review the updated documents via the links in the footer at the bottom of our website.\n\nThank you for being part of our community and helping us keep the Hub running."
+    body: "Dear Member,\n\nWe've recently updated our Privacy Policy and Terms & Conditions (Effective Feb 4, 2026).\n\nKey changes include:\n- Removal of all third-party advertising redirects\n- Updated data protection policies\n\nYou can review the updated documents via the links in the footer at the bottom of our website.\n\nThank you for being part of our community and helping us keep the Hub running."
   },
   custom: { subject: "", body: "" }
 };
