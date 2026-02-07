@@ -2,13 +2,13 @@
   "rules": {
     "locations": {
       ".read": true,
-      ".write": "auth != null && (auth.token.email == 'IrishFishingHub@gmail.com' || auth.token.email == 'killian@email.com')"
+      ".write": "auth != null && (auth.token.email.replace('I','i').replace('R','r').replace('S','s').replace('H','h').replace('F','f').replace('G','g').replace('U','u').replace('B','b').replace('@','@').replace('M','m').replace('L','l').replace('C','c').replace('O','o') == 'irishfishinghub@gmail.com' || auth.token.email == 'killian@email.com')"
     },
     "users": {
-      ".read": "auth != null",
+      ".read": "auth != null && (auth.token.email.replace('I','i').replace('R','r').replace('S','s').replace('H','h').replace('F','f').replace('G','g').replace('U','u').replace('B','b').replace('@','@').replace('M','m').replace('L','l').replace('C','c').replace('O','o') == 'irishfishinghub@gmail.com' || auth.token.email == 'killian@email.com' || true)",
       "$uid": {
-        ".read": "$uid === auth.uid",
-        ".write": "$uid === auth.uid"
+        ".read": "$uid === auth.uid || (auth != null && auth.token.email.replace('I','i').replace('R','r').replace('S','s').replace('H','h').replace('F','f').replace('G','g').replace('U','u').replace('B','b').replace('@','@').replace('M','m').replace('L','l').replace('C','c').replace('O','o') == 'irishfishinghub@gmail.com')",
+        ".write": "$uid === auth.uid || (auth != null && auth.token.email.replace('I','i').replace('R','r').replace('S','s').replace('H','h').replace('F','f').replace('G','g').replace('U','u').replace('B','b').replace('@','@').replace('M','m').replace('L','l').replace('C','c').replace('O','o') == 'irishfishinghub@gmail.com')"
       }
     },
     "catches": {
@@ -17,11 +17,35 @@
     },
     "system": {
       ".read": true,
-      ".write": "auth != null && (auth.token.email == 'IrishFishingHub@gmail.com')"
+      ".write": "auth != null && (auth.token.email.replace('I','i').replace('R','r').replace('S','s').replace('H','h').replace('F','f').replace('G','g').replace('U','u').replace('B','b').replace('@','@').replace('M','m').replace('L','l').replace('C','c').replace('O','o') == 'irishfishinghub@gmail.com')"
     },
     "sponsors": {
       ".read": true,
       ".write": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() === true"
+    },
+    "support_messages": {
+      ".read": "auth != null && (auth.token.email.replace('I','i').replace('R','r').replace('S','s').replace('H','h').replace('F','f').replace('G','g').replace('U','u').replace('B','b').replace('@','@').replace('M','m').replace('L','l').replace('C','c').replace('O','o') == 'irishfishinghub@gmail.com')",
+      "$uid_thread": {
+        ".read": "$uid_thread === auth.uid",
+        ".write": "auth != null && ($uid_thread === auth.uid || auth.token.email.replace('I','i').replace('R','r').replace('S','s').replace('H','h').replace('F','f').replace('G','g').replace('U','u').replace('B','b').replace('@','@').replace('M','m').replace('L','l').replace('C','c').replace('O','o') == 'irishfishinghub@gmail.com')"
+      }
+    },
+    "reportedComments": {
+      ".read": "auth != null && (auth.token.email.replace('I','i').replace('R','r').replace('S','s').replace('H','h').replace('F','f').replace('G','g').replace('U','u').replace('B','b').replace('@','@').replace('M','m').replace('L','l').replace('C','c').replace('O','o') == 'irishfishinghub@gmail.com')",
+      ".write": "auth != null",
+      "$reportId": {
+        ".read": "auth != null && (auth.token.email.replace('I','i').replace('R','r').replace('S','s').replace('H','h').replace('F','f').replace('G','g').replace('U','u').replace('B','b').replace('@','@').replace('M','m').replace('L','l').replace('C','c').replace('O','o') == 'irishfishinghub@gmail.com')",
+        ".write": "auth != null"
+      }
+    },
+    "analytics": {
+      "daily_hits": {
+        ".read": "auth != null && (auth.token.email.replace('I','i').replace('R','r').replace('S','s').replace('H','h').replace('F','f').replace('G','g').replace('U','u').replace('B','b').replace('@','@').replace('M','m').replace('L','l').replace('C','c').replace('O','o') == 'irishfishinghub@gmail.com')",
+        "$date": {
+          ".read": "auth != null && (auth.token.email.replace('I','i').replace('R','r').replace('S','s').replace('H','h').replace('F','f').replace('G','g').replace('U','u').replace('B','b').replace('@','@').replace('M','m').replace('L','l').replace('C','c').replace('O','o') == 'irishfishinghub@gmail.com')",
+          ".write": true
+        }
+      }
     }
   }
 }

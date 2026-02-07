@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Irish Fishing Hub - TikTok Video Mockup</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a1120;
+            --accent-primary: #00d4ff;
+            --accent-success: #00ff88;
+            --accent-warning: #ffab00;
+            --glass: rgba(10, 17, 32, 0.7);
+            --border-glass: rgba(0, 212, 255, 0.1);
+            --ad-width: 405px;
+            --ad-height: 720px;
+        }
+
+        body {
+            background: #000;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            /* PERFECT CENTERING */
+            align-items: center;
+            /* PERFECT CENTERING */
+            min-height: 100vh;
+            font-family: 'Outfit', sans-serif;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .video-container {
+            width: var(--ad-width);
+            height: var(--ad-height);
+            background: #000;
+            position: relative;
+            /* Maintain position context */
+            overflow: hidden;
+            box-shadow: 0 0 100px rgba(0, 212, 255, 0.3);
+            border: 1px solid #333;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Scenes Base */
+        .scene {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px;
+            z-index: 10;
+        }
+
+        .scene.active {
+            opacity: 1;
+            z-index: 20;
+        }
+
+        /* Scene 1: Hook */
+        .scene-1 {
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.8)),
+                url('C:/Users/killi/.gemini/antigravity/brain/c668bf8c-a28d-4e36-b83e-af23c35b610a/weekend_fishing_bg_feb78_1770318382860.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .scene-1 h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.1;
+            text-transform: uppercase;
+            animation: zoomIn 3s linear forwards;
+        }
+
+        /* Scene 2: Tech */
+        .scene-2 {
+            background: var(--bg-dark);
+        }
+
+        .mock-phone {
+            width: 320px;
+            height: 600px;
+            background: #000;
+            border-radius: 40px;
+            border: 12px solid #1a1a1a;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+            animation: slideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* IFRAME FOR ACTUAL SITE */
+        .mock-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #fff;
+            transform-origin: top left;
+        }
+
+        .mock-ui-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            pointer-events: none;
+        }
+
+        .mock-ui-card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            text-align: left;
+            animation: fadeInRight 0.5s ease-out 1s forwards;
+            opacity: 0;
+        }
+
+        /* Scene 3: Community */
+        .scene-3 {
+            background: #050a14;
+        }
+
+        .catch-container {
+            width: 100%;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .catch-photo {
+            width: 100%;
+            height: 350px;
+            background: linear-gradient(45deg, #111, #222);
+            border-radius: 24px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            border: 2px solid var(--border-glass);
+            overflow: hidden;
+        }
+
+        /* Scene 4: CTA */
+        .scene-4 {
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #001a33 100%);
+        }
+
+        .logo {
+            width: 100px;
+            margin-bottom: 30px;
+            animation: rotateIn 0.8s ease-out;
+        }
+
+        .cta-btn {
+            background: var(--accent-primary);
+            color: var(--bg-dark);
+            padding: 18px 50px;
+            border-radius: 40px;
+            font-weight: 800;
+            text-decoration: none;
+            font-size: 1.4rem;
+            margin-top: 40px;
+            box-shadow: 0 15px 30px rgba(0, 212, 255, 0.4);
+            animation: pulseCTA 2s infinite;
+        }
+
+        /* Animations */
+        @keyframes zoomIn {
+            from {
+                transform: scale(1);
+            }
+
+            to {
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(150px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                transform: translateX(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes rotateIn {
+            from {
+                transform: rotate(-45deg) scale(0.5);
+                opacity: 0;
+            }
+
+            to {
+                transform: rotate(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes pulseCTA {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 15px 30px rgba(0, 212, 255, 0.4);
+            }
+
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 15px 40px rgba(0, 212, 255, 0.6);
+            }
+
+            100% {
+                transform: scale(1);
+                box-shadow: 0 15px 30px rgba(0, 212, 255, 0.4);
+            }
+        }
+
+        .glow-text {
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.8);
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: var(--accent-primary);
+            width: 0;
+            z-index: 100;
+        }
+
+        .progress-bar.active {
+            animation: progress 15s linear forwards;
+        }
+
+        @keyframes progress {
+            from {
+                width: 0;
+            }
+
+            to {
+                width: 100%;
+            }
+        }
+
+        /* TikTok Like/Comment Icons Simulation */
+        .tiktok-sidebar {
+            position: absolute;
+            right: 15px;
+            bottom: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 50;
+        }
+
+        .tk-icon {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="video-container" id="video">
+        <div class="progress-bar" id="progress"></div>
+
+        <div class="tiktok-sidebar">
+            <div class="tk-icon">❤️</div>
+            <div class="tk-icon">💬</div>
+            <div class="tk-icon">🏹</div>
+        </div>
+
+        <!-- Scene 1: 0-3s -->
+        <div class="scene scene-1 active" id="s1">
+            <h1 class="glow-text">Planning your next session?</h1>
+        </div>
+
+        <!-- Scene 2: 3-7s -->
+        <div class="scene scene-2" id="s2">
+            <h2 style="color: var(--accent-primary); margin-bottom: 25px; font-size: 1.8rem;">Stop guessing the tides.
+            </h2>
+            <div class="mock-phone">
+                <iframe src="index.html" class="mock-iframe" id="app-iframe"></iframe>
+                <div class="mock-ui-overlay">
+                    <div class="mock-ui-card" style="animation-delay: 0.5s;">
+                        <div style="font-size: 0.7rem; font-weight: 800; color: var(--accent-primary);">PRECISION DATA
+                        </div>
+                        <div style="font-size: 1rem;">Real-time Tide Stations</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scene 3: 7-12s -->
+        <div class="scene scene-3" id="s3">
+            <h2 style="margin-bottom: 30px; font-size: 1.8rem;">Local knowledge in your pocket.</h2>
+            <div class="catch-container">
+                <div class="catch-photo">🐟</div>
+                <div class="mock-ui-card" style="opacity: 1; width: 100%;">
+                    <div style="font-weight: 800; color: var(--accent-success); font-size: 1.2rem;">8.5kg Bass</div>
+                    <div style="font-size: 0.9rem; color: #aaa;">Claddagh, Galway • Live Feed</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scene 4: 12-15s -->
+        <div class="scene scene-4" id="s4">
+            <img src="assets/logo.png" alt="Logo" class="logo">
+            <h1 class="glow-text" style="font-size: 2.8rem; margin-bottom: 10px;">MASTER THE COAST</h1>
+            <p style="color: var(--accent-primary); font-weight: 800; font-size: 1.2rem; letter-spacing: 2px;">
+                IRISHFISHINGHUB.COM</p>
+            <a href="#" class="cta-btn">GET STARTED</a>
+        </div>
+    </div>
+
+    <script>
+        const s1 = document.getElementById('s1');
+        const s2 = document.getElementById('s2');
+        const s3 = document.getElementById('s3');
+        const s4 = document.getElementById('s4');
+        const progress = document.getElementById('progress');
+        const iframe = document.getElementById('app-iframe');
+
+        function startVideo() {
+            progress.classList.add('active');
+
+            // Interaction: Start app on specific page if needed
+            // iframe.src = 'index.html#dashboard';
+
+            setTimeout(() => {
+                s1.classList.remove('active');
+                s2.classList.add('active');
+            }, 3000);
+
+            setTimeout(() => {
+                s2.classList.remove('active');
+                s3.classList.add('active');
+            }, 7000);
+
+            setTimeout(() => {
+                s3.classList.remove('active');
+                s4.classList.add('active');
+            }, 12000);
+
+            // Loop video every 15s
+            setTimeout(() => {
+                location.reload();
+            }, 15000);
+        }
+
+        // Auto start
+        window.addEventListener('load', startVideo);
+    </script>
+</body>
+
+</html>

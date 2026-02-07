@@ -803,6 +803,7 @@ document.addEventListener('DOMContentLoaded', () => {
   checkPaymentStatus();
 
   loadMessagesFromFirebase();
+  trackSiteHit();
 
   updateAuthUI();
   showPage('home');
@@ -3928,6 +3929,38 @@ function loadAdminDashboard() {
 
   loadAdminMessages();
   loadReportedComments();
+
+  // Set default date to today for visibility
+  const today = new Date().toISOString().split('T')[0];
+  const dateInput = document.getElementById('admin-hits-date');
+  if (dateInput) {
+    dateInput.value = today;
+    loadDailyHits(today);
+  }
+}
+
+function trackSiteHit() {
+  if (!firebaseDB) return;
+
+  const today = new Date().toISOString().split('T')[0];
+  const hitRef = firebaseDB.ref(`analytics/daily_hits/${today}`);
+
+  // Use transaction to safely increment even with concurrent visitors
+  hitRef.transaction((currentValue) => {
+    return (currentValue || 0) + 1;
+  });
+}
+
+function loadDailyHits(date) {
+  if (!firebaseDB || !isAdmin()) return;
+
+  const display = document.getElementById('admin-hits-display');
+  if (display) display.textContent = '...';
+
+  firebaseDB.ref(`analytics/daily_hits/${date}`).on('value', (snapshot) => {
+    const hits = snapshot.val() || 0;
+    if (display) display.textContent = hits;
+  });
 }
 
 function loadStationInsights() {

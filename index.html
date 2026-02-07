@@ -794,6 +794,28 @@
           </div>
         </div>
 
+        <!-- Site Traffic Insights -->
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>📈 Site Traffic</h3>
+          </div>
+          <div class="admin-card-body" style="text-align: center; padding: 2rem;">
+            <div class="form-group" style="margin-bottom: 20px;">
+              <label for="admin-hits-date">Select Date</label>
+              <input type="date" id="admin-hits-date" class="auth-input" onchange="loadDailyHits(this.value)"
+                style="max-width: 200px; margin: 10px auto;">
+            </div>
+            <div class="insight-item" style="border: none;">
+              <span class="insight-value" id="admin-hits-display"
+                style="font-size: 3rem; color: var(--accent-primary);">0</span>
+              <span class="insight-label">Site Hits / Visitors</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 15px;">
+              Tracks every unique page load across all visitors.
+            </p>
+          </div>
+        </div>
+
         <!-- Communication Center (Email) -->
         <div class="admin-card admin-card-full" id="admin-email-center" style="display: none;">
           <div class="admin-card-header">
