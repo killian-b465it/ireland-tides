@@ -21,14 +21,13 @@
   <!-- App Styles -->
   <link rel="stylesheet" href="style.css">
 
+
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 
-
-
-  <!-- Google AdSense -->
+  <!-- Google AdSense Auto Ads -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4749246157404876"
     crossorigin="anonymous"></script>
 
@@ -187,13 +186,7 @@
         </div>
 
 
-        <!-- Ad Slot (Sidebar High) -->
-        <div class="card fade-in ad-card" id="ad-card-sidebar">
-          <div class="card-header">
-            <span class="card-title">📢 ADS TO KEEP OUR PLATFORM FREE</span>
-          </div>
-          <div id="container-eebc42a1bc18608e22c241b4e8ae00ec"></div>
-        </div>
+
 
         <!-- Today's Tides -->
         <div class="card fade-in" id="tide-times-card" style="display: none;">
@@ -726,7 +719,10 @@
 
       <div class="sponsor-info-content">
         <div class="sponsor-info-logo-wrapper">
-          <img id="sponsor-info-logo" src="" alt="Sponsor Logo" class="sponsor-info-logo">
+          <img id="sponsor-info-logo" src="" alt="Sponsor Logo" class="sponsor-info-logo"
+            onerror="this.style.display='none'; document.getElementById('sponsor-logo-fallback').style.display='flex'">
+          <div id="sponsor-logo-fallback"
+            style="display:none; font-size:3rem; align-items:center; justify-content:center; height:100px;">🤝</div>
         </div>
 
         <h3 id="sponsor-info-name" class="sponsor-info-name"></h3>

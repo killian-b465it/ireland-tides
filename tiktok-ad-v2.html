@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ireland Tides - Premium Social Ad</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Outfit:wght@500;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #020617;
+            --neon-blue: #00f2ff;
+            --neon-blue-glow: rgba(0, 242, 255, 0.4);
+            --glass: rgba(15, 23, 42, 0.6);
+            --accent: #38bdf8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .phone-canvas {
+            width: 380px;
+            height: 675px;
+            /* 9:16 ratio */
+            background: linear-gradient(rgba(2, 6, 23, 0.4), rgba(2, 6, 23, 0.9)),
+                url('https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=1932&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 40px 25px;
+            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 242, 255, 0.1);
+        }
+
+        /* Animated Ambient Light */
+        .glow {
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(circle at 50% 50%, var(--neon-blue-glow) 0%, transparent 60%);
+            top: -25%;
+            left: -25%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: pulse 6s infinite ease-in-out;
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.2;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.4;
+                transform: scale(1.1);
+            }
+        }
+
+        .header {
+            z-index: 10;
+        }
+
+        .brand-pill {
+            display: inline-block;
+            background: rgba(0, 242, 255, 0.1);
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            color: var(--neon-blue);
+            padding: 6px 12px;
+            border-radius: 100px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        .headline {
+            font-family: 'Outfit', sans-serif;
+            font-size: 42px;
+            font-weight: 800;
+            line-height: 1;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        .subline {
+            color: var(--accent);
+            font-size: 18px;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        .dashboard-mockup {
+            margin-top: auto;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 20px;
+            z-index: 10;
+            transform: perspective(1000px) rotateX(10deg);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            animation: float 4s infinite ease-in-out;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: perspective(1000px) rotateX(10deg) translateY(0);
+            }
+
+            50% {
+                transform: perspective(1000px) rotateX(12deg) translateY(-10px);
+            }
+        }
+
+        .cta-container {
+            margin-top: 30px;
+            z-index: 10;
+        }
+
+        .btn {
+            width: 100%;
+            background: var(--neon-blue);
+            color: var(--bg-dark);
+            padding: 18px;
+            border-radius: 14px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: none;
+            box-shadow: 0 0 30px var(--neon-blue-glow);
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: pulse-button 2s infinite;
+        }
+
+        @keyframes pulse-button {
+            0% {
+                box-shadow: 0 0 20px var(--neon-blue-glow);
+            }
+
+            50% {
+                box-shadow: 0 0 40px var(--neon-blue-glow);
+            }
+
+            100% {
+                box-shadow: 0 0 20px var(--neon-blue-glow);
+            }
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 15px;
+            color: #64748b;
+            font-size: 11px;
+            z-index: 10;
+        }
+
+        /* Floating elements Decoration */
+        .decor {
+            position: absolute;
+            background: linear-gradient(45deg, var(--neon-blue), transparent);
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.1;
+        }
+
+        .d1 {
+            width: 200px;
+            height: 200px;
+            top: 10%;
+            right: -50px;
+        }
+
+        .d2 {
+            width: 150px;
+            height: 150px;
+            bottom: 20%;
+            left: -50px;
+            background: linear-gradient(45deg, var(--accent), transparent);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="glow"></div>
+    <div class="phone-canvas">
+        <div class="decor d1"></div>
+        <div class="decor d2"></div>
+
+        <div class="header">
+            <div class="brand-pill">Irish Fishing Hub</div>
+            <h1 class="headline">Precision<br>For Every<br>Cast.</h1>
+            <p class="subline">Real-time Atlantic Tides.</p>
+        </div>
+
+        <div class="dashboard-mockup">
+            <div class="tide-info">
+                <div>
+                    <p class="label">Current Level</p>
+                    <p class="value">3.2m <span class="trend-up">▲</span></p>
+                </div>
+                <div style="text-align: right;">
+                    <p class="label">Dublin Port</p>
+                    <p class="value" style="font-size: 16px; color: var(--accent);">High @ 14:32</p>
+                </div>
+            </div>
+
+            <div class="graph-container">
+                <svg class="wave-svg" viewBox="0 0 400 120" preserveAspectRatio="none">
+                    <path d="M0 80 C 100 20, 200 100, 300 40 C 350 10, 400 60, 400 60 L400 120 L0 120 Z"
+                        fill="url(#grad)" stroke="var(--neon-blue)" stroke-width="2" />
+                    <defs>
+                        <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:var(--neon-blue);stop-opacity:0.3" />
+                            <stop offset="100%" style="stop-color:transparent;stop-opacity:0" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <div style="flex: 1; height: 4px; background: var(--neon-blue); border-radius: 2px;"></div>
+                <div style="flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px;"></div>
+                <div style="flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px;"></div>
+            </div>
+        </div>
+
+        <div class="cta-container">
+            <button class="btn">Start Your Session</button>
+            <p class="footer-note">Web-based . Mobile Ready . Community Driven</p>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -2205,8 +2205,10 @@ window.submitCatch = () => {
   const processCatch = (photoData) => {
     const isGeneralPost = !state.currentModalLatLng;
 
+    const postTimestamp = Date.now();
     const c = {
-      id: Date.now(),
+      id: postTimestamp,
+      createdAt: postTimestamp, // Dedicated creation timestamp for expiration logic
       species: sp,
       details: dt,
       lat: isGeneralPost ? null : state.currentModalLatLng.lat,
@@ -2261,8 +2263,26 @@ function loadCommunityCatches() {
   const catchesRef = firebaseDB.ref('catches');
   catchesRef.on('value', (snapshot) => {
     const catches = [];
+    const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+    const now = Date.now();
+
     snapshot.forEach((childSnapshot) => {
-      catches.push(childSnapshot.val());
+      const catchData = childSnapshot.val();
+      if (!catchData) return;
+
+      // Use createdAt if available, otherwise fall back to id (both are timestamps)
+      const postTime = catchData.createdAt || catchData.id;
+
+      // Auto-delete posts older than 30 days (unless pinned)
+      if (!catchData.isPinned && postTime && (now - postTime) > thirtyDaysMs) {
+        if (firebaseDB) {
+          firebaseDB.ref('catches/' + catchData.id).remove()
+            .catch(err => console.warn('Auto-cleanup catch failed:', err));
+        }
+        return; // Skip adding to local state
+      }
+
+      catches.push(catchData);
     });
 
     // Update local state with latest data and sort by newest
@@ -2314,7 +2334,7 @@ function renderCatchFeed() {
   feed.innerHTML = '';
 
   const now = Date.now();
-  const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+  const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
 
   // Sort all catches: First by pinned status, then by time (id is the timestamp)
   const allSortedCatches = [...(state.catches || [])].sort((a, b) => {
@@ -2326,19 +2346,29 @@ function renderCatchFeed() {
     return a.isPinned ? -1 : 1;
   });
 
-  // Filter based on archive mode - Pinned posts ALWAYS show regardless of 7-day filter
+  // Use createdAt if present (new posts), otherwise fall back to id (old posts)
+  const getPostTime = (c) => c.createdAt || c.id || null;
+
+  // Filter based on archive mode - Pinned posts ALWAYS show regardless of 30-day filter
   const catchesToShow = state.showArchive
     ? allSortedCatches
-    : allSortedCatches.filter(c => c.isPinned || (now - (c.id || 0)) <= sevenDaysMs);
+    : allSortedCatches.filter(c => {
+      if (c.isPinned) return true;
+      const postTime = getPostTime(c);
+      return postTime && (now - postTime) <= thirtyDaysMs;
+    });
 
-  // Check if there are older posts available
-  const hasOlderPosts = allSortedCatches.some(c => (now - (c.id || 0)) > sevenDaysMs);
+  // Check if there are older posts available (within what Firebase kept)
+  const hasOlderPosts = allSortedCatches.some(c => {
+    const postTime = getPostTime(c);
+    return !c.isPinned && postTime && (now - postTime) > thirtyDaysMs;
+  });
 
   // Archive toggle button at top
   if (hasOlderPosts || state.showArchive) {
     const toggleBtn = document.createElement('button');
     toggleBtn.className = 'btn btn-sm btn-outline archive-toggle-btn';
-    toggleBtn.innerHTML = state.showArchive ? '📅 Show Recent (Last 7 Days)' : '📜 View Older Posts';
+    toggleBtn.innerHTML = state.showArchive ? '📅 Show Recent (Last 30 Days)' : '📜 View Older Posts';
     toggleBtn.onclick = () => {
       state.showArchive = !state.showArchive;
       renderCatchFeed();
@@ -2426,47 +2456,6 @@ function renderCatchFeed() {
       </div>
     `;
     feed.appendChild(item);
-
-    // [MONETIZATION] Inject Ad Slot every 2 posts for higher volume
-    if ((index + 1) % 2 === 0) {
-      const adContainer = document.createElement('div');
-      adContainer.className = 'catch-card feed-ad-item';
-      adContainer.style.background = 'rgba(255, 255, 255, 0.02)';
-      adContainer.style.textAlign = 'center';
-      adContainer.style.padding = '15px 0';
-      adContainer.style.minHeight = '280px';
-
-      const adId = `ad-300-250-${index}-${Date.now()}`;
-      adContainer.innerHTML = `
-        <div class="card-header" style="justify-content: center; border-bottom: none; margin-bottom: 10px;">
-          <span class="card-title" style="font-size: 0.7rem; color: var(--text-muted);">📢 ADS TO KEEP OUR PLATFORM FREE</span>
-        </div>
-        <div id="${adId}" style="display:inline-block; margin:0 auto;"></div>
-      `;
-      feed.appendChild(adContainer);
-
-      // Inject the Adsterra 300x250 script
-      try {
-        const adDiv = document.getElementById(adId);
-        const scriptOptions = document.createElement('script');
-        scriptOptions.innerHTML = `
-          atOptions = {
-            'key' : '9f4ccd6e67ab1bb552203881fb79a9cb',
-            'format' : 'iframe',
-            'height' : 250,
-            'width' : 300,
-            'params' : {}
-          };
-        `;
-        adDiv.appendChild(scriptOptions);
-
-        const scriptInvoke = document.createElement('script');
-        scriptInvoke.src = 'https://www.highperformanceformat.com/9f4ccd6e67ab1bb552203881fb79a9cb/invoke.js';
-        adDiv.appendChild(scriptInvoke);
-      } catch (err) {
-        console.warn('Ad injection error:', err);
-      }
-    }
   });
 }
 

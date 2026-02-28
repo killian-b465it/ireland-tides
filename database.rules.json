@@ -1,12 +1,5 @@
 {
   "rules": {
-    /* 
-      ATTENTION: These rules are "OPEN" because the app is currently using a custom 
-      login system instead of Firebase Authentication. 
-      
-      To use "Production" security, we would need to implement firebase.auth().
-      For now, these rules will restore your Dashboard and Profile Pictures.
-    */
     "locations": {
       ".read": true,
       ".write": true

@@ -61,14 +61,44 @@ window.renderSponsorBanner = () => {
 
     wrapper.style.display = 'block';
 
-    const sponsorItems = window.state.sponsors.map(sponsor => `
-    <div class="sponsor-banner-item" onclick="openSponsorInfoModal('${sponsor.id}')">
-      <img src="${sponsor.logoUrl}" alt="${sponsor.name}" class="sponsor-banner-logo" onerror="this.src='assets/logo.png'">
-    </div>
-  `).join('');
+    // Build ONE set of sponsor items
+    const buildItems = () => window.state.sponsors.map(sponsor => {
+        const item = document.createElement('div');
+        item.className = 'sponsor-banner-item';
+        item.onclick = () => openSponsorInfoModal(sponsor.id);
+        item.innerHTML = `<img src="${sponsor.logoUrl}" alt="${sponsor.name}" class="sponsor-banner-logo" onerror="this.src='assets/logo.png'">`;
+        return item;
+    });
 
-    track.innerHTML = sponsorItems + sponsorItems;
+    // Clear and render original set
+    track.innerHTML = '';
+    const originalItems = buildItems();
+    originalItems.forEach(el => track.appendChild(el));
+
+    // After layout paint, clone exact items for seamless loop tail
+    requestAnimationFrame(() => {
+        // Only clone if there are items to clone
+        if (originalItems.length === 0) return;
+
+        // Clone each original item and append as "infinite tail"
+        originalItems.forEach(el => {
+            const clone = el.cloneNode(true);
+            clone.onclick = el.onclick;
+            track.appendChild(clone);
+        });
+
+        // Calculate total width of one set and adjust animation duration
+        // so speed is consistent regardless of sponsor count
+        const itemWidth = originalItems[0].offsetWidth || 170;
+        const gap = 32; // --space-xl ~= 32px
+        const singleSetWidth = (itemWidth + gap) * originalItems.length;
+        const speed = 80; // pixels per second
+        const duration = Math.max(singleSetWidth / speed, 8); // minimum 8s
+
+        track.style.animationDuration = `${duration}s`;
+    });
 };
+
 
 // Load sponsors in admin table
 window.loadAdminSponsors = () => {
@@ -222,7 +252,23 @@ window.openSponsorInfoModal = (sponsorId) => {
 
     currentSponsorWebsite = sponsor.websiteUrl;
 
-    document.getElementById('sponsor-info-logo').src = sponsor.logoUrl;
+    // Reset image state before loading new sponsor logo
+    const logoImg = document.getElementById('sponsor-info-logo');
+    const logoFallback = document.getElementById('sponsor-logo-fallback');
+    logoImg.style.display = 'block';
+    if (logoFallback) logoFallback.style.display = 'none';
+
+    if (sponsor.logoUrl) {
+        logoImg.src = sponsor.logoUrl;
+        logoImg.onerror = () => {
+            logoImg.style.display = 'none';
+            if (logoFallback) logoFallback.style.display = 'flex';
+        };
+    } else {
+        logoImg.src = '';
+        logoImg.style.display = 'none';
+        if (logoFallback) logoFallback.style.display = 'flex';
+    }
     document.getElementById('sponsor-info-name').textContent = sponsor.name;
 
     // Description
