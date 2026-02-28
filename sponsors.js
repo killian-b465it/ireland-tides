@@ -48,54 +48,105 @@ window.renderSponsorsGrid = () => {
   `).join('');
 };
 
-// Render sponsor banner on dashboard
+// Render sponsor banner on dashboard - true infinite JS carousel
 window.renderSponsorBanner = () => {
     const wrapper = document.getElementById('sponsor-banner-wrapper');
     const track = document.getElementById('sponsor-banner-track');
     if (!wrapper || !track) return;
 
-    if (window.state.sponsors.length === 0) {
+    if (!window.state.sponsors || window.state.sponsors.length === 0) {
         wrapper.style.display = 'none';
         return;
     }
 
     wrapper.style.display = 'block';
 
-    // Build ONE set of sponsor items
-    const buildItems = () => window.state.sponsors.map(sponsor => {
-        const item = document.createElement('div');
-        item.className = 'sponsor-banner-item';
-        item.onclick = () => openSponsorInfoModal(sponsor.id);
-        item.innerHTML = `<img src="${sponsor.logoUrl}" alt="${sponsor.name}" class="sponsor-banner-logo" onerror="this.src='assets/logo.png'">`;
-        return item;
-    });
+    // Cancel any existing animation loop
+    if (window._sponsorAnimId) {
+        cancelAnimationFrame(window._sponsorAnimId);
+        window._sponsorAnimId = null;
+    }
 
-    // Clear and render original set
+    // Reset track: disable CSS animation, use absolute positioning
     track.innerHTML = '';
-    const originalItems = buildItems();
-    originalItems.forEach(el => track.appendChild(el));
+    track.style.cssText = `
+        position: relative;
+        width: 100%;
+        height: 70px;
+        overflow: hidden;
+        animation: none;
+    `;
 
-    // After layout paint, clone exact items for seamless loop tail
+    const SPEED = 40;  // pixels per second — comfortable reading speed
+    const GAP = 32;    // gap between items in px
+    const ITEM_W = 170; // default item width estimate
+
+    // Build enough items to fill the container twice over (ensures no gap)
+    // We repeat sponsors until we have at least 2x container width worth
+    const containerWidth = wrapper.offsetWidth || 900;
+    const totalSponsorSetWidth = window.state.sponsors.length * (ITEM_W + GAP);
+    const copiesNeeded = Math.max(2, Math.ceil((containerWidth * 2.5) / totalSponsorSetWidth));
+
+    // Create all DOM items (repeated copies of sponsor list)
+    const domItems = [];
+    for (let copy = 0; copy < copiesNeeded; copy++) {
+        window.state.sponsors.forEach(sponsor => {
+            const item = document.createElement('div');
+            item.className = 'sponsor-banner-item';
+            item.style.cssText = `
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                cursor: pointer;
+            `;
+            item.innerHTML = `<img src="${sponsor.logoUrl}" alt="${sponsor.name}" class="sponsor-banner-logo" onerror="this.src='assets/logo.png'">`;
+            item.onclick = () => openSponsorInfoModal(sponsor.id);
+            track.appendChild(item);
+            domItems.push({ el: item, sponsor });
+        });
+    }
+
+    // After layout paint: measure real item width and set initial positions
     requestAnimationFrame(() => {
-        // Only clone if there are items to clone
-        if (originalItems.length === 0) return;
+        const realItemW = domItems[0]?.el.offsetWidth || ITEM_W;
+        const step = realItemW + GAP;
 
-        // Clone each original item and append as "infinite tail"
-        originalItems.forEach(el => {
-            const clone = el.cloneNode(true);
-            clone.onclick = el.onclick;
-            track.appendChild(clone);
+        // Position items end-to-end starting from x=0
+        domItems.forEach((item, i) => {
+            item.x = i * step;
+            item.el.style.left = item.x + 'px';
         });
 
-        // Calculate total width of one set and adjust animation duration
-        // so speed is consistent regardless of sponsor count
-        const itemWidth = originalItems[0].offsetWidth || 170;
-        const gap = 32; // --space-xl ~= 32px
-        const singleSetWidth = (itemWidth + gap) * originalItems.length;
-        const speed = 80; // pixels per second
-        const duration = Math.max(singleSetWidth / speed, 8); // minimum 8s
+        let lastTime = null;
+        let paused = false;
+        track.addEventListener('mouseenter', () => paused = true);
+        track.addEventListener('mouseleave', () => paused = false);
 
-        track.style.animationDuration = `${duration}s`;
+        function animate(ts) {
+            if (!lastTime) lastTime = ts;
+            const delta = Math.min((ts - lastTime) / 1000, 0.05); // cap to 50ms
+            lastTime = ts;
+
+            if (!paused) {
+                // Find the rightmost x so we know where to teleport off-screen items
+                let maxX = -Infinity;
+                domItems.forEach(item => { if (item.x > maxX) maxX = item.x; });
+
+                domItems.forEach(item => {
+                    item.x -= SPEED * delta;
+                    // When item scrolls fully off the left edge, move it to the right
+                    if (item.x + realItemW < 0) {
+                        item.x = maxX + step;
+                        maxX = item.x; // update maxX so next item chains correctly
+                    }
+                    item.el.style.left = item.x + 'px';
+                });
+            }
+
+            window._sponsorAnimId = requestAnimationFrame(animate);
+        }
+
+        window._sponsorAnimId = requestAnimationFrame(animate);
     });
 };
 
