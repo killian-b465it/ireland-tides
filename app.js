@@ -2170,6 +2170,7 @@ window.submitCatch = () => {
       date: new Date().toLocaleDateString('en-GB'),
       author: state.user.name,
       authorId: state.user.id,
+      authorIsAdmin: state.user.isAdmin === true,
       photo: photoData,
       likes: 0,
       likedBy: [],
@@ -2359,6 +2360,7 @@ function renderCatchFeed() {
       <div class="feed-header catch-header">
         <div class="header-left">
           <span class="feed-user" ${userOnClick} ${nameStyle}>${displayName}</span>
+          ${c.authorIsAdmin ? '<span class="admin-badge">🛡️ Admin</span>' : ''}
           ${c.isPinned ? '<span class="pinned-badge">📌 Pinned</span>' : ''}
         </div>
         <div class="header-right">
@@ -3967,6 +3969,7 @@ function loadUsersTable() {
               <button onclick="openUsernameEditor('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}', '${u.email}')">✏️ Edit Username</button>
               <button onclick="changeUserPassword('${u.id}')">🔑 Change Password</button>
               <button onclick="toggleUserStatus('${u.id}')">${isActive ? '🔴 Deactivate' : '🟢 Activate'}</button>
+              <button onclick="toggleAdminStatus('${u.id}')" style="color: ${u.isAdmin ? 'var(--accent-warning)' : 'var(--accent-primary)'}">${u.isAdmin ? '👑 Remove Admin' : '👑 Make Admin'}</button>
               ${plan !== 'pro' ? `<button onclick="giftProSubscription('${u.id}')">🎁 Gift 1mo Pro</button>` : ''}
               <button class="danger-action" onclick="deleteUserAccount('${u.id}')">🗑️ Delete Account</button>
             </div>
@@ -3998,6 +4001,29 @@ function loadUsersTable() {
     `;
   }).join('');
 }
+
+// Toggle admin status for a user
+window.toggleAdminStatus = async (userId) => {
+  if (!isAdmin()) return;
+  const user = state.allUsers.find(u => u.id === userId);
+  if (!user) return;
+
+  const newAdminState = !user.isAdmin;
+  const action = newAdminState ? 'Make Admin' : 'Remove Admin';
+
+  if (!confirm(`${action} for ${user.name || user.email}?`)) return;
+
+  user.isAdmin = newAdminState;
+
+  // Persist to Firebase
+  if (firebaseDB) {
+    await firebaseDB.ref('users/' + userId).update({ isAdmin: newAdminState })
+      .catch(err => console.error('Failed to update admin status:', err));
+  }
+
+  // Refresh the table
+  loadUsersTable();
+};
 
 window.deleteUserAccount = async (userId) => {
   const user = state.allUsers.find(u => u.id === userId);
