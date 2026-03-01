@@ -657,6 +657,13 @@ function updateClock() {
 function verifySubscriptionStatus() {
   if (!state.user || state.user.plan !== 'pro') return;
 
+  // Admins always have permanent pro access — never expire their subscription
+  if (state.user.isAdmin) {
+    state.user.subscriptionExpired = false;
+    state.user.lastVerifiedDate = Date.now();
+    return;
+  }
+
   const now = Date.now();
 
   // Check for gifted Pro expiration
