@@ -3027,6 +3027,89 @@ window.submitReport = () => {
   }
 };
 
+// ============================================
+// Report Post
+// ============================================
+let currentPostReportContext = null;
+
+window.reportPost = (catchId) => {
+  if (!state.user) {
+    return openAuthModal();
+  }
+
+  const targetCatch = state.catches.find(c => c.id === catchId);
+  if (!targetCatch) {
+    return alert('Post not found.');
+  }
+
+  // Store context for submission
+  currentPostReportContext = {
+    catchId,
+    postText: targetCatch.details || targetCatch.species,
+    postAuthor: targetCatch.author || targetCatch.userName || 'Unknown',
+    postAuthorId: targetCatch.authorId || targetCatch.userId || ''
+  };
+
+  // Display summary in modal
+  const postDisplay = (targetCatch.species || 'Post') + (targetCatch.details ? ` - ${targetCatch.details}` : '');
+  const limitedDisplay = postDisplay.length > 50 ? postDisplay.substring(0, 50) + '...' : postDisplay;
+  document.getElementById('report-post-text').textContent = `"${limitedDisplay}" - ${currentPostReportContext.postAuthor}`;
+
+  // Reset form
+  document.getElementById('report-post-reason').value = 'spam';
+  document.getElementById('report-post-details').value = '';
+
+  // Show modal
+  document.getElementById('report-post-modal').classList.add('active');
+};
+
+window.closeReportPostModal = () => {
+  document.getElementById('report-post-modal').classList.remove('active');
+  currentPostReportContext = null;
+};
+
+window.submitPostReport = () => {
+  if (!currentPostReportContext) return;
+
+  const reason = document.getElementById('report-post-reason').value;
+  const details = document.getElementById('report-post-details').value.trim();
+
+  const report = {
+    id: 'report_' + Date.now(),
+    type: 'post',
+    catchId: currentPostReportContext.catchId,
+    postText: currentPostReportContext.postText,
+    postAuthor: currentPostReportContext.postAuthor,
+    postAuthorId: currentPostReportContext.postAuthorId,
+    reportedBy: state.user.name,
+    reportedById: state.user.id,
+    reportReason: reason,
+    reportDetails: details,
+    reportDate: Date.now(),
+    status: 'pending'
+  };
+
+  // Save to unified reportedComments endpoint
+  if (firebaseDB) {
+    firebaseDB.ref('reportedComments/' + report.id).set(report)
+      .then(() => {
+        alert('Post reported. Our team will review it shortly.');
+        closeReportPostModal();
+      })
+      .catch(err => {
+        console.error('Error reporting post:', err);
+        alert('Failed to submit report. Please try again.');
+      });
+  } else {
+    // Fallback to localStorage
+    const reports = JSON.parse(localStorage.getItem('reported_comments') || '[]');
+    reports.push(report);
+    localStorage.setItem('reported_comments', JSON.stringify(reports));
+    alert('Post reported. Our team will review it shortly.');
+    closeReportPostModal();
+  }
+};
+
 
 // ============================================
 // Admin - Reported Comments Management
