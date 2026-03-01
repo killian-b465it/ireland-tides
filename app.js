@@ -2062,7 +2062,7 @@ function initCommunityMap() {
 }
 
 window.openPostModal = (latlng) => {
-  if (!state.user || state.user.plan !== 'pro') return openPremiumModal();
+  if (!state.user) return openPremiumModal();
 
   state.currentModalLatLng = latlng; // null if general post
 
@@ -2090,7 +2090,7 @@ window.openPostModal = (latlng) => {
 };
 
 window.openPostModal = (latlng) => {
-  if (!state.user || state.user.plan !== 'pro') return openPremiumModal();
+  if (!state.user) return openPremiumModal();
 
   state.currentModalLatLng = latlng; // null if general post
 
@@ -2144,7 +2144,7 @@ window.removeImage = () => {
 };
 
 window.submitCatch = () => {
-  if (!state.user || state.user.plan !== 'pro') {
+  if (!state.user) {
     closeModal();
     return openPremiumModal();
   }
@@ -2242,8 +2242,12 @@ function loadCommunityCatches() {
     // Update local state with latest data and sort by newest
     state.catches = catches.sort((a, b) => b.id - a.id);
 
-    // Also update backup localStorage
-    localStorage.setItem('fishing_catches', JSON.stringify(state.catches));
+    // Also update backup localStorage with a try-catch for quota limits (Base64 images)
+    try {
+      localStorage.setItem('fishing_catches', JSON.stringify(state.catches));
+    } catch (e) {
+      console.warn('Could not save catches to localStorage (quota exceeded)');
+    }
 
     // Refresh UI
     if (communityMarkerGroup) {
@@ -2858,7 +2862,7 @@ window.handleCommentKey = (e, id) => {
 };
 
 window.postComment = (id) => {
-  if (!state.user || state.user.plan !== 'pro') return openPremiumModal();
+  if (!state.user) return openPremiumModal();
 
   const input = document.getElementById(`input-${id}`);
   const text = input.value.trim();
@@ -3680,7 +3684,7 @@ window.manageStripeSubscription = async () => {
 };
 
 window.likeCatch = (id) => {
-  if (!state.user || state.user.plan !== 'pro') return openPremiumModal();
+  if (!state.user) return openPremiumModal();
 
   const c = state.catches.find(cat => cat.id === id);
   if (!c) return;
@@ -3707,7 +3711,7 @@ window.likeCatch = (id) => {
 };
 
 window.commentOnCatch = (id) => {
-  if (!state.user || state.user.plan !== 'pro') return openPremiumModal();
+  if (!state.user) return openPremiumModal();
 
   const text = prompt('Enter your comment:');
   if (!text) return;
