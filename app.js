@@ -651,70 +651,13 @@ function updateClock() {
 // ============================================
 
 /**
- * Check if Pro subscription is still valid based on billing cycle
- * Runs once per day on app load
+ * Subscription verification — DISABLED.
+ * All accounts have permanent free Pro access.
+ * This function is kept as a stub to avoid call-site errors.
  */
 function verifySubscriptionStatus() {
-  if (!state.user || state.user.plan !== 'pro') return;
-
-  // Admins always have permanent pro access — never expire their subscription
-  if (state.user.isAdmin) {
-    state.user.subscriptionExpired = false;
-    state.user.lastVerifiedDate = Date.now();
-    return;
-  }
-
-  const now = Date.now();
-
-  // Check for gifted Pro expiration
-  if (state.user.proExpirationDate && now > state.user.proExpirationDate) {
-    state.user.plan = 'free';
-    state.user.proExpirationDate = null;
-    state.user.subscriptionExpired = true;
-    persistUserData();
-
-    setTimeout(() => {
-      alert('Your complimentary Pro access has expired. We hope you enjoyed it! You can upgrade anytime to keep Pro features.');
-    }, 1000);
-    return;
-  }
-
-  const lastVerified = state.user.lastVerifiedDate || 0;
-  const todayStart = new Date().setHours(0, 0, 0, 0);
-
-  // Only run verification once per day
-  if (lastVerified >= todayStart) return;
-
-  const cycleStart = state.user.subscriptionCycleStart;
-  if (!cycleStart) {
-    if (state.user.proExpirationDate) return; // Gifted pro doesn't use cycle tracking
-
-    // Legacy Pro user without cycle tracking - set it now
-    state.user.subscriptionCycleStart = now;
-    state.user.proStartDate = state.user.proStartDate || now;
-    state.user.lastVerifiedDate = now;
-    persistUserData();
-    return;
-  }
-
-  const daysSinceCycle = Math.floor((now - cycleStart) / (1000 * 60 * 60 * 24));
-
-  // Subscription valid for 28-31 days (monthly billing)
-  if (daysSinceCycle > 31) {
-    // Subscription expired - downgrade to free
-    state.user.plan = 'free';
-    state.user.subscriptionExpired = true;
-    persistUserData();
-
-    // Show expiration notice after UI loads
-    setTimeout(() => {
-      alert('Your Pro subscription has expired. Please renew to continue enjoying Pro features.');
-    }, 1000);
-  } else {
-    // Still valid - update last verified date
-    state.user.lastVerifiedDate = now;
-    persistUserData();
-  }
+  // All plans are permanently pro — nothing to verify.
+  return;
 }
 
 /**
@@ -791,10 +734,13 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => fetchAllLiveStationData(), 500);
   startAutoUpdate();
 
-  // Auto-grant Pro status during beta (free for all users)
-  if (state.user && state.user.plan !== 'pro') {
-    state.user.plan = 'pro';
-    state.user.betaProUser = true; // Mark as beta user for later tracking
+  // All accounts are permanently pro — upgrade any free users and clear any expired flags
+  if (state.user) {
+    if (state.user.plan !== 'pro') {
+      state.user.plan = 'pro';
+    }
+    state.user.subscriptionExpired = false;
+    state.user.proExpirationDate = null;
     persistUserData();
   }
 
