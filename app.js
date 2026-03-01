@@ -2143,17 +2143,25 @@ window.removeImage = () => {
   document.getElementById('preview-img').src = '';
 };
 
+let isSubmittingCatch = false;
 window.submitCatch = () => {
+  if (isSubmittingCatch) return;
+
   if (!state.user) {
     closeModal();
     return openPremiumModal();
   }
 
+  isSubmittingCatch = true;
+
   const sp = document.getElementById('catch-species').value;
   const dt = document.getElementById('catch-details').value;
   const photoInput = document.getElementById('catch-photo');
 
-  if (!sp) return alert('Enter a title or species!');
+  if (!sp) {
+    isSubmittingCatch = false;
+    return alert('Enter a title or species!');
+  }
 
   const processCatch = (photoData) => {
     const isGeneralPost = !state.currentModalLatLng;
@@ -2181,12 +2189,14 @@ window.submitCatch = () => {
     syncCatchToFirebase(c);
 
     closeModal();
-    // Note: renderCatchFeed and markers will be updated by the ref.on('value') listener automatically
+    // Allow new posts after 2 seconds to prevent rapid duplication
+    setTimeout(() => { isSubmittingCatch = false; }, 2000);
   };
 
   if (photoInput.files && photoInput.files[0]) {
     const reader = new FileReader();
     reader.onload = (e) => processCatch(e.target.result);
+    reader.onerror = () => { isSubmittingCatch = false; alert('Error reading image.'); };
     reader.readAsDataURL(photoInput.files[0]);
   } else {
     processCatch(null);
@@ -2389,6 +2399,11 @@ function renderCatchFeed() {
         <button class="action-btn social-btn" onclick="toggleComments(${c.id})">
           💬 ${c.comments ? c.comments.length : 0}
         </button>
+        ${state.user && state.user.id !== displayUserId ? `
+          <button class="action-btn social-btn" onclick="reportPost(${c.id})" style="margin-left: auto;" title="Report Post">
+            ⚠️
+          </button>
+        ` : ''}
       </div>
       <div class="comments-section" id="comments-${c.id}">
         <div class="comments-list comment-list" id="comments-list-${c.id}">
@@ -3070,9 +3085,9 @@ function renderReportedComments(filter = 'pending') {
         </div>
         <div class="report-body">
           <div class="reported-comment">
-            <p class="report-label">Reported Comment:</p>
-            <p class="comment-content">"${sanitizeHTML(report.commentText)}"</p>
-            <p class="comment-meta">By ${sanitizeHTML(report.commentAuthor)}</p>
+            <p class="report-label">${report.type === 'post' ? 'Reported Post:' : 'Reported Comment:'}</p>
+            <p class="comment-content">"${sanitizeHTML(report.type === 'post' ? report.postText : report.commentText)}"</p>
+            <p class="comment-meta">By ${sanitizeHTML(report.type === 'post' ? report.postAuthor : report.commentAuthor)}</p>
           </div>
           
           <div class="report-details">
@@ -3082,9 +3097,15 @@ function renderReportedComments(filter = 'pending') {
         
         ${report.status === 'pending' ? `
           <div class="report-actions">
-            <button class="btn btn-sm btn-danger" onclick="removeReportedComment('${report.id}', ${report.catchId}, ${report.commentIndex})">
-              Remove Comment
-            </button>
+            ${report.type === 'post' ? `
+              <button class="btn btn-sm btn-danger" onclick="removeReportedPost('${report.id}', ${report.catchId})">
+                Remove Post
+              </button>
+            ` : `
+              <button class="btn btn-sm btn-danger" onclick="removeReportedComment('${report.id}', ${report.catchId}, ${report.commentIndex})">
+                Remove Comment
+              </button>
+            `}
             <button class="btn btn-sm btn-outline" onclick="dismissReport('${report.id}')">
               Dismiss Report
             </button>
@@ -3097,6 +3118,35 @@ function renderReportedComments(filter = 'pending') {
     `;
   }).join('');
 }
+
+window.removeReportedPost = (reportId, catchId) => {
+  if (!confirm('Remove this post and mark report as resolved?')) return;
+
+  // Delete the post globally
+  if (firebaseDB) {
+    firebaseDB.ref('catches/' + catchId).remove()
+      .catch(err => console.error('Error removing reported post:', err));
+  }
+
+  // Update report status
+  const report = state.reportedComments.find(r => r.id === reportId);
+  if (report) {
+    report.status = 'removed';
+    report.reviewedBy = state.user.name;
+    report.reviewedById = state.user.id;
+    report.reviewDate = Date.now();
+
+    if (firebaseDB) {
+      firebaseDB.ref('reportedComments/' + reportId).update({
+        status: 'removed',
+        reviewedBy: state.user.name,
+        reviewedById: state.user.id,
+        reviewDate: Date.now()
+      });
+    }
+  }
+  renderReportedComments(state.reportFilter || 'pending');
+};
 
 window.removeReportedComment = (reportId, catchId, commentIndex) => {
   if (!confirm('Remove this comment and mark report as resolved?')) return;
