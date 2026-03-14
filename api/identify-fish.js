@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     // Only allow POST
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
@@ -24,7 +24,8 @@ export default async function handler(req, res) {
         const mimeType = `image/${base64Match[1]}`;
         const base64Data = base64Match[2];
 
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+        // Using gemini-2.0-flash-lite - highest free tier limit (30 req/min)
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${apiKey}`;
 
         const geminiResponse = await fetch(geminiUrl, {
             method: 'POST',
@@ -60,6 +61,9 @@ If you cannot identify a fish in the image, still try your best guess and give a
         if (!geminiResponse.ok) {
             const errText = await geminiResponse.text();
             console.error('Gemini error:', geminiResponse.status, errText);
+            if (geminiResponse.status === 429) {
+                return res.status(429).json({ error: 'AI is busy, please try again in a few seconds' });
+            }
             return res.status(502).json({ error: 'AI service error' });
         }
 
@@ -83,4 +87,4 @@ If you cannot identify a fish in the image, still try your best guess and give a
         console.error('Identify fish error:', error);
         return res.status(500).json({ error: 'Failed to identify species' });
     }
-}
+};
