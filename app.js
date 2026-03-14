@@ -3348,6 +3348,7 @@ function updateAuthModalContent() {
 }
 
 window.handleAuthSubmit = async () => {
+  console.log("[Auth Flow] handleAuthSubmit started");
   const email = document.getElementById('auth-email').value;
   const username = document.getElementById('auth-username').value;
   const password = document.getElementById('auth-password').value;
@@ -3357,11 +3358,15 @@ window.handleAuthSubmit = async () => {
   const remember = document.getElementById('auth-remember').checked;
   const termsCheckbox = document.getElementById('auth-terms');
 
+  console.log("[Auth Flow] Mode:", state.authMode);
+
   // Enforce Terms & Conditions acceptance on Signup
   if (state.authMode === 'signup') {
     if (!termsCheckbox || !termsCheckbox.checked) {
+      console.log("[Auth Flow] Terms not checked");
       return alert('You must agree to the Terms & Conditions and Privacy Policy to create an account.');
     }
+    console.log("[Auth Flow] Terms checked successfully");
   }
 
   // Check if admin email - require correct password
@@ -3371,8 +3376,6 @@ window.handleAuthSubmit = async () => {
       return alert('Invalid admin password.');
     }
     // Admin credentials valid - Force login
-    // Try to find existing profile logic via Firebase would be here, but for simplicity
-    // we just construct the admin session directly to ensure access.
     state.user = {
       id: email.includes('admin') ? 'admin_main_root' : 'support_main_root',
       name: email.includes('admin') ? 'Administrator' : 'Customer Support',
@@ -3384,10 +3387,8 @@ window.handleAuthSubmit = async () => {
       isAdmin: true
     };
 
-    // Complete login process
     state.user.remember = remember;
     registerUserInSystem(state.user);
-    // Determine storage
     if (remember) {
       localStorage.setItem('fishing_user', JSON.stringify(state.user));
       sessionStorage.removeItem('fishing_user');
@@ -3400,38 +3401,37 @@ window.handleAuthSubmit = async () => {
     return;
   }
 
+  console.log("[Auth Flow] About to check Firebase");
+
   // For non-admin users, check Firebase for existing account
   if (!isAdminEmail && firebaseDB) {
     try {
+      console.log("[Auth Flow] Querying Firebase for email:", email);
       const snapshot = await firebaseDB.ref('users').orderByChild('email').equalTo(email.toLowerCase()).once('value');
       const firebaseUser = snapshot.val();
+      console.log("[Auth Flow] Firebase email check result:", firebaseUser);
 
       if (state.authMode === 'login') {
-        // LOGIN: User must exist in Firebase
         if (!firebaseUser) {
           return alert('No account found with this email. Please sign up first!');
         }
 
-        // Get the user data from Firebase
         const userId = Object.keys(firebaseUser)[0];
         const userData = firebaseUser[userId];
 
-        // Check password (simple validation - in production use proper auth)
         if (userData.password && userData.password !== password) {
           return alert('Incorrect password. Please try again.');
         }
 
-        // Check if user is deactivated
         if (userData.active === false) {
           return alert('Your account has been deactivated. Please contact irishfishinghub@gmail.com if you believe this is a mistake.');
         }
 
-        // Login successful - load user data
         state.user = {
           id: userId,
           name: userData.name,
           email: userData.email,
-          plan: userData.plan || 'pro', // Beta = free Pro
+          plan: userData.plan || 'pro',
           remember: remember,
           betaProUser: userData.betaProUser || true,
           joinDate: userData.joinDate,
@@ -3440,38 +3440,41 @@ window.handleAuthSubmit = async () => {
         };
 
       } else {
-        // SIGNUP: Check if email already exists
+        // SIGNUP
         if (firebaseUser) {
           return alert('An account with this email already exists. Please login instead!');
         }
 
-        // Validate username
         if (!username) return alert('Please enter a username.');
 
-        // Check if username is taken
+        console.log("[Auth Flow] Checking if username is taken:", username);
         const usernameSnapshot = await firebaseDB.ref('users').orderByChild('name').equalTo(username).once('value');
+        console.log("[Auth Flow] Firebase username check result:", usernameSnapshot.val());
+
         if (usernameSnapshot.val()) {
           return alert('This username is already taken. Please choose another.');
         }
 
-        // Create new user
+        console.log("[Auth Flow] Creating new user object");
         state.user = {
           id: 'user_' + Date.now(),
           name: username,
           email: email.toLowerCase(),
-          password: password, // Store for validation (in production, hash this!)
-          plan: 'pro', // Beta = free Pro
+          password: password,
+          plan: 'pro',
           remember: remember,
           betaProUser: true,
           joinDate: Date.now()
         };
       }
     } catch (error) {
-      console.warn('Firebase auth check failed:', error);
-      // Fallback to local auth if Firebase fails
+      console.warn('[Auth Flow] Firebase auth check failed:', error);
+      alert('System error during registration: ' + error.message);
+      return;
     }
   } else {
     // Fallback for when Firebase is not available
+    console.log("[Auth Flow] Firebase not found, using fallback local auth");
     const existingUser = state.allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
 
     if (state.authMode === 'login' && !existingUser) {
@@ -3498,11 +3501,21 @@ window.handleAuthSubmit = async () => {
     };
   }
 
+  // CRITICAL FIX: Ensure state.user actually exists before proceeding
+  if (!state.user) {
+    console.error("Auth flow failed to generate a user object.");
+    return;
+  }
+
   state.user.remember = remember;
 
   // Register/update user in system and sync to Firebase
-  registerUserInSystem(state.user);
-  syncUserToFirebase(state.user);
+  try {
+    registerUserInSystem(state.user);
+    if (firebaseDB) syncUserToFirebase(state.user);
+  } catch (err) {
+    console.error("Failed to sync user data:", err);
+  }
 
   if (remember) {
     localStorage.setItem('fishing_user', JSON.stringify(state.user));
