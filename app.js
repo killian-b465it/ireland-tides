@@ -5828,7 +5828,7 @@ window.clearSpeciesPhoto = function () {
 };
 
 // AI Fish Identification - Direct Gemini API call
-const GEMINI_API_KEY = 'AIzaSyC8vhaKltOYtxgVK7Ovr92cseO9EuFvz3A';
+const GEMINI_API_KEY = 'AIzaSyBd4swH-drkxFKcUXaaHqjSPDj-75onTqY';
 
 // Compress image before sending to API
 function compressImage(dataUrl, maxWidth = 1024) {
