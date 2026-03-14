@@ -6014,6 +6014,39 @@ function startWalkthrough() {
   const headerHeight = document.querySelector('.navbar').offsetHeight;
 
   const intro = introJs();
+  const isMobile = document.documentElement.clientWidth <= 768;
+
+  const tourSteps = [
+    {
+      title: "Welcome to Irish Fishing Hub! 🎣",
+      intro: "Let's take a quick tour of the app to help you catch more fish."
+    },
+    {
+      title: "Sea vs Freshwater 🌊🏞️",
+      intro: "Toggle between coastal seawater tides or inland lakes. The map will instantly update to show relevant fishing spots.",
+      ...(isMobile ? { position: "auto" } : { element: document.querySelector('.fishing-mode-toggle-wrapper'), position: "bottom" })
+    },
+    {
+      title: "Interactive Map 🗺️",
+      intro: "You can click any pin on the map behind this tour to see real-time tides, weather, and fishing conditions for that exact location.",
+    },
+    {
+      title: "Map Layers 🗺️",
+      intro: "Looking for a tackle shop or a boat ramp? Use these filters to turn different types of locations on or off.",
+      ...(isMobile ? { position: "auto" } : { element: document.getElementById('filter-toggle-btn'), position: "bottom" })
+    },
+    {
+      title: "Community Feed 👥",
+      intro: "Check out the Community tab to see what other Irish anglers are catching right now, or share your own catches!",
+      ...(isMobile ? { position: "auto" } : { element: document.getElementById('nav-community'), position: "top" })
+    },
+    {
+      title: "AI Fish Identifier 🤖🐟",
+      intro: "Not sure what you caught? Upload a photo in the Species Guide and our AI will identify the fish for you instantly. Tight lines!",
+      ...(isMobile ? { position: "auto" } : { element: document.getElementById('nav-species'), position: "top" })
+    }
+  ];
+
   intro.setOptions({
     showStepNumbers: false,
     showProgress: true,
@@ -6026,40 +6059,7 @@ function startWalkthrough() {
     scrollToElement: true,
     disableInteraction: true, // Prevents map/buttons from stealing focus
     scrollPadding: headerHeight + 20, // offset for fixed navbar
-    steps: [
-      {
-        title: "Welcome to Irish Fishing Hub! 🎣",
-        intro: "Let's take a quick tour of the app to help you catch more fish."
-      },
-      {
-        element: document.documentElement.clientWidth <= 768 ? null : document.querySelector('.fishing-mode-toggle-wrapper'),
-        title: "Sea vs Freshwater 🌊🏞️",
-        intro: "Toggle between coastal seawater tides or inland lakes. The map will instantly update to show relevant fishing spots.",
-        position: "bottom"
-      },
-      {
-        title: "Interactive Map 🗺️",
-        intro: "You can click any pin on the map behind this tour to see real-time tides, weather, and fishing conditions for that exact location.",
-      },
-      {
-        element: document.documentElement.clientWidth <= 768 ? null : document.getElementById('filter-toggle-btn'),
-        title: "Map Layers 🗺️",
-        intro: "Looking for a tackle shop or a boat ramp? Use these filters to turn different types of locations on or off.",
-        position: "bottom"
-      },
-      {
-        element: document.documentElement.clientWidth <= 768 ? null : document.getElementById('nav-community'),
-        title: "Community Feed 👥",
-        intro: "Check out the Community tab to see what other Irish anglers are catching right now, or share your own catches!",
-        position: "top"
-      },
-      {
-        element: document.documentElement.clientWidth <= 768 ? null : document.getElementById('nav-species'),
-        title: "AI Fish Identifier 🤖🐟",
-        intro: "Not sure what you caught? Upload a photo in the Species Guide and our AI will identify the fish for you instantly. Tight lines!",
-        position: "top"
-      }
-    ]
+    steps: tourSteps
   });
 
   intro.oncomplete(function () {
