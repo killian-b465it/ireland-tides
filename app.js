@@ -6025,6 +6025,10 @@ function startWalkthrough() {
         intro: "Let's take a quick tour of the app to help you catch more fish."
       },
       {
+        title: "Sign Up / Log In 👤",
+        intro: "Create a free account to log your catches, save favorite spots, and join the community."
+      },
+      {
         title: "Sea vs Freshwater 🌊🏞️",
         intro: "Toggle between coastal seawater tides or inland lakes. The map will instantly update to show relevant fishing spots."
       },
@@ -6050,6 +6054,12 @@ function startWalkthrough() {
       {
         title: "Welcome to Irish Fishing Hub! 🎣",
         intro: "Let's take a quick tour of the app to help you catch more fish."
+      },
+      {
+        element: document.getElementById('login-btn'),
+        title: "Sign Up / Log In 👤",
+        intro: "Create a free account to log your catches, save favorite spots, and join the community.",
+        position: "bottom"
       },
       {
         element: document.querySelector('.fishing-mode-toggle-wrapper'),
