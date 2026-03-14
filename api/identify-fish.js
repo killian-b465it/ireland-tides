@@ -4,7 +4,7 @@ module.exports = async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
         return res.status(503).json({ error: 'API key not configured' });
     }
@@ -23,18 +23,26 @@ module.exports = async function handler(req, res) {
 
         const mimeType = `image/${base64Match[1]}`;
         const base64Data = base64Match[2];
+        const dataUrl = `data:${mimeType};base64,${base64Data}`;
 
-        // Using gemini-2.0-flash-lite - highest free tier limit (30 req/min)
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${apiKey}`;
+        // Using Groq's Llama 3.2 Vision model (free tier)
+        const groqUrl = 'https://api.groq.com/openai/v1/chat/completions';
 
-        const geminiResponse = await fetch(geminiUrl, {
+        const groqResponse = await fetch(groqUrl, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({
-                contents: [{
-                    parts: [
-                        {
-                            text: `You are an expert marine biologist and fish identification specialist. Analyse this image and identify any fish or marine species shown.
+                model: 'llama-3.2-11b-vision-preview',
+                messages: [
+                    {
+                        role: 'user',
+                        content: [
+                            {
+                                type: 'text',
+                                text: `You are an expert marine biologist and fish identification specialist. Analyse this image and identify any fish or marine species shown.
 
 Respond ONLY with valid JSON in this exact format (no markdown, no code blocks, no extra text):
 {
@@ -49,26 +57,33 @@ Respond ONLY with valid JSON in this exact format (no markdown, no code blocks, 
 }
 
 If you cannot identify a fish in the image, still try your best guess and give a lower confidence score.`
-                        },
-                        {
-                            inlineData: { mimeType, data: base64Data }
-                        }
-                    ]
-                }]
+                            },
+                            {
+                                type: 'image_url',
+                                image_url: {
+                                    url: dataUrl
+                                }
+                            }
+                        ]
+                    }
+                ],
+                temperature: 0.1,
+                max_tokens: 500,
+                response_format: { type: 'json_object' }
             })
         });
 
-        if (!geminiResponse.ok) {
-            const errText = await geminiResponse.text();
-            console.error('Gemini error:', geminiResponse.status, errText);
-            if (geminiResponse.status === 429) {
+        if (!groqResponse.ok) {
+            const errText = await groqResponse.text();
+            console.error('Groq API error:', groqResponse.status, errText);
+            if (groqResponse.status === 429) {
                 return res.status(429).json({ error: 'AI is busy, please try again in a few seconds' });
             }
             return res.status(502).json({ error: 'AI service error' });
         }
 
-        const geminiData = await geminiResponse.json();
-        const textContent = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
+        const groqData = await groqResponse.json();
+        const textContent = groqData.choices?.[0]?.message?.content;
 
         if (!textContent) {
             return res.status(502).json({ error: 'No AI response' });
