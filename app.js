@@ -5608,3 +5608,328 @@ window.testEmailPreview = () => {
     </body></html>
   `);
 };
+
+// ============================================
+// Species Guide - Data & Logic
+// ============================================
+const IRISH_FISH_SPECIES = [
+  // Sea Fish
+  { id: 'atlantic_mackerel', name: 'Atlantic Mackerel', scientific: 'Scomber scombrus', category: 'sea', habitat: 'Open water, coastal', size: '25-45cm', season: 'Jun - Oct', description: 'One of Ireland\'s most popular sport fish. Easily caught from piers and boats. Identified by distinctive wavy black stripes on a blue-green back. Excellent eating.', emoji: '🐟', record: '1.02 kg' },
+  { id: 'european_bass', name: 'European Sea Bass', scientific: 'Dicentrarchus labrax', category: 'sea', habitat: 'Rocky shores, estuaries', size: '40-80cm', season: 'May - Nov', description: 'Prized sport and table fish. Silver body with a spiny dorsal fin. Found around rocky coastlines, piers, and estuaries. Catch-and-release encouraged for conservation.', emoji: '🐟', record: '7.94 kg' },
+  { id: 'cod', name: 'Atlantic Cod', scientific: 'Gadus morhua', category: 'sea', habitat: 'Deep water, wrecks', size: '50-120cm', season: 'Oct - Mar', description: 'Large cold-water fish with a distinctive barbel on its chin. Found over wrecks and rough ground. Popular target for boat anglers. Mottled brown-green colouration.', emoji: '🐟', record: '19.96 kg' },
+  { id: 'pollock', name: 'Pollock', scientific: 'Pollachius pollachius', category: 'sea', habitat: 'Reefs, wrecks, piers', size: '40-75cm', season: 'Apr - Oct', description: 'Common around rocky reefs and wrecks. Dark greenish-brown on top with a lighter belly. Strong fighters on light tackle. Good eating when fresh.', emoji: '🐟', record: '8.62 kg' },
+  { id: 'coalfish', name: 'Coalfish (Saithe)', scientific: 'Pollachius virens', category: 'sea', habitat: 'Deep water, piers', size: '50-100cm', season: 'All year', description: 'Similar to pollock but darker in colour. Juveniles (called coalies) are common from piers. Larger specimens found in deeper water. Powerful fighters.', emoji: '🐟', record: '15.88 kg' },
+  { id: 'wrasse_ballan', name: 'Ballan Wrasse', scientific: 'Labrus bergylta', category: 'sea', habitat: 'Rocky shores, kelp beds', size: '25-50cm', season: 'May - Oct', description: 'Colourful fish found in rocky areas. Varies from green to red-brown. Thick lips and strong teeth for crushing shells. Very popular with LRF anglers.', emoji: '🐟', record: '4.19 kg' },
+  { id: 'conger_eel', name: 'Conger Eel', scientific: 'Conger conger', category: 'sea', habitat: 'Wrecks, rocky holes', size: '100-200cm', season: 'Jun - Oct', description: 'Largest eel species in Irish waters. Can grow over 2m long. Found in wrecks and rock crevices. Powerful and exciting to catch. Handle with care!', emoji: '🐍', record: '32.43 kg' },
+  { id: 'ray_thornback', name: 'Thornback Ray', scientific: 'Raja clavata', category: 'sea', habitat: 'Sandy/muddy seabed', size: '60-100cm', season: 'Apr - Oct', description: 'Most common ray in Irish waters. Named for the thorny spines on its back and tail. Found over sandy and muddy ground. Excellent eating.', emoji: '🦈', record: '10.43 kg' },
+  { id: 'plaice', name: 'Plaice', scientific: 'Pleuronectes platessa', category: 'sea', habitat: 'Sandy seabed', size: '25-50cm', season: 'Mar - Oct', description: 'Popular flatfish identified by orange or red spots on its brown upper side. Found on sandy beaches and banks. Caught by boat and shore anglers alike.', emoji: '🐟', record: '3.63 kg' },
+  { id: 'dogfish_lesser', name: 'Lesser Spotted Dogfish', scientific: 'Scyliorhinus canicula', category: 'sea', habitat: 'Sandy/rocky seabed', size: '50-80cm', season: 'All year', description: 'Small shark common all around Ireland. Covered in dark spots. One of the most commonly caught sea fish, especially by beginners. Rough sandpaper-like skin.', emoji: '🦈', record: '1.71 kg' },
+  { id: 'flounder', name: 'Flounder', scientific: 'Platichthys flesus', category: 'sea', habitat: 'Estuaries, sandy bays', size: '20-40cm', season: 'Sep - Mar', description: 'Flatfish that enters estuaries and even freshwater. Brown upper side. Common in harbours and river mouths. Good winter sport from the shore.', emoji: '🐟', record: '1.53 kg' },
+  { id: 'whiting', name: 'Whiting', scientific: 'Merlangius merlangus', category: 'sea', habitat: 'Inshore, sandy seabed', size: '25-40cm', season: 'Sep - Mar', description: 'Silver-bodied fish common in winter months. Often caught in numbers from piers and beaches. Distinguished from pollack by its smaller mouth and lack of barbel.', emoji: '🐟', record: '2.89 kg' },
+  { id: 'spurdog', name: 'Spurdog', scientific: 'Squalus acanthias', category: 'sea', habitat: 'Deep water, reefs', size: '60-100cm', season: 'May - Oct', description: 'Small shark with venomous spines in front of its dorsal fins. Once very common but now a protected species in many areas. Grey with white spots.', emoji: '🦈', record: '10.21 kg' },
+  { id: 'blue_shark', name: 'Blue Shark', scientific: 'Prionace glauca', category: 'sea', habitat: 'Open ocean', size: '150-300cm', season: 'Jul - Oct', description: 'Beautiful pelagic shark that visits Irish waters in summer. Brilliant blue colour on its back. Catch-and-release only. Found offshore, mainly off the south and west coasts.', emoji: '🦈', record: '98 kg' },
+  { id: 'garfish', name: 'Garfish', scientific: 'Belone belone', category: 'sea', habitat: 'Surface, coastal', size: '40-70cm', season: 'May - Sep', description: 'Slender fish with a distinctive elongated beak-like jaw. Swims near the surface. Fun to catch on light tackle. Has unusual green-coloured bones!', emoji: '🐟', record: '0.96 kg' },
+
+  // Freshwater Fish
+  { id: 'brown_trout', name: 'Brown Trout', scientific: 'Salmo trutta', category: 'freshwater', habitat: 'Rivers, lakes, streams', size: '25-50cm', season: 'Mar - Sep', description: 'Ireland\'s most widespread freshwater game fish. Beautiful golden-brown with black and red spots. Found in clean rivers and lakes across the country. Excellent fly fishing.', emoji: '🐟', record: '11.73 kg' },
+  { id: 'atlantic_salmon', name: 'Atlantic Salmon', scientific: 'Salmo salar', category: 'freshwater', habitat: 'Rivers (spawning)', size: '60-100cm', season: 'Jan - Sep', description: 'The king of Irish freshwater fish. Returns from the Atlantic to spawn in rivers. Silver in the sea, develops spots and colour in freshwater. License required.', emoji: '🐟', record: '25.79 kg' },
+  { id: 'pike', name: 'Northern Pike', scientific: 'Esox lucius', category: 'freshwater', habitat: 'Lakes, slow rivers', size: '60-120cm', season: 'All year', description: 'Ireland\'s apex freshwater predator. Distinctive elongated body with a duck-bill mouth full of teeth. Ambush predator found in weedy lakes and rivers. Can grow very large.', emoji: '🐟', record: '19.15 kg' },
+  { id: 'perch', name: 'European Perch', scientific: 'Perca fluviatilis', category: 'freshwater', habitat: 'Lakes, canals, rivers', size: '20-35cm', season: 'All year', description: 'Striking fish with bold dark vertical bars and bright orange-red fins. Common in lakes and canals. Excellent sport on light tackle. Schools around submerged structures.', emoji: '🐟', record: '2.72 kg' },
+  { id: 'bream', name: 'Common Bream', scientific: 'Abramis brama', category: 'freshwater', habitat: 'Lakes, slow rivers', size: '30-50cm', season: 'May - Oct', description: 'Deep-bodied silver-bronze fish popular with coarse anglers. Forms large shoals in lakes and canals. Best fished with float or feeder methods. Very popular in competitions.', emoji: '🐟', record: '5.07 kg' },
+  { id: 'roach', name: 'Roach', scientific: 'Rutilus rutilus', category: 'freshwater', habitat: 'Lakes, rivers, canals', size: '15-30cm', season: 'All year', description: 'Silver fish with red-orange fins. Very common in Irish stillwaters and canals. Often found in large shoals. Popular target for match anglers. Good introduction to coarse fishing.', emoji: '🐟', record: '1.18 kg' },
+  { id: 'rudd', name: 'Rudd', scientific: 'Scardinius erythrophthalmus', category: 'freshwater', habitat: 'Weedy lakes, canals', size: '15-30cm', season: 'May - Sep', description: 'Similar to roach but more golden with brighter red fins. Feeds closer to the surface. Found in weedy lakes and ponds. Eye positioned higher on head than roach.', emoji: '🐟', record: '1.56 kg' },
+  { id: 'tench', name: 'Tench', scientific: 'Tinca tinca', category: 'freshwater', habitat: 'Lakes, ponds', size: '30-50cm', season: 'May - Sep', description: 'Beautiful olive-green fish with small scales and a thick muscular body. Orange-red eyes. Associated with weedy warm-water lakes. Mucus-covered skin. Dawn and dusk feeder.', emoji: '🐟', record: '3.62 kg' },
+  { id: 'sea_trout', name: 'Sea Trout', scientific: 'Salmo trutta (sea-run)', category: 'freshwater', habitat: 'Rivers, estuaries', size: '30-60cm', season: 'May - Sep', description: 'Sea-run form of the brown trout. Migrates to the sea then returns to freshwater to spawn. Silver colouration from sea feeding. Excellent night-fishing quarry.', emoji: '🐟', record: '5.56 kg' },
+
+  // Shellfish
+  { id: 'brown_crab', name: 'Brown Crab', scientific: 'Cancer pagurus', category: 'shellfish', habitat: 'Rocky shores, subtidal', size: '15-25cm (width)', season: 'Apr - Nov', description: 'The "edible crab" — most commercially important crab in Ireland. Distinctive pie-crust edge on the shell. Reddish-brown colour. Found in rocky areas. Excellent eating.', emoji: '🦀', record: '7+ kg' },
+  { id: 'lobster', name: 'European Lobster', scientific: 'Homarus gammarus', category: 'shellfish', habitat: 'Rocky seabed, crevices', size: '25-50cm', season: 'May - Sep', description: 'Dark blue-black lobster found in rocky habitats all around Ireland. A premium seafood delicacy. Caught in baited pots. Can live for 60+ years.', emoji: '🦞', record: '5+ kg' },
+  { id: 'dublin_bay_prawn', name: 'Dublin Bay Prawn', scientific: 'Nephrops norvegicus', category: 'shellfish', habitat: 'Muddy seabed', size: '15-25cm', season: 'All year', description: 'Also known as langoustine or Norway lobster. Despite the name, found all around Ireland in muddy seabeds. Key Irish fishery species. Delicious when fresh.', emoji: '🦐', record: 'N/A' },
+  { id: 'velvet_crab', name: 'Velvet Swimming Crab', scientific: 'Necora puber', category: 'shellfish', habitat: 'Rocky shores', size: '6-10cm (width)', season: 'Apr - Oct', description: 'Aggressive little crab with bright red eyes and blue markings on its legs. Velvety texture on its shell. Common under rocks at low tide. Will pinch!', emoji: '🦀', record: 'N/A' },
+  { id: 'common_shrimp', name: 'Common Shrimp', scientific: 'Crangon crangon', category: 'shellfish', habitat: 'Sandy/muddy estuaries', size: '3-7cm', season: 'All year', description: 'Small translucent brown shrimp found in estuaries and shallow sandy areas. Can be caught with a push net. Important food source for larger fish.', emoji: '🦐', record: 'N/A' },
+  { id: 'native_oyster', name: 'Native Flat Oyster', scientific: 'Ostrea edulis', category: 'shellfish', habitat: 'Shallow bays, estuaries', size: '5-11cm', season: 'Sep - Apr', description: 'Ireland\'s native oyster with a flat, rounded shell. Famous from Galway Bay. Traditionally eaten raw with Guinness. Important aquaculture species. Protected in many areas.', emoji: '🦪', record: 'N/A' },
+  { id: 'blue_mussel', name: 'Blue Mussel', scientific: 'Mytilus edulis', category: 'shellfish', habitat: 'Rocky intertidal', size: '5-10cm', season: 'Sep - Apr', description: 'Dark blue-black bivalve found in dense clusters on rocks, piers, and harbour walls all around Ireland. Filter feeder. Important commercial and recreational species.', emoji: '🐚', record: 'N/A' },
+];
+
+let speciesCurrentCategory = 'all';
+let speciesSearchQuery = '';
+
+// Render the species gallery
+function renderSpeciesGallery() {
+  const grid = document.getElementById('species-gallery-grid');
+  if (!grid) return;
+
+  let filtered = IRISH_FISH_SPECIES;
+
+  // Filter by category
+  if (speciesCurrentCategory !== 'all') {
+    filtered = filtered.filter(s => s.category === speciesCurrentCategory);
+  }
+
+  // Filter by search
+  if (speciesSearchQuery) {
+    const q = speciesSearchQuery.toLowerCase();
+    filtered = filtered.filter(s =>
+      s.name.toLowerCase().includes(q) ||
+      s.scientific.toLowerCase().includes(q) ||
+      s.description.toLowerCase().includes(q) ||
+      s.habitat.toLowerCase().includes(q)
+    );
+  }
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column: 1/-1; text-align:center; padding: 40px;">
+      <div style="font-size:3rem; margin-bottom:16px;">🔍</div>
+      <p>No species found matching your search.</p>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(species => `
+    <div class="species-card" onclick="openSpeciesDetail('${species.id}')">
+      <div class="species-card-image" style="display:flex;align-items:center;justify-content:center;font-size:4rem;background:linear-gradient(135deg, ${getCategoryGradient(species.category)});">
+        ${species.emoji}
+      </div>
+      <div class="species-card-body">
+        <div class="species-card-name">${species.name}</div>
+        <div class="species-card-scientific">${species.scientific}</div>
+        <div class="species-card-tags">
+          <span class="species-tag ${species.category}">${species.category === 'sea' ? '🌊 Sea' : species.category === 'freshwater' ? '🏞️ Freshwater' : '🦀 Shellfish'}</span>
+          ${species.season !== 'All year' ? `<span class="species-tag sea" style="background:rgba(255,255,255,0.05);color:var(--text-muted);">📅 ${species.season}</span>` : ''}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function getCategoryGradient(category) {
+  switch (category) {
+    case 'sea': return 'rgba(0,136,255,0.15), rgba(0,212,255,0.05)';
+    case 'freshwater': return 'rgba(0,255,136,0.15), rgba(0,200,100,0.05)';
+    case 'shellfish': return 'rgba(255,171,0,0.15), rgba(255,120,0,0.05)';
+    default: return 'rgba(0,136,255,0.15), rgba(0,212,255,0.05)';
+  }
+}
+
+// Filter by category tab
+window.filterSpeciesByCategory = function (category, btn) {
+  speciesCurrentCategory = category;
+
+  // Update active tab
+  document.querySelectorAll('.species-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  renderSpeciesGallery();
+};
+
+// Filter by search input
+window.filterSpeciesGallery = function (query) {
+  speciesSearchQuery = query;
+  renderSpeciesGallery();
+};
+
+// Open species detail modal
+window.openSpeciesDetail = function (speciesId) {
+  const species = IRISH_FISH_SPECIES.find(s => s.id === speciesId);
+  if (!species) return;
+
+  // Remove existing modal if any
+  const existingModal = document.getElementById('species-detail-modal');
+  if (existingModal) existingModal.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'species-detail-modal';
+  modal.className = 'modal active';
+  modal.onclick = function (e) { if (e.target === modal) modal.remove(); };
+  modal.innerHTML = `
+    <div class="modal-content species-detail-modal-content">
+      <div class="species-detail-image" style="display:flex;align-items:center;justify-content:center;font-size:6rem;background:linear-gradient(135deg, ${getCategoryGradient(species.category)});">
+        ${species.emoji}
+      </div>
+      <div class="species-detail-body">
+        <h2>${species.name}</h2>
+        <p class="scientific-name">${species.scientific}</p>
+        <div class="species-info-grid">
+          <div class="species-info-item">
+            <span class="info-label">📏 Typical Size</span>
+            <span class="info-value">${species.size}</span>
+          </div>
+          <div class="species-info-item">
+            <span class="info-label">📅 Best Season</span>
+            <span class="info-value">${species.season}</span>
+          </div>
+          <div class="species-info-item">
+            <span class="info-label">🏠 Habitat</span>
+            <span class="info-value">${species.habitat}</span>
+          </div>
+          <div class="species-info-item">
+            <span class="info-label">🏷️ Category</span>
+            <span class="info-value">${species.category === 'sea' ? '🌊 Sea Fish' : species.category === 'freshwater' ? '🏞️ Freshwater' : '🦀 Shellfish'}</span>
+          </div>
+          ${species.record ? `<div class="species-info-item" style="grid-column:1/-1;">
+            <span class="info-label">🏆 Irish Record</span>
+            <span class="info-value">${species.record}</span>
+          </div>` : ''}
+        </div>
+        <p class="species-description">${species.description}</p>
+        <div class="modal-actions" style="margin-top:20px;">
+          <button class="btn btn-outline" onclick="document.getElementById('species-detail-modal').remove()">Close</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+};
+
+// ============================================
+// Species Guide - Photo Upload & AI
+// ============================================
+
+// Open camera on mobile
+window.openSpeciesCamera = function () {
+  document.getElementById('species-camera-input').click();
+};
+
+// Handle photo upload/capture
+window.handleSpeciesPhotoUpload = function (input) {
+  if (!input.files || !input.files[0]) return;
+
+  const file = input.files[0];
+  const reader = new FileReader();
+
+  reader.onload = function (e) {
+    const preview = document.getElementById('species-preview');
+    const previewImg = document.getElementById('species-preview-img');
+    const uploadContent = document.getElementById('species-upload-content');
+
+    previewImg.src = e.target.result;
+    preview.style.display = 'block';
+    uploadContent.style.display = 'none';
+
+    // Auto-trigger AI identification
+    identifyFishSpecies(e.target.result);
+  };
+
+  reader.readAsDataURL(file);
+};
+
+// Clear photo and reset
+window.clearSpeciesPhoto = function () {
+  document.getElementById('species-preview').style.display = 'none';
+  document.getElementById('species-upload-content').style.display = 'flex';
+  document.getElementById('species-preview-img').src = '';
+  document.getElementById('species-ai-loading').style.display = 'none';
+  document.getElementById('species-ai-result').style.display = 'none';
+  document.getElementById('species-ai-error').style.display = 'none';
+
+  // Reset file inputs
+  document.getElementById('species-photo-input').value = '';
+  document.getElementById('species-camera-input').value = '';
+};
+
+// AI Fish Identification
+async function identifyFishSpecies(imageDataUrl) {
+  const loadingEl = document.getElementById('species-ai-loading');
+  const resultEl = document.getElementById('species-ai-result');
+  const errorEl = document.getElementById('species-ai-error');
+
+  loadingEl.style.display = 'flex';
+  resultEl.style.display = 'none';
+  errorEl.style.display = 'none';
+
+  try {
+    // Try server-side Gemini API first
+    const response = await fetch('/api/identify-fish', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: imageDataUrl })
+    });
+
+    if (!response.ok) throw new Error('API request failed');
+
+    const data = await response.json();
+
+    if (data.error) throw new Error(data.error);
+
+    // Display result
+    loadingEl.style.display = 'none';
+    resultEl.style.display = 'block';
+
+    document.getElementById('species-result-name').textContent = data.name || 'Unknown Species';
+    document.getElementById('species-result-scientific').textContent = data.scientific || '';
+
+    // Confidence
+    const confidenceEl = document.getElementById('species-result-confidence');
+    if (data.confidence) {
+      const pct = Math.round(data.confidence * 100);
+      confidenceEl.innerHTML = `
+        <span style="font-size:0.85rem;color:var(--text-secondary);">Confidence: <strong style="color:var(--accent-success);">${pct}%</strong></span>
+        <div class="confidence-bar">
+          <div class="confidence-fill" style="width:${pct}%"></div>
+        </div>
+      `;
+    } else {
+      confidenceEl.innerHTML = '';
+    }
+
+    // Details
+    const detailsEl = document.getElementById('species-result-details');
+    detailsEl.innerHTML = '';
+    if (data.habitat) detailsEl.innerHTML += `<div class="species-detail-item"><div class="detail-label">🏠 Habitat</div><div class="detail-value">${data.habitat}</div></div>`;
+    if (data.size) detailsEl.innerHTML += `<div class="species-detail-item"><div class="detail-label">📏 Size</div><div class="detail-value">${data.size}</div></div>`;
+    if (data.description) detailsEl.innerHTML += `<div class="species-detail-item" style="grid-column:1/-1;"><div class="detail-label">📝 About</div><div class="detail-value">${data.description}</div></div>`;
+    if (data.edible !== undefined) detailsEl.innerHTML += `<div class="species-detail-item"><div class="detail-label">🍽️ Edible</div><div class="detail-value">${data.edible ? 'Yes' : 'No'}</div></div>`;
+    if (data.conservation) detailsEl.innerHTML += `<div class="species-detail-item"><div class="detail-label">🛡️ Conservation</div><div class="detail-value">${data.conservation}</div></div>`;
+
+  } catch (err) {
+    console.warn('AI identification failed, using local matching:', err.message);
+
+    // Fallback: try to match against our local species data
+    loadingEl.style.display = 'none';
+
+    // Show a helpful error message with suggestion
+    errorEl.style.display = 'block';
+    document.getElementById('species-error-message').textContent =
+      'AI identification is not available right now. A Gemini API key needs to be configured in the server. Browse the species gallery below to identify your catch manually!';
+  }
+}
+
+// Drag and drop support
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    const dropZone = document.getElementById('species-upload-zone');
+    if (!dropZone) return;
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        const input = document.getElementById('species-photo-input');
+        input.files = e.dataTransfer.files;
+        handleSpeciesPhotoUpload(input);
+      }
+    });
+  }, 1000);
+});
+
+// Integrate with showPage
+(function patchShowPageForSpecies() {
+  const origShowPage = window.showPage;
+  window.showPage = function (pageId) {
+    origShowPage(pageId);
+    if (pageId === 'species') {
+      renderSpeciesGallery();
+    }
+  };
+})();
+

@@ -56,6 +56,7 @@
         <a href="#" class="nav-link" id="nav-community" onclick="showPage('community')">Community</a>
         <a href="#" class="nav-link" id="nav-sponsors" onclick="showPage('sponsors')">Sponsors</a>
         <a href="#" class="nav-link" id="nav-directory" onclick="showPage('directory')">Shop Directory</a>
+        <a href="#" class="nav-link" id="nav-species" onclick="showPage('species')">Species Guide</a>
         <a href="#" class="nav-link admin-only" id="nav-admin" onclick="showPage('admin')" style="display: none;">🛡️
           Admin</a>
       </div>
@@ -102,6 +103,7 @@
       <a href="#" class="mobile-menu-link" onclick="showPage('community'); closeMobileMenu()">Community</a>
       <a href="#" class="mobile-menu-link" onclick="showPage('sponsors'); closeMobileMenu()">Sponsors</a>
       <a href="#" class="mobile-menu-link" onclick="showPage('directory'); closeMobileMenu()">Shop Directory</a>
+      <a href="#" class="mobile-menu-link" onclick="showPage('species'); closeMobileMenu()">🐟 Species Guide</a>
       <a href="#" class="mobile-menu-link admin-only" id="mobile-nav-admin"
         onclick="showPage('admin'); closeMobileMenu()" style="display: none;">🛡️ Admin</a>
       <a href="#" class="mobile-menu-link" onclick="openSupportChoiceModal(); closeMobileMenu()">💬 Contact Support</a>
@@ -424,6 +426,97 @@
         <div class="loading">
           <div class="loading-spinner"></div>
           <span>Loading national directory...</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Species Guide Page -->
+  <main class="page" id="page-species" style="display: none;">
+    <div class="species-container">
+      <div class="species-hero">
+        <h1>🐟 Species Guide</h1>
+        <p>Identify fish with AI or browse common Irish species</p>
+      </div>
+
+      <!-- AI Fish Identifier Section -->
+      <div class="species-identifier-section">
+        <div class="card species-identifier-card">
+          <div class="card-header">
+            <span class="card-title">📸 AI Fish Identifier</span>
+          </div>
+          <div class="species-identifier-body">
+            <div class="species-upload-zone" id="species-upload-zone">
+              <div class="species-upload-content" id="species-upload-content">
+                <div class="species-upload-icon">📷</div>
+                <h3>Take or Upload a Photo</h3>
+                <p>Snap a photo of your catch or upload an image to identify the species</p>
+                <div class="species-upload-buttons">
+                  <label class="btn btn-primary species-upload-btn" for="species-photo-input">
+                    📁 Upload Photo
+                  </label>
+                  <button class="btn btn-outline species-camera-btn" onclick="openSpeciesCamera()">
+                    📸 Take Photo
+                  </button>
+                </div>
+                <input type="file" id="species-photo-input" accept="image/*" style="display: none;"
+                  onchange="handleSpeciesPhotoUpload(this)">
+                <input type="file" id="species-camera-input" accept="image/*" capture="environment"
+                  style="display: none;" onchange="handleSpeciesPhotoUpload(this)">
+              </div>
+              <!-- Image Preview -->
+              <div class="species-preview" id="species-preview" style="display: none;">
+                <img id="species-preview-img" src="" alt="Fish photo">
+                <button class="species-preview-remove" onclick="clearSpeciesPhoto()">✕</button>
+              </div>
+            </div>
+
+            <!-- AI Identification Loading -->
+            <div class="species-ai-loading" id="species-ai-loading" style="display: none;">
+              <div class="loading-spinner"></div>
+              <p>Analyzing your photo with AI...</p>
+            </div>
+
+            <!-- AI Result Card -->
+            <div class="species-ai-result" id="species-ai-result" style="display: none;">
+              <div class="species-result-header">
+                <span class="species-result-badge">🤖 AI Identification</span>
+                <button class="btn btn-sm btn-outline" onclick="clearSpeciesPhoto()">Try Another</button>
+              </div>
+              <div class="species-result-body">
+                <h2 id="species-result-name">Unknown Species</h2>
+                <p class="species-result-scientific" id="species-result-scientific"></p>
+                <div class="species-result-confidence" id="species-result-confidence"></div>
+                <div class="species-result-details" id="species-result-details"></div>
+              </div>
+            </div>
+
+            <!-- AI Error -->
+            <div class="species-ai-error" id="species-ai-error" style="display: none;">
+              <p>⚠️ <span id="species-error-message">Could not identify the fish. Please try a clearer photo.</span></p>
+              <button class="btn btn-sm btn-outline" onclick="clearSpeciesPhoto()">Try Again</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Species Gallery Section -->
+      <div class="species-gallery-section">
+        <div class="species-gallery-header">
+          <h2>🇮🇪 Irish Fish Species</h2>
+          <div class="species-search-wrapper">
+            <input type="text" id="species-search" class="species-search-input" placeholder="Search species..."
+              oninput="filterSpeciesGallery(this.value)">
+          </div>
+          <div class="species-filter-tabs" id="species-filter-tabs">
+            <button class="species-tab active" onclick="filterSpeciesByCategory('all', this)">All</button>
+            <button class="species-tab" onclick="filterSpeciesByCategory('sea', this)">🌊 Sea Fish</button>
+            <button class="species-tab" onclick="filterSpeciesByCategory('freshwater', this)">🏞️ Freshwater</button>
+            <button class="species-tab" onclick="filterSpeciesByCategory('shellfish', this)">🦀 Shellfish</button>
+          </div>
+        </div>
+        <div class="species-gallery-grid" id="species-gallery-grid">
+          <!-- Populated by JS -->
         </div>
       </div>
     </div>
@@ -752,6 +845,103 @@
       </div>
     </div>
   </div>
+
+  <!-- Species Guide Page -->
+  <main class="page" id="page-species" style="display: none;">
+    <div class="species-container">
+      <div class="species-hero">
+        <h1>🐟 Species Guide</h1>
+        <p>Identify fish species with AI or browse Ireland's marine & freshwater life</p>
+      </div>
+
+      <!-- AI Fish Identifier -->
+      <div class="species-identifier-section">
+        <div class="species-identifier-card">
+          <div class="admin-card-header">
+            <h3>🤖 AI Fish Identifier</h3>
+            <span class="badge" style="background:rgba(0,255,136,0.15);color:var(--accent-success);">AI Powered</span>
+          </div>
+          <div class="species-identifier-body">
+            <div class="species-upload-zone" id="species-upload-zone">
+              <!-- Upload content (default) -->
+              <div class="species-upload-content" id="species-upload-content">
+                <div class="species-upload-icon">📸</div>
+                <h3>Upload or Take a Photo</h3>
+                <p>Our AI will identify the fish species from your photo</p>
+                <div class="species-upload-buttons">
+                  <label class="btn btn-primary species-upload-btn">
+                    📁 Upload Photo
+                    <input type="file" accept="image/*" id="species-photo-input"
+                      onchange="handleSpeciesPhotoUpload(this)" style="display:none;">
+                  </label>
+                  <button class="btn btn-outline species-camera-btn" onclick="openSpeciesCamera()">
+                    📷 Take Photo
+                  </button>
+                  <input type="file" accept="image/*" capture="environment" id="species-camera-input"
+                    onchange="handleSpeciesPhotoUpload(this)" style="display:none;">
+                </div>
+                <p style="font-size:0.8rem;color:var(--text-muted);margin-top:8px;">
+                  Supports JPG, PNG • Drag & drop also works
+                </p>
+              </div>
+
+              <!-- Photo preview (hidden initially) -->
+              <div class="species-preview" id="species-preview" style="display:none;">
+                <img id="species-preview-img" src="" alt="Fish photo">
+                <button class="species-preview-remove" onclick="clearSpeciesPhoto()">✕</button>
+              </div>
+            </div>
+
+            <!-- AI Loading -->
+            <div class="species-ai-loading" id="species-ai-loading" style="display:none;">
+              <div class="loading-spinner"></div>
+              <p>Analysing your photo with AI...</p>
+              <p style="font-size:0.8rem;color:var(--text-muted);">This may take a few seconds</p>
+            </div>
+
+            <!-- AI Result -->
+            <div class="species-ai-result" id="species-ai-result" style="display:none;">
+              <div class="species-result-header">
+                <span class="species-result-badge">🤖 AI Identified</span>
+              </div>
+              <div class="species-result-body">
+                <h2 id="species-result-name">Unknown Species</h2>
+                <p class="species-result-scientific" id="species-result-scientific"></p>
+                <div class="species-result-confidence" id="species-result-confidence"></div>
+                <div class="species-result-details" id="species-result-details"></div>
+              </div>
+            </div>
+
+            <!-- AI Error -->
+            <div class="species-ai-error" id="species-ai-error" style="display:none;">
+              <div style="font-size:2rem;margin-bottom:8px;">⚠️</div>
+              <p id="species-error-message">AI identification is not available right now.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Species Gallery -->
+      <div class="species-gallery-section">
+        <div class="species-gallery-header">
+          <h2>📚 Irish Species Gallery</h2>
+          <div class="species-search-wrapper">
+            <input type="text" class="species-search-input" placeholder="🔍 Search species by name, habitat..."
+              oninput="filterSpeciesGallery(this.value)">
+          </div>
+          <div class="species-filter-tabs">
+            <button class="species-tab active" onclick="filterSpeciesByCategory('all', this)">All</button>
+            <button class="species-tab" onclick="filterSpeciesByCategory('sea', this)">🌊 Sea Fish</button>
+            <button class="species-tab" onclick="filterSpeciesByCategory('freshwater', this)">🏞️ Freshwater</button>
+            <button class="species-tab" onclick="filterSpeciesByCategory('shellfish', this)">🦀 Shellfish</button>
+          </div>
+        </div>
+        <div class="species-gallery-grid" id="species-gallery-grid">
+          <!-- Cards will be rendered by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </main>
 
   <!-- Admin Dashboard Page -->
   <main class="page" id="page-admin" style="display: none;">

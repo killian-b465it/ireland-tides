@@ -103,5 +103,96 @@ app.post('/send-broadcast-email', async (req, res) => {
     }
 });
 
+// ============================================
+// AI Fish Identification via Google Gemini
+// ============================================
+app.post('/api/identify-fish', async (req, res) => {
+    try {
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            return res.status(503).json({ error: 'Gemini API key not configured. Add GEMINI_API_KEY to your .env file.' });
+        }
+
+        const { image } = req.body;
+        if (!image) {
+            return res.status(400).json({ error: 'No image provided' });
+        }
+
+        // Extract base64 data from data URL
+        const base64Match = image.match(/^data:image\/(\w+);base64,(.+)$/);
+        if (!base64Match) {
+            return res.status(400).json({ error: 'Invalid image format. Expected base64 data URL.' });
+        }
+
+        const mimeType = `image/${base64Match[1]}`;
+        const base64Data = base64Match[2];
+
+        // Call Gemini Vision API
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+        const geminiResponse = await fetch(geminiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [
+                        {
+                            text: `You are an expert marine biologist specialising in Irish and European fish species. Analyse this image and identify the fish or marine species shown.
+
+Respond ONLY with valid JSON in this exact format (no markdown, no code blocks):
+{
+  "name": "Common name of the species",
+  "scientific": "Scientific/Latin name",
+  "confidence": 0.85,
+  "habitat": "Where this species is typically found",
+  "size": "Typical size range",
+  "description": "Brief 1-2 sentence description",
+  "edible": true,
+  "conservation": "Conservation status if notable"
+}
+
+If you cannot identify a fish in the image, respond with:
+{"name": "Unknown", "scientific": "", "confidence": 0.0, "description": "Could not identify a fish species in this image. Please try a clearer photo showing the full fish."}`
+                        },
+                        {
+                            inlineData: {
+                                mimeType: mimeType,
+                                data: base64Data
+                            }
+                        }
+                    ]
+                }]
+            })
+        });
+
+        if (!geminiResponse.ok) {
+            const errorText = await geminiResponse.text();
+            console.error('Gemini API error:', errorText);
+            return res.status(502).json({ error: 'AI service temporarily unavailable' });
+        }
+
+        const geminiData = await geminiResponse.json();
+
+        // Extract the text response
+        const textContent = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!textContent) {
+            return res.status(502).json({ error: 'No response from AI service' });
+        }
+
+        // Parse the JSON response (handle markdown code blocks if present)
+        let cleanJson = textContent.trim();
+        if (cleanJson.startsWith('```')) {
+            cleanJson = cleanJson.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
+        }
+
+        const result = JSON.parse(cleanJson);
+        res.json(result);
+
+    } catch (error) {
+        console.error('Fish identification error:', error);
+        res.status(500).json({ error: 'Failed to identify fish species' });
+    }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Secure Stripe server running on port ${PORT}`));
