@@ -5830,6 +5830,23 @@ window.clearSpeciesPhoto = function () {
 // AI Fish Identification - Direct Gemini API call
 const GEMINI_API_KEY = 'AIzaSyC8vhaKltOYtxgVK7Ovr92cseO9EuFvz3A';
 
+// Compress image before sending to API
+function compressImage(dataUrl, maxWidth = 1024) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', 0.7));
+    };
+    img.src = dataUrl;
+  });
+}
+
 async function identifyFishSpecies(imageDataUrl) {
   const loadingEl = document.getElementById('species-ai-loading');
   const resultEl = document.getElementById('species-ai-result');
@@ -5840,12 +5857,17 @@ async function identifyFishSpecies(imageDataUrl) {
   errorEl.style.display = 'none';
 
   try {
+    // Compress image to reduce size
+    const compressedImage = await compressImage(imageDataUrl);
+
     // Extract base64 data from data URL
-    const base64Match = imageDataUrl.match(/^data:image\/(\w+);base64,(.+)$/);
+    const base64Match = compressedImage.match(/^data:image\/([\w+]+);base64,(.+)$/);
     if (!base64Match) throw new Error('Invalid image format');
 
     const mimeType = `image/${base64Match[1]}`;
     const base64Data = base64Match[2];
+
+    console.log('Sending image to Gemini API, size:', Math.round(base64Data.length / 1024), 'KB');
 
     // Call Gemini Vision API directly
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
@@ -5857,9 +5879,9 @@ async function identifyFishSpecies(imageDataUrl) {
         contents: [{
           parts: [
             {
-              text: `You are an expert marine biologist specialising in Irish and European fish species. Analyse this image and identify the fish or marine species shown.
+              text: `You are an expert marine biologist and fish identification specialist. Analyse this image and identify any fish or marine species shown. It could be any species from anywhere in the world, but pay special attention to Irish and European species.
 
-Respond ONLY with valid JSON in this exact format (no markdown, no code blocks):
+Respond ONLY with valid JSON in this exact format (no markdown, no code blocks, no extra text):
 {
   "name": "Common name of the species",
   "scientific": "Scientific/Latin name",
@@ -5871,8 +5893,7 @@ Respond ONLY with valid JSON in this exact format (no markdown, no code blocks):
   "conservation": "Conservation status if notable"
 }
 
-If you cannot identify a fish in the image, respond with:
-{"name": "Unknown", "scientific": "", "confidence": 0.0, "description": "Could not identify a fish species in this image. Please try a clearer photo showing the full fish."}`
+If you cannot identify a fish in the image, still try your best guess and give a lower confidence score.`
             },
             {
               inlineData: {
@@ -5885,9 +5906,15 @@ If you cannot identify a fish in the image, respond with:
       })
     });
 
-    if (!response.ok) throw new Error('Gemini API request failed');
+    if (!response.ok) {
+      const errBody = await response.text();
+      console.error('Gemini API error:', response.status, errBody);
+      throw new Error(`API error ${response.status}`);
+    }
 
     const geminiData = await response.json();
+    console.log('Gemini response:', geminiData);
+
     const textContent = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!textContent) throw new Error('No response from AI');
 
