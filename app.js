@@ -3762,6 +3762,17 @@ window.acceptLegal = () => {
       overlay.classList.add('hidden');
       document.body.style.overflow = ''; // Restore scrolling
     }
+
+    // Trigger Walkthrough right after legal acceptance (First visit only)
+    setTimeout(() => {
+      const hasSeenWalkthrough = localStorage.getItem('hasSeenWalkthrough');
+      if (!hasSeenWalkthrough) {
+        if (confirm("Welcome to the Irish Fishing Hub! 🎣\nWould you like a quick 5-step tour to see how everything works?")) {
+          startWalkthrough();
+        }
+        localStorage.setItem('hasSeenWalkthrough', 'true');
+      }
+    }, 500);
   }
 };
 
