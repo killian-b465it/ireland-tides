@@ -6032,33 +6032,32 @@ function startWalkthrough() {
         intro: "Let's take a quick tour of the app to help you catch more fish."
       },
       {
-        element: document.querySelector('.fishing-mode-toggle-wrapper'),
+        element: document.documentElement.clientWidth <= 768 ? null : document.querySelector('.fishing-mode-toggle-wrapper'),
         title: "Sea vs Freshwater 🌊🏞️",
         intro: "Toggle between coastal seawater tides or inland lakes. The map will instantly update to show relevant fishing spots.",
         position: "bottom"
       },
       {
-        // NO ELEMENT = Floating in the center of the screen
         title: "Interactive Map 🗺️",
         intro: "You can click any pin on the map behind this tour to see real-time tides, weather, and fishing conditions for that exact location.",
       },
       {
-        element: document.getElementById('filter-toggle-btn'),
+        element: document.documentElement.clientWidth <= 768 ? null : document.getElementById('filter-toggle-btn'),
         title: "Map Layers 🗺️",
         intro: "Looking for a tackle shop or a boat ramp? Use these filters to turn different types of locations on or off.",
-        position: "auto"
+        position: "bottom"
       },
       {
-        element: document.documentElement.clientWidth <= 768 ? document.querySelector('.bottom-nav-item[onclick*="community"]') : document.getElementById('nav-community'),
+        element: document.documentElement.clientWidth <= 768 ? null : document.getElementById('nav-community'),
         title: "Community Feed 👥",
         intro: "Check out the Community tab to see what other Irish anglers are catching right now, or share your own catches!",
-        position: "auto"
+        position: "top"
       },
       {
-        element: document.documentElement.clientWidth <= 768 ? document.querySelector('.bottom-nav-item[onclick*="species"]') : document.getElementById('nav-species'),
+        element: document.documentElement.clientWidth <= 768 ? null : document.getElementById('nav-species'),
         title: "AI Fish Identifier 🤖🐟",
         intro: "Not sure what you caught? Upload a photo in the Species Guide and our AI will identify the fish for you instantly. Tight lines!",
-        position: "auto"
+        position: "top"
       }
     ]
   });
