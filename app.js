@@ -6024,6 +6024,7 @@ function startWalkthrough() {
     doneLabel: 'Done',
     tooltipPosition: 'auto',
     scrollToElement: true,
+    disableInteraction: true, // Prevents map/buttons from stealing focus
     scrollPadding: headerHeight + 20, // offset for fixed navbar
     steps: [
       {

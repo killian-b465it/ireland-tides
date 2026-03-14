@@ -5227,6 +5227,7 @@ input:checked+.toggle-slider:before {
         font-size: 0.9rem;
     }
 }
+
 /* Intro.js Custom Dark Theme for Irish Fishing Hub */
 .introjs-tooltip {
     background-color: var(--bg-card);
@@ -5236,16 +5237,19 @@ input:checked+.toggle-slider:before {
     color: var(--text-main);
     font-family: 'Inter', sans-serif;
 }
+
 .introjs-tooltiptext {
     font-size: 1rem;
     line-height: 1.5;
     padding: 20px;
 }
+
 .introjs-tooltipbuttons {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     padding: 10px 20px;
     background-color: rgba(0, 0, 0, 0.2);
 }
+
 .introjs-button {
     text-shadow: none;
     background: transparent;
@@ -5257,54 +5261,94 @@ input:checked+.toggle-slider:before {
     font-weight: 500;
     transition: all 0.2s ease;
 }
+
 .introjs-button:hover {
-    background-color: rgba(255,255,255,0.1);
+    background-color: rgba(255, 255, 255, 0.1);
     border-color: var(--text-main);
 }
-.introjs-nextbutton, .introjs-donebutton {
+
+.introjs-nextbutton,
+.introjs-donebutton {
     background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
     border: none;
     color: #000;
     font-weight: 700;
 }
-.introjs-nextbutton:hover, .introjs-donebutton:hover {
+
+.introjs-nextbutton:hover,
+.introjs-donebutton:hover {
     background: linear-gradient(135deg, #2deeef, #2aa0ff);
     color: #000;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
 }
+
 .introjs-disabled {
     opacity: 0.5;
     pointer-events: none;
 }
+
 .introjs-bullets ul li a {
-    background: rgba(255,255,255,0.3);
+    background: rgba(255, 255, 255, 0.3);
 }
+
 .introjs-bullets ul li a.active {
     background: var(--accent-primary);
 }
+
 .introjs-helperLayer {
     background: rgba(0, 212, 255, 0.1);
     border: 1px dashed var(--accent-primary);
     border-radius: 4px;
 }
-.introjs-arrow.top { border-bottom-color: var(--bg-card); }
-.introjs-arrow.bottom { border-top-color: var(--bg-card); }
-.introjs-arrow.left { border-right-color: var(--bg-card); }
-.introjs-arrow.right { border-left-color: var(--bg-card); }
+
+.introjs-arrow.top {
+    border-bottom-color: var(--bg-card);
+}
+
+.introjs-arrow.bottom {
+    border-top-color: var(--bg-card);
+}
+
+.introjs-arrow.left {
+    border-right-color: var(--bg-card);
+}
+
+.introjs-arrow.right {
+    border-left-color: var(--bg-card);
+}
 
 
-/* Fix Intro.js Tooltip Text Color */
-.introjs-tooltip * {
+/* Fix Intro.js Tooltip Text Color & Z-Index issues */
+.introjs-tooltip {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-glass) !important;
     color: var(--text-main) !important;
 }
+
 .introjs-tooltiptext {
     color: var(--text-main) !important;
 }
+
 .introjs-tooltipbuttons .introjs-button {
     color: var(--text-main) !important;
-}
-.introjs-nextbutton, .introjs-donebutton {
-    color: #000 !important;
+    text-shadow: none !important;
 }
 
+.introjs-nextbutton,
+.introjs-donebutton {
+    color: #000 !important;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)) !important;
+    text-shadow: none !important;
+}
+
+/* Ensure Leaflet map controls don't overlap the walkthrough */
+.introjs-showElement,
+.introjs-showElement * {
+    z-index: 9999999 !important;
+}
+
+/* Fix map getting stuck (Leaflet panning constraint during IntroJS) */
+.introjs-helperLayer {
+    background-color: rgba(21, 34, 56, 0.4) !important;
+}
