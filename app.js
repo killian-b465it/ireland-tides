@@ -5827,7 +5827,9 @@ window.clearSpeciesPhoto = function () {
   document.getElementById('species-camera-input').value = '';
 };
 
-// AI Fish Identification
+// AI Fish Identification - Direct Gemini API call
+const GEMINI_API_KEY = 'AIzaSyC8vhaKltOYtxgVK7Ovr92cseO9EuFvz3A';
+
 async function identifyFishSpecies(imageDataUrl) {
   const loadingEl = document.getElementById('species-ai-loading');
   const resultEl = document.getElementById('species-ai-result');
@@ -5838,18 +5840,64 @@ async function identifyFishSpecies(imageDataUrl) {
   errorEl.style.display = 'none';
 
   try {
-    // Try server-side Gemini API first
-    const response = await fetch('/api/identify-fish', {
+    // Extract base64 data from data URL
+    const base64Match = imageDataUrl.match(/^data:image\/(\w+);base64,(.+)$/);
+    if (!base64Match) throw new Error('Invalid image format');
+
+    const mimeType = `image/${base64Match[1]}`;
+    const base64Data = base64Match[2];
+
+    // Call Gemini Vision API directly
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+    const response = await fetch(geminiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image: imageDataUrl })
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            {
+              text: `You are an expert marine biologist specialising in Irish and European fish species. Analyse this image and identify the fish or marine species shown.
+
+Respond ONLY with valid JSON in this exact format (no markdown, no code blocks):
+{
+  "name": "Common name of the species",
+  "scientific": "Scientific/Latin name",
+  "confidence": 0.85,
+  "habitat": "Where this species is typically found",
+  "size": "Typical size range",
+  "description": "Brief 1-2 sentence description",
+  "edible": true,
+  "conservation": "Conservation status if notable"
+}
+
+If you cannot identify a fish in the image, respond with:
+{"name": "Unknown", "scientific": "", "confidence": 0.0, "description": "Could not identify a fish species in this image. Please try a clearer photo showing the full fish."}`
+            },
+            {
+              inlineData: {
+                mimeType: mimeType,
+                data: base64Data
+              }
+            }
+          ]
+        }]
+      })
     });
 
-    if (!response.ok) throw new Error('API request failed');
+    if (!response.ok) throw new Error('Gemini API request failed');
 
-    const data = await response.json();
+    const geminiData = await response.json();
+    const textContent = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!textContent) throw new Error('No response from AI');
 
-    if (data.error) throw new Error(data.error);
+    // Parse JSON (handle markdown code blocks if present)
+    let cleanJson = textContent.trim();
+    if (cleanJson.startsWith('```')) {
+      cleanJson = cleanJson.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
+    }
+
+    const data = JSON.parse(cleanJson);
 
     // Display result
     loadingEl.style.display = 'none';
@@ -5882,15 +5930,11 @@ async function identifyFishSpecies(imageDataUrl) {
     if (data.conservation) detailsEl.innerHTML += `<div class="species-detail-item"><div class="detail-label">🛡️ Conservation</div><div class="detail-value">${data.conservation}</div></div>`;
 
   } catch (err) {
-    console.warn('AI identification failed, using local matching:', err.message);
-
-    // Fallback: try to match against our local species data
+    console.warn('AI identification failed:', err.message);
     loadingEl.style.display = 'none';
-
-    // Show a helpful error message with suggestion
     errorEl.style.display = 'block';
     document.getElementById('species-error-message').textContent =
-      'AI identification is not available right now. A Gemini API key needs to be configured in the server. Browse the species gallery below to identify your catch manually!';
+      'AI identification encountered an error. Please try again with a clearer photo of the fish.';
   }
 }
 
