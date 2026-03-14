@@ -5909,7 +5909,7 @@ async function identifyFishSpecies(imageDataUrl) {
     loadingEl.style.display = 'none';
     errorEl.style.display = 'block';
     document.getElementById('species-error-message').textContent =
-      'AI identification encountered an error. Please try again in a moment.';
+      'Error: ' + err.message;
   }
 }
 
