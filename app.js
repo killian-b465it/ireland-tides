@@ -5827,8 +5827,7 @@ window.clearSpeciesPhoto = function () {
   document.getElementById('species-camera-input').value = '';
 };
 
-// AI Fish Identification - Direct Gemini API call
-const GEMINI_API_KEY = 'AIzaSyBd4swH-drkxFKcUXaaHqjSPDj-75onTqY';
+// AI Fish Identification - via Vercel serverless function
 
 // Compress image before sending to API
 function compressImage(dataUrl, maxWidth = 1024) {
@@ -5857,105 +5856,23 @@ async function identifyFishSpecies(imageDataUrl) {
   errorEl.style.display = 'none';
 
   try {
-    // Compress image to reduce size
+    // Compress image first
     const compressedImage = await compressImage(imageDataUrl);
 
-    // Extract base64 data from data URL
-    const base64Match = compressedImage.match(/^data:image\/([\w+]+);base64,(.+)$/);
-    if (!base64Match) throw new Error('Invalid image format');
-
-    const mimeType = `image/${base64Match[1]}`;
-    const base64Data = base64Match[2];
-
-    console.log('Sending image to Gemini API, size:', Math.round(base64Data.length / 1024), 'KB');
-
-    // Call Gemini Vision API directly
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
-
-    const response = await fetch(geminiUrl, {
+    // Call our Vercel serverless function (API key is stored server-side)
+    const response = await fetch('/api/identify-fish', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          parts: [
-            {
-              text: `You are an expert marine biologist and fish identification specialist. Analyse this image and identify any fish or marine species shown. It could be any species from anywhere in the world, but pay special attention to Irish and European species.
-
-Respond ONLY with valid JSON in this exact format (no markdown, no code blocks, no extra text):
-{
-  "name": "Common name of the species",
-  "scientific": "Scientific/Latin name",
-  "confidence": 0.85,
-  "habitat": "Where this species is typically found",
-  "size": "Typical size range",
-  "description": "Brief 1-2 sentence description",
-  "edible": true,
-  "conservation": "Conservation status if notable"
-}
-
-If you cannot identify a fish in the image, still try your best guess and give a lower confidence score.`
-            },
-            {
-              inlineData: {
-                mimeType: mimeType,
-                data: base64Data
-              }
-            }
-          ]
-        }]
-      })
+      body: JSON.stringify({ image: compressedImage })
     });
 
     if (!response.ok) {
-      const errBody = await response.text();
-      console.error('Gemini API error:', response.status, errBody);
-      if (response.status === 429) {
-        // Rate limited - retry after delay
-        console.log('Rate limited, retrying in 3 seconds...');
-        await new Promise(r => setTimeout(r, 3000));
-        const retry = await fetch(geminiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{
-              parts: [
-                { text: `Identify the fish species in this image. Respond ONLY with JSON: {"name":"Common name","scientific":"Latin name","confidence":0.85,"habitat":"Where found","size":"Size range","description":"Brief description","edible":true,"conservation":"Status"}` },
-                { inlineData: { mimeType: mimeType, data: base64Data } }
-              ]
-            }]
-          })
-        });
-        if (!retry.ok) throw new Error('rate_limit');
-        const retryData = await retry.json();
-        const retryText = retryData.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (!retryText) throw new Error('No response from AI');
-        let retryJson = retryText.trim();
-        if (retryJson.startsWith('```')) retryJson = retryJson.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
-        const retryResult = JSON.parse(retryJson);
-        loadingEl.style.display = 'none';
-        resultEl.style.display = 'block';
-        document.getElementById('species-result-name').textContent = retryResult.name || 'Unknown Species';
-        document.getElementById('species-result-scientific').textContent = retryResult.scientific || '';
-        document.getElementById('species-result-confidence').innerHTML = '';
-        document.getElementById('species-result-details').innerHTML = retryResult.description ? `<div class="species-detail-item" style="grid-column:1/-1;"><div class="detail-label">📝 About</div><div class="detail-value">${retryResult.description}</div></div>` : '';
-        return;
-      }
-      throw new Error(`API error ${response.status}`);
+      const errData = await response.json().catch(() => ({}));
+      console.error('API error:', response.status, errData);
+      throw new Error(errData.error || `Server error ${response.status}`);
     }
 
-    const geminiData = await response.json();
-    console.log('Gemini response:', geminiData);
-
-    const textContent = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!textContent) throw new Error('No response from AI');
-
-    // Parse JSON (handle markdown code blocks if present)
-    let cleanJson = textContent.trim();
-    if (cleanJson.startsWith('```')) {
-      cleanJson = cleanJson.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
-    }
-
-    const data = JSON.parse(cleanJson);
+    const data = await response.json();
 
     // Display result
     loadingEl.style.display = 'none';
@@ -5991,13 +5908,8 @@ If you cannot identify a fish in the image, still try your best guess and give a
     console.warn('AI identification failed:', err.message);
     loadingEl.style.display = 'none';
     errorEl.style.display = 'block';
-    if (err.message === 'rate_limit') {
-      document.getElementById('species-error-message').textContent =
-        'AI is busy right now — too many requests. Please wait 30 seconds and try again!';
-    } else {
-      document.getElementById('species-error-message').textContent =
-        'AI identification encountered an error (' + err.message + '). Please wait a moment and try again.';
-    }
+    document.getElementById('species-error-message').textContent =
+      'AI identification encountered an error. Please try again in a moment.';
   }
 }
 
