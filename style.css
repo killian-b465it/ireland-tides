@@ -5293,3 +5293,18 @@ input:checked+.toggle-slider:before {
 .introjs-arrow.left { border-right-color: var(--bg-card); }
 .introjs-arrow.right { border-left-color: var(--bg-card); }
 
+
+/* Fix Intro.js Tooltip Text Color */
+.introjs-tooltip * {
+    color: var(--text-main) !important;
+}
+.introjs-tooltiptext {
+    color: var(--text-main) !important;
+}
+.introjs-tooltipbuttons .introjs-button {
+    color: var(--text-main) !important;
+}
+.introjs-nextbutton, .introjs-donebutton {
+    color: #000 !important;
+}
+

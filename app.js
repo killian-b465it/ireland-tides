@@ -6035,7 +6035,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       localStorage.setItem('hasSeenWalkthrough', 'true');
     }
-  }, 1500); // Wait 1.5s after load to not overwhelm the user immediately
+  }, 3500); // Wait 3.5s after load to ensure loading screen is totally gone
 });
 
 
