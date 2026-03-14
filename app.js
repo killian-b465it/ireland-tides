@@ -3328,17 +3328,21 @@ function updateAuthModalContent() {
   const switchTarget = document.querySelector('.auth-switch a');
   const usernameInput = document.getElementById('auth-username');
 
+  const termsContainer = document.getElementById('auth-terms-container');
+
   if (state.authMode === 'login') {
     title.innerText = 'Welcome Back';
     sub.innerText = 'Log in to your account';
     btn.innerText = 'Log In';
     if (usernameInput) usernameInput.style.display = 'none';
+    if (termsContainer) termsContainer.style.display = 'none';
     switchTarget.parentElement.innerHTML = `Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign up</a>`;
   } else {
     title.innerText = 'Join the Hub';
     sub.innerText = 'Create your free account';
     btn.innerText = 'Sign Up';
     if (usernameInput) usernameInput.style.display = 'block';
+    if (termsContainer) termsContainer.style.display = 'flex';
     switchTarget.parentElement.innerHTML = `Already have an account? <a href="#" onclick="toggleAuthMode()">Log in</a>`;
   }
 }
@@ -3351,6 +3355,14 @@ window.handleAuthSubmit = async () => {
   if (!password) return alert('Please enter your password.');
 
   const remember = document.getElementById('auth-remember').checked;
+  const termsCheckbox = document.getElementById('auth-terms');
+
+  // Enforce Terms & Conditions acceptance on Signup
+  if (state.authMode === 'signup') {
+    if (!termsCheckbox || !termsCheckbox.checked) {
+      return alert('You must agree to the Terms & Conditions and Privacy Policy to create an account.');
+    }
+  }
 
   // Check if admin email - require correct password
   const isAdminEmail = CONFIG.ADMIN_EMAILS.map(e => e.toLowerCase()).includes(email.toLowerCase());
@@ -3502,6 +3514,19 @@ window.handleAuthSubmit = async () => {
 
   updateAuthUI();
   closeAuthModal();
+
+  // Trigger Walkthrough if this is a brand new account signing up
+  if (state.authMode === 'signup') {
+    setTimeout(() => {
+      const hasSeenWalkthrough = localStorage.getItem('hasSeenWalkthrough');
+      if (!hasSeenWalkthrough) {
+        if (confirm("Registration successful! 🎣\n\nWould you like a quick 5-step tour of the Irish Fishing Hub to see how everything works?")) {
+          startWalkthrough();
+        }
+        localStorage.setItem('hasSeenWalkthrough', 'true');
+      }
+    }, 500); // Small delay to let the modal close fully
+  }
 };
 
 
@@ -6024,18 +6049,6 @@ function startWalkthrough() {
   }, 300); // slight delay to ensure UI is ready
 }
 
-// Auto-trigger on first visit
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-    const hasSeenWalkthrough = localStorage.getItem('hasSeenWalkthrough');
-    if (!hasSeenWalkthrough) {
-      // Create a nice custom prompt
-      if (confirm("Welcome to the Irish Fishing Hub! 🎣\nWould you like a quick 5-step tour to see how everything works?")) {
-        startWalkthrough();
-      }
-      localStorage.setItem('hasSeenWalkthrough', 'true');
-    }
-  }, 3500); // Wait 3.5s after load to ensure loading screen is totally gone
-});
+// Walkthrough trigger moved to auth signup sequence
 
 
