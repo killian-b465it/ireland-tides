@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
 
-  <!-- Inline CSS Fix for Intro.js Mobile Cache Bug -->
+  <!-- Inline CSS Fix for Intro.js Mobile Cache Bug & Positioning -->
   <style>
     .introjs-tooltip {
       background-color: #152238 !important;
@@ -50,6 +50,8 @@
     .introjs-tooltipbuttons .introjs-button {
       color: #e6f1ff !important;
       text-shadow: none !important;
+      background-color: rgba(255, 255, 255, 0.1) !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
     }
 
     .introjs-nextbutton,
@@ -57,6 +59,11 @@
       color: #000 !important;
       background: linear-gradient(135deg, #00d4ff, #0088ff) !important;
       text-shadow: none !important;
+      border: none !important;
+    }
+
+    .introjs-prevbutton {
+      color: #a0aec0 !important;
     }
 
     .introjs-showElement,
@@ -77,8 +84,30 @@
     }
 
     .introjs-helperLayer {
-      background-color: rgba(21, 34, 56, 0.4) !important;
+      background-color: rgba(21, 34, 56, 0.5) !important;
       z-index: 9999999 !important;
+    }
+
+    /* Force mobile tooltips to a bulletproof fixed bottom sheet layout */
+    @media (max-width: 768px) {
+      .introjs-tooltip {
+        position: fixed !important;
+        top: auto !important;
+        bottom: 5vh !important;
+        left: 5vw !important;
+        right: 5vw !important;
+        width: 90vw !important;
+        min-width: 90vw !important;
+        max-width: 90vw !important;
+        margin-left: 0 !important;
+        transform: none !important;
+        box-sizing: border-box !important;
+      }
+
+      /* Hide the little directional arrow since the box is floating */
+      .introjs-arrow {
+        display: none !important;
+      }
     }
   </style>
 </head>
