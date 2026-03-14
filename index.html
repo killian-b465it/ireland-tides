@@ -1502,34 +1502,52 @@
         <button class="modal-close-btn-inline" onclick="closeTermsModal()">✕</button>
       </div>
       <div class="modal-body terms-content">
-        <p>Last updated: February 1, 2026</p>
+        <p>Last updated: March 15, 2026 (Version 2.0)</p>
 
         <h3>1. Acceptance of Terms</h3>
         <p>By accessing the Irish Fishing Hub, you agree to be bound by these Terms and Conditions and all applicable
-          laws and regulations in Ireland.</p>
+          laws and regulations in Ireland. If you do not agree with any of these terms, you are prohibited from using or
+          accessing this site.</p>
 
-        <h3>2. Use of Data</h3>
-        <p>Tidal and weather data provided by this application is for informational and recreational fishing purposes
+        <h3>2. Use of Data and Real-Time Feeds</h3>
+        <p>Tidal and weather data provided by this application is for informational and restricted recreational fishing
+          purposes
           only. Do not rely on this data for maritime navigation or safety-critical decisions. Always consult official
           Marine Institute (Ireland) notices and local harbor master reports.</p>
-        <p><strong>Location Accuracy:</strong> All fishing, shop, and facility locations provided are for guidance only
+        <p><strong>Location Accuracy:</strong> All fishing, shop, and facility locations provided in the directory map
+          are for guidance only
           and may not be 100% accurate. It is the user's responsibility to verify and find the exact location. Irish
-          Fishing Hub serves only as a guide.</p>
-
-        <h3>3. Real-Time Data Accuracy</h3>
+          Fishing Hub serves only as an estimation guide.</p>
         <p>While we strive to provide real-time data from the Marine Institute sensor network, we cannot guarantee 100%
           uptime or accuracy. Data may be delayed or estimated during sensor maintenance or network outages.</p>
 
-        <h3>4. Pro Subscription</h3>
-        <p>Pro features are provided on a monthly subscription basis. Subscriptions can be cancelled at any time through
-          the user profile menu.</p>
+        <h3>3. Community Feed & User-Generated Content</h3>
+        <p>As part of V2, users can post catches, locations, and comments to the Community Feed. By posting content, you
+          grant Irish Fishing Hub a non-exclusive, royalty-free license to display, reproduce, and distribute your
+          content within the platform.</p>
+        <p><strong>Content Rules:</strong> You agree not to post content that is illegal, offensive, harassing,
+          defamatory, or infringes on intellectual property rights. We reserve the right to remove any content or ban
+          users who violate these community guidelines without prior notice.</p>
 
-        <h3>5. Limitation of Liability</h3>
-        <p>Irish Fishing Hub shall not be held liable for any loss, damage, or injury resulting from the use of data
+        <h3>4. AI Fish Identifier</h3>
+        <p>The AI Fish Identification tool is provided "as is" for educational and recreational purposes. We make no
+          warranties regarding the absolute accuracy of the AI's identification. You remain solely responsible for
+          adhering to local fishing regulations, size limits, and species restrictions regardless of the AI's output.
+        </p>
+
+        <h3>5. Pro Subscription</h3>
+        <p>Pro features are provided on a monthly subscription basis. Subscriptions can be cancelled at any time through
+          the user profile menu. Refunds are processed solely at the discretion of the administration based on fair-use
+          analysis.</p>
+
+        <h3>6. Limitation of Liability</h3>
+        <p>Irish Fishing Hub shall not be held liable for any loss, damage, or injury resulting from the use of data, AI
+          results, or community information
           provided through this service.</p>
 
         <h3>7. Third-Party Links & Advertising</h3>
-        <p>This platform is supported by advertising banners to remain free for all users. By using this service, you
+        <p>This platform is supported by advertising networks (including Google AdSense) to remain free for all users.
+          By using this service, you
           acknowledge and agree to the presence of these advertisements as a condition of free access.</p>
 
       </div>
@@ -1547,11 +1565,12 @@
         <button class="modal-close-btn-inline" onclick="closePrivacyModal()">✕</button>
       </div>
       <div class="modal-body terms-content">
-        <p>Last updated: February 1, 2026</p>
+        <p>Last updated: March 15, 2026 (Version 2.0)</p>
 
         <h3>1. Introduction</h3>
         <p>Irish Fishing Hub ("we", "our", or "us") values your privacy. This Privacy Policy explains how we collect,
-          use, disclose, and safeguard your information when you use our web application.</p>
+          use, disclose, and safeguard your information when you use our web application, including our new V2 features
+          like the AI Fish Identifier and Community Feed.</p>
 
         <h3>2. Information We Collect</h3>
 
@@ -1561,31 +1580,36 @@
           services</p>
         <p><strong>Storage:</strong> Securely stored via Firebase Authentication and Realtime Database</p>
 
-        <h4>2.2 User-Generated Content</h4>
+        <h4>2.2 User-Generated Content & Community Feed</h4>
         <p><strong>What we collect:</strong> Catch reports, photos, comments, fishing locations, and community posts you
-          choose to share</p>
-        <p><strong>Why:</strong> To enable community features and share fishing information with other users</p>
-        <p><strong>Visibility:</strong> Content you post is visible to other users based on your privacy settings</p>
+          choose to share on the V2 Community Feed.</p>
+        <p><strong>Why:</strong> To enable community interaction and share fishing information with other users</p>
+        <p><strong>Visibility:</strong> Content you post is visible to other users. Metadata such as timestamps and
+          linked species are also stored.</p>
 
-        <h4>2.3 Usage Data</h4>
+        <h4>2.3 AI Fish Identifier Data</h4>
+        <p><strong>What we collect:</strong> Photos of fish uploaded to our AI Species Guide.</p>
+        <p><strong>Why:</strong> Images are temporarily processed to return species identification confidence scores. We
+          do not permanently store or sell your private photos unless explicitly shared by you to the public feed.</p>
+
+        <h4>2.4 Usage Data</h4>
         <p><strong>What we collect:</strong> Pages visited, features used, time spent on app, device type, browser type
         </p>
         <p><strong>Why:</strong> To improve our services, fix bugs, and understand user behavior</p>
 
-        <h4>2.4 Location Data</h4>
+        <h4>2.5 Location Data</h4>
         <p><strong>What we collect:</strong> Fishing locations you mark on the map (optional)</p>
         <p><strong>Why:</strong> To show fishing spots and provide location-based tide data</p>
-        <p><strong>Note:</strong> We do not track your real-time location unless you explicitly share it</p>
+        <p><strong>Note:</strong> We do not track your real-time GPS location continuously unless you explicitly enable
+          browser geolocation for nearby stations.</p>
 
         <h3>3. How We Use Your Information</h3>
         <ul>
-          <li>Provide tide data, weather forecasts, and fishing conditions</li>
-          <li>Enable community features (posting, commenting, liking)</li>
-          <li>Process Pro subscription payments via Stripe</li>
-          <li>Send important account notifications and updates</li>
-          <li>Improve and optimize our services</li>
-          <li>Respond to support requests</li>
-          <li>Display relevant ad banners via Adsterra</li>
+          <li>Provide real-time tide data, weather forecasts, and fishing conditions across Ireland</li>
+          <li>Enable V2 community features (posting, commenting, liking, reporting)</li>
+          <li>Process Pro subscription payments securely via Stripe</li>
+          <li>Analyze fish images through our AI recognition models</li>
+          <li>Display highly relevant, contextual advertising via Google AdSense</li>
         </ul>
 
         <h3>4. Third-Party Services</h3>
@@ -1597,69 +1621,25 @@
         <p><strong>Stripe:</strong> Payment processing for Pro subscriptions. <a href="https://stripe.com/privacy"
             target="_blank">Privacy Policy</a></p>
 
-        <p><strong>Adsterra:</strong> We use Adsterra to display advertising banners. Adsterra and its partners may use
-          cookies and similar technologies to collect information about your visits to this and other websites to
-          provide relevant ads.
-          You can manage your ad preferences via your browser settings.
-          <a href="https://adsterra.com/privacy-policy/" target="_blank">Learn more</a>
+        <p><strong>Google AdSense:</strong> We use Google AdSense to display advertising banners. Third party vendors,
+          including Google, use cookies to serve ads based on a user's prior visits to your website or other websites.
+          Google's use of advertising cookies enables it and its partners to serve ads to your users based on their
+          visit to your sites and/or other sites on the Internet.
+          <a href="https://policies.google.com/technologies/ads" target="_blank">Learn more about Google AdSense</a>
         </p>
-
 
         <h3>5. Data Sharing</h3>
         <p><strong>We do NOT sell your personal data.</strong></p>
-        <p>We only share data with:</p>
-        <ul>
-          <li>Firebase (database hosting)</li>
-          <li>Stripe (payment processing)</li>
-          <li>Adsterra (advertising banners)</li>
-          <li>Other users (only content you choose to post publicly)</li>
-        </ul>
+        <p>We only share data with essential infrastructure providers (Firebase, Stripe) and advertising networks
+          (Google) through automated programmatic means.</p>
 
         <h3>6. Cookies and Tracking</h3>
-        <p>We use essential cookies to:</p>
-        <ul>
-          <li>Keep you logged in</li>
-          <li>Remember your preferences</li>
-          <li>Enable banner advertising functionality</li>
-        </ul>
-        <p>You can disable cookies in your browser settings, but some features may not work properly.</p>
+        <p>We use essential cookies to keep you logged in and remember your preferences. Advertising networks also drop
+          cookies to personalize ads.</p>
 
         <h3>7. Your Rights (GDPR)</h3>
-        <p>If you are in the EU/EEA, you have the right to:</p>
-        <ul>
-          <li><strong>Access:</strong> Request a copy of your data</li>
-          <li><strong>Rectification:</strong> Correct inaccurate data</li>
-          <li><strong>Erasure:</strong> Request deletion of your data</li>
-          <li><strong>Portability:</strong> Receive your data in a portable format</li>
-          <li><strong>Objection:</strong> Object to data processing</li>
-        </ul>
-        <p>To exercise these rights, contact us via the support form in your profile.</p>
-
-        <h3>8. Data Retention</h3>
-        <p>We retain your data for as long as your account is active. If you delete your account, we will delete your
-          personal data within 30 days, except where required by law.</p>
-
-        <h3>9. Children's Privacy</h3>
-        <p>Our service is not intended for users under 18. We do not knowingly collect data from children. If you
-          believe a child has provided us with personal data, please contact us immediately.</p>
-
-        <h3>10. Security</h3>
-        <p>We use industry-standard security measures including:</p>
-        <ul>
-          <li>Encrypted passwords (bcrypt)</li>
-          <li>HTTPS/SSL encryption</li>
-          <li>Firebase security rules</li>
-          <li>Regular security audits</li>
-        </ul>
-        <p>However, no method of transmission over the internet is 100% secure.</p>
-
-        <h3>11. Changes to This Policy</h3>
-        <p>We may update this Privacy Policy from time to time. We will notify you of significant changes via email or a
-          prominent notice in the app.</p>
-
-        <h3>12. Contact Us</h3>
-        <p>If you have questions about this Privacy Policy, contact us via the support form in your profile settings.
-        </p>
+        <p>If you are in the EU/EEA, you have the right to request access, rectification, erasure, and portability of
+          your data by contacting us directly through the support interface.</p>
       </div>
       <div class="modal-footer">
         <button class="btn btn-primary" onclick="closePrivacyModal()">I Understand</button>
@@ -1811,6 +1791,51 @@
       </div>
     </div>
   </div>
+
+  <!-- SEO and Content Optimization Footer (For AdSense Crawlers) -->
+  <footer
+    style="background-color: #0b1426; color: rgba(255,255,255,0.6); padding: 40px 20px; margin-top: 50px; font-size: 0.85rem; border-top: 1px solid rgba(255,255,255,0.05);">
+    <div
+      style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
+      <div>
+        <h3 style="color: #e6f1ff; font-size: 1.1rem; margin-bottom: 15px;">About Irish Fishing Hub</h3>
+        <p style="line-height: 1.6; margin-bottom: 10px;">Irish Fishing Hub is the ultimate online platform for anglers
+          across Ireland. We provide real-time tide charts, marine weather conditions, and precise fishing spot
+          directories spanning both seawater coastal areas and inland freshwater lakes. Whether you're targeting
+          Atlantic Mackerel from a pier or seeking European Seabass, our interactive fishing map gives you the
+          environmental edge.</p>
+        <p style="line-height: 1.6;">Our comprehensive database is built on live data from the Irish Marine Institute
+          and community submissions, ensuring you always know exactly when high tide hits and where to find the absolute
+          best fishing locations near you.</p>
+      </div>
+      <div>
+        <h3 style="color: #e6f1ff; font-size: 1.1rem; margin-bottom: 15px;">App Features</h3>
+        <ul style="list-style-type: none; padding: 0; line-height: 1.8;">
+          <li><strong>Live Tides:</strong> Accurate water level telemetry, moon phases, and real-time station graphs.
+          </li>
+          <li><strong>AI Fish Identifier:</strong> Upload a photo of your catch and let our custom-trained Artificial
+            Intelligence immediately identify the Irish fish species.</li>
+          <li><strong>Community Catch Feed:</strong> Join thousands of local Irish anglers sharing bait tips, catch
+            logs, and real-time success stories.</li>
+          <li><strong>Tackle & Ramp Directory:</strong> Locate nearby tackle shops, boat slips, and marine facilities
+            instantly.</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="color: #e6f1ff; font-size: 1.1rem; margin-bottom: 15px;">Legal & Links</h3>
+        <ul style="list-style-type: none; padding: 0; line-height: 1.8;">
+          <li><a href="#" onclick="openTermsModal()" style="color: #4facfe; text-decoration: none;">Terms &
+              Conditions</a></li>
+          <li><a href="#" onclick="openPrivacyModal()" style="color: #4facfe; text-decoration: none;">Privacy Policy</a>
+          </li>
+          <li><a href="#" onclick="openSupportModal()" style="color: #4facfe; text-decoration: none;">Contact
+              Support</a></li>
+        </ul>
+        <p style="margin-top: 20px; font-size: 0.75rem;">&copy; 2026 Irish Fishing Hub App. Data provided for
+          recreational use only.</p>
+      </div>
+    </div>
+  </footer>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
