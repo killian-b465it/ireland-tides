@@ -35,7 +35,52 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
 
+  <!-- Inline CSS Fix for Intro.js Mobile Cache Bug -->
+  <style>
+    .introjs-tooltip {
+      background-color: #152238 !important;
+      border: 1px solid rgba(0, 212, 255, 0.1) !important;
+      color: #e6f1ff !important;
+    }
 
+    .introjs-tooltiptext {
+      color: #e6f1ff !important;
+    }
+
+    .introjs-tooltipbuttons .introjs-button {
+      color: #e6f1ff !important;
+      text-shadow: none !important;
+    }
+
+    .introjs-nextbutton,
+    .introjs-donebutton {
+      color: #000 !important;
+      background: linear-gradient(135deg, #00d4ff, #0088ff) !important;
+      text-shadow: none !important;
+    }
+
+    .introjs-showElement,
+    .introjs-showElement * {
+      z-index: 9999999 !important;
+    }
+
+    .introjs-tooltipReferenceLayer {
+      z-index: 10000000 !important;
+    }
+
+    .introjs-tooltip {
+      z-index: 10000001 !important;
+    }
+
+    .introjs-overlay {
+      z-index: 9999998 !important;
+    }
+
+    .introjs-helperLayer {
+      background-color: rgba(21, 34, 56, 0.4) !important;
+      z-index: 9999999 !important;
+    }
+  </style>
 </head>
 
 <body>
