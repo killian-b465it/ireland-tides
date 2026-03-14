@@ -6032,9 +6032,9 @@ function startWalkthrough() {
         intro: "Let's take a quick tour of the app to help you catch more fish."
       },
       {
-        element: document.getElementById('fishing-mode-toggle-container'),
+        element: document.documentElement.clientWidth <= 768 ? document.querySelector('.navbar') : document.getElementById('fishing-mode-toggle-container'),
         title: "Sea vs Freshwater 🌊🏞️",
-        intro: "Toggle between coastal seawater tides or inland lakes. The map will instantly update to show relevant fishing spots.",
+        intro: "Toggle between coastal seawater tides or inland lakes using the switch at the top! The map will instantly update to show relevant fishing spots.",
         position: "bottom"
       },
       {
