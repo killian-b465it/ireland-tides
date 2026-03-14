@@ -5112,10 +5112,13 @@ input:checked+.toggle-slider:before {
 
 /* Species Detail Modal */
 .species-detail-modal-content {
-    max-width: 600px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 85vh;
     padding: 0;
-    overflow: hidden;
+    overflow-y: auto;
     border-radius: 20px;
+    margin: auto;
 }
 
 .species-detail-image {
