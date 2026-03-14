@@ -90,13 +90,21 @@
 
     /* Force all mobile text boxes to float exactly like Step 1 */
     @media (max-width: 768px) {
+
+      .introjs-tooltipReferenceLayer,
+      .introjs-tooltip {
+        visibility: visible !important;
+        opacity: 1 !important;
+        display: block !important;
+      }
+
       .introjs-tooltip {
         position: fixed !important;
         top: 50% !important;
         left: 50% !important;
         transform: translate(-50%, -50%) !important;
         width: 90vw !important;
-        max-width: 400px !important;
+        max-width: 340px !important;
         margin: 0 !important;
         box-sizing: border-box !important;
       }
