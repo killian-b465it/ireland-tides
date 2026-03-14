@@ -31,6 +31,10 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4749246157404876"
     crossorigin="anonymous"></script>
 
+  <!-- Intro.js for Walkthrough -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
+
 
 </head>
 
@@ -107,6 +111,7 @@
       <a href="#" class="mobile-menu-link admin-only" id="mobile-nav-admin"
         onclick="showPage('admin'); closeMobileMenu()" style="display: none;">🛡️ Admin</a>
       <a href="#" class="mobile-menu-link" onclick="openSupportChoiceModal(); closeMobileMenu()">💬 Contact Support</a>
+      <a href="#" class="mobile-menu-link" onclick="startWalkthrough(); closeMobileMenu()">🎓 App Tour</a>
       <a href="#" class="mobile-menu-link" onclick="openTermsModal(); closeMobileMenu()">⚖️ Terms & Conditions</a>
       <a href="#" class="mobile-menu-link" onclick="openPrivacyModal(); closeMobileMenu()">🛡️ Privacy Policy</a>
     </div>
@@ -254,6 +259,8 @@
         <div class="sidebar-footer">
           <a href="#" onclick="openSupportChoiceModal()">Contact Support</a>
           <span>•</span>
+          <a href="#" onclick="startWalkthrough()">App Tour</a>
+          <span>•</span>
           <a href="#" onclick="openTermsModal()">Terms & Conditions</a>
           <span>•</span>
           <a href="#" onclick="openPrivacyModal()">Privacy Policy</a>
@@ -364,6 +371,8 @@
         </div>
         <div class="sidebar-footer">
           <a href="#" onclick="openSupportChoiceModal()">Contact Support</a>
+          <span>•</span>
+          <a href="#" onclick="startWalkthrough()">App Tour</a>
           <span>•</span>
           <a href="#" onclick="openTermsModal()">Terms & Conditions</a>
           <span>•</span>
