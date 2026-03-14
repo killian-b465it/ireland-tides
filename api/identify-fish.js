@@ -68,8 +68,7 @@ If you cannot identify a fish in the image, still try your best guess and give a
                     }
                 ],
                 temperature: 0.1,
-                max_tokens: 500,
-                response_format: { type: 'json_object' }
+                max_tokens: 500
             })
         });
 
