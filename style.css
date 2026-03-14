@@ -5348,7 +5348,21 @@ input:checked+.toggle-slider:before {
     z-index: 9999999 !important;
 }
 
+/* Force tooltip to escape hidden container overflow on mobile */
+.introjs-tooltipReferenceLayer {
+    z-index: 10000000 !important;
+}
+
+.introjs-tooltip {
+    z-index: 10000001 !important;
+}
+
+.introjs-overlay {
+    z-index: 9999998 !important;
+}
+
 /* Fix map getting stuck (Leaflet panning constraint during IntroJS) */
 .introjs-helperLayer {
     background-color: rgba(21, 34, 56, 0.4) !important;
+    z-index: 9999999 !important;
 }
