@@ -78,7 +78,7 @@ If you cannot identify a fish in the image, still try your best guess and give a
             if (groqResponse.status === 429) {
                 return res.status(429).json({ error: 'AI is busy, please try again in a few seconds' });
             }
-            return res.status(502).json({ error: 'AI service error' });
+            return res.status(502).json({ error: `AI service error: ${errText}` });
         }
 
         const groqData = await groqResponse.json();
