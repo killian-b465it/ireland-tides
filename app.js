@@ -5909,6 +5909,37 @@ If you cannot identify a fish in the image, still try your best guess and give a
     if (!response.ok) {
       const errBody = await response.text();
       console.error('Gemini API error:', response.status, errBody);
+      if (response.status === 429) {
+        // Rate limited - retry after delay
+        console.log('Rate limited, retrying in 3 seconds...');
+        await new Promise(r => setTimeout(r, 3000));
+        const retry = await fetch(geminiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [
+                { text: `Identify the fish species in this image. Respond ONLY with JSON: {"name":"Common name","scientific":"Latin name","confidence":0.85,"habitat":"Where found","size":"Size range","description":"Brief description","edible":true,"conservation":"Status"}` },
+                { inlineData: { mimeType: mimeType, data: base64Data } }
+              ]
+            }]
+          })
+        });
+        if (!retry.ok) throw new Error('rate_limit');
+        const retryData = await retry.json();
+        const retryText = retryData.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!retryText) throw new Error('No response from AI');
+        let retryJson = retryText.trim();
+        if (retryJson.startsWith('```')) retryJson = retryJson.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '');
+        const retryResult = JSON.parse(retryJson);
+        loadingEl.style.display = 'none';
+        resultEl.style.display = 'block';
+        document.getElementById('species-result-name').textContent = retryResult.name || 'Unknown Species';
+        document.getElementById('species-result-scientific').textContent = retryResult.scientific || '';
+        document.getElementById('species-result-confidence').innerHTML = '';
+        document.getElementById('species-result-details').innerHTML = retryResult.description ? `<div class="species-detail-item" style="grid-column:1/-1;"><div class="detail-label">📝 About</div><div class="detail-value">${retryResult.description}</div></div>` : '';
+        return;
+      }
       throw new Error(`API error ${response.status}`);
     }
 
@@ -5960,8 +5991,13 @@ If you cannot identify a fish in the image, still try your best guess and give a
     console.warn('AI identification failed:', err.message);
     loadingEl.style.display = 'none';
     errorEl.style.display = 'block';
-    document.getElementById('species-error-message').textContent =
-      'AI identification encountered an error. Please try again with a clearer photo of the fish.';
+    if (err.message === 'rate_limit') {
+      document.getElementById('species-error-message').textContent =
+        'AI is busy right now — too many requests. Please wait 30 seconds and try again!';
+    } else {
+      document.getElementById('species-error-message').textContent =
+        'AI identification encountered an error (' + err.message + '). Please wait a moment and try again.';
+    }
   }
 }
 
