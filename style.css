@@ -591,12 +591,12 @@ body {
 
 /* Map & Markers */
 .map-container {
-    height: calc(100vh - 120px);
-    max-height: calc(100vh - 120px);
-    border-radius: 20px;
-    overflow: hidden;
+    height: 750px; /* Fill most of the screen on desktop */
+    max-height: 750px; /* Ensure map is long */
     position: sticky;
     top: 95px;
+    border-radius: 20px;
+    overflow: hidden;
     border: 1px solid var(--border-glass);
 }
 
@@ -1710,10 +1710,10 @@ body {
 
 .water-wave {
     font-size: 5rem;
-    background: linear-gradient(to top, var(--accent-primary) 50%, #333 50%);
+    background: linear-gradient(to top, #ffffff 50%, var(--accent-primary) 50%);
     background-size: 100% 200%;
     background-position: 0% 0%;
-    /* Start empty (Grey/Top) */
+    /* Start empty (White/Top) */
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -2497,18 +2497,20 @@ body {
         }
     }
 
-    .nav-brand {
-        position: static;
-        transform: none;
-        flex: 1;
-        display: flex;
-        justify-content: center;
-        padding: 10px 0;
-    }
+    @media (max-width: 768px) {
+        .nav-brand {
+            position: static;
+            transform: none;
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 10px 0;
+        }
 
-    .navbar {
-        height: auto;
-        min-height: 60px;
+        .navbar {
+            height: auto;
+            min-height: 60px;
+        }
     }
 
     .nav-live {
@@ -2538,7 +2540,7 @@ body {
 
     .map-container {
         order: 1;
-        height: 300px;
+        height: 60vh; /* Scaled back for mobile view */
         position: relative;
         top: auto;
     }
