@@ -137,6 +137,7 @@
       <div class="nav-links">
         <a href="#" class="nav-link active" id="nav-home" onclick="showPage('home')">📊 Dashboard</a>
         <a href="#" class="nav-link" id="nav-community" onclick="showPage('community')">👥 Community</a>
+        <a href="#" class="nav-link" id="nav-guide" onclick="showPage('guide')">🎣 Beginner Guide</a>
         <a href="#" class="nav-link" id="nav-sponsors" onclick="showPage('sponsors')">⭐ Sponsors</a>
         <a href="#" class="nav-link" id="nav-directory" onclick="showPage('directory')">🏪 Shop Directory</a>
         <a href="#" class="nav-link" id="nav-species" onclick="showPage('species')">🐟 Species Guide</a>
@@ -184,6 +185,7 @@
     <div class="mobile-menu" id="mobile-menu">
       <a href="#" class="mobile-menu-link" onclick="showPage('home'); closeMobileMenu()">📊 Dashboard</a>
       <a href="#" class="mobile-menu-link" onclick="showPage('community'); closeMobileMenu()">👥 Community</a>
+      <a href="#" class="mobile-menu-link" onclick="showPage('guide'); closeMobileMenu()">🎣 Beginner Guide</a>
       <a href="#" class="mobile-menu-link" onclick="showPage('sponsors'); closeMobileMenu()">⭐ Sponsors</a>
       <a href="#" class="mobile-menu-link" onclick="showPage('directory'); closeMobileMenu()">🏪 Shop Directory</a>
       <a href="#" class="mobile-menu-link" onclick="showPage('species'); closeMobileMenu()">🐟 Species Guide</a>
@@ -605,6 +607,62 @@
         </div>
         <div class="species-gallery-grid" id="species-gallery-grid">
           <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Beginner Guide Page -->
+  <main class="page" id="page-guide" style="display: none;">
+    <div class="guide-container">
+      <div class="guide-hero">
+        <h1>🎣 Beginner Fishing Guide</h1>
+        <p>Your ultimate resource for starting your fishing journey in Ireland.</p>
+      </div>
+
+      <div class="guide-grid">
+        <!-- Gear Basics Section -->
+        <div class="card guide-card">
+          <div class="card-header">
+            <span class="card-title">🎣 Gear Basics</span>
+          </div>
+          <div class="guide-card-body">
+            <p><strong>Sea Fishing:</strong> You'll need a sturdy spinning or beachcaster rod (9-12ft), a 4000-6000 size reel, and 15-20lb line. Saltwater environments demand robust gear.</p>
+            <p><strong>Freshwater:</strong> A lighter setup is ideal. A 7-9ft spinning rod, 2500-3000 size reel, and 6-10lb line will cover most lakes and rivers.</p>
+          </div>
+        </div>
+
+        <!-- Baits & Lures Section -->
+        <div class="card guide-card">
+          <div class="card-header">
+            <span class="card-title">🪱 Baits & Lures</span>
+          </div>
+          <div class="guide-card-body">
+            <p><strong>Top Sea Baits:</strong> Mackerel strip is the number one sea bait in Ireland. Lugworm and ragworm are excellent for flatfish and bass.</p>
+            <p><strong>Top Lures:</strong> Silver spinners (like Toby lures) are essential for mackerel and pollock. Soft plastic lures work well for bass and wrasse.</p>
+          </div>
+        </div>
+
+        <!-- Understanding Tides Section -->
+        <div class="card guide-card">
+          <div class="card-header">
+            <span class="card-title">🌊 Understanding Tides</span>
+          </div>
+          <div class="guide-card-body">
+            <p><strong>When to fish:</strong> The best time for sea fishing is generally two hours before high tide and one hour after. Moving water brings feeding fish.</p>
+            <p><strong>Spring Tides:</strong> These occur around new and full moons, offering the highest high tides and lowest low tides, often producing the best fishing conditions.</p>
+          </div>
+        </div>
+
+        <!-- Safety & Etiquette Section -->
+        <div class="card guide-card">
+          <div class="card-header">
+            <span class="card-title">🛡️ Safety & Etiquette</span>
+          </div>
+          <div class="guide-card-body">
+            <p><strong>Safety First:</strong> Never turn your back to the sea, especially when rock fishing. Always wear a lifejacket in dangerous spots and check the weather/swell forecast.</p>
+            <p><strong>Etiquette:</strong> Leave no trace. Take all your rubbish and old tackle home. Respect catch limits and try to catch-and-release when possible.</p>
+          </div>
         </div>
       </div>
     </div>

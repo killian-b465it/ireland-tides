@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Irish Fishing Hub - Real-Time Fishing Tide Data
  * Main Application Logic
  */
@@ -582,6 +582,12 @@ window.showPage = (pageId) => {
   // Refresh admin sponsor table on tab switch
   if (pageId === 'admin' && isAdmin() && window.loadAdminSponsors) {
     window.loadAdminSponsors();
+  }
+
+  // Guide page specific initialization could go here in the future
+  if (pageId === 'guide') {
+    // Currently static content, smooth scroll to top on open
+    window.scrollTo(0, 0);
   }
 
   setTimeout(() => activePage.classList.add('active'), 10);
