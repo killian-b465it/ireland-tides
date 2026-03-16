@@ -79,6 +79,7 @@ body {
     align-items: center;
     gap: var(--space-md);
     flex-shrink: 0;
+    margin-left: auto;
 }
 
 /* Auth Buttons */
@@ -2511,7 +2512,6 @@ body {
             height: auto;
             min-height: 60px;
         }
-    }
 
     .nav-live {
         display: none;
@@ -2553,7 +2553,7 @@ body {
     .admin-container {
         padding: var(--space-md);
     }
-
+}
 /* ============================================   Shop Directory Styles   ============================================ */
 .directory-container {
     max-width: 1400px;
