@@ -1710,7 +1710,7 @@ body {
 
 .water-wave {
     font-size: 5rem;
-    background: linear-gradient(to top, #ffffff 50%, var(--accent-primary) 50%);
+    background: linear-gradient(to top, var(--accent-primary) 50%, #ffffff 50%);
     background-size: 100% 200%;
     background-position: 0% 0%;
     /* Start empty (White/Top) */
