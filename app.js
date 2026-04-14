@@ -155,7 +155,16 @@ const PIERS = [
   { name: 'Portavogie Pier', lat: 54.4572, lon: -5.4380 },
   { name: 'Kilkeel Pier', lat: 54.0605, lon: -5.9945 },
   { name: 'Cushendall Pier', lat: 55.0803, lon: -6.0542 },
-  { name: 'Glenarm Pier', lat: 54.9686, lon: -5.9553 }
+  { name: 'Glenarm Pier', lat: 54.9686, lon: -5.9553 },
+  // Kerry / Dingle Peninsula (Community Submitted)
+  { name: 'Dunquin Pier', lat: 52.1230, lon: -10.4530 },
+  { name: 'Brandon Pier', lat: 52.2770, lon: -10.1030 },
+  { name: 'Brandon Creek', lat: 52.2350, lon: -10.1800 },
+  { name: 'Dingle Lighthouse', lat: 52.1350, lon: -10.2820 },
+  { name: 'Inch Beach', lat: 52.1320, lon: -9.9770 },
+  { name: 'Wine Strand', lat: 52.1600, lon: -10.3600 },
+  { name: 'Killshanig (Castlegregory)', lat: 52.2850, lon: -9.9870 },
+  { name: 'Waterville Pier', lat: 51.8280, lon: -10.1740 }
 ];
 
 // ============================================
@@ -292,6 +301,7 @@ const FRESHWATER_SPOTS = [
   { id: 'killarney_lakes', name: 'Killarney Lakes (Lough Leane)', type: 'Lake', lat: 52.02, lng: -9.52, species: ['Salmon', 'Brown Trout'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Free fishing. Stunning scenery.' },
   { id: 'muckross_lake', name: 'Muckross Lake', type: 'Lake', lat: 52.00, lng: -9.50, species: ['Brown Trout'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Middle Killarney lake.' },
   { id: 'lough_currane', name: 'Lough Currane', type: 'Lake', lat: 51.82, lng: -10.15, species: ['Salmon', 'Sea Trout'], licenseRequired: true, licenseType: 'Salmon/Sea Trout License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Waterville. World famous sea trout.' },
+  { id: 'lough_gill_kerry', name: 'Lough Gill (Dingle)', type: 'Lake', lat: 52.1590, lng: -10.0420, species: ['Brown Trout'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Dingle Peninsula. Wadeable. Stocked with big brownies.' },
   { id: 'caragh_lake', name: 'Caragh Lake', type: 'Lake', lat: 52.00, lng: -9.87, species: ['Salmon', 'Brown Trout'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Kerry gem.' },
   { id: 'barfinnihy_lake', name: 'Barfinnihy Lake', type: 'Lake', lat: 51.93, lng: -9.85, species: ['Rainbow Trout'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Stocked monthly with rainbows.' },
   { id: 'lough_derg', name: 'Lough Derg', type: 'Lake', lat: 52.92, lng: -8.33, species: ['Pike', 'Brown Trout', 'Perch', 'Bream'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Third largest lake. Great pike fishing.' },
@@ -4784,6 +4794,8 @@ const TACKLE_SHOPS = [
   // Kerry
   { name: "O'Neill's Fishing Tackle", county: "Kerry", address: "6 Plunkett St, Killarney", phone: "064 663 1970", website: "https://www.killarneyfishing.com", lat: 52.0599, lng: -9.5044, rating: 4.7 },
   { name: "Kerry Angling", county: "Kerry", address: "Strand St, Tralee", phone: "066 712 6644", website: "", lat: 52.2705, lng: -9.7020, rating: 4.3 },
+  { name: "The Angling Hub", county: "Kerry", address: "Tralee, Co. Kerry", phone: "", website: "", lat: 52.2710, lng: -9.7100, rating: 4.5 },
+  { name: "Landers Outdoor World", county: "Kerry", address: "Tralee, Co. Kerry", phone: "", website: "", lat: 52.2680, lng: -9.7050, rating: 4.4 },
 
   // Mayo
   { name: "Pat Scahill's Tackle Shop", county: "Mayo", address: "Castlebar St, Westport", phone: "098 27899", website: "", lat: 53.8015, lng: -9.5175, rating: 4.8 },
@@ -4806,9 +4818,14 @@ const TACKLE_SHOPS = [
 
   // Clare
   { name: "Ennis Tackle & Bait", county: "Clare", address: "Abbey St, Ennis", phone: "065 682 8366", website: "", lat: 52.8428, lng: -8.9820, rating: 4.3 },
+  { name: "Shannonside Tackle", county: "Clare", address: "Clonlara, Co. Clare", phone: "", website: "", lat: 52.7380, lng: -8.5640, rating: 4.6 },
+
+  // Tipperary
+  { name: "Open Season", county: "Tipperary", address: "Nenagh, Co. Tipperary", phone: "", website: "", lat: 52.8620, lng: -8.1970, rating: 4.7 },
 
   // Limerick
   { name: "Steve's Fishing Tackle", county: "Limerick", address: "23 William St, Limerick City", phone: "061 415 484", website: "", lat: 52.6642, lng: -8.6295, rating: 4.6 },
+  { name: "Anglers Curse", county: "Limerick", address: "Near Croom, Co. Limerick", phone: "", website: "", lat: 52.5190, lng: -8.7180, rating: 4.3 },
 
   // Sligo - Verified Hyde Bridge coords
   { name: "Barton Smith Tackle", county: "Sligo", address: "Hyde Bridge, Sligo", phone: "071 914 2356", website: "https://www.bartonsmith.ie", lat: 54.272258, lng: -8.4740566, rating: 4.7 },
