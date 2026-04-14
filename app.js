@@ -6241,7 +6241,7 @@ window.initDepthMap = function() {
   state.depthMap = L.map('depth-map', {
     zoomControl: true,
     attributionControl: true
-  }).setView([52.9333, -8.3333], 11); // Default to Lough Derg
+  }).setView([53.4, -8.2], 7); // Default to Ireland
 
   // Satellite Base Layer (ESRI World Imagery)
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
@@ -6266,18 +6266,44 @@ window.initDepthMap = function() {
     maxZoom: 18
   }).addTo(state.depthMap);
 
+  renderInlandDepths();
+
   console.log('Depth Maps initialized');
 };
 
-window.jumpToDepthLocation = function(coordsString) {
+function renderInlandDepths() {
   if (!state.depthMap) return;
-  const parts = coordsString.split(',');
-  if (parts.length === 3) {
-    const lat = parseFloat(parts[0]);
-    const lon = parseFloat(parts[1]);
-    const zoom = parseInt(parts[2]);
-    state.depthMap.flyTo([lat, lon], zoom);
-  }
-};
+
+  const inlandPoints = [
+    // Lough Derg (Shannon)
+    { lat: 52.9667, lon: -8.3000, d: '14m' },
+    { lat: 52.9231, lon: -8.3444, d: '28m' },
+    { lat: 52.8833, lon: -8.3833, d: '10m' },
+    { lat: 52.9900, lon: -8.2800, d: '8m' },
+    // Lough Corrib
+    { lat: 53.5000, lon: -9.3100, d: '42m' }, 
+    { lat: 53.4500, lon: -9.2333, d: '20m' },
+    { lat: 53.4000, lon: -9.1833, d: '3m' }, 
+    { lat: 53.4300, lon: -9.2500, d: '15m' },
+    // Lough Ree
+    { lat: 53.5600, lon: -7.9500, d: '31m' },
+    { lat: 53.5200, lon: -7.9800, d: '12m' },
+    { lat: 53.4800, lon: -7.9500, d: '6m' },
+    // Lower Lough Erne
+    { lat: 54.4900, lon: -7.8600, d: '65m' },
+    { lat: 54.4500, lon: -7.8000, d: '30m' },
+    { lat: 54.4200, lon: -7.7500, d: '18m' }
+  ];
+
+  inlandPoints.forEach(pt => {
+    const icon = L.divIcon({
+      className: 'inland-depth-marker',
+      html: `<div style="text-align: center; font-size: 0.75rem; font-weight: bold; color: white; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.3); border-radius: 3px; padding: 1px 0; min-width: 25px;">${pt.d}</div>`,
+      iconSize: [25, 18],
+      iconAnchor: [12, 9]
+    });
+    L.marker([pt.lat, pt.lon], { icon }).addTo(state.depthMap);
+  });
+}
 
 
