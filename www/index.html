@@ -135,13 +135,14 @@
   <nav class="navbar">
     <div class="nav-container">
       <div class="nav-links">
-        <a href="#" class="nav-link active" id="nav-home" onclick="showPage('home')">📊 Dashboard</a>
-        <a href="#" class="nav-link" id="nav-community" onclick="showPage('community')">👥 Community</a>
-        <a href="#" class="nav-link" id="nav-guide" onclick="showPage('guide')">🎣 Beginner Guide</a>
-        <a href="#" class="nav-link" id="nav-sponsors" onclick="showPage('sponsors')">⭐ Sponsors</a>
-        <a href="#" class="nav-link" id="nav-directory" onclick="showPage('directory')">🏪 Shop Directory</a>
-        <a href="#" class="nav-link" id="nav-species" onclick="showPage('species')">🐟 Species Guide</a>
-        <a href="#" class="nav-link admin-only" id="nav-admin" onclick="showPage('admin')" style="display: none;">🛡️
+        <a href="javascript:void(0)" class="nav-link active" id="nav-home" onclick="showPage('home')">📊 Dashboard</a>
+        <a href="javascript:void(0)" class="nav-link" id="nav-community" onclick="showPage('community')">👥 Community</a>
+        <a href="javascript:void(0)" class="nav-link" id="nav-guide" onclick="showPage('guide')">🎣 Beginner Guide</a>
+        <a href="javascript:void(0)" class="nav-link" id="nav-sponsors" onclick="showPage('sponsors')">⭐ Sponsors</a>
+        <a href="javascript:void(0)" class="nav-link" id="nav-directory" onclick="showPage('directory')">🏪 Shop Directory</a>
+        <a href="javascript:void(0)" class="nav-link" id="nav-species" onclick="showPage('species')">🐟 Species Guide</a>
+        <a href="javascript:void(0)" class="nav-link" id="nav-depth" onclick="showPage('depth')">📈 Depth Charts</a>
+        <a href="javascript:void(0)" class="nav-link admin-only" id="nav-admin" onclick="showPage('admin')" style="display: none;">🛡️
           Admin</a>
       </div>
 
@@ -183,18 +184,20 @@
     </div>
     <!-- Mobile Dropdown Menu -->
     <div class="mobile-menu" id="mobile-menu">
-      <a href="#" class="mobile-menu-link" onclick="showPage('home'); closeMobileMenu()">📊 Dashboard</a>
-      <a href="#" class="mobile-menu-link" onclick="showPage('community'); closeMobileMenu()">👥 Community</a>
-      <a href="#" class="mobile-menu-link" onclick="showPage('guide'); closeMobileMenu()">🎣 Beginner Guide</a>
-      <a href="#" class="mobile-menu-link" onclick="showPage('sponsors'); closeMobileMenu()">⭐ Sponsors</a>
-      <a href="#" class="mobile-menu-link" onclick="showPage('directory'); closeMobileMenu()">🏪 Shop Directory</a>
-      <a href="#" class="mobile-menu-link" onclick="showPage('species'); closeMobileMenu()">🐟 Species Guide</a>
-      <a href="#" class="mobile-menu-link admin-only" id="mobile-nav-admin"
+      <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('home'); closeMobileMenu()">📊 Dashboard</a>
+      <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('community'); closeMobileMenu()">👥 Community</a>
+      <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('guide'); closeMobileMenu()">🎣 Beginner Guide</a>
+      <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('sponsors'); closeMobileMenu()">⭐ Sponsors</a>
+      <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('directory'); closeMobileMenu()">🏪 Shop Directory</a>
+      <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('species'); closeMobileMenu()">🐟 Species Guide</a>
+      <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('depth'); closeMobileMenu()">📈 Depth Charts</a>
+      <a href="javascript:void(0)" class="mobile-menu-link" onclick="openRateModal(); closeMobileMenu()">⭐ Rate App</a>
+      <a href="javascript:void(0)" class="mobile-menu-link admin-only" id="mobile-nav-admin"
         onclick="showPage('admin'); closeMobileMenu()" style="display: none;">🛡️ Admin</a>
       <a href="articles.html" class="mobile-menu-link">📝 Fishing Blog</a>
       <a href="about.html" class="mobile-menu-link">ℹ️ About Us</a>
       <a href="contact.html" class="mobile-menu-link">💬 Contact Support</a>
-      <a href="#" class="mobile-menu-link" onclick="startWalkthrough(); closeMobileMenu()">🎓 App Tour</a>
+      <a href="javascript:void(0)" class="mobile-menu-link" onclick="startWalkthrough(); closeMobileMenu()">🎓 App Tour</a>
       <a href="terms.html" class="mobile-menu-link">⚖️ Terms & Conditions</a>
       <a href="privacy.html" class="mobile-menu-link">🛡️ Privacy Policy</a>
     </div>
@@ -630,6 +633,38 @@
     </div>
   </main>
 
+  <!-- Depth Charts Page -->
+  <main class="page" id="page-depth" style="display: none;">
+    <div class="directory-container">
+      <div class="directory-hero" style="margin-bottom: 20px;">
+        <h1>📈 Depth Charts & Bathymetry</h1>
+        <p>Explore depth maps for major Irish lakes and rivers</p>
+      </div>
+      <div class="depth-chart-wrapper" style="background: rgba(0,0,0,0.5); border-radius: 12px; padding: 5px; border: 1px solid rgba(255,255,255,0.1); width: 100%; height: 65vh; position: relative;">
+        <div id="depth-map" style="width: 100%; height: 100%; border-radius: 8px; z-index: 1;"></div>
+        
+        <!-- Interactive Map Legend (Collapsible) -->
+        <div class="depth-legend" style="position: absolute; bottom: 30px; left: 20px; z-index: 999; background: rgba(21, 34, 56, 0.9); border: 1px solid rgba(255,255,255,0.1); padding: 10px 15px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); width: max-content; cursor: pointer;" onclick="const body = this.querySelector('.legend-body'); const arrow = this.querySelector('.legend-arrow'); if(body.style.display==='none'){body.style.display='block'; arrow.textContent='▼';}else{body.style.display='none'; arrow.textContent='▶';}">
+          <h4 style="margin: 0; font-size: 0.9rem; color: #fff; display: flex; align-items: center; gap: 6px; user-select: none;"><span class="legend-arrow">▼</span> Bathymetry Key</h4>
+          <div class="legend-body" style="margin-top: 10px;">
+            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+              <div style="width: 25px; height: 3px; background: #00d4ff; margin-right: 10px;"></div>
+              <span style="font-size: 0.8rem; color: #ccc;">Contour Line (Meters)</span>
+            </div>
+            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+              <div style="width: 25px; height: 15px; background: linear-gradient(to right, #00d4ff, #0a2e5c); border-radius: 2px; margin-right: 10px;"></div>
+              <span style="font-size: 0.8rem; color: #ccc;">Light = Shallow | Dark = Deep</span>
+            </div>
+            <div style="display: flex; align-items: center;">
+              <div style="width: 25px; text-align: center; font-size: 0.75rem; font-weight: bold; color: white; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.3); border-radius: 3px; margin-right: 10px; padding: 1px 0;">12m</div>
+              <span style="font-size: 0.8rem; color: #ccc;">Estimated Inland Depth</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
   <!-- Beginner Guide Page -->
   <main class="page" id="page-guide" style="display: none;">
     <div class="guide-container">
@@ -751,8 +786,39 @@
         <button class="btn btn-primary"
           onclick="handleAuthSubmit(); setTimeout(refreshCommunityGating, 100);">Continue</button>
         <p class="auth-switch">Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign up</a></p>
+
+        <div class="auth-divider" style="text-align: center; margin: 20px 0; position: relative;">
+          <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 10px 0;">
+          <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--bg-card); padding: 0 10px; color: var(--text-secondary); font-size: 0.8rem; white-space: nowrap;">or continue with</span>
+        </div>
+        
+        <div class="social-login-container" style="display: flex; flex-direction: column; gap: 10px;">
+          <button class="btn btn-social" style="background: white; color: #333; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 10px;" onclick="handleSocialLogin('Google')">
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width: 20px;"> Continue with Google
+          </button>
+          <button class="btn btn-social" style="background: black; color: white; border: 1px solid #333; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 10px;" onclick="handleSocialLogin('Apple')">
+            <img src="https://www.svgrepo.com/show/511330/apple-173.svg" alt="Apple" style="width: 20px; filter: invert(1);"> Continue with Apple
+          </button>
+          <button class="btn btn-social" style="background: #1877F2; color: white; border: none; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 10px;" onclick="handleSocialLogin('Facebook')">
+            <img src="https://www.svgrepo.com/show/475647/facebook-color.svg" alt="Facebook" style="width: 20px;"> Continue with Facebook
+          </button>
+        </div>
       </div>
       <button class="modal-close-btn" onclick="closeAuthModal()">✕</button>
+    </div>
+  </div>
+
+  <!-- Rate App Modal -->
+  <div class="modal" id="rate-modal">
+    <div class="modal-content" style="text-align: center; max-width: 400px; position: relative;">
+      <div style="font-size: 3rem; margin-bottom: 15px;">⭐</div>
+      <h2 style="margin-bottom: 15px;">Enjoying Irish Fishing Hub?</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 25px; line-height: 1.5;">If you're having a good time catching fish and tracking tides, a 5-star rating on the Google Play Store helps us keep adding new features!</p>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <button class="btn btn-primary" onclick="window.location.href='market://details?id=com.irishfishinghub.app'; closeRateModal();" style="width: 100%;">Rate us 5 Stars ⭐️</button>
+        <button class="btn btn-outline" onclick="closeRateModal()" style="width: 100%;">Maybe Later</button>
+      </div>
+      <button class="modal-close-btn" onclick="closeRateModal()">✕</button>
     </div>
   </div>
 
@@ -1888,9 +1954,8 @@
     </div>
   </div>
 
-  <!-- SEO and Content Optimization Footer (For AdSense Crawlers) - Visually Hidden -->
-  <footer
-    style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;">
+  <!-- SEO and Content Optimization Footer (For AdSense / Search Crawlers) -->
+  <footer class="app-footer" style="background: var(--bg-card); border-top: 1px solid rgba(255,255,255,0.05); padding: 40px 20px; font-size: 0.9rem; margin-top: auto; position: relative; z-index: 100;">
     <div
       style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
       <div>
@@ -1932,6 +1997,20 @@
       </div>
     </div>
   </footer>
+
+  <!-- GDPR Cookie Consent Banner -->
+  <div id="cookie-banner" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-card); border-top: 1px solid var(--accent-primary); padding: 20px; z-index: 999999; box-shadow: 0 -10px 30px rgba(0,0,0,0.5);">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 15px;">
+      <div style="flex: 1; min-width: 300px; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5;">
+        <strong style="color: white; display: block; margin-bottom: 5px;">🍪 Your Privacy Choices</strong>
+        We use cookies and similar technologies to enhance your experience, analyze our traffic, and serve targeted advertisements via Google AdSense. By clicking "Accept All", you consent to our use of cookies. Read our <a href="#" onclick="openPrivacyModal()" style="color: var(--accent-primary);">Privacy Policy</a> for more details.
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button class="btn btn-outline" onclick="document.getElementById('cookie-banner').style.display='none'">Decline</button>
+        <button class="btn btn-primary" onclick="acceptCookies()">Accept All</button>
+      </div>
+    </div>
+  </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
