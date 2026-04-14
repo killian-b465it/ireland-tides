@@ -3350,7 +3350,9 @@ window.viewReportedPost = (catchId) => {
 window.openAuthModal = () => {
   state.authMode = 'login';
   updateAuthModalContent();
-  document.getElementById('auth-modal').classList.add('active');
+  const modal = document.getElementById('auth-modal');
+  modal.style.display = 'flex'; // Ensure display is flex (overriding popstate hide)
+  modal.classList.add('active');
 };
 
 window.closeAuthModal = () => document.getElementById('auth-modal').classList.remove('active');
@@ -3375,14 +3377,14 @@ function updateAuthModalContent() {
     btn.innerText = 'Log In';
     if (usernameInput) usernameInput.style.display = 'none';
     if (termsContainer) termsContainer.style.display = 'none';
-    switchTarget.parentElement.innerHTML = `Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign up</a>`;
+    switchTarget.parentElement.innerHTML = `Don't have an account? <a href="javascript:void(0)" onclick="toggleAuthMode()">Sign up</a>`;
   } else {
     title.innerText = 'Join the Hub';
     sub.innerText = 'Create your free account';
     btn.innerText = 'Sign Up';
     if (usernameInput) usernameInput.style.display = 'block';
     if (termsContainer) termsContainer.style.display = 'flex';
-    switchTarget.parentElement.innerHTML = `Already have an account? <a href="#" onclick="toggleAuthMode()">Log in</a>`;
+    switchTarget.parentElement.innerHTML = `Already have an account? <a href="javascript:void(0)" onclick="toggleAuthMode()">Log in</a>`;
   }
 }
 
@@ -6189,9 +6191,57 @@ function startWalkthrough() {
 // Social Login Handlers & Rate App Logic
 // ============================================
 
-window.handleSocialLogin = function(provider) {
-  // Show a toast or alert since Firebase Social Auth requires backend config
-  alert(`Connecting to ${provider}... \n\nNote: This feature is currently in Developer mode. Please use Email/Password login for now.`);
+window.handleSocialLogin = async function (provider) {
+  if (provider !== 'Google') return;
+
+  console.log(`Attempting Google login...`);
+
+  try {
+    let credential;
+
+    // 1. Detect if we are on a native device or the web
+    if (window.Capacitor && Capacitor.isNativePlatform()) {
+      // NATIVE CODE (Android/iOS)
+      const { GoogleSignIn } = Capacitor.Plugins;
+      if (!GoogleSignIn) throw new Error('Google Sign-In plugin not found');
+
+      const result = await GoogleSignIn.signIn();
+      credential = firebase.auth.GoogleAuthProvider.credential(result.authentication.idToken);
+    } else {
+      // WEB CODE (Website/Browser)
+      const googleProvider = new firebase.auth.GoogleAuthProvider();
+      // Optional: Add scopes if needed
+      // googleProvider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+      
+      const result = await firebase.auth().signInWithPopup(googleProvider);
+      credential = result.credential;
+    }
+
+    if (credential) {
+      const userCredential = await firebase.auth().signInWithCredential(credential);
+      const user = userCredential.user;
+
+      // Map Firebase user to our internal profile system
+      const userData = {
+        id: user.uid,
+        name: user.displayName || user.email.split('@')[0],
+        email: user.email,
+        photoURL: user.photoURL
+      };
+
+      registerUserInSystem(userData);
+      state.user = userData;
+      localStorage.setItem('fishing_user', JSON.stringify(userData));
+
+      closeAuthModal();
+      showPage('home');
+      alert(`Welcome, ${userData.name}!`);
+    }
+
+  } catch (err) {
+    console.error(`Google login failed:`, err);
+    alert(`Login Failed: ${err.message || 'Please use Email/Password for now.'}`);
+  }
 };
 
 window.openRateModal = function() {

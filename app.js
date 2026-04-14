@@ -3350,7 +3350,9 @@ window.viewReportedPost = (catchId) => {
 window.openAuthModal = () => {
   state.authMode = 'login';
   updateAuthModalContent();
-  document.getElementById('auth-modal').classList.add('active');
+  const modal = document.getElementById('auth-modal');
+  modal.style.display = 'flex'; // Ensure display is flex (overriding popstate hide)
+  modal.classList.add('active');
 };
 
 window.closeAuthModal = () => document.getElementById('auth-modal').classList.remove('active');
@@ -3375,14 +3377,14 @@ function updateAuthModalContent() {
     btn.innerText = 'Log In';
     if (usernameInput) usernameInput.style.display = 'none';
     if (termsContainer) termsContainer.style.display = 'none';
-    switchTarget.parentElement.innerHTML = `Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign up</a>`;
+    switchTarget.parentElement.innerHTML = `Don't have an account? <a href="javascript:void(0)" onclick="toggleAuthMode()">Sign up</a>`;
   } else {
     title.innerText = 'Join the Hub';
     sub.innerText = 'Create your free account';
     btn.innerText = 'Sign Up';
     if (usernameInput) usernameInput.style.display = 'block';
     if (termsContainer) termsContainer.style.display = 'flex';
-    switchTarget.parentElement.innerHTML = `Already have an account? <a href="#" onclick="toggleAuthMode()">Log in</a>`;
+    switchTarget.parentElement.innerHTML = `Already have an account? <a href="javascript:void(0)" onclick="toggleAuthMode()">Log in</a>`;
   }
 }
 
