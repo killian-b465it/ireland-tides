@@ -4312,7 +4312,27 @@ window.changeUserPassword = (userId) => {
   loadUsersTable();
 };
 
+// ============================================
+// GDPR Cookie Consent Logic
+// ============================================
+window.acceptCookies = function() {
+  localStorage.setItem('cookieConsentAccepted', 'true');
+  const banner = document.getElementById('cookie-banner');
+  if (banner) {
+    banner.style.display = 'none';
+  }
+};
 
+document.addEventListener('DOMContentLoaded', () => {
+  if (!localStorage.getItem('cookieConsentAccepted')) {
+    const banner = document.getElementById('cookie-banner');
+    if (banner) {
+      setTimeout(() => {
+        banner.style.display = 'block';
+      }, 1000);
+    }
+  }
+});
 
 window.giftProSubscription = (userId) => {
   if (!confirm('Are you sure you want to gift this user 1 month of Pro status for free?')) return;

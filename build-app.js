@@ -12,6 +12,7 @@ if (!fs.existsSync(targetDir)){
 // Folders and specific files to include in the build
 const includeItems = [
     'assets',
+    'articles',
     'app.js',
     'index.html',
     'loading.css',

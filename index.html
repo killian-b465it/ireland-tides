@@ -1938,9 +1938,8 @@
     </div>
   </div>
 
-  <!-- SEO and Content Optimization Footer (For AdSense Crawlers) - Visually Hidden -->
-  <footer
-    style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;">
+  <!-- SEO and Content Optimization Footer (For AdSense / Search Crawlers) -->
+  <footer class="app-footer" style="background: var(--bg-card); border-top: 1px solid rgba(255,255,255,0.05); padding: 40px 20px; font-size: 0.9rem; margin-top: auto; position: relative; z-index: 100;">
     <div
       style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
       <div>
@@ -1982,6 +1981,20 @@
       </div>
     </div>
   </footer>
+
+  <!-- GDPR Cookie Consent Banner -->
+  <div id="cookie-banner" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-card); border-top: 1px solid var(--accent-primary); padding: 20px; z-index: 999999; box-shadow: 0 -10px 30px rgba(0,0,0,0.5);">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 15px;">
+      <div style="flex: 1; min-width: 300px; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5;">
+        <strong style="color: white; display: block; margin-bottom: 5px;">🍪 Your Privacy Choices</strong>
+        We use cookies and similar technologies to enhance your experience, analyze our traffic, and serve targeted advertisements via Google AdSense. By clicking "Accept All", you consent to our use of cookies. Read our <a href="#" onclick="openPrivacyModal()" style="color: var(--accent-primary);">Privacy Policy</a> for more details.
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button class="btn btn-outline" onclick="document.getElementById('cookie-banner').style.display='none'">Decline</button>
+        <button class="btn btn-primary" onclick="acceptCookies()">Accept All</button>
+      </div>
+    </div>
+  </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
