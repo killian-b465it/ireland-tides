@@ -242,6 +242,7 @@ const HARBOURS = [
 let state = {
   map: null,
   communityMap: null,
+  depthMap: null,
   chart: null,
   selectedStation: null,
   markers: {},
@@ -601,9 +602,20 @@ window.showPage = (pageId, skipHistory = false) => {
   }
   if (pageId === 'community') {
     if (!state.communityMap) {
-      initCommunityMap();
+      if (typeof window.initCommunityMap === 'function') {
+         window.initCommunityMap();
+      }
     } else {
       setTimeout(() => state.communityMap.invalidateSize(), 50);
+    }
+  }
+  if (pageId === 'depth') {
+    if (!state.depthMap) {
+      if (typeof window.initDepthMap === 'function') {
+         window.initDepthMap();
+      }
+    } else {
+      setTimeout(() => state.depthMap.invalidateSize(), 50);
     }
   }
   if (pageId === 'directory') {
@@ -6218,5 +6230,43 @@ window.addEventListener('popstate', (event) => {
     window.showPage('home', true);
   }
 });
+
+// ============================================
+// Depth Charts Map Functions
+// ============================================
+window.initDepthMap = function() {
+  const container = document.getElementById('depth-map');
+  if (!container || state.depthMap) return;
+
+  state.depthMap = L.map('depth-map', {
+    zoomControl: true,
+    attributionControl: true
+  }).setView([52.9333, -8.3333], 11); // Default to Lough Derg
+
+  // Satellite Base Layer (ESRI World Imagery)
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '&copy; Esri &mdash; Source: Esri, i-cubed',
+    maxZoom: 18
+  }).addTo(state.depthMap);
+
+  // OpenSeaMap Seamarks & Depth Contours Overlay
+  L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
+    attribution: 'Map data: &copy; <a href="http://www.openseamap.org">OpenSeaMap</a> contributors',
+    maxZoom: 18
+  }).addTo(state.depthMap);
+
+  console.log('Depth Maps initialized');
+};
+
+window.jumpToDepthLocation = function(coordsString) {
+  if (!state.depthMap) return;
+  const parts = coordsString.split(',');
+  if (parts.length === 3) {
+    const lat = parseFloat(parts[0]);
+    const lon = parseFloat(parts[1]);
+    const zoom = parseInt(parts[2]);
+    state.depthMap.flyTo([lat, lon], zoom);
+  }
+};
 
 
