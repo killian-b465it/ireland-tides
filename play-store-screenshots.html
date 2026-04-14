@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Play Store Screenshots Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --accent: #00d4ff;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background: #1e293b;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+      padding: 40px;
+      justify-content: center;
+    }
+    .screenshot-container {
+      width: 1080px;
+      height: 1920px;
+      background: linear-gradient(135deg, var(--bg-color), #1e293b);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      border-radius: 20px;
+      transform: scale(0.3); /* Scale down for viewing, scale up when screenshotting */
+      transform-origin: top left;
+      margin-bottom: -1300px;
+      margin-right: -700px;
+    }
+    .screenshot-header {
+      text-align: center;
+      padding: 120px 60px 0;
+      z-index: 10;
+    }
+    .screenshot-title {
+      color: #ffffff;
+      font-size: 80px;
+      font-weight: 800;
+      margin: 0;
+      line-height: 1.1;
+      text-transform: uppercase;
+      letter-spacing: -2px;
+      text-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    }
+    .screenshot-subtitle {
+      color: var(--accent);
+      font-size: 45px;
+      font-weight: 600;
+      margin-top: 20px;
+    }
+    .device-mockup {
+      width: 850px;
+      height: 1600px;
+      background: #000;
+      position: absolute;
+      bottom: -100px;
+      border-radius: 60px;
+      border: 15px solid #334155;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .device-screen {
+      width: 100%;
+      height: 100%;
+      background: #000;
+    }
+    .iframe-screen {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .floating-badge {
+      position: absolute;
+      background: var(--accent);
+      color: #0f172a;
+      padding: 20px 40px;
+      border-radius: 50px;
+      font-size: 35px;
+      font-weight: 800;
+      top: 400px;
+      right: 50px;
+      z-index: 20;
+      box-shadow: 0 15px 30px rgba(0,212,255,0.4);
+      transform: rotate(5deg);
+    }
+
+    /* specific variations */
+    #sc1 { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); }
+    #sc2 { background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%); }
+    #sc3 { background: linear-gradient(135deg, #4c1d95 0%, #0f172a 100%); }
+    #sc4 { background: linear-gradient(135deg, #7f1d1d 0%, #0f172a 100%); }
+  </style>
+</head>
+<body>
+
+  <!-- Screen 1: Real-time Tides -->
+  <div class="screenshot-container" id="sc1">
+    <div class="screenshot-header">
+      <h1 class="screenshot-title">REAL-TIME TIDE DATA</h1>
+      <p class="screenshot-subtitle">Live Water Levels & Conditions</p>
+    </div>
+    <div class="floating-badge">🌊 Irish Coasts</div>
+    <div class="device-mockup">
+      <div class="device-screen">
+        <iframe src="index.html" class="iframe-screen"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen 2: Depth Charts -->
+  <div class="screenshot-container" id="sc2">
+    <div class="screenshot-header">
+      <h1 class="screenshot-title">LAKE DEPTH CHARTS</h1>
+      <p class="screenshot-subtitle">Find Where The Big Fish Hide</p>
+    </div>
+    <div class="floating-badge">📈 New Feature</div>
+    <div class="device-mockup">
+      <div class="device-screen">
+        <iframe src="index.html#page=depth" class="iframe-screen"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen 3: AI Identifier -->
+  <div class="screenshot-container" id="sc3">
+    <div class="screenshot-header">
+      <h1 class="screenshot-title">AI FISH IDENTIFIER</h1>
+      <p class="screenshot-subtitle">Snap a Photo & Identify Instantly</p>
+    </div>
+    <div class="floating-badge">🤖 Smart Scanner</div>
+    <div class="device-mockup">
+      <div class="device-screen">
+        <iframe src="index.html#page=species" class="iframe-screen"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen 4: Community -->
+  <div class="screenshot-container" id="sc4">
+    <div class="screenshot-header">
+      <h1 class="screenshot-title">ACTIVE COMMUNITY</h1>
+      <p class="screenshot-subtitle">Share Catches & Read Reports</p>
+    </div>
+    <div class="floating-badge">👥 10k+ Anglers</div>
+    <div class="device-mockup">
+      <div class="device-screen">
+        <iframe src="index.html#page=community" class="iframe-screen"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Scale handling logic to make it easy to full screen and screenshot
+    document.querySelectorAll('.screenshot-container').forEach(el => {
+      el.addEventListener('click', function() {
+        if(this.style.transform === 'scale(1)') {
+          this.style.transform = 'scale(0.3)';
+          this.style.marginBottom = '-1300px';
+          this.style.marginRight = '-700px';
+          this.style.zIndex = '1';
+        } else {
+          this.style.transform = 'scale(1)';
+          this.style.marginBottom = '20px';
+          this.style.marginRight = '20px';
+          this.style.zIndex = '1000';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

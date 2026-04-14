@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Irish Fishing Hub - TikTok Post</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* 9:16 Canvas — 1080×1920 scaled to fit screen */
+        .canvas {
+            width: 405px;
+            height: 720px;
+            position: relative;
+            overflow: hidden;
+            background: #000c1a;
+            border-radius: 12px;
+            box-shadow: 0 60px 120px rgba(0,0,0,0.8);
+        }
+
+        /* === OCEAN BACKGROUND === */
+        .ocean-bg {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 50% 0%, rgba(0, 120, 200, 0.4) 0%, transparent 60%),
+                linear-gradient(180deg,
+                    #000c1a 0%,
+                    #001428 20%,
+                    #001e3d 40%,
+                    #00294f 60%,
+                    #003363 80%,
+                    #004080 100%
+                );
+        }
+
+        /* Animated stars */
+        .stars {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+        }
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--dur, 3s) ease-in-out infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+
+        /* Horizon glow */
+        .horizon {
+            position: absolute;
+            bottom: 280px;
+            left: 0; right: 0;
+            height: 60px;
+            background: linear-gradient(180deg, transparent 0%, rgba(0, 200, 255, 0.12) 50%, transparent 100%);
+        }
+
+        /* Ocean water layers */
+        .water {
+            position: absolute;
+            bottom: 0;
+            left: 0; right: 0;
+            height: 310px;
+        }
+
+        .water-layer {
+            position: absolute;
+            width: 200%;
+            bottom: 0;
+        }
+
+        /* SVG waves */
+        .wave-svg {
+            width: 200%;
+            animation: waveShift var(--speed, 6s) linear infinite;
+            display: block;
+        }
+
+        @keyframes waveShift {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+        }
+
+        /* Moon */
+        .moon {
+            position: absolute;
+            top: 50px;
+            right: 60px;
+            width: 55px;
+            height: 55px;
+            background: radial-gradient(circle at 38% 38%, #fffde0, #f0c040);
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(255, 220, 80, 0.6), 0 0 80px rgba(255, 200, 0, 0.2);
+        }
+
+        .moon-glow {
+            position: absolute;
+            inset: -25px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 220, 80, 0.3) 0%, transparent 70%);
+            animation: moonPulse 4s ease-in-out infinite;
+        }
+        @keyframes moonPulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        /* Light reflection on water */
+        .moon-reflection {
+            position: absolute;
+            bottom: 180px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 120px;
+            background: linear-gradient(180deg, rgba(255,220,80,0.5) 0%, transparent 100%);
+            filter: blur(6px);
+            border-radius: 50%;
+            animation: reflectSway 4s ease-in-out infinite;
+        }
+        @keyframes reflectSway {
+            0%, 100% { transform: translateX(-50%) scaleX(1); opacity: 0.8; }
+            50% { transform: translateX(-50%) scaleX(2.5); opacity: 0.4; }
+        }
+
+        /* === TOP CONTENT === */
+        .top-content {
+            position: absolute;
+            top: 0;
+            left: 0; right: 0;
+            padding: 50px 36px 0;
+            z-index: 20;
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 200, 255, 0.15);
+            border: 1px solid rgba(0, 200, 255, 0.4);
+            backdrop-filter: blur(10px);
+            padding: 7px 14px;
+            border-radius: 100px;
+            margin-bottom: 26px;
+        }
+
+        .brand-dot {
+            width: 8px; height: 8px;
+            background: #00c8ff;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #00c8ff;
+            animation: blink 2s ease-in-out infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .brand-name {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: #00c8ff;
+            text-transform: uppercase;
+        }
+
+        .headline {
+            font-size: 54px;
+            font-weight: 900;
+            line-height: 0.9;
+            text-transform: uppercase;
+            color: white;
+            letter-spacing: -1px;
+            text-shadow: 0 4px 30px rgba(0,0,0,0.5);
+            margin-bottom: 18px;
+        }
+
+        .headline .accent {
+            background: linear-gradient(90deg, #00c8ff, #0070ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: block;
+        }
+
+        .subheadline {
+            font-size: 16px;
+            font-weight: 400;
+            color: rgba(255,255,255,0.65);
+            line-height: 1.5;
+            max-width: 260px;
+        }
+
+        /* === TIDE CARD === */
+        .tide-card {
+            position: absolute;
+            bottom: 330px;
+            left: 36px;
+            right: 36px;
+            z-index: 30;
+            background: rgba(5, 20, 40, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 200, 255, 0.2);
+            border-radius: 20px;
+            padding: 18px 20px 14px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .card-title {
+            font-size: 10px;
+            letter-spacing: 3px;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+        }
+
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(0, 255, 128, 0.15);
+            border: 1px solid rgba(0, 255, 128, 0.4);
+            padding: 3px 10px;
+            border-radius: 100px;
+        }
+        .live-dot {
+            width: 5px; height: 5px;
+            background: #00ff80;
+            border-radius: 50%;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+        .live-text {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #00ff80;
+            text-transform: uppercase;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+        .stat-label {
+            font-size: 9px;
+            color: rgba(255,255,255,0.35);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+        }
+        .stat-value {
+            font-size: 26px;
+            font-weight: 900;
+            color: white;
+        }
+        .stat-unit {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            font-weight: 400;
+        }
+
+        /* Tide chart SVG */
+        .chart-area {
+            height: 60px;
+            position: relative;
+        }
+        .chart-svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+        .chart-path {
+            fill: none;
+            stroke: url(#chartGrad);
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 6px rgba(0, 200, 255, 0.8));
+        }
+        .chart-fill {
+            fill: url(#fillGrad);
+            opacity: 0.4;
+        }
+        .pulse-dot {
+            fill: #00c8ff;
+            filter: drop-shadow(0 0 6px #00c8ff);
+        }
+        .pulse-ring {
+            fill: none;
+            stroke: #00c8ff;
+            stroke-width: 1.5;
+            opacity: 0;
+            animation: ringExpand 2s ease-out infinite;
+        }
+        @keyframes ringExpand {
+            0% { r: 4; opacity: 0.8; }
+            100% { r: 12; opacity: 0; }
+        }
+
+        /* === BOTTOM CTA === */
+        .bottom-cta {
+            position: absolute;
+            bottom: 50px;
+            left: 36px;
+            right: 36px;
+            z-index: 40;
+        }
+
+        .features {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .feature-pill {
+            flex: 1;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 12px;
+            padding: 10px 4px;
+            text-align: center;
+        }
+        .feature-icon { font-size: 18px; display: block; margin-bottom: 4px; }
+        .feature-label {
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+        }
+
+        .cta-btn {
+            display: block;
+            background: linear-gradient(90deg, #00c8ff, #0070ff);
+            color: white;
+            text-align: center;
+            padding: 18px;
+            border-radius: 14px;
+            font-size: 17px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-decoration: none;
+            box-shadow: 0 10px 40px rgba(0, 140, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        @keyframes shimmer {
+            to { left: 160%; }
+        }
+
+        .cta-url {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+            text-align: center;
+            margin-top: 12px;
+            letter-spacing: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="canvas">
+        <!-- Ocean Background -->
+        <div class="ocean-bg"></div>
+
+        <!-- Stars -->
+        <div class="stars" id="stars"></div>
+
+        <!-- Moon -->
+        <div class="moon">
+            <div class="moon-glow"></div>
+        </div>
+
+        <!-- Horizon -->
+        <div class="horizon"></div>
+
+        <!-- Moon reflection -->
+        <div class="moon-reflection"></div>
+
+        <!-- Ocean Water -->
+        <div class="water">
+            <svg viewBox="0 0 810 310" class="wave-svg" style="--speed:7s; position:absolute; bottom:0;">
+                <defs>
+                    <linearGradient id="oceanGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#005f9e" stop-opacity="0.95"/>
+                        <stop offset="100%" stop-color="#001e3d" stop-opacity="1"/>
+                    </linearGradient>
+                </defs>
+                <path d="M0,70 C60,30 120,110 180,70 C240,30 300,110 360,70 C420,30 480,110 540,70 C600,30 660,110 720,70 C780,30 810,70 810,70 L810,310 L0,310 Z" fill="url(#oceanGrad)" opacity="0.6"/>
+            </svg>
+            <svg viewBox="0 0 810 310" class="wave-svg" style="--speed:5s; position:absolute; bottom:0;">
+                <path d="M0,90 C80,50 160,130 240,90 C320,50 400,130 480,90 C560,50 640,130 720,90 C780,60 810,90 810,90 L810,310 L0,310 Z" fill="#003363" opacity="0.8"/>
+            </svg>
+            <svg viewBox="0 0 810 310" class="wave-svg" style="--speed:3.5s; position:absolute; bottom:0;">
+                <path d="M0,110 C90,80 180,140 270,110 C360,80 450,140 540,110 C630,80 720,140 810,110 L810,310 L0,310 Z" fill="#001e3d"/>
+            </svg>
+        </div>
+
+        <!-- Top Content -->
+        <div class="top-content">
+            <div class="brand-badge">
+                <div class="brand-dot"></div>
+                <span class="brand-name">Irish Fishing Hub</span>
+            </div>
+
+            <h1 class="headline">
+                MASTER<br>
+                <span class="accent">THE TIDE.</span>
+            </h1>
+            <p class="subheadline">Stop guessing. Real-time tide data for every pier on the Irish coast. 🇮🇪</p>
+        </div>
+
+        <!-- Tide Data Card -->
+        <div class="tide-card">
+            <div class="card-header">
+                <span class="card-title">Live Tide Data</span>
+                <div class="live-badge">
+                    <div class="live-dot"></div>
+                    <span class="live-text">Live</span>
+                </div>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat">
+                    <div class="stat-label">Height</div>
+                    <div class="stat-value">3.4<span class="stat-unit">m</span></div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Next High</div>
+                    <div class="stat-value">14<span class="stat-unit">:22</span></div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">State</div>
+                    <div class="stat-value" style="font-size:17px; padding-top:6px; color:#00c8ff;">Rising</div>
+                </div>
+            </div>
+
+            <div class="chart-area">
+                <svg class="chart-svg" viewBox="0 0 300 60" preserveAspectRatio="none">
+                    <defs>
+                        <linearGradient id="chartGrad" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0%" stop-color="#0070ff"/>
+                            <stop offset="100%" stop-color="#00c8ff"/>
+                        </linearGradient>
+                        <linearGradient id="fillGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#00c8ff" stop-opacity="0.4"/>
+                            <stop offset="100%" stop-color="#00c8ff" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+                    <!-- Fill area -->
+                    <path class="chart-fill" d="M0,55 L0,45 Q30,40 60,30 Q90,20 120,18 Q150,16 180,22 Q210,28 240,20 Q265,14 290,8 L290,55 Z"/>
+                    <!-- Line -->
+                    <path class="chart-path" d="M0,45 Q30,40 60,30 Q90,20 120,18 Q150,16 180,22 Q210,28 240,20 Q265,14 290,8"/>
+                    <!-- Pulse dot at end -->
+                    <circle class="pulse-dot" cx="290" cy="8" r="4"/>
+                    <circle class="pulse-ring" cx="290" cy="8" r="4"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Bottom Area -->
+        <div class="bottom-cta">
+            <div class="features">
+                <div class="feature-pill">
+                    <span class="feature-icon">🌊</span>
+                    <span class="feature-label">Tides</span>
+                </div>
+                <div class="feature-pill">
+                    <span class="feature-icon">🌤️</span>
+                    <span class="feature-label">Weather</span>
+                </div>
+                <div class="feature-pill">
+                    <span class="feature-icon">🐟</span>
+                    <span class="feature-label">Fish ID</span>
+                </div>
+                <div class="feature-pill">
+                    <span class="feature-icon">👥</span>
+                    <span class="feature-label">Community</span>
+                </div>
+            </div>
+
+            <a href="#" class="cta-btn">Download Free ↗</a>
+            <div class="cta-url">IRISHFISHINGHUB.COM</div>
+        </div>
+    </div>
+
+    <script>
+        // Generate random stars
+        const starsEl = document.getElementById('stars');
+        for (let i = 0; i < 80; i++) {
+            const star = document.createElement('div');
+            const size = Math.random() * 2 + 0.5;
+            star.className = 'star';
+            star.style.cssText = `
+                width: ${size}px;
+                height: ${size}px;
+                top: ${Math.random() * 55}%;
+                left: ${Math.random() * 100}%;
+                --dur: ${Math.random() * 4 + 2}s;
+                animation-delay: ${Math.random() * 4}s;
+            `;
+            starsEl.appendChild(star);
+        }
+    </script>
+</body>
+</html>

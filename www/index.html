@@ -1,0 +1,1944 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Real-time tide data for fishing around Ireland's coast. View current water levels, high/low tide times, and fishing conditions for all Irish coastal locations.">
+  <title>Irish Fishing Hub - Real-Time Fishing Tide Data</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+
+  <!-- App Styles -->
+  <link rel="stylesheet" href="style.css?v=1.1.2">
+
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
+  <!-- Google AdSense Auto Ads -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4749246157404876"
+    crossorigin="anonymous"></script>
+
+  <!-- Intro.js for Walkthrough -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
+
+  <!-- Inline CSS Fix for Intro.js Mobile Cache Bug & Positioning -->
+  <style>
+    .introjs-tooltip {
+      background-color: #152238 !important;
+      border: 1px solid rgba(0, 212, 255, 0.1) !important;
+      color: #e6f1ff !important;
+    }
+
+    .introjs-tooltiptext {
+      color: #e6f1ff !important;
+    }
+
+    .introjs-tooltipbuttons .introjs-button {
+      color: #e6f1ff !important;
+      text-shadow: none !important;
+      background-color: rgba(255, 255, 255, 0.1) !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+
+    .introjs-nextbutton,
+    .introjs-donebutton {
+      color: #000 !important;
+      background: linear-gradient(135deg, #00d4ff, #0088ff) !important;
+      text-shadow: none !important;
+      border: none !important;
+    }
+
+    .introjs-prevbutton {
+      color: #a0aec0 !important;
+    }
+
+    .introjs-showElement,
+    .introjs-showElement * {
+      z-index: 9999999 !important;
+    }
+
+    .introjs-tooltipReferenceLayer {
+      z-index: 10000000 !important;
+    }
+
+    .introjs-tooltip {
+      z-index: 10000001 !important;
+    }
+
+    .introjs-overlay {
+      z-index: 9999998 !important;
+    }
+
+    .introjs-helperLayer {
+      background-color: rgba(21, 34, 56, 0.5) !important;
+      z-index: 9999999 !important;
+    }
+
+    /* Force all mobile text boxes to float exactly like Step 1 */
+    @media (max-width: 768px) {
+
+      .introjs-tooltipReferenceLayer,
+      .introjs-tooltip {
+        visibility: visible !important;
+        opacity: 1 !important;
+        display: block !important;
+      }
+
+      .introjs-tooltip {
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: 90vw !important;
+        max-width: 340px !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+      }
+
+      /* Hide the directional arrow since the box is floating in the center */
+      .introjs-arrow {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <div class="loading-content">
+      <h1 class="welcome-text">Welcome</h1>
+      <h2 class="sub-welcome-text">Irish Fishing Hub</h2>
+      <div class="loading-logo-wrapper">
+        <div class="water-wave">🌊</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Irish Fishing Hub v1.1.1 Official Release -->
+
+  <!-- Navigation bar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-links">
+        <a href="#" class="nav-link active" id="nav-home" onclick="showPage('home')">📊 Dashboard</a>
+        <a href="#" class="nav-link" id="nav-community" onclick="showPage('community')">👥 Community</a>
+        <a href="#" class="nav-link" id="nav-guide" onclick="showPage('guide')">🎣 Beginner Guide</a>
+        <a href="#" class="nav-link" id="nav-sponsors" onclick="showPage('sponsors')">⭐ Sponsors</a>
+        <a href="#" class="nav-link" id="nav-directory" onclick="showPage('directory')">🏪 Shop Directory</a>
+        <a href="#" class="nav-link" id="nav-species" onclick="showPage('species')">🐟 Species Guide</a>
+        <a href="#" class="nav-link admin-only" id="nav-admin" onclick="showPage('admin')" style="display: none;">🛡️
+          Admin</a>
+      </div>
+
+      <div class="nav-brand">
+        <img src="assets/logo.png" alt="Logo" class="nav-logo-img"
+          style="height: 32px; width: 32px; margin-right: 8px;">
+        <span class="nav-title">Irish Fishing Hub</span>
+      </div>
+
+      <div class="nav-right">
+        <a href="https://www.buymeacoffee.com/AppDev21" target="_blank" class="btn"
+          style="padding: 4px 10px; font-size: 0.8rem; margin-right: 10px; display: flex; align-items: center; gap: 5px; text-decoration: none; color: #ffab00 !important; border: 1px solid #ffab00 !important; background: transparent; white-space: nowrap;">
+          <span style="font-size: 1rem;">🎣</span> Support Dev
+        </a>
+        <div class="nav-auth">
+          <button class="btn btn-sm btn-outline" id="login-btn" onclick="openAuthModal()">Login/Signup</button>
+          <div id="user-display" style="display: none;" onclick="openProfileModal()">
+            <span id="user-name-label">User</span>
+            <div class="user-avatar-wrapper">
+              <div class="user-avatar">👤</div>
+              <span class="notification-badge" id="notification-badge" style="display: none;">0</span>
+            </div>
+          </div>
+        </div>
+        <div class="nav-live">
+          <div class="live-indicator">
+            <span class="live-dot"></span>
+            <span>LIVE</span>
+          </div>
+          <span id="current-time"></span>
+        </div>
+        <!-- Mobile Menu Button -->
+        <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileMenu()">
+          <span style="display:block;width:18px;height:3px;background:#fff;border-radius:2px;"></span>
+          <span style="display:block;width:18px;height:3px;background:#fff;border-radius:2px;"></span>
+          <span style="display:block;width:18px;height:3px;background:#fff;border-radius:2px;"></span>
+        </button>
+      </div>
+    </div>
+    <!-- Mobile Dropdown Menu -->
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="#" class="mobile-menu-link" onclick="showPage('home'); closeMobileMenu()">📊 Dashboard</a>
+      <a href="#" class="mobile-menu-link" onclick="showPage('community'); closeMobileMenu()">👥 Community</a>
+      <a href="#" class="mobile-menu-link" onclick="showPage('guide'); closeMobileMenu()">🎣 Beginner Guide</a>
+      <a href="#" class="mobile-menu-link" onclick="showPage('sponsors'); closeMobileMenu()">⭐ Sponsors</a>
+      <a href="#" class="mobile-menu-link" onclick="showPage('directory'); closeMobileMenu()">🏪 Shop Directory</a>
+      <a href="#" class="mobile-menu-link" onclick="showPage('species'); closeMobileMenu()">🐟 Species Guide</a>
+      <a href="#" class="mobile-menu-link admin-only" id="mobile-nav-admin"
+        onclick="showPage('admin'); closeMobileMenu()" style="display: none;">🛡️ Admin</a>
+      <a href="articles.html" class="mobile-menu-link">📝 Fishing Blog</a>
+      <a href="about.html" class="mobile-menu-link">ℹ️ About Us</a>
+      <a href="contact.html" class="mobile-menu-link">💬 Contact Support</a>
+      <a href="#" class="mobile-menu-link" onclick="startWalkthrough(); closeMobileMenu()">🎓 App Tour</a>
+      <a href="terms.html" class="mobile-menu-link">⚖️ Terms & Conditions</a>
+      <a href="privacy.html" class="mobile-menu-link">🛡️ Privacy Policy</a>
+    </div>
+  </nav>
+
+
+  <!-- Home Page (Dashboard) -->
+  <main class="page active" id="page-home">
+    <!-- Fishing Mode Toggle (Moved inside page container) -->
+    <div class="fishing-mode-toggle-wrapper">
+      <div class="fishing-mode-toggle" id="fishing-mode-toggle-container">
+        <span class="mode-label active" id="mode-label-sea">🌊 Sea</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="fishing-mode-toggle" onchange="toggleFishingMode()">
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="mode-label" id="mode-label-freshwater">🏞️ Freshwater</span>
+
+        <!-- Filter Button (moved here for sleeker UI) -->
+        <button class="filter-toggle-btn-inline" id="filter-toggle-btn" onclick="toggleFilterPanel()"
+          title="Show/Hide Map Layers">
+          <span class="filter-toggle-icon">🗺️</span>
+          <span class="filter-toggle-text">Map Layers</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Sponsor Banner -->
+    <div class="sponsor-banner-wrapper" id="sponsor-banner-wrapper" style="display: none;">
+      <div class="sponsor-banner">
+        <div class="sponsor-banner-track" id="sponsor-banner-track">
+          <!-- Logos will be dynamically inserted here -->
+        </div>
+      </div>
+    </div>
+
+    <div class="app-container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <!-- Location Info -->
+        <div class="card fade-in" id="location-card">
+          <div class="card-header">
+            <span class="card-title">📍 Selected Location</span>
+          </div>
+          <div id="location-info">
+            <div class="empty-state">
+              <div class="empty-state-icon">🗺️</div>
+              <p>Select a tide station on the map</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Current Tide -->
+        <div class="card fade-in" id="tide-card" style="display: none;">
+          <div class="card-header">
+            <span class="card-title">🌊 Current Tide</span>
+          </div>
+          <div class="tide-current" id="tide-current">
+            <div class="loading">
+              <div class="loading-spinner"></div>
+              <span>Loading tide data...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Weather Conditions -->
+        <div class="card fade-in" id="weather-card" style="display: none;">
+          <div class="card-header" style="justify-content: space-between; display: flex; align-items: center;">
+            <button class="nav-arrow" onclick="navigateForecast(-1)">❮</button>
+            <span class="card-title" id="weather-card-title">Local Weather</span>
+            <button class="nav-arrow" onclick="navigateForecast(1)">❯</button>
+          </div>
+          <div class="weather-display" id="weather-display">
+            <div class="loading">
+              <div class="loading-spinner"></div>
+              <span>Fetching weather...</span>
+            </div>
+          </div>
+        </div>
+
+
+
+
+        <!-- Today's Tides -->
+        <div class="card fade-in" id="tide-times-card" style="display: none;">
+          <div class="card-header" style="justify-content: space-between; display: flex; align-items: center;">
+            <button class="nav-arrow" onclick="navigateForecast(-1)">❮</button>
+            <span class="card-title" id="tide-card-title">Today's Tides</span>
+            <button class="nav-arrow" onclick="navigateForecast(1)">❯</button>
+          </div>
+          <div class="tide-times" id="tide-times">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Fishing Conditions -->
+        <div class="card fade-in" id="fishing-card" style="display: none;">
+          <div class="card-header">
+            <span class="card-title">🎣 Fishing Conditions</span>
+          </div>
+          <div class="fishing-score" id="fishing-score">
+            <!-- Populated by JS -->
+          </div>
+          <div class="moon-phase" id="moon-phase" style="margin-top: var(--space-md);">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Nearby Shops -->
+        <div class="card fade-in" id="shops-card" style="display: none;">
+          <div class="card-header">
+            <span class="card-title">📍 Nearby Fishing Shops</span>
+          </div>
+          <div class="shop-list" id="shop-list">
+            <div class="loading">
+              <div class="loading-spinner"></div>
+              <span>Searching for shops...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tide Chart -->
+        <div class="card fade-in" id="chart-card" style="display: none;">
+          <div class="card-header">
+            <span class="card-title">📈 Tide Chart (24h)</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="tide-chart"></canvas>
+          </div>
+        </div>
+
+        <!-- Station List -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📋 All Stations</span>
+          </div>
+          <div class="station-list" id="station-list">
+            <div class="loading">
+              <div class="loading-spinner"></div>
+              <span>Loading stations...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SEO Text Card -->
+        <div class="card" style="margin-top: 15px; background: rgba(0,0,0,0.2);">
+          <div class="card-header">
+            <span class="card-title">🎣 About Irish Fishing Hub</span>
+          </div>
+          <div style="padding: 10px 15px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4;">
+            Irish Fishing Hub is Ireland's premier digital tool for anglers. Access real-time tide charts, live weather conditions, and precise water levels for hundreds of coastal spots. Whether you're sea fishing for bass or finding freshwater spots, our live community reports and interactive tackle shop directory have you covered.
+          </div>
+        </div>
+
+        <div class="sidebar-footer">
+          <a href="about.html">About Us</a>
+          <span>•</span>
+          <a href="contact.html">Contact</a>
+          <span>•</span>
+          <a href="articles.html">Fishing Blog</a>
+          <span>•</span>
+          <a href="terms.html">Terms</a>
+          <span>•</span>
+          <a href="privacy.html">Privacy</a>
+          <br>
+          <span style="display:block; margin-top:5px; font-size: 0.75rem;">&copy; 2026 Irish Fishing Hub</span>
+        </div>
+      </aside>
+
+      <!-- Map -->
+      <section class="map-container">
+
+        <!-- Collapsible Filter Panel -->
+        <div class="filter-sidebar" id="filter-sidebar">
+          <div class="filter-sidebar-header">
+            <h3>Map Filters</h3>
+            <button class="filter-close-btn" onclick="applyAndCloseFilters()">&times;</button>
+          </div>
+          <div class="filter-options">
+            <label class="filter-option">
+              <input type="checkbox" id="filter-stations" checked>
+              <span class="filter-checkbox"></span>
+              <span class="filter-emoji">🌊</span> Tidal Stations
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" id="filter-shops" checked>
+              <span class="filter-checkbox"></span>
+              <span class="filter-emoji">🏪</span> Tackle Shops
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" id="filter-piers" checked>
+              <span class="filter-checkbox"></span>
+              <span class="filter-emoji">🎣</span> Fishing Piers
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" id="filter-ramps" checked>
+              <span class="filter-checkbox"></span>
+              <span class="filter-emoji">🚤</span> Boat Ramps
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" id="filter-harbours" checked>
+              <span class="filter-checkbox"></span>
+              <span class="filter-emoji">🛥️</span> Harbours
+            </label>
+          </div>
+          <button class="filter-apply-btn" onclick="applyFilters()">✓ Apply Filters</button>
+        </div>
+
+        <!-- Filter Overlay -->
+        <div class="filter-overlay" id="filter-overlay" onclick="closeFilterPanel()"></div>
+
+        <!-- Freshwater Filter Sidebar (hidden in sea mode) -->
+        <div class="filter-sidebar freshwater-filter-sidebar" id="freshwater-filter-sidebar" style="display: none;">
+          <div class="filter-sidebar-header">
+            <h3>🏞️ Freshwater Filters</h3>
+            <button class="filter-close-btn" onclick="applyFreshwaterFilters()">&times;</button>
+          </div>
+          <div class="filter-options">
+            <label class="filter-option">
+              <input type="checkbox" id="filter-fw-spots" checked>
+              <span class="filter-checkbox"></span>
+              <span class="filter-emoji">🐟</span> Fishing Spots
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" id="filter-fw-parks" checked>
+              <span class="filter-checkbox"></span>
+              <span class="filter-emoji">🏞️</span> Fishing Parks
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" id="filter-fw-ramps" checked>
+              <span class="filter-checkbox"></span>
+              <span class="filter-emoji">🚤</span> Boat Ramps
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" id="filter-fw-piers" checked>
+              <span class="filter-checkbox"></span>
+              <span class="filter-emoji">🎣</span> Piers & Platforms
+            </label>
+            <label class="filter-option">
+              <input type="checkbox" id="filter-fw-shops" checked>
+              <span class="filter-checkbox"></span>
+              <span class="filter-emoji">🏪</span> Tackle Shops
+            </label>
+          </div>
+          <button class="filter-apply-btn" onclick="applyFreshwaterFilters()">✓ Apply Filters</button>
+        </div>
+
+        <!-- Freshwater Filter Overlay -->
+        <div class="filter-overlay" id="freshwater-filter-overlay" onclick="closeFreshwaterFilterPanel()"></div>
+
+        <div id="map"></div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Community Page (Social) -->
+  <main class="page" id="page-community" style="display: none;">
+    <div class="app-container">
+      <aside class="sidebar">
+        <div class="card">
+          <div class="card-header" style="justify-content: space-between; display: flex; align-items: center;">
+            <span class="card-title">📸 Pin a spot on the map or post an update</span>
+            <button class="btn btn-sm btn-primary" onclick="openPostModal(null)">📝 Post Update</button>
+          </div>
+          <div class="catch-feed" id="catch-feed">
+            <div class="empty-state">
+              <p>No catches shared yet. Be the first!</p>
+            </div>
+          </div>
+        </div>
+        <div class="sidebar-footer">
+          <a href="about.html">About Us</a>
+          <span>•</span>
+          <a href="contact.html">Contact</a>
+          <span>•</span>
+          <a href="articles.html">Fishing Blog</a>
+          <span>•</span>
+          <a href="terms.html">Terms</a>
+          <span>•</span>
+          <a href="privacy.html">Privacy</a>
+          <br>
+          <span style="display:block; margin-top:5px; font-size: 0.75rem;">&copy; 2026 Irish Fishing Hub</span>
+        </div>
+      </aside>
+      <section class="map-container">
+        <div id="community-gating-overlay" class="premium-overlay" style="display: none;">
+          <div class="overlay-content" id="community-login-prompt">
+            <div class="premium-badge">🔒 LOGIN REQUIRED</div>
+            <h2>Create a Free Account</h2>
+            <p>The Community Hub is available to all registered users. Create a free account to share catches, interact
+              with other anglers, and access all features!</p>
+            <button class="btn btn-primary btn-lg" onclick="openAuthModal()">Sign Up / Login</button>
+            <p class="premium-footer">Join the Irish fishing community today 🎣</p>
+          </div>
+          <div class="overlay-content" id="community-premium-prompt" style="display: none;">
+            <div class="premium-badge">🏆 PREMIUM</div>
+            <h2>Join the Crew!</h2>
+            <p>The Community Hub is exclusive to Pro members. See live catches, share your own spots, and interact with
+              other anglers across Ireland.</p>
+            <div class="premium-price">Only €10 / month</div>
+            <button class="btn btn-primary btn-lg" onclick="openPremiumModal()">Upgrade to Pro</button>
+            <p class="premium-footer">Join 500+ pros on the water today 🎣</p>
+          </div>
+        </div>
+        <div id="social-map"></div>
+        <div class="map-overlay">
+          <p>Click anywhere on the map to mark a new fishing spot!</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Sponsors Page -->
+  <main class="page" id="page-sponsors" style="display: none;">
+    <div class="directory-container">
+      <div class="directory-hero">
+        <h1>🤝 Our Sponsors</h1>
+        <p>Supporting the Irish Fishing Hub community</p>
+      </div>
+
+      <div class="sponsors-grid" id="sponsors-grid">
+        <div class="empty-state">
+          <p>No sponsors yet. Check back soon!</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Directory Page (National Shop List) -->
+  <main class="page" id="page-directory" style="display: none;">
+    <div class="directory-container">
+      <div class="directory-hero">
+        <h1>🇮🇪 National Tackle Store Directory</h1>
+        <p>Find the best fishing gear across every county in Ireland</p>
+      </div>
+      <div class="county-directory" id="county-directory">
+        <div class="loading">
+          <div class="loading-spinner"></div>
+          <span>Loading national directory...</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Species Guide Page -->
+  <main class="page" id="page-species" style="display: none;">
+    <div class="species-container">
+      <div class="species-hero">
+        <h1>🐟 Species Guide</h1>
+        <p>Identify fish with AI or browse common Irish species</p>
+      </div>
+
+      <!-- AI Fish Identifier Section -->
+      <div class="species-identifier-section">
+        <div class="card species-identifier-card">
+          <div class="card-header">
+            <span class="card-title">📸 AI Fish Identifier</span>
+          </div>
+          <div class="species-identifier-body">
+            <div class="species-upload-zone" id="species-upload-zone">
+              <div class="species-upload-content" id="species-upload-content">
+                <div class="species-upload-icon">📷</div>
+                <h3>Take or Upload a Photo</h3>
+                <p>Snap a photo of your catch or upload an image to identify the species</p>
+                <div class="species-upload-buttons">
+                  <label class="btn btn-primary species-upload-btn" for="species-photo-input">
+                    📁 Upload Photo
+                  </label>
+                  <button class="btn btn-outline species-camera-btn" onclick="openSpeciesCamera()">
+                    📸 Take Photo
+                  </button>
+                </div>
+                <input type="file" id="species-photo-input" accept="image/*" style="display: none;"
+                  onchange="handleSpeciesPhotoUpload(this)">
+                <input type="file" id="species-camera-input" accept="image/*" capture="environment"
+                  style="display: none;" onchange="handleSpeciesPhotoUpload(this)">
+              </div>
+              <!-- Image Preview -->
+              <div class="species-preview" id="species-preview" style="display: none;">
+                <img id="species-preview-img" src="" alt="Fish photo">
+                <button class="species-preview-remove" onclick="clearSpeciesPhoto()">✕</button>
+              </div>
+            </div>
+
+            <!-- AI Identification Loading -->
+            <div class="species-ai-loading" id="species-ai-loading" style="display: none;">
+              <div class="loading-spinner"></div>
+              <p>Analyzing your photo with AI...</p>
+            </div>
+
+            <!-- AI Result Card -->
+            <div class="species-ai-result" id="species-ai-result" style="display: none;">
+              <div class="species-result-header">
+                <span class="species-result-badge">🤖 AI Identification</span>
+                <button class="btn btn-sm btn-outline" onclick="clearSpeciesPhoto()">Try Another</button>
+              </div>
+              <div class="species-result-body">
+                <h2 id="species-result-name">Unknown Species</h2>
+                <p class="species-result-scientific" id="species-result-scientific"></p>
+                <div class="species-result-confidence" id="species-result-confidence"></div>
+                <div class="species-result-details" id="species-result-details"></div>
+              </div>
+            </div>
+
+            <!-- AI Error -->
+            <div class="species-ai-error" id="species-ai-error" style="display: none;">
+              <p>⚠️ <span id="species-error-message">Could not identify the fish. Please try a clearer photo.</span></p>
+              <button class="btn btn-sm btn-outline" onclick="clearSpeciesPhoto()">Try Again</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Species Gallery Section -->
+      <div class="species-gallery-section">
+        <div class="species-gallery-header">
+          <h2>🇮🇪 Irish Fish Species</h2>
+          <div class="species-search-wrapper">
+            <input type="text" id="species-search" class="species-search-input" placeholder="Search species..."
+              oninput="filterSpeciesGallery(this.value)">
+          </div>
+          <div class="species-filter-tabs" id="species-filter-tabs">
+            <button class="species-tab active" onclick="filterSpeciesByCategory('all', this)">All</button>
+            <button class="species-tab" onclick="filterSpeciesByCategory('sea', this)">🌊 Sea Fish</button>
+            <button class="species-tab" onclick="filterSpeciesByCategory('freshwater', this)">🏞️ Freshwater</button>
+            <button class="species-tab" onclick="filterSpeciesByCategory('shellfish', this)">🦀 Shellfish</button>
+          </div>
+        </div>
+        <div class="species-gallery-grid" id="species-gallery-grid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Beginner Guide Page -->
+  <main class="page" id="page-guide" style="display: none;">
+    <div class="guide-container">
+      <div class="guide-hero">
+        <h1>🎣 Beginner Fishing Guide</h1>
+        <p>Your ultimate resource for starting your fishing journey in Ireland.</p>
+      </div>
+
+      <div class="guide-grid">
+        <!-- Gear Basics Section -->
+        <div class="card guide-card">
+          <div class="card-header">
+            <span class="card-title">🎣 Gear Basics</span>
+          </div>
+          <div class="guide-card-body">
+            <p><strong>Sea Fishing:</strong> You'll need a sturdy spinning or beachcaster rod (9-12ft), a 4000-6000 size reel, and 15-20lb line. Saltwater environments demand robust gear.</p>
+            <p><strong>Freshwater:</strong> A lighter setup is ideal. A 7-9ft spinning rod, 2500-3000 size reel, and 6-10lb line will cover most lakes and rivers.</p>
+          </div>
+        </div>
+
+        <!-- Baits & Lures Section -->
+        <div class="card guide-card">
+          <div class="card-header">
+            <span class="card-title">🪱 Baits & Lures</span>
+          </div>
+          <div class="guide-card-body">
+            <p><strong>Top Sea Baits:</strong> Mackerel strip is the number one sea bait in Ireland. Lugworm and ragworm are excellent for flatfish and bass.</p>
+            <p><strong>Top Lures:</strong> Silver spinners (like Toby lures) are essential for mackerel and pollock. Soft plastic lures work well for bass and wrasse.</p>
+          </div>
+        </div>
+
+        <!-- Understanding Tides Section -->
+        <div class="card guide-card">
+          <div class="card-header">
+            <span class="card-title">🌊 Understanding Tides</span>
+          </div>
+          <div class="guide-card-body">
+            <p><strong>When to fish:</strong> The best time for sea fishing is generally two hours before high tide and one hour after. Moving water brings feeding fish.</p>
+            <p><strong>Spring Tides:</strong> These occur around new and full moons, offering the highest high tides and lowest low tides, often producing the best fishing conditions.</p>
+          </div>
+        </div>
+
+        <!-- Safety & Etiquette Section -->
+        <div class="card guide-card">
+          <div class="card-header">
+            <span class="card-title">🛡️ Safety & Etiquette</span>
+          </div>
+          <div class="guide-card-body">
+            <p><strong>Safety First:</strong> Never turn your back to the sea, especially when rock fishing. Always wear a lifejacket in dangerous spots and check the weather/swell forecast.</p>
+            <p><strong>Etiquette:</strong> Leave no trace. Take all your rubbish and old tackle home. Respect catch limits and try to catch-and-release when possible.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Custom Catch Modal -->
+  <div id="catch-modal" class="modal">
+    <div class="modal-content">
+      <h3>🎣 Share Your Catch</h3>
+      <div class="form-group">
+        <label>What did you catch?</label>
+        <input type="text" id="catch-species" placeholder="e.g., Sea Bass, Mackerel">
+      </div>
+      <div class="form-group">
+        <label>Details</label>
+        <textarea id="catch-details" placeholder="How was the fight? What bait did you use?"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Add a Photo</label>
+        <div class="file-input-wrapper">
+          <input type="file" id="catch-photo" accept="image/*" onchange="previewImage(this)">
+          <div id="image-preview" class="image-preview" style="display: none;">
+            <img id="preview-img" src="" alt="Preview">
+            <button class="remove-image" onclick="removeImage()">✕</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="submitCatch()">Post</button>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Auth Modal -->
+  <div class="modal" id="auth-modal">
+    <div class="modal-content">
+      <h2 id="auth-title">Welcome Back</h2>
+      <p id="auth-sub">Log in to your account</p>
+      <div class="auth-form-container">
+        <input type="email" id="auth-email" placeholder="Email Address" class="auth-input">
+        <input type="text" id="auth-username" placeholder="Username (Signup Only)" class="auth-input"
+          style="display: none;">
+        <div style="position: relative;">
+          <input type="password" id="auth-password" placeholder="Password" class="auth-input">
+          <button type="button" onclick="togglePasswordVisibility()"
+            style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.2rem; color: var(--text-secondary); padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;"
+            title="Show/Hide Password" id="password-toggle-btn">
+            👁️
+          </button>
+        </div>
+        <label class="auth-remember"
+          style="display:flex; align-items:center; gap:8px; margin: 10px 0; font-size: 0.9rem; cursor: pointer;">
+          <input type="checkbox" id="auth-remember" checked>
+          <span>Remember me</span>
+        </label>
+
+        <label id="auth-terms-container"
+          style="display:none; align-items:flex-start; gap:8px; margin: 0 0 15px 0; font-size: 0.8rem; cursor: pointer;">
+          <input type="checkbox" id="auth-terms">
+          <span style="color: var(--text-secondary); line-height: 1.3;">I agree to the <a href="#"
+              onclick="openTermsModal()" style="color: var(--accent-primary);">Terms & Conditions</a> and <a href="#"
+              onclick="openPrivacyModal()" style="color: var(--accent-primary);">Privacy Policy</a>.</span>
+        </label>
+
+        <button class="btn btn-primary"
+          onclick="handleAuthSubmit(); setTimeout(refreshCommunityGating, 100);">Continue</button>
+        <p class="auth-switch">Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign up</a></p>
+      </div>
+      <button class="modal-close-btn" onclick="closeAuthModal()">✕</button>
+    </div>
+  </div>
+
+  <!-- Premium Upgrade Modal -->
+  <div class="modal" id="premium-modal">
+    <div class="modal-content modal-large">
+      <div class="premium-modal-grid">
+        <div class="premium-modal-info">
+          <div class="premium-badge">🏆 PRO PLAN</div>
+          <h2>Unlock the Hub</h2>
+          <ul class="premium-benefits">
+            <li>✅ Post catches to the Community Feed</li>
+            <li>✅ Detailed catch coordinates & spots</li>
+            <li>✅ Like & Comment on others posts</li>
+            <li>✅ Exclusive pro angler insights</li>
+            <li>✅ Support the development of Irish Fishing Hub</li>
+          </ul>
+        </div>
+        <div class="premium-modal-cta">
+          <div class="price-bubble">
+            <span class="currency">€</span><span class="amount">10</span><span class="freq">/mo</span>
+          </div>
+          <p>Cancel any time. No contracts.</p>
+          <button class="btn btn-success btn-lg" onclick="openStripeCheckout()">Start Pro Membership</button>
+          <div class="stripe-badge-container">
+            <svg class="stripe-svg" viewBox="0 0 60 25" xmlns="http://www.w3.org/2000/svg">
+              <path fill="currentColor"
+                d="M59.64 14.28h-8.06c.19 1.93 1.6 2.55 3.27 2.55 1.63 0 2.91-.44 3.82-1l.73 2.15c-1.12.77-2.85 1.34-4.88 1.34-3.51 0-5.73-2.22-5.73-6.24 0-3.66 2.04-6.3 5.42-6.3 3.32 0 5.14 2.51 5.14 5.74 0 .42-.03.82-.07 1.05.01-.15.01-.15.36-.29zm-7.98-2.15h5.1c-.13-1.63-1.42-2.3-2.52-2.3-1.39 0-2.34.84-2.58 2.3zM45.72 8.28c-1.36 0-2.23.63-2.73 1.25V8.5h-2.8v13.52c0 .28-.01.55.02.82l2.8-.2v-6.35c.57.57 1.41 1.01 2.52 1.01 2.36 0 4.38-2.11 4.38-5.51 0-3.48-2.01-5.51-4.19-5.51zm-.81 5.4c-1.07 0-1.74-.63-1.92-1.06v-2.09c.18-.43.85-1.06 1.92-1.06 1.15 0 1.65 1.08 1.65 2.11 0 1.02-.5 2.1-1.65 2.1zM34.78 6.55c-1.11 0-2.07.45-2.61.94V3.13l-3.04.64v13.52c0 .28-.01.55.02.82l2.8-.2V9.92c.51-.55 1.38-1.08 2.3-1.08.66 0 .97.31.97.99V18.1c0 .28-.01.55.02.82l2.8-.2v-9.5c.01-1.57-.96-2.67-3.26-2.67zM24.78 18.25l-.01.1L24.78 19.1c.21 0 .28-.01.28-.31V8.5h-2.8v1.3c-.53-.8-1.47-1.52-3.04-1.52-2.45 0-4.59 2.18-4.59 5.51 0 3.33 2.14 5.51 4.59 5.51 1.57 0 2.51-.72 3.04-1.52v.87c.01 0-.01.01-.1.1zM19.46 13.68c0-1.03.5-2.11 1.65-2.11 1.07 0 1.74.63 1.92 1.06v2.09c-.18.43-.85 1.06-1.92 1.06-1.15 0-1.65-1.08-1.65-2.11zM11.66 4.3c-.22 0-.46.03-.7.09l.48 2.6c.15-.04.31-.06.39-.06.74 0 1.19.43 1.19 1.19v.42H10.1v2.73h2.92v6.83c0 .28-.01.55.02.82l2.8-.2V11.27h1.99V8.54h-1.99V7.93c0-2.31-1.13-3.63-4.18-3.63zM1.02 11.27l1.37.58c1.39.59 2.05 1 2.05 1.98 0 .86-.71 1.33-1.89 1.33-1.51 0-3.13-.57-4.22-1.28L-2 16.51c1.36.85 3.35 1.51 5.37 1.51 3.55 0 5.4-1.74 5.4-4.29 0-3.37-2.32-4.11-4.73-5.11l-1.37-.58c-.97-.41-1.64-.78-1.64-1.51 0-.61.54-1.02 1.52-1.02 1.2 0 2.56.45 3.51.98l1.01-2.52C5.74 3.06 4.19 2.5 2.6 2.5.01 2.5-2.1 3.99-2.1 6.51c0 3.05 2.14 3.93 4.49 4.91z" />
+            </svg>
+            <span class="stripe-secure-text">Secure 256-bit SSL encrypted payment</span>
+          </div>
+        </div>
+      </div>
+      <button class="modal-close-btn" onclick="closePremiumModal()">✕</button>
+    </div>
+  </div>
+
+  <!-- Stripe Checkout Modal -->
+  <div class="modal" id="stripe-checkout-modal">
+    <div class="modal-content stripe-checkout-container">
+      <div class="stripe-header">
+        <div class="stripe-logo">
+          <svg viewBox="0 0 60 25" xmlns="http://www.w3.org/2000/svg">
+            <path fill="currentColor"
+              d="M59.64 14.28h-8.06c.19 1.93 1.6 2.55 3.27 2.55 1.63 0 2.91-.44 3.82-1l.73 2.15c-1.12.77-2.85 1.34-4.88 1.34-3.51 0-5.73-2.22-5.73-6.24 0-3.66 2.04-6.3 5.42-6.3 3.32 0 5.14 2.51 5.14 5.74 0 .42-.03.82-.07 1.05.01-.15.01-.15.36-.29zm-7.98-2.15h5.1c-.13-1.63-1.42-2.3-2.52-2.3-1.39 0-2.34.84-2.58 2.3zM45.72 8.28c-1.36 0-2.23.63-2.73 1.25V8.5h-2.8v13.52c0 .28-.01.55.02.82l2.8-.2v-6.35c.57.57 1.41 1.01 2.52 1.01 2.36 0 4.38-2.11 4.38-5.51 0-3.48-2.01-5.51-4.19-5.51zm-.81 5.4c-1.07 0-1.74-.63-1.92-1.06v-2.09c.18-.43.85-1.06 1.92-1.06 1.15 0 1.65 1.08 1.65 2.11 0 1.02-.5 2.1-1.65 2.1zM34.78 6.55c-1.11 0-2.07.45-2.61.94V3.13l-3.04.64v13.52c0 .28-.01.55.02.82l2.8-.2V9.92c.51-.55 1.38-1.08 2.3-1.08.66 0 .97.31.97.99V18.1c0 .28-.01.55.02.82l2.8-.2v-9.5c.01-1.57-.96-2.67-3.26-2.67zM24.78 18.25l-.01.1L24.78 19.1c.21 0 .28-.01.28-.31V8.5h-2.8v1.3c-.53-.8-1.47-1.52-3.04-1.52-2.45 0-4.59 2.18-4.59 5.51 0 3.33 2.14 5.51 4.59 5.51 1.57 0 2.51-.72 3.04-1.52v.87c.01 0-.01.01-.1.1zM19.46 13.68c0-1.03.5-2.11 1.65-2.11 1.07 0 1.74.63 1.92 1.06v2.09c-.18.43-.85 1.06-1.92 1.06-1.15 0-1.65-1.08-1.65-2.11zM11.66 4.3c-.22 0-.46.03-.7.09l.48 2.6c.15-.04.31-.06.39-.06.74 0 1.19.43 1.19 1.19v.42H10.1v2.73h2.92v6.83c0 .28-.01.55.02.82l2.8-.2V11.27h1.99V8.54h-1.99V7.93c0-2.31-1.13-3.63-4.18-3.63zM1.02 11.27l1.37.58c1.39.59 2.05 1 2.05 1.98 0 .86-.71 1.33-1.89 1.33-1.51 0-3.13-.57-4.22-1.28L-2 16.51c1.36.85 3.35 1.51 5.37 1.51 3.55 0 5.4-1.74 5.4-4.29 0-3.37-2.32-4.11-4.73-5.11l-1.37-.58c-.97-.41-1.64-.78-1.64-1.51 0-.61.54-1.02 1.52-1.02 1.2 0 2.56.45 3.51.98l1.01-2.52C5.74 3.06 4.19 2.5 2.6 2.5.01 2.5-2.1 3.99-2.1 6.51c0 3.05 2.14 3.93 4.49 4.91z" />
+          </svg>
+        </div>
+        <button class="modal-close-btn-inline" onclick="closeStripeCheckout()">✕</button>
+      </div>
+
+      <div class="stripe-body">
+        <div class="checkout-summary">
+          <p class="product-name">Irish Fishing Hub Pro</p>
+          <div class="product-price">€10.00 <span class="price-period">per month</span></div>
+        </div>
+
+        <div class="stripe-form">
+          <div class="form-group stripe-field">
+            <label>Card Information</label>
+            <div class="card-input-container">
+              <input type="text" id="stripe-card-number" placeholder="1234 5678 1234 5678" maxlength="19">
+              <div class="card-meta">
+                <input type="text" id="stripe-card-expiry" placeholder="MM / YY" maxlength="7">
+                <input type="text" id="stripe-card-cvc" placeholder="CVC" maxlength="3">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group stripe-field">
+            <label>Cardholder Name</label>
+            <input type="text" id="stripe-card-name" placeholder="John Doe">
+          </div>
+
+          <div class="form-group stripe-field">
+            <label>Country or region</label>
+            <select id="stripe-country">
+              <option value="IE">Ireland</option>
+              <option value="UK">United Kingdom</option>
+              <option value="US">United States</option>
+            </select>
+          </div>
+
+          <button class="stripe-pay-btn" id="stripe-pay-btn" onclick="processStripePayment()">
+            <span class="btn-text">Subscribe</span>
+            <div class="stripe-spinner hidden" id="stripe-pay-spinner"></div>
+          </button>
+
+          <p class="stripe-disclaimer">By confirming your subscription, you allow Irish Fishing Hub to charge your card
+            for this payment and future payments in accordance with their terms.</p>
+        </div>
+      </div>
+
+      <div class="stripe-footer">
+        <span class="powered-by">Powered by <strong>Stripe</strong></span>
+        <div class="footer-links">
+          <span>Terms</span>
+          <span>Privacy</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shop Details Modal -->
+  <div class="modal" id="shop-details-modal">
+    <div class="modal-content modal-large">
+      <div id="shop-details-hero" class="street-view-container">
+        <div class="loading-overlay" id="sv-loading">
+          <div class="loading-spinner"></div>
+        </div>
+        <img id="street-view-image" src="" alt="Shop Exterior" style="display: none;"
+          onload="this.style.display='block'; document.getElementById('sv-loading').style.display='none';">
+        <div class="no-image-placeholder" id="sv-fallback" style="display: none;">
+          <span>🏙️ No street view available</span>
+        </div>
+      </div>
+
+      <div class="shop-details-body">
+        <h2 id="shop-details-name">Shop Name</h2>
+        <div class="shop-meta-large">
+          <p id="shop-details-address"><span class="icon">📍</span> Loading address...</p>
+          <p id="shop-details-phone"><span class="icon">📞</span> Loading phone...</p>
+          <p id="shop-details-email"><span class="icon">📧</span> Loading email...</p>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn" onclick="closeShopDetails()">Close</button>
+          <button id="shop-details-directions-btn" class="btn btn-primary">Get Directions</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Modal -->
+  <div class="modal" id="profile-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>👤 Your Profile</h2>
+        <button class="modal-close-btn-inline" onclick="closeProfileModal()">✕</button>
+      </div>
+
+      <div class="profile-header-section">
+        <div class="avatar-upload-wrapper">
+          <img id="profile-avatar-preview" src="" alt="Profile">
+          <label for="avatar-input" class="avatar-edit-btn">📷</label>
+          <input type="file" id="avatar-input" accept="image/*" style="display: none;"
+            onchange="handleAvatarSelect(this)">
+        </div>
+        <div class="profile-status">
+          <span id="profile-plan-badge" class="plan-badge">FREE PLAN</span>
+          <button class="btn btn-sm btn-outline" id="profile-upgrade-btn" onclick="openPremiumModal()">Upgrade</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Display Name</label>
+        <input type="text" id="profile-name" class="auth-input">
+      </div>
+
+      <div class="form-group">
+        <label>Bio</label>
+        <textarea id="profile-bio" class="auth-input" rows="3"
+          placeholder="Tell us about your fishing experience..."></textarea>
+      </div>
+
+      <div class="modal-actions" style="justify-content: space-between; margin-top: 20px;">
+        <button class="btn btn-danger btn-outline" onclick="logout()">Log Out</button>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn btn-outline" onclick="openSupportModal()">💬 Contact Support</button>
+          <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sponsor Modal -->
+  <div class="modal" id="sponsor-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="sponsor-modal-title">➕ Add New Sponsor</h2>
+        <button class="modal-close-btn-inline" onclick="closeSponsorModal()">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label>Sponsor Name *</label>
+        <input type="text" id="sponsor-name-input" class="auth-input" placeholder="e.g. Fishing Tackle Ireland">
+      </div>
+
+      <div class="form-group">
+        <label>Logo URL *</label>
+        <input type="url" id="sponsor-logo-url" class="auth-input" placeholder="https://example.com/logo.png">
+        <small style="color: var(--text-muted); font-size: 0.85rem;">Paste a direct link to the sponsor's logo
+          image</small>
+      </div>
+
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="sponsor-email-input" class="auth-input" placeholder="contact@sponsor.com">
+      </div>
+
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="tel" id="sponsor-phone-input" class="auth-input" placeholder="+353 1 234 5678">
+      </div>
+
+      <div class="form-group">
+        <label>Website URL</label>
+        <input type="url" id="sponsor-website-input" class="auth-input" placeholder="https://sponsor-website.com">
+      </div>
+
+      <div class="form-group">
+        <label>Description (Optional)</label>
+        <textarea id="sponsor-description-input" class="auth-input" rows="3"
+          placeholder="Brief description of the sponsor..."></textarea>
+      </div>
+
+      <div class="modal-actions" style="margin-top: 20px;">
+        <button class="btn btn-outline" onclick="closeSponsorModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveSponsor()" id="save-sponsor-btn">Add Sponsor</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sponsor Info Modal -->
+  <div class="modal" id="sponsor-info-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="sponsor-info-title">Sponsor Information</h2>
+        <button class="modal-close-btn-inline" onclick="closeSponsorInfoModal()">✕</button>
+      </div>
+
+      <div class="sponsor-info-content">
+        <div class="sponsor-info-logo-wrapper">
+          <img id="sponsor-info-logo" src="" alt="Sponsor Logo" class="sponsor-info-logo"
+            onerror="this.style.display='none'; document.getElementById('sponsor-logo-fallback').style.display='flex'">
+          <div id="sponsor-logo-fallback"
+            style="display:none; font-size:3rem; align-items:center; justify-content:center; height:100px;">🤝</div>
+        </div>
+
+        <h3 id="sponsor-info-name" class="sponsor-info-name"></h3>
+
+        <div id="sponsor-info-description" class="sponsor-info-description" style="display: none;"></div>
+
+        <div class="sponsor-info-contacts">
+          <div class="sponsor-contact-item" id="sponsor-contact-email" style="display: none;">
+            <span class="contact-icon">📧</span>
+            <a id="sponsor-email-link" href="" class="contact-link"></a>
+          </div>
+
+          <div class="sponsor-contact-item" id="sponsor-contact-phone" style="display: none;">
+            <span class="contact-icon">📞</span>
+            <a id="sponsor-phone-link" href="" class="contact-link"></a>
+          </div>
+
+          <div class="sponsor-contact-item">
+            <span class="contact-icon">🌐</span>
+            <a id="sponsor-website-link" href="" target="_blank" rel="noopener noreferrer" class="contact-link"></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="margin-top: 20px;">
+        <button class="btn btn-primary" onclick="visitSponsorWebsite()" id="visit-sponsor-btn">Visit Website →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Species Guide Page -->
+  <main class="page" id="page-species" style="display: none;">
+    <div class="species-container">
+      <div class="species-hero">
+        <h1>🐟 Species Guide</h1>
+        <p>Identify fish species with AI or browse Ireland's marine & freshwater life</p>
+      </div>
+
+      <!-- AI Fish Identifier -->
+      <div class="species-identifier-section">
+        <div class="species-identifier-card">
+          <div class="admin-card-header">
+            <h3>🤖 AI Fish Identifier</h3>
+            <span class="badge" style="background:rgba(0,255,136,0.15);color:var(--accent-success);">AI Powered</span>
+          </div>
+          <div class="species-identifier-body">
+            <div class="species-upload-zone" id="species-upload-zone">
+              <!-- Upload content (default) -->
+              <div class="species-upload-content" id="species-upload-content">
+                <div class="species-upload-icon">📸</div>
+                <h3>Upload or Take a Photo</h3>
+                <p>Our AI will identify the fish species from your photo</p>
+                <div class="species-upload-buttons">
+                  <label class="btn btn-primary species-upload-btn">
+                    📁 Upload Photo
+                    <input type="file" accept="image/*" id="species-photo-input"
+                      onchange="handleSpeciesPhotoUpload(this)" style="display:none;">
+                  </label>
+                  <button class="btn btn-outline species-camera-btn" onclick="openSpeciesCamera()">
+                    📷 Take Photo
+                  </button>
+                  <input type="file" accept="image/*" capture="environment" id="species-camera-input"
+                    onchange="handleSpeciesPhotoUpload(this)" style="display:none;">
+                </div>
+                <p style="font-size:0.8rem;color:var(--text-muted);margin-top:8px;">
+                  Supports JPG, PNG • Drag & drop also works
+                </p>
+              </div>
+
+              <!-- Photo preview (hidden initially) -->
+              <div class="species-preview" id="species-preview" style="display:none;">
+                <img id="species-preview-img" src="" alt="Fish photo">
+                <button class="species-preview-remove" onclick="clearSpeciesPhoto()">✕</button>
+              </div>
+            </div>
+
+            <!-- AI Loading -->
+            <div class="species-ai-loading" id="species-ai-loading" style="display:none;">
+              <div class="loading-spinner"></div>
+              <p>Analysing your photo with AI...</p>
+              <p style="font-size:0.8rem;color:var(--text-muted);">This may take a few seconds</p>
+            </div>
+
+            <!-- AI Result -->
+            <div class="species-ai-result" id="species-ai-result" style="display:none;">
+              <div class="species-result-header">
+                <span class="species-result-badge">🤖 AI Identified</span>
+              </div>
+              <div class="species-result-body">
+                <h2 id="species-result-name">Unknown Species</h2>
+                <p class="species-result-scientific" id="species-result-scientific"></p>
+                <div class="species-result-confidence" id="species-result-confidence"></div>
+                <div class="species-result-details" id="species-result-details"></div>
+              </div>
+            </div>
+
+            <!-- AI Error -->
+            <div class="species-ai-error" id="species-ai-error" style="display:none;">
+              <div style="font-size:2rem;margin-bottom:8px;">⚠️</div>
+              <p id="species-error-message">AI identification is not available right now.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Species Gallery -->
+      <div class="species-gallery-section">
+        <div class="species-gallery-header">
+          <h2>📚 Irish Species Gallery</h2>
+          <div class="species-search-wrapper">
+            <input type="text" class="species-search-input" placeholder="🔍 Search species by name, habitat..."
+              oninput="filterSpeciesGallery(this.value)">
+          </div>
+          <div class="species-filter-tabs">
+            <button class="species-tab active" onclick="filterSpeciesByCategory('all', this)">All</button>
+            <button class="species-tab" onclick="filterSpeciesByCategory('sea', this)">🌊 Sea Fish</button>
+            <button class="species-tab" onclick="filterSpeciesByCategory('freshwater', this)">🏞️ Freshwater</button>
+            <button class="species-tab" onclick="filterSpeciesByCategory('shellfish', this)">🦀 Shellfish</button>
+          </div>
+        </div>
+        <div class="species-gallery-grid" id="species-gallery-grid">
+          <!-- Cards will be rendered by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Admin Dashboard Page -->
+  <main class="page" id="page-admin" style="display: none;">
+    <div class="admin-container">
+      <div class="admin-header">
+        <h1>🛡️ Admin Dashboard</h1>
+        <p>Manage users, view insights, and respond to support messages</p>
+      </div>
+
+      <div class="admin-grid">
+        <!-- Station Insights -->
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>📊 Tidal Station Insights</h3>
+          </div>
+          <div class="admin-card-body admin-card-body-flush" id="admin-station-insights">
+            <div class="insight-grid">
+              <div class="insight-item">
+                <span class="insight-value" id="total-stations">0</span>
+                <span class="insight-label">Total Stations</span>
+              </div>
+              <div class="insight-item">
+                <span class="insight-value" id="active-stations">0</span>
+                <span class="insight-label">Active</span>
+              </div>
+              <div class="insight-item">
+                <span class="insight-value" id="offline-stations">0</span>
+                <span class="insight-label">Offline</span>
+              </div>
+            </div>
+            <div class="station-status-list" id="admin-station-list">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Site Traffic Insights -->
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>📈 Site Traffic</h3>
+          </div>
+          <div class="admin-card-body" style="text-align: center; padding: 2rem;">
+            <div class="form-group" style="margin-bottom: 20px;">
+              <label for="admin-hits-date">Select Date</label>
+              <input type="date" id="admin-hits-date" class="auth-input" onchange="loadDailyHits(this.value)"
+                style="max-width: 200px; margin: 10px auto;">
+            </div>
+            <div class="insight-item" style="border: none;">
+              <span class="insight-value" id="admin-hits-display"
+                style="font-size: 3rem; color: var(--accent-primary);">0</span>
+              <span class="insight-label">Site Hits / Visitors</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 15px;">
+              Tracks every unique page load across all visitors.
+            </p>
+          </div>
+        </div>
+
+        <!-- Communication Center (Email) -->
+        <div class="admin-card admin-card-full" id="admin-email-center" style="display: none;">
+          <div class="admin-card-header">
+            <h3>📨 Communication Center</h3>
+            <button class="btn btn-sm btn-outline" onclick="closeEmailCenter()">Close</button>
+          </div>
+          <div class="admin-card-body">
+            <div class="broadcast-stats">
+              <div class="stat-box">
+                <span class="label">Audience</span>
+                <span class="val" id="email-total-members">0 Members</span>
+              </div>
+              <div class="stat-box">
+                <span class="label">Last Sent</span>
+                <span class="val" id="email-last-sent">N/A</span>
+              </div>
+            </div>
+
+            <div class="email-center-grid">
+              <div class="template-selector">
+                <button class="template-btn active" id="btn-temp-update" onclick="loadEmailTemplate('update')">
+                  <span class="temp-name">🚀 App Update</span>
+                  <span class="temp-desc">New features & improvements</span>
+                </button>
+                <button class="template-btn" id="btn-temp-legal" onclick="loadEmailTemplate('legal')">
+                  <span class="temp-name">⚖️ Legal Change</span>
+                  <span class="temp-desc">Policy & Terms updates</span>
+                </button>
+                <button class="template-btn" id="btn-temp-welcome" onclick="loadEmailTemplate('welcome')">
+                  <span class="temp-name">👋 Welcome</span>
+                  <span class="temp-desc">Greeting for new members</span>
+                </button>
+                <button class="template-btn" id="btn-temp-sponsor" onclick="loadEmailTemplate('sponsorship')">
+                  <span class="temp-name">🤝 Sponsorship & Update</span>
+                  <span class="temp-desc">New update & call for sponsors</span>
+                </button>
+                <button class="template-btn" id="btn-temp-custom" onclick="loadEmailTemplate('custom')">
+                  <span class="temp-name">✍️ Custom Message</span>
+                  <span class="temp-desc">Write from scratch</span>
+                </button>
+              </div>
+
+              <div class="email-editor-panel">
+                <input type="text" id="email-subject" class="email-subject-input" placeholder="Email Subject">
+                <textarea id="email-body" class="email-body-editor" placeholder="Write your message here..."></textarea>
+
+                <div class="email-footer-actions">
+                  <span id="email-status-text" style="font-size: 0.85rem; color: var(--text-muted);"></span>
+                  <button class="btn btn-outline" onclick="testEmailPreview()">Preview</button>
+                  <button class="btn btn-primary" onclick="broadcastEmailToAll()">🚀 Send to All members</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- User Accounts -->
+        <div class="admin-card">
+          <div class="admin-card-header" style="justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+              <h3>👥 User Accounts</h3>
+              <div class="admin-search-wrapper" id="admin-search-container">
+                <button class="admin-search-toggle" onclick="toggleAdminSearch()" title="Toggle Search">🔍</button>
+                <input type="text" id="admin-user-search" placeholder="Search accounts..."
+                  class="admin-search-input-collapsible" oninput="loadUsersTable()">
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <button class="btn btn-sm btn-primary" onclick="openEmailCenter()">📨 Global Broadcast</button>
+              <span class="badge" id="total-users-badge">0 users</span>
+            </div>
+          </div>
+          <div class="admin-card-body admin-card-body-flush">
+            <div class="admin-table-scroll-wrapper">
+              <table class="admin-table" id="users-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Password</th>
+                    <th>Plan</th>
+                    <th>Joined</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="users-table-body">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Support Messages -->
+        <div class="admin-card admin-card-full">
+          <div class="admin-card-header">
+            <h3>💬 Support Messages</h3>
+            <span class="badge" id="unread-messages-badge">0 unread</span>
+          </div>
+          <div class="admin-card-body">
+            <div class="messages-list" id="admin-messages-list">
+              <div class="empty-state">
+                <p>No support messages yet</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reported Community Content -->
+        <div class="admin-card admin-card-full">
+          <div class="admin-card-header">
+            <h3>⚠️ Reported Community Content</h3>
+            <div class="report-filters">
+              <button class="btn btn-sm btn-primary" onclick="filterReports('pending')">Pending</button>
+              <button class="btn btn-sm btn-outline" onclick="filterReports('dismissed')">Dismissed</button>
+              <button class="btn btn-sm btn-outline" onclick="filterReports('removed')">Removed</button>
+              <button class="btn btn-sm btn-outline" onclick="filterReports('all')">All</button>
+            </div>
+          </div>
+          <div class="admin-card-body">
+            <div id="reported-comments-list">
+              <div class="empty-state">
+                <p>Loading reports...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sponsor Management -->
+        <div class="admin-card admin-card-full">
+          <div class="admin-card-header">
+            <h3>🤝 Sponsor Management</h3>
+            <button class="btn btn-sm btn-primary" onclick="openAddSponsorModal()">➕ Add New Sponsor</button>
+          </div>
+          <div class="admin-card-body">
+            <div class="admin-table-scroll-wrapper">
+              <table class="sponsor-table">
+                <thead>
+                  <tr>
+                    <th>Logo</th>
+                    <th>Name</th>
+                    <th>Website</th>
+                    <th>Added</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="sponsors-table-body">
+                  <tr>
+                    <td colspan="5" class="empty-state">
+                      <p>No sponsors yet. Click "Add New Sponsor" to get started.</p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Location Manager -->
+        <div class="admin-card admin-card-full">
+          <div class="admin-card-header">
+            <h3>📍 Location Manager</h3>
+            <div class="admin-location-controls">
+              <div class="mode-toggle-admin">
+                <button class="mode-btn active" id="admin-mode-sea" onclick="setAdminMapMode('sea')">🌊 Sea</button>
+                <button class="mode-btn" id="admin-mode-freshwater" onclick="setAdminMapMode('freshwater')">🏞️
+                  Freshwater</button>
+              </div>
+              <select id="admin-location-type" class="admin-select">
+                <option value="pier">🎣 Pier</option>
+                <option value="ramp">🚤 Boat Ramp</option>
+                <option value="harbour">🛥️ Harbour</option>
+                <option value="spot">🐟 Fishing Spot</option>
+                <option value="park">🌲 Park</option>
+                <option value="shop">🏪 Tackle Shop</option>
+              </select>
+              <button class="btn btn-primary btn-sm" id="add-location-btn" onclick="enableAddLocationMode()">
+                ➕ Add Location
+              </button>
+            </div>
+          </div>
+          <div class="admin-card-body admin-map-body">
+            <div class="admin-map-container">
+              <div id="admin-map"></div>
+              <div class="admin-map-instructions" id="admin-map-instructions" style="display: none;">
+                Click on the map to place a new location
+              </div>
+            </div>
+            <div class="admin-location-list">
+              <h4>Locations <span id="admin-location-count">(0)</span></h4>
+              <div class="location-list-items" id="admin-location-list">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Location Editor Modal -->
+  <div class="modal" id="location-editor-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="location-editor-title">Add Location</h2>
+        <button class="modal-close-btn-inline" onclick="closeLocationEditor()">✕</button>
+      </div>
+      <form id="location-editor-form" onsubmit="saveLocation(event)">
+        <input type="hidden" id="location-id">
+        <input type="hidden" id="location-mode">
+        <div class="form-group">
+          <label for="location-name">Name *</label>
+          <input type="text" id="location-name" required placeholder="Enter location name">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="location-lat">Latitude *</label>
+            <input type="number" id="location-lat" required step="0.0001" placeholder="53.3478">
+          </div>
+          <div class="form-group">
+            <label for="location-lon">Longitude *</label>
+            <input type="number" id="location-lon" required step="0.0001" placeholder="-6.2044">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="location-type-edit">Type *</label>
+          <select id="location-type-edit" required>
+            <option value="pier">🎣 Pier</option>
+            <option value="ramp">🚤 Boat Ramp</option>
+            <option value="harbour">🛥️ Harbour</option>
+            <option value="spot">🐟 Fishing Spot</option>
+            <option value="park">🌲 Park</option>
+            <option value="shop">🏪 Tackle Shop</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="location-description">Description</label>
+          <textarea id="location-description" rows="2" placeholder="Optional description"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" onclick="closeLocationEditor()">Cancel</button>
+          <button type="button" class="btn btn-danger" id="delete-location-btn" onclick="deleteLocation()"
+            style="display: none;">Delete</button>
+          <button type="submit" class="btn btn-primary">Save Location</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Shop Editor Modal -->
+  <div class="modal" id="shop-editor-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="shop-editor-title">Add Shop</h2>
+        <button class="modal-close-btn-inline" onclick="closeShopEditor()">✕</button>
+      </div>
+      <form id="shop-editor-form" onsubmit="saveShop(event)">
+        <input type="hidden" id="shop-id">
+        <input type="hidden" id="shop-mode">
+        <div class="form-group">
+          <label for="shop-name">Shop Name *</label>
+          <input type="text" id="shop-name" required placeholder="e.g., Rory's Fishing Tackle">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="shop-county">County *</label>
+            <input type="text" id="shop-county" required placeholder="e.g., Dublin">
+          </div>
+          <div class="form-group">
+            <label for="shop-rating">Rating</label>
+            <input type="number" id="shop-rating" step="0.1" min="0" max="5" placeholder="4.5">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="shop-address">Address</label>
+          <input type="text" id="shop-address" placeholder="Full street address">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="shop-phone">Phone</label>
+            <input type="tel" id="shop-phone" placeholder="01 234 5678">
+          </div>
+          <div class="form-group">
+            <label for="shop-website">Website</label>
+            <input type="url" id="shop-website" placeholder="https://example.com">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="shop-lat">Latitude *</label>
+            <input type="number" id="shop-lat" required step="0.0001" placeholder="53.3478">
+          </div>
+          <div class="form-group">
+            <label for="shop-lon">Longitude *</label>
+            <input type="number" id="shop-lon" required step="0.0001" placeholder="-6.2044">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" onclick="closeShopEditor()">Cancel</button>
+          <button type="button" class="btn btn-danger" id="delete-shop-btn" onclick="deleteShop()"
+            style="display: none;">Delete</button>
+          <button type="submit" class="btn btn-primary">Save Shop</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- Contact Support Modal -->
+  <div class="modal" id="support-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>💬 Contact Support</h2>
+        <button class="modal-close-btn-inline" onclick="closeSupportModal()">✕</button>
+      </div>
+
+      <div class="support-thread" id="support-thread">
+        <div class="empty-state">
+          <p>No messages yet. Send us a message below!</p>
+        </div>
+      </div>
+
+      <div class="support-compose">
+        <textarea id="support-message-input" placeholder="Type your message here..." rows="3"></textarea>
+        <button class="btn btn-primary" onclick="sendSupportMessage()">Send Message</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Public User Profile Modal -->
+  <div class="modal" id="public-profile-modal">
+    <div class="modal-content profile-modal-content">
+      <div class="modal-header">
+        <h2>👤 User Profile</h2>
+        <button class="modal-close-btn-inline" onclick="closePublicProfileModal()">✕</button>
+      </div>
+      <div class="public-profile-view">
+        <div class="profile-avatar-large" id="public-profile-avatar">👤</div>
+        <h3 id="public-profile-name">User Name</h3>
+        <span class="badge" id="public-profile-badge">Pro Angler</span>
+        <p class="profile-bio" id="public-profile-bio">No bio available.</p>
+        <div class="profile-stats-row">
+          <div class="profile-stat">
+            <span class="stat-value" id="public-profile-joined">-</span>
+            <span class="stat-label">Joined</span>
+          </div>
+          <div class="profile-stat">
+            <span class="stat-value" id="public-profile-catches">0</span>
+            <span class="stat-label">Catches</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Reply Modal -->
+  <div class="modal" id="admin-reply-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📩 Reply to <span id="reply-to-user">User</span></h2>
+        <button class="modal-close-btn-inline" onclick="closeAdminReplyModal()">✕</button>
+      </div>
+
+      <div class="support-thread" id="admin-reply-thread">
+        <!-- Shows conversation history -->
+      </div>
+
+      <div class="support-compose">
+        <textarea id="admin-reply-input" placeholder="Type your reply..." rows="3"></textarea>
+        <button class="btn btn-primary" onclick="sendAdminReply()">Send Reply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Username Editor Modal (Admin) -->
+  <div class="modal" id="username-editor-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>✏️ Edit Username</h2>
+        <button class="modal-close-btn-inline" onclick="closeUsernameEditor()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p>Editing username for: <strong id="username-edit-email"></strong></p>
+        <div class="form-group">
+          <label for="username-edit-input">New Username</label>
+          <input type="text" id="username-edit-input" class="auth-input" placeholder="Enter new username">
+        </div>
+        <input type="hidden" id="username-edit-userid">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeUsernameEditor()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveUsername()">Save Username</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Terms & Conditions Modal -->
+  <div class="modal" id="terms-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>⚖️ Terms & Conditions</h2>
+        <button class="modal-close-btn-inline" onclick="closeTermsModal()">✕</button>
+      </div>
+      <div class="modal-body terms-content">
+        <p><strong>Last updated: March 15, 2026 (Version 2.1 - Comprehensive Coverage)</strong></p>
+
+        <h3>1. Acceptance of Terms & Binding Agreement</h3>
+        <p>By accessing, browsing, or using the Irish Fishing Hub ("the App" or "the Service"), you establish a legally
+          binding agreement with the owners and developers of the Irish Fishing Hub. If you do not agree, in full, with
+          any portion of these Terms and Conditions—including our liability limitations—you are strictly prohibited from
+          using or accessing this site. We reserve the right to modify these terms at any time without prior individual
+          notice; continued use constitutes acceptance of the modified terms.</p>
+
+        <h3>2. Restricted Disclaimer of Liability & Assumption of Risk</h3>
+        <p><strong>Tidal Data & Marine Safety:</strong> All tidal charts, weather forecasts, wind speeds, moon phases,
+          and environmental data provided within this application are strictly for recreational and informational
+          purposes. Data is sourced dynamically via third parties (including but not limited to the Irish Marine
+          Institute API) and may be delayed, estimated, or mathematically extrapolated.</p>
+        <p><strong>Strict Prohibition of Navigational Use:</strong> Under no circumstances should the data provided by
+          the Irish Fishing Hub be relied upon for maritime navigation, sailing, swimming safety, or any critical
+          decision-making where property damage, personal injury, or loss of life could occur. You assume 100% of all
+          risks associated with your activities in marine environments.</p>
+
+        <h3>3. Accuracy of Location & Directory Data</h3>
+        <p>All map pins, including fishing stations, tackle shops, boat slipways, coast guard stations, and
+          community-marked catches, are estimated coordinates provided "as is". We make no warranties regarding the
+          accuracy, accessibility, safety, or legal status (e.g., trespassing rules, private property lines) of any
+          location shown on the map. It is the sole responsibility of the user to verify public access rights and adhere
+          to all local trespass laws before entering any property.</p>
+
+        <h3>4. AI Fish Identifier & Fishing Regulations</h3>
+        <p>The "AI Species Guide" and "Fish Scanner" features utilize experimental machine learning image recognition to
+          suggest potential fish species. This tool is provided for entertainment and educational purposes only.</p>
+        <p><strong>No Legal Reliance:</strong> The AI tool is absolutely not a substitute for knowing local and national
+          fishing regulations. We make zero warranties regarding the accuracy of the AI analysis. If the AI
+          misidentifies a protected, restricted, or undersized species, Irish Fishing Hub and its developers assume zero
+          liability for any fines, confiscations, or legal action taken against you by fisheries protection authorities
+          (e.g., Inland Fisheries Ireland). You are solely responsible for accurately identifying your catch and
+          adhering to all quotas and size limits.</p>
+
+        <h3>5. User-Generated Content & Community Feed License</h3>
+        <p>By uploading, posting, or submitting content (including but not limited to photos, catch logs, location
+          coordinates, text comments, and profile information) to the Community Feed or any other part of the Service,
+          you grant Irish Fishing Hub a perpetual, worldwide, non-exclusive, royalty-free, transferable license to use,
+          reproduce, distribute, display, and modify that content for the purpose of operating and promoting the
+          Service.</p>
+        <p><strong>Content Restrictions:</strong> You agree that you will not post content that is: unlawful,
+          defamatory, harassing, sexually explicit, spam, fraudulent, or infringes on the intellectual property of
+          others. We reserve the absolute right to delete any content and terminate any user account at our sole
+          discretion, without warning or explanation.</p>
+
+        <h3>6. Subscriptions, Payments, & Fair Use</h3>
+        <p>Premium features ("Pro Subscription") are processed entirely through highly secure third-party payment
+          gateways (Stripe). We do not store or process your credit card information. Subscriptions are billed
+          automatically on a recurring schedule until cancelled by you through your account settings.</p>
+        <p><strong>Refund Policy:</strong> All subscription fees are strictly non-refundable except where legally
+          mandated by EU distance selling regulations. We reserve the right to modify pricing, suspend features, or
+          terminate accounts for "Fair Use" violations (such as API abuse, account sharing, or automated scraping)
+          without refund.</p>
+
+        <h3>7. Severability & Jurisdiction</h3>
+        <p>If any provision of these Terms is found to be unenforceable or invalid, that provision will be limited or
+          eliminated to the minimum extent necessary so that the Terms will otherwise remain in full force and effect.
+          These Terms shall be governed by and construed in accordance with the laws of the Republic of Ireland, without
+          regard to its conflict of law provisions.</p>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="closeTermsModal()">I Understand</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Privacy Policy Modal -->
+  <div class="modal" id="privacy-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🛡️ Privacy Policy</h2>
+        <button class="modal-close-btn-inline" onclick="closePrivacyModal()">✕</button>
+      </div>
+      <div class="modal-body terms-content">
+        <p><strong>Last updated: March 15, 2026 (Version 2.1 - Comprehensive Processing Policy)</strong></p>
+
+        <h3>1. Introduction & Scope</h3>
+        <p>The Irish Fishing Hub ("we", "our", or "us") is deeply committed to protecting your privacy. This
+          comprehensive Privacy Policy defines exactly how we collect, process, share, and retain your data when you
+          interact with our web application, mobile views, APIs, and associated services (including the V2 AI Identifier
+          and Community Feed).</p>
+
+        <h3>2. Explicit Data Collection & Usage</h3>
+
+        <h4>2.1 Mandatory Authentication & Profiling Data</h4>
+        <p><strong>Data Points:</strong> Email address, cryptographically hashed passwords, usernames, and profile
+          avatars.</p>
+        <p><strong>Purpose & Justification:</strong> Required to establish your unique identity, issue JSON Web Tokens
+          (JWT) for secure session management, provision access to Pro-tier features, and allow cross-device
+          synchronization.</p>
+        <p><strong>Storage Vendor:</strong> Google Firebase Authentication. Data is encrypted at rest and in transit.
+        </p>
+
+        <h4>2.2 User-Generated Content & Community Sharing</h4>
+        <p><strong>Data Points:</strong> Catch photos, text logs, declared species, bait details, timestamps, reported
+          weights, and user interactions (likes, reports).</p>
+        <p><strong>Purpose & Justification:</strong> This data forms the core of the Community Feed. By uploading it,
+          you explicitly consent to its public display across the application.</p>
+        <p><strong>Exposed Metadata:</strong> When you upload photos to the community feed, Exif data (camera details,
+          embedded GPS) is computationally stripped on the client-side before upload to Firebase Storage to protect your
+          exact "secret" fishing spots unless you manually declare the location.</p>
+
+        <h4>2.3 AI Machine Vision Processing</h4>
+        <p><strong>Data Points:</strong> Images uploaded specifically to the "AI Species Identifier" tool.</p>
+        <p><strong>Purpose & Justification:</strong> Images are transmitted to our backend AI processing model to
+          execute inference and return a species prediction array.</p>
+        <p><strong>Retention Guarantee:</strong> Images uploaded solely for AI identification (and not posted to the
+          community feed) are processed purely in-memory or in ephemeral storage. They are permanently deleted upon
+          completion of the inference task. We do not use your private AI queries to train future machine learning
+          models.</p>
+
+        <h4>2.4 Financial & Payment Ledger Data</h4>
+        <p><strong>Data Points:</strong> Billing email, active subscription status, payment history identifiers.</p>
+        <p><strong>Purpose & Justification:</strong> To manage Pro subscriptions.</p>
+        <p><strong>Security Isolation:</strong> We do NOT collect, store, or transmit your credit card numbers, CVV, or
+          bank details. All financial transactions are handed off entirely to Stripe Inc. via highly secure iframe
+          segregation. Their privacy standards apply to the financial data.</p>
+
+        <h4>2.5 Telemetry, Analytics & Advertising Profiles</h4>
+        <p><strong>Data Points:</strong> IP addresses, browser user-agent strings, device viewport sizing, operating
+          system versions, and page navigation flows.</p>
+        <p><strong>Purpose & Justification:</strong> This telemetry is utilized inherently by secure web servers to
+          return data. It is also utilized by analytics and Google AdSense to classify application health and serve
+          personalized advertising banners.</p>
+
+        <h3>3. Third-Party Data Processors & Sub-processors</h3>
+        <p>We leverage industry-standard third-party sub-processors to run the service. We hold them to strict data
+          protection standards:</p>
+        <ul style="margin-left:20px;">
+          <li><strong>Google Cloud & Firebase:</strong> For real-time NoSQL database hosting, asset storage, and
+            authentication.</li>
+          <li><strong>Stripe:</strong> For PCI-DSS compliant payment processing.</li>
+          <li><strong>Google AdSense:</strong> Advertising network. Third party vendors, including Google, use tracking
+            cookies to serve ads based on a user's prior web history. You may opt out of personalized advertising by
+            visiting Google's <a href="https://www.google.com/settings/ads" target="_blank">Ads Settings</a>.</li>
+        </ul>
+
+        <h3>4. Legal Compliance, GDPR & Data Rights</h3>
+        <p>If you reside within the European Economic Area (EEA), your data is handled in strict accordance with the
+          General Data Protection Regulation (GDPR). You possess the following non-negotiable rights:</p>
+        <ul style="margin-left:20px;">
+          <li><strong>Right to be Forgotten:</strong> You may instantly delete your account via the settings menu. This
+            executes a cascading deletion script that physically wipes your profile, public community posts, uploaded
+            bucket images, and authentication tokens from our active database within 24 hours.</li>
+          <li><strong>Right to Access:</strong> You may request a raw JSON export of all associated user data held in
+            the Firebase Realtime Database.</li>
+          <li><strong>Right to Restrict Processing:</strong> You may opt out of data processing by terminating your
+            account.</li>
+        </ul>
+
+        <h3>5. Law Enforcement & Mandatory Disclosure</h3>
+        <p>We are governed by the laws of the Republic of Ireland. We will disclose your user data, without your prior
+          consent, if compelled to do so by a valid subpoena, court order, or warrant issued by An Garda Síochána or
+          relevant international authorities investigating illegal activities or immediate threats to public safety.</p>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="closePrivacyModal()">I Understand</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mandatory Legal Consent Overlay -->
+  <div class="legal-overlay hidden" id="legal-consent-overlay">
+    <div class="legal-consent-card">
+      <div class="legal-header">
+        <div class="legal-logo">🌊</div>
+        <h1>Legal Update</h1>
+        <p>Please review and accept our updated terms to continue.</p>
+      </div>
+
+      <div class="legal-checklist">
+        <label class="legal-item">
+          <input type="checkbox" id="check-terms" onchange="updateLegalContinueButton()">
+          <span class="custom-check"></span>
+          <span class="legal-text">I accept the <a href="#" onclick="openTermsModal()">Terms & Conditions</a></span>
+        </label>
+
+        <label class="legal-item">
+          <input type="checkbox" id="check-privacy" onchange="updateLegalContinueButton()">
+          <span class="custom-check"></span>
+          <span class="legal-text">I accept the <a href="#" onclick="openPrivacyModal()">Privacy Policy</a></span>
+        </label>
+      </div>
+
+      <p class="legal-note">By clicking "Agree & Continue", you confirm you are over 18 or have parental consent to use
+        this fishing hub.</p>
+
+      <button id="legal-continue-btn" class="btn btn-primary btn-full" disabled onclick="acceptLegal()">
+        Agree & Continue
+      </button>
+
+      <div class="legal-support"
+        style="margin-top: 20px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+        <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-bottom: 10px;">Questions about our terms or
+          privacy?</p>
+        <button class="btn btn-sm btn-outline" onclick="openSupportModal()"
+          style="width: 100%; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <span>💬</span> Contact Support Chat
+        </button>
+        <p style="font-size: 0.75rem; color: rgba(255,255,255,0.4);">For extra support: <a
+            href="mailto:irishfishinghub@gmail.com"
+            style="color: #4facfe; text-decoration: none;">irishfishinghub@gmail.com</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report Comment Modal -->
+  <div class="modal" id="report-comment-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Report Comment</h2>
+        <button class="modal-close" onclick="closeReportModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <p class="report-comment-text" id="report-comment-text"></p>
+
+        <div class="form-group">
+          <label>Reason for reporting:</label>
+          <select id="report-reason" class="form-input">
+            <option value="spam">Spam</option>
+            <option value="harassment">Harassment or Bullying</option>
+            <option value="inappropriate">Inappropriate Content</option>
+            <option value="misinformation">Misinformation</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Additional details (optional):</label>
+          <textarea id="report-details" class="form-input" rows="3" placeholder="Provide more context..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeReportModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="submitReport()">Submit Report</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report Post Modal -->
+  <div class="modal" id="report-post-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Report Post</h2>
+        <button class="modal-close" onclick="closeReportPostModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <p class="report-comment-text" id="report-post-text"></p>
+
+        <div class="form-group">
+          <label>Reason for reporting:</label>
+          <select id="report-post-reason" class="form-input">
+            <option value="spam">Spam</option>
+            <option value="harassment">Harassment or Bullying</option>
+            <option value="inappropriate">Inappropriate Content</option>
+            <option value="misinformation">Misinformation</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Additional details (optional):</label>
+          <textarea id="report-post-details" class="form-input" rows="3"
+            placeholder="Provide more context..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeReportPostModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="submitPostReport()">Submit Report</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <!-- Support Choice Modal -->
+  <div class="modal" id="support-choice-modal">
+    <div class="modal-content support-choice-card">
+      <div class="modal-header">
+        <h2>💬 Contact Support</h2>
+        <button class="modal-close-btn-inline" onclick="closeSupportChoiceModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 25px;">
+          How would you like to contact us?
+        </p>
+        <div class="support-options-grid">
+          <button class="support-option-btn" onclick="handleInAppSupport()">
+            <div class="support-option-icon">💬</div>
+            <div class="support-option-info">
+              <span class="support-option-title">In-App Chat</span>
+              <span class="support-option-desc">Message us directly in the app</span>
+            </div>
+          </button>
+
+          <a href="mailto:irishfishinghub@gmail.com" class="support-option-btn" style="text-decoration: none;">
+            <div class="support-option-icon">📧</div>
+            <div class="support-option-info">
+              <span class="support-option-title">Email Support</span>
+              <span class="support-option-desc">irishfishinghub@gmail.com</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEO and Content Optimization Footer (For AdSense Crawlers) - Visually Hidden -->
+  <footer
+    style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;">
+    <div
+      style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
+      <div>
+        <h3 style="color: #e6f1ff; font-size: 1.1rem; margin-bottom: 15px;">About Irish Fishing Hub</h3>
+        <p style="line-height: 1.6; margin-bottom: 10px;">Irish Fishing Hub is the ultimate online platform for anglers
+          across Ireland. We provide real-time tide charts, marine weather conditions, and precise fishing spot
+          directories spanning both seawater coastal areas and inland freshwater lakes. Whether you're targeting
+          Atlantic Mackerel from a pier or seeking European Seabass, our interactive fishing map gives you the
+          environmental edge.</p>
+        <p style="line-height: 1.6;">Our comprehensive database is built on live data from the Irish Marine Institute
+          and community submissions, ensuring you always know exactly when high tide hits and where to find the absolute
+          best fishing locations near you.</p>
+      </div>
+      <div>
+        <h3 style="color: #e6f1ff; font-size: 1.1rem; margin-bottom: 15px;">App Features</h3>
+        <ul style="list-style-type: none; padding: 0; line-height: 1.8;">
+          <li><strong>Live Tides:</strong> Accurate water level telemetry, moon phases, and real-time station graphs.
+          </li>
+          <li><strong>AI Fish Identifier:</strong> Upload a photo of your catch and let our custom-trained Artificial
+            Intelligence immediately identify the Irish fish species.</li>
+          <li><strong>Community Catch Feed:</strong> Join thousands of local Irish anglers sharing bait tips, catch
+            logs, and real-time success stories.</li>
+          <li><strong>Tackle & Ramp Directory:</strong> Locate nearby tackle shops, boat slips, and marine facilities
+            instantly.</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="color: #e6f1ff; font-size: 1.1rem; margin-bottom: 15px;">Legal & Links</h3>
+        <ul style="list-style-type: none; padding: 0; line-height: 1.8;">
+          <li><a href="#" onclick="openTermsModal()" style="color: #4facfe; text-decoration: none;">Terms &
+              Conditions</a></li>
+          <li><a href="#" onclick="openPrivacyModal()" style="color: #4facfe; text-decoration: none;">Privacy Policy</a>
+          </li>
+          <li><a href="#" onclick="openSupportModal()" style="color: #4facfe; text-decoration: none;">Contact
+              Support</a></li>
+        </ul>
+        <p style="margin-top: 20px; font-size: 0.75rem;">&copy; 2026 Irish Fishing Hub App. Data provided for
+          recreational use only.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.min.js"></script>
+  <script src="https://js.stripe.com/v3/"></script>
+  <script src="app.js"></script>
+  <script src="sponsors.js"></script>
+</body>
+
+</html>

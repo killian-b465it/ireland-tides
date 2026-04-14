@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Irish Fishing Hub - Spring Campaign</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --ad-width: 1080px;
+            --ad-height: 1920px;
+        }
+
+        body {
+            background: #000;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .ad-container {
+            width: var(--ad-width);
+            height: var(--ad-height);
+            background: var(--bg-dark);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ad-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.65) saturate(1.2);
+            z-index: 1;
+        }
+
+        .ad-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom,
+                    rgba(10, 17, 32, 0.4) 0%,
+                    transparent 40%,
+                    transparent 60%,
+                    var(--bg-dark) 100%);
+            z-index: 2;
+        }
+
+        .content {
+            position: relative;
+            z-index: 10;
+            padding: 80px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .brand img {
+            width: 100px;
+        }
+
+        .brand span {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--accent-primary);
+        }
+
+        .headline {
+            font-size: 7rem;
+            font-weight: 900;
+            line-height: 0.85;
+            text-transform: uppercase;
+            margin-top: 100px;
+        }
+
+        .headline span {
+            color: var(--accent-success);
+        }
+
+        .feature-showcase {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            margin-bottom: 100px;
+        }
+
+        .feature-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            padding: 50px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .feature-icon {
+            font-size: 5rem;
+            background: rgba(255, 255, 255, 0.05);
+            width: 150px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 30px;
+        }
+
+        .feature-text h3 {
+            font-size: 2.5rem;
+            margin: 0;
+            color: #fff;
+        }
+
+        .feature-text p {
+            font-size: 1.8rem;
+            margin: 10px 0 0;
+            color: var(--text-secondary);
+        }
+
+        .footer {
+            text-align: center;
+        }
+
+        .cta {
+            background: var(--accent-primary);
+            color: var(--bg-dark);
+            font-size: 3rem;
+            font-weight: 800;
+            padding: 40px 100px;
+            border-radius: 100px;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 20px 50px rgba(0, 212, 255, 0.3);
+        }
+
+        .url {
+            font-size: 2rem;
+            color: var(--text-muted);
+            margin-top: 40px;
+            letter-spacing: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ad-container">
+        <!-- Reusing the weekend background as fallback for now due to gen error -->
+        <img src="C:/Users/killi/.gemini/antigravity/brain/c668bf8c-a28d-4e36-b83e-af23c35b610a/weekend_fishing_bg_feb78_1770318382860.png"
+            class="ad-background">
+        <div class="ad-overlay"></div>
+
+        <div class="content">
+            <header class="brand">
+                <img src="assets/logo.png" alt="Logo">
+                <span>Irish Fishing Hub</span>
+            </header>
+
+            <h1 class="headline">SPRING IS<br><span>COMING.</span></h1>
+
+            <div class="feature-showcase">
+                <div class="feature-card">
+                    <div class="feature-icon">🛰️</div>
+                    <div class="feature-text">
+                        <h3>Precision Tides</h3>
+                        <p>Real-time data from 100+ stations around the coast.</p>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📸</div>
+                    <div class="feature-text">
+                        <h3>Catch Feed</h3>
+                        <p>Share local knowledge and sync with the community.</p>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="footer">
+                <a href="#" class="cta">JOIN THE COMMUNITY</a>
+                <div class="url">IRISHFISHINGHUB.COM</div>
+            </footer>
+        </div>
+    </div>
+</body>
+
+</html>

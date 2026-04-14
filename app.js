@@ -537,7 +537,11 @@ function updateCatchInFirebase(catchId, updates) {
 // ============================================
 // Navigation Logic
 // ============================================
-window.showPage = (pageId) => {
+window.showPage = (pageId, skipHistory = false) => {
+  if (!skipHistory) {
+    window.history.pushState({ page: pageId }, '', '#' + pageId);
+  }
+
   // Gating check for Community tab
   if (pageId === 'community') {
     const overlay = document.getElementById('community-gating-overlay');
@@ -6124,5 +6128,68 @@ function startWalkthrough() {
 }
 
 // Walkthrough trigger moved to auth signup sequence
+
+// ============================================
+// Social Login Handlers & Rate App Logic
+// ============================================
+
+window.handleSocialLogin = function(provider) {
+  // Show a toast or alert since Firebase Social Auth requires backend config
+  alert(`Connecting to ${provider}... \n\nNote: This feature is currently in Developer mode. Please use Email/Password login for now.`);
+};
+
+window.openRateModal = function() {
+  const modal = document.getElementById('rate-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('active'), 10);
+  }
+};
+
+window.closeRateModal = function() {
+  const modal = document.getElementById('rate-modal');
+  if (modal) {
+    modal.classList.remove('active');
+    setTimeout(() => modal.style.display = 'none', 300);
+  }
+};
+
+// ============================================
+// Back Button Navigation Logic (Popstate)
+// ============================================
+window.addEventListener('popstate', (event) => {
+  // 1. Close any open modals first before navigating pages
+  const activeModals = Array.from(document.querySelectorAll('.modal')).filter(m => 
+    m.classList.contains('active') || 
+    m.style.display === 'block' || 
+    m.style.display === 'flex'
+  );
+
+  if (activeModals.length > 0) {
+    activeModals.forEach(m => {
+      m.classList.remove('active');
+      m.style.display = 'none';
+    });
+    
+    // Fallback handlers if they have specific close functions
+    if (typeof window.closeAuthModal === 'function' && document.getElementById('auth-modal')) window.closeAuthModal();
+    if (typeof window.closePremiumModal === 'function' && document.getElementById('premium-modal')) window.closePremiumModal();
+    if (typeof window.closeRateModal === 'function' && document.getElementById('rate-modal')) window.closeRateModal();
+    if (typeof window.closeModal === 'function') window.closeModal();
+    
+    // Re-push the current page state to prevent the actual page changing next time
+    const activePage = document.querySelector('.page.active');
+    const pageId = activePage ? activePage.id.replace('page-', '') : 'home';
+    window.history.pushState({ page: pageId }, '', '#' + pageId);
+    return;
+  }
+  
+  // 2. If no modals are open, navigate to the previous page
+  if (event.state && event.state.page) {
+    window.showPage(event.state.page, true);
+  } else {
+    window.showPage('home', true);
+  }
+});
 
 

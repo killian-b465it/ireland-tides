@@ -141,6 +141,7 @@
         <a href="#" class="nav-link" id="nav-sponsors" onclick="showPage('sponsors')">⭐ Sponsors</a>
         <a href="#" class="nav-link" id="nav-directory" onclick="showPage('directory')">🏪 Shop Directory</a>
         <a href="#" class="nav-link" id="nav-species" onclick="showPage('species')">🐟 Species Guide</a>
+        <a href="#" class="nav-link" id="nav-depth" onclick="showPage('depth')">📈 Depth Charts</a>
         <a href="#" class="nav-link admin-only" id="nav-admin" onclick="showPage('admin')" style="display: none;">🛡️
           Admin</a>
       </div>
@@ -189,12 +190,16 @@
       <a href="#" class="mobile-menu-link" onclick="showPage('sponsors'); closeMobileMenu()">⭐ Sponsors</a>
       <a href="#" class="mobile-menu-link" onclick="showPage('directory'); closeMobileMenu()">🏪 Shop Directory</a>
       <a href="#" class="mobile-menu-link" onclick="showPage('species'); closeMobileMenu()">🐟 Species Guide</a>
+      <a href="#" class="mobile-menu-link" onclick="showPage('depth'); closeMobileMenu()">📈 Depth Charts</a>
+      <a href="#" class="mobile-menu-link" onclick="openRateModal(); closeMobileMenu()">⭐ Rate App</a>
       <a href="#" class="mobile-menu-link admin-only" id="mobile-nav-admin"
         onclick="showPage('admin'); closeMobileMenu()" style="display: none;">🛡️ Admin</a>
-      <a href="#" class="mobile-menu-link" onclick="openSupportChoiceModal(); closeMobileMenu()">💬 Contact Support</a>
+      <a href="articles.html" class="mobile-menu-link">📝 Fishing Blog</a>
+      <a href="about.html" class="mobile-menu-link">ℹ️ About Us</a>
+      <a href="contact.html" class="mobile-menu-link">💬 Contact Support</a>
       <a href="#" class="mobile-menu-link" onclick="startWalkthrough(); closeMobileMenu()">🎓 App Tour</a>
-      <a href="#" class="mobile-menu-link" onclick="openTermsModal(); closeMobileMenu()">⚖️ Terms & Conditions</a>
-      <a href="#" class="mobile-menu-link" onclick="openPrivacyModal(); closeMobileMenu()">🛡️ Privacy Policy</a>
+      <a href="terms.html" class="mobile-menu-link">⚖️ Terms & Conditions</a>
+      <a href="privacy.html" class="mobile-menu-link">🛡️ Privacy Policy</a>
     </div>
   </nav>
 
@@ -337,15 +342,28 @@
           </div>
         </div>
 
+        <!-- SEO Text Card -->
+        <div class="card" style="margin-top: 15px; background: rgba(0,0,0,0.2);">
+          <div class="card-header">
+            <span class="card-title">🎣 About Irish Fishing Hub</span>
+          </div>
+          <div style="padding: 10px 15px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4;">
+            Irish Fishing Hub is Ireland's premier digital tool for anglers. Access real-time tide charts, live weather conditions, and precise water levels for hundreds of coastal spots. Whether you're sea fishing for bass or finding freshwater spots, our live community reports and interactive tackle shop directory have you covered.
+          </div>
+        </div>
+
         <div class="sidebar-footer">
-          <a href="#" onclick="openSupportChoiceModal()">Contact Support</a>
+          <a href="about.html">About Us</a>
           <span>•</span>
-          <a href="#" onclick="startWalkthrough()">App Tour</a>
+          <a href="contact.html">Contact</a>
           <span>•</span>
-          <a href="#" onclick="openTermsModal()">Terms & Conditions</a>
+          <a href="articles.html">Fishing Blog</a>
           <span>•</span>
-          <a href="#" onclick="openPrivacyModal()">Privacy Policy</a>
-          <span>&copy; 2026 Irish Fishing Hub</span>
+          <a href="terms.html">Terms</a>
+          <span>•</span>
+          <a href="privacy.html">Privacy</a>
+          <br>
+          <span style="display:block; margin-top:5px; font-size: 0.75rem;">&copy; 2026 Irish Fishing Hub</span>
         </div>
       </aside>
 
@@ -451,14 +469,17 @@
           </div>
         </div>
         <div class="sidebar-footer">
-          <a href="#" onclick="openSupportChoiceModal()">Contact Support</a>
+          <a href="about.html">About Us</a>
           <span>•</span>
-          <a href="#" onclick="startWalkthrough()">App Tour</a>
+          <a href="contact.html">Contact</a>
           <span>•</span>
-          <a href="#" onclick="openTermsModal()">Terms & Conditions</a>
+          <a href="articles.html">Fishing Blog</a>
           <span>•</span>
-          <a href="#" onclick="openPrivacyModal()">Privacy Policy</a>
-          <span>&copy; 2026 Irish Fishing Hub</span>
+          <a href="terms.html">Terms</a>
+          <span>•</span>
+          <a href="privacy.html">Privacy</a>
+          <br>
+          <span style="display:block; margin-top:5px; font-size: 0.75rem;">&copy; 2026 Irish Fishing Hub</span>
         </div>
       </aside>
       <section class="map-container">
@@ -612,6 +633,22 @@
     </div>
   </main>
 
+  <!-- Depth Charts Page -->
+  <main class="page" id="page-depth" style="display: none;">
+    <div class="directory-container">
+      <div class="directory-hero" style="margin-bottom: 20px;">
+        <h1>📈 Depth Charts & Bathymetry</h1>
+        <p>Explore depth maps for major Irish lakes and rivers</p>
+      </div>
+      <div class="depth-chart-wrapper" style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 40px 20px; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
+        <div style="font-size: 3rem; margin-bottom: 10px;">🗺️</div>
+        <h3 style="color: var(--accent-primary); margin-bottom: 10px;">Navigational Charts Loading...</h3>
+        <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto 20px;">We are currently integrating high-resolution bathymetric data for Lough Derg, Lough Corrib, and the River Shannon. Ensure your app is up to date to get access to these detailed underwater structures soon.</p>
+        <button class="btn btn-primary" onclick="showPage('home')">Back to Dashboard</button>
+      </div>
+    </div>
+  </main>
+
   <!-- Beginner Guide Page -->
   <main class="page" id="page-guide" style="display: none;">
     <div class="guide-container">
@@ -733,8 +770,39 @@
         <button class="btn btn-primary"
           onclick="handleAuthSubmit(); setTimeout(refreshCommunityGating, 100);">Continue</button>
         <p class="auth-switch">Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign up</a></p>
+
+        <div class="auth-divider" style="text-align: center; margin: 20px 0; position: relative;">
+          <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 10px 0;">
+          <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--bg-card); padding: 0 10px; color: var(--text-secondary); font-size: 0.8rem; white-space: nowrap;">or continue with</span>
+        </div>
+        
+        <div class="social-login-container" style="display: flex; flex-direction: column; gap: 10px;">
+          <button class="btn btn-social" style="background: white; color: #333; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 10px;" onclick="handleSocialLogin('Google')">
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width: 20px;"> Continue with Google
+          </button>
+          <button class="btn btn-social" style="background: black; color: white; border: 1px solid #333; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 10px;" onclick="handleSocialLogin('Apple')">
+            <img src="https://www.svgrepo.com/show/511330/apple-173.svg" alt="Apple" style="width: 20px; filter: invert(1);"> Continue with Apple
+          </button>
+          <button class="btn btn-social" style="background: #1877F2; color: white; border: none; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 10px;" onclick="handleSocialLogin('Facebook')">
+            <img src="https://www.svgrepo.com/show/475647/facebook-color.svg" alt="Facebook" style="width: 20px;"> Continue with Facebook
+          </button>
+        </div>
       </div>
       <button class="modal-close-btn" onclick="closeAuthModal()">✕</button>
+    </div>
+  </div>
+
+  <!-- Rate App Modal -->
+  <div class="modal" id="rate-modal">
+    <div class="modal-content" style="text-align: center; max-width: 400px; position: relative;">
+      <div style="font-size: 3rem; margin-bottom: 15px;">⭐</div>
+      <h2 style="margin-bottom: 15px;">Enjoying Irish Fishing Hub?</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 25px; line-height: 1.5;">If you're having a good time catching fish and tracking tides, a 5-star rating on the Google Play Store helps us keep adding new features!</p>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <button class="btn btn-primary" onclick="window.location.href='market://details?id=com.irishfishinghub.app'; closeRateModal();" style="width: 100%;">Rate us 5 Stars ⭐️</button>
+        <button class="btn btn-outline" onclick="closeRateModal()" style="width: 100%;">Maybe Later</button>
+      </div>
+      <button class="modal-close-btn" onclick="closeRateModal()">✕</button>
     </div>
   </div>
 

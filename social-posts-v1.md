@@ -1,6 +1,6 @@
-# 🌊 Ireland Tides - Social Media Post Pack (v1.1)
+# 🌊 Irish Fishing Hub - Social Media Post Pack (v1.1)
 
-This pack contains high-conversion captions and a TikTok script designed to match the premium dark/neon aesthetic of the Ireland Tides platform.
+This pack contains high-conversion captions and a TikTok script designed to match the premium dark/neon aesthetic of the Irish Fishing Hub platform.
 
 ---
 
@@ -39,7 +39,7 @@ Master the coast. Join the community today. 🏆
 | Time | Visual | Audio (Voiceover/Text) |
 | :--- | :--- | :--- |
 | **0:00-0:03** | Cinematic high-speed footage of waves crashing against rocks. | "Planning your next fishing session?" |
-| **0:03-0:07** | Close up on the **Ireland Tides Dashboard** with rising wave animation. | "Stop guessing the tides. Get precision data for the whole Irish coast." |
+| **0:03-0:07** | Close up on the **Irish Fishing Hub Dashboard** with rising wave animation. | "Stop guessing the tides. Get precision data for the whole Irish coast." |
 | **0:07-0:12** | Screen recording of scrolling through the **Community Tab** showing catch photos. | "See what's biting in real-time with our local community reports." |
 | **0:12-0:16** | Showing the **Interactive Map** toggling filters for Piers and Ramps. | "Piers, shops, ramps—all in one place." |
 | **0:16-0:20** | End screen with Logo and "Available Web & Mobile" text. | "Irish Fishing Hub. Master the coast. Link in bio!" |

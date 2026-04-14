@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Irish Fishing Hub - Instagram Post</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #0a0a0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* 1:1 Square Canvas for Instagram */
+        .canvas {
+            width: 540px;
+            height: 540px;
+            position: relative;
+            overflow: hidden;
+            background: #000c1a;
+            border-radius: 8px;
+            box-shadow: 0 60px 120px rgba(0,0,0,0.8);
+        }
+
+        /* === BACKGROUND === */
+        .bg-base {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 70% 20%, rgba(0, 100, 200, 0.3) 0%, transparent 55%),
+                radial-gradient(ellipse at 20% 80%, rgba(0, 60, 140, 0.3) 0%, transparent 50%),
+                linear-gradient(160deg, #000a14 0%, #001428 30%, #001e3d 60%, #002852 100%);
+        }
+
+        /* Grid pattern overlay */
+        .grid-overlay {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0,200,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,200,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            mask-image: radial-gradient(circle at 60% 50%, black 30%, transparent 70%);
+            -webkit-mask-image: radial-gradient(circle at 60% 50%, black 30%, transparent 70%);
+        }
+
+        /* Floating particles */
+        .particles {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            background: rgba(0, 200, 255, 0.3);
+            border-radius: 50%;
+            animation: floatUp var(--dur, 8s) linear infinite;
+            animation-delay: var(--delay, 0s);
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(100%) scale(0); opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translateY(-100px) scale(1); opacity: 0; }
+        }
+
+        /* === LEFT CONTENT COLUMN === */
+        .left-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 55%;
+            height: 100%;
+            padding: 42px 0 42px 38px;
+            display: flex;
+            flex-direction: column;
+            z-index: 20;
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(0, 200, 255, 0.1);
+            border: 1px solid rgba(0, 200, 255, 0.3);
+            backdrop-filter: blur(8px);
+            padding: 6px 14px;
+            border-radius: 100px;
+            margin-bottom: 28px;
+            width: fit-content;
+        }
+        .brand-dot {
+            width: 7px; height: 7px;
+            background: #00c8ff;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #00c8ff;
+            animation: blink 2s ease-in-out infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        .brand-name {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: #00c8ff;
+            text-transform: uppercase;
+        }
+
+        .headline {
+            font-size: 46px;
+            font-weight: 900;
+            line-height: 0.88;
+            text-transform: uppercase;
+            color: white;
+            letter-spacing: -1px;
+            text-shadow: 0 4px 30px rgba(0,0,0,0.6);
+            margin-bottom: 20px;
+        }
+        .headline .accent {
+            background: linear-gradient(90deg, #00c8ff, #0070ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: block;
+        }
+
+        .subtext {
+            font-size: 13px;
+            color: rgba(255,255,255,0.55);
+            line-height: 1.6;
+            max-width: 220px;
+            margin-bottom: auto;
+        }
+
+        /* Feature tags */
+        .features-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 22px;
+        }
+        .feature-tag {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 6px 10px;
+        }
+        .feature-tag .icon { font-size: 13px; }
+        .feature-tag .label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.6);
+            text-transform: uppercase;
+        }
+
+        /* CTA */
+        .cta-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .cta-btn {
+            background: linear-gradient(90deg, #00c8ff, #0070ff);
+            color: white;
+            padding: 12px 22px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            box-shadow: 0 8px 30px rgba(0, 140, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        @keyframes shimmer {
+            to { left: 160%; }
+        }
+        .cta-url {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px;
+            color: rgba(255,255,255,0.25);
+            letter-spacing: 1px;
+        }
+
+        /* === RIGHT SIDE — PHONE MOCKUP === */
+        .phone-area {
+            position: absolute;
+            right: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 15;
+        }
+
+        .phone-frame {
+            width: 210px;
+            height: 420px;
+            background: #0e1629;
+            border-radius: 30px;
+            border: 3px solid #1e293b;
+            position: relative;
+            box-shadow:
+                -20px 20px 60px rgba(0,0,0,0.6),
+                0 0 40px rgba(0,200,255,0.08);
+            overflow: hidden;
+            transform: perspective(800px) rotateY(-8deg);
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 18px;
+            background: #0e1629;
+            border-radius: 0 0 14px 14px;
+            z-index: 5;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #020a18;
+            display: flex;
+            flex-direction: column;
+            padding: 28px 14px 14px;
+            gap: 8px;
+        }
+
+        /* Mini app UI elements */
+        .mini-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 10px;
+        }
+        .mini-logo {
+            font-size: 9px;
+            font-weight: 900;
+            color: #00c8ff;
+            letter-spacing: 1px;
+        }
+        .mini-dots {
+            display: flex;
+            gap: 3px;
+        }
+        .mini-dots span {
+            width: 4px; height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+        }
+
+        .mini-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 10px;
+        }
+
+        .mini-stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .mini-stat-label {
+            font-size: 7px;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .mini-stat-value {
+            font-size: 16px;
+            font-weight: 900;
+            color: white;
+        }
+        .mini-stat-unit {
+            font-size: 8px;
+            color: rgba(255,255,255,0.4);
+        }
+        .mini-accent { color: #00c8ff; font-size: 11px; font-weight: 700; }
+
+        /* Mini chart */
+        .mini-chart {
+            height: 50px;
+            position: relative;
+            margin-top: 4px;
+        }
+        .mini-chart svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Station info */
+        .mini-station {
+            font-size: 6px;
+            color: rgba(255,255,255,0.2);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding-top: 6px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            margin-top: 6px;
+        }
+
+        /* Weather row */
+        .mini-weather {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .mini-weather-icon { font-size: 22px; }
+        .mini-weather-temp {
+            font-size: 18px;
+            font-weight: 900;
+            color: white;
+        }
+        .mini-weather-desc {
+            font-size: 7px;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Community card */
+        .mini-community {
+            flex: 1;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .mini-community-title {
+            font-size: 7px;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .avatar-row {
+            display: flex;
+            gap: 3px;
+        }
+        .avatar {
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            border: 1px solid rgba(0,200,255,0.3);
+        }
+        .avatar:nth-child(1) { background: linear-gradient(135deg, #0070ff, #00c8ff); }
+        .avatar:nth-child(2) { background: linear-gradient(135deg, #00c8ff, #00ff80); }
+        .avatar:nth-child(3) { background: linear-gradient(135deg, #ff6b6b, #ffa500); }
+        .avatar:nth-child(4) { background: linear-gradient(135deg, #a855f7, #ec4899); }
+
+        .mini-catch {
+            font-size: 7px;
+            color: rgba(255,255,255,0.5);
+            line-height: 1.4;
+        }
+        .mini-catch b { color: #00c8ff; }
+
+        /* Bottom nav */
+        .mini-nav {
+            display: flex;
+            justify-content: space-around;
+            padding: 6px 0 2px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            margin-top: auto;
+        }
+        .nav-item {
+            text-align: center;
+        }
+        .nav-icon { font-size: 14px; }
+        .nav-label {
+            font-size: 6px;
+            color: rgba(255,255,255,0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .nav-item.active .nav-icon { filter: drop-shadow(0 0 4px #00c8ff); }
+        .nav-item.active .nav-label { color: #00c8ff; }
+
+        /* Glow behind phone */
+        .phone-glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(0, 140, 255, 0.15) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            animation: phoneGlow 4s ease-in-out infinite;
+        }
+        @keyframes phoneGlow {
+            0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        /* Irish flag stripe at bottom */
+        .flag-stripe {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            display: flex;
+            z-index: 50;
+        }
+        .flag-stripe div { flex: 1; }
+        .flag-green { background: #169b62; }
+        .flag-white { background: white; }
+        .flag-orange { background: #ff883e; }
+    </style>
+</head>
+<body>
+    <div class="canvas">
+        <div class="bg-base"></div>
+        <div class="grid-overlay"></div>
+
+        <!-- Particles -->
+        <div class="particles" id="particles"></div>
+
+        <!-- Left Content -->
+        <div class="left-content">
+            <div class="brand-badge">
+                <div class="brand-dot"></div>
+                <span class="brand-name">Irish Fishing Hub</span>
+            </div>
+
+            <h1 class="headline">
+                KNOW<br>YOUR<br>
+                <span class="accent">COAST.</span>
+            </h1>
+
+            <p class="subtext">
+                Real-time tides, weather, community reports, and AI-powered fish ID — built for Irish anglers. 🇮🇪
+            </p>
+
+            <div class="features-row">
+                <div class="feature-tag">
+                    <span class="icon">🌊</span>
+                    <span class="label">Live Tides</span>
+                </div>
+                <div class="feature-tag">
+                    <span class="icon">🌤️</span>
+                    <span class="label">Weather</span>
+                </div>
+                <div class="feature-tag">
+                    <span class="icon">🐟</span>
+                    <span class="label">Fish ID</span>
+                </div>
+                <div class="feature-tag">
+                    <span class="icon">👥</span>
+                    <span class="label">Community</span>
+                </div>
+            </div>
+
+            <div class="cta-area">
+                <a href="#" class="cta-btn">Try It Free ↗</a>
+                <span class="cta-url">irishfishinghub.com</span>
+            </div>
+        </div>
+
+        <!-- Phone Mockup -->
+        <div class="phone-area">
+            <div class="phone-glow"></div>
+            <div class="phone-frame">
+                <div class="phone-notch"></div>
+                <div class="phone-screen">
+                    <div class="mini-header">
+                        <span class="mini-logo">IRISH FISHING HUB</span>
+                        <div class="mini-dots"><span></span><span></span><span></span></div>
+                    </div>
+
+                    <!-- Tide Card -->
+                    <div class="mini-card">
+                        <div class="mini-stat-row">
+                            <div>
+                                <div class="mini-stat-label">Tide Height</div>
+                                <div class="mini-stat-value">3.4<span class="mini-stat-unit">m</span></div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div class="mini-stat-label">Status</div>
+                                <div class="mini-accent">▲ Rising</div>
+                            </div>
+                        </div>
+                        <div class="mini-chart">
+                            <svg viewBox="0 0 180 50" preserveAspectRatio="none">
+                                <defs>
+                                    <linearGradient id="miniGrad" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#00c8ff" stop-opacity="0.3"/>
+                                        <stop offset="100%" stop-color="#00c8ff" stop-opacity="0"/>
+                                    </linearGradient>
+                                    <linearGradient id="miniLineGrad" x1="0" y1="0" x2="1" y2="0">
+                                        <stop offset="0%" stop-color="#0070ff"/>
+                                        <stop offset="100%" stop-color="#00c8ff"/>
+                                    </linearGradient>
+                                </defs>
+                                <path d="M0,40 Q20,35 40,28 Q60,20 80,16 Q100,12 120,18 Q140,24 160,15 Q175,10 180,8 L180,50 L0,50Z" fill="url(#miniGrad)"/>
+                                <path d="M0,40 Q20,35 40,28 Q60,20 80,16 Q100,12 120,18 Q140,24 160,15 Q175,10 180,8" fill="none" stroke="url(#miniLineGrad)" stroke-width="2" stroke-linecap="round" filter="drop-shadow(0 0 4px rgba(0,200,255,0.6))"/>
+                                <circle cx="180" cy="8" r="3" fill="#00c8ff" filter="drop-shadow(0 0 4px #00c8ff)"/>
+                            </svg>
+                        </div>
+                        <div class="mini-station">Station: Galway Bay — Accuracy: 99.8%</div>
+                    </div>
+
+                    <!-- Weather -->
+                    <div class="mini-weather">
+                        <span class="mini-weather-icon">🌤️</span>
+                        <div>
+                            <div class="mini-weather-temp">14°</div>
+                        </div>
+                        <div>
+                            <div class="mini-weather-desc">Partly Cloudy</div>
+                            <div class="mini-weather-desc">Wind: 12kph SW</div>
+                        </div>
+                    </div>
+
+                    <!-- Community -->
+                    <div class="mini-community">
+                        <div class="mini-community-title">Community Feed</div>
+                        <div class="avatar-row">
+                            <div class="avatar"></div>
+                            <div class="avatar"></div>
+                            <div class="avatar"></div>
+                            <div class="avatar"></div>
+                        </div>
+                        <div class="mini-catch"><b>Sean_Angler</b> landed a 4.2kg Bass at Dunmore East! 🎣</div>
+                    </div>
+
+                    <!-- Nav -->
+                    <div class="mini-nav">
+                        <div class="nav-item active">
+                            <div class="nav-icon">🌊</div>
+                            <div class="nav-label">Tides</div>
+                        </div>
+                        <div class="nav-item">
+                            <div class="nav-icon">🗺️</div>
+                            <div class="nav-label">Map</div>
+                        </div>
+                        <div class="nav-item">
+                            <div class="nav-icon">👥</div>
+                            <div class="nav-label">Community</div>
+                        </div>
+                        <div class="nav-item">
+                            <div class="nav-icon">⚙️</div>
+                            <div class="nav-label">Settings</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Irish flag accent -->
+        <div class="flag-stripe">
+            <div class="flag-green"></div>
+            <div class="flag-white"></div>
+            <div class="flag-orange"></div>
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('particles');
+        for (let i = 0; i < 25; i++) {
+            const p = document.createElement('div');
+            const size = Math.random() * 3 + 1;
+            p.className = 'particle';
+            p.style.cssText = `
+                width: ${size}px; height: ${size}px;
+                left: ${Math.random() * 100}%;
+                bottom: ${Math.random() * 40}%;
+                --dur: ${Math.random() * 8 + 6}s;
+                --delay: ${Math.random() * 8}s;
+            `;
+            container.appendChild(p);
+        }
+    </script>
+</body>
+</html>
