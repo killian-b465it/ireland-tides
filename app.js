@@ -772,13 +772,20 @@ document.addEventListener('DOMContentLoaded', () => {
   showPage('home');
 
   // Dismiss loading screen after animation
-  setTimeout(() => {
-    const loader = document.getElementById('loading-screen');
-    if (loader) loader.classList.add('hidden');
-
-    // Check for mandatory legal consent after loading
+  const appAlreadyLoaded = sessionStorage.getItem('appLoaded');
+  const loader = document.getElementById('loading-screen');
+  
+  if (appAlreadyLoaded && loader) {
+    loader.style.display = 'none';
     checkLegalConsent();
-  }, 6500); // 1s delay + 5s fill animation
+  } else {
+    setTimeout(() => {
+      if (loader) loader.classList.add('hidden');
+      sessionStorage.setItem('appLoaded', 'true');
+      // Check for mandatory legal consent after loading
+      checkLegalConsent();
+    }, 6500); // 1s delay + 5s fill animation
+  }
 });
 
 // [BETA BANNER LOGIC REMOVED FOR V1.1.0]
