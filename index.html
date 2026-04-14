@@ -786,23 +786,6 @@
         <button class="btn btn-primary"
           onclick="handleAuthSubmit(); setTimeout(refreshCommunityGating, 100);">Continue</button>
         <p class="auth-switch">Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign up</a></p>
-
-        <div class="auth-divider" style="text-align: center; margin: 20px 0; position: relative;">
-          <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 10px 0;">
-          <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--bg-card); padding: 0 10px; color: var(--text-secondary); font-size: 0.8rem; white-space: nowrap;">or continue with</span>
-        </div>
-        
-        <div class="social-login-container" style="display: flex; flex-direction: column; gap: 10px;">
-          <button class="btn btn-social" style="background: white; color: #333; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 10px;" onclick="handleSocialLogin('Google')">
-            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width: 20px;"> Continue with Google
-          </button>
-          <button class="btn btn-social" style="background: black; color: white; border: 1px solid #333; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 10px;" onclick="handleSocialLogin('Apple')">
-            <img src="https://www.svgrepo.com/show/511330/apple-173.svg" alt="Apple" style="width: 20px; filter: invert(1);"> Continue with Apple
-          </button>
-          <button class="btn btn-social" style="background: #1877F2; color: white; border: none; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 10px;" onclick="handleSocialLogin('Facebook')">
-            <img src="https://www.svgrepo.com/show/475647/facebook-color.svg" alt="Facebook" style="width: 20px;"> Continue with Facebook
-          </button>
-        </div>
       </div>
       <button class="modal-close-btn" onclick="closeAuthModal()">✕</button>
     </div>
