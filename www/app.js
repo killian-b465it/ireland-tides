@@ -2103,6 +2103,8 @@ async function compressImage(base64Str, maxWidth = 1200, quality = 0.75) {
       ctx.drawImage(img, 0, 0, width, height);
       resolve(canvas.toDataURL('image/jpeg', quality));
     };
+    img.onerror = () => resolve(base64Str); // Fallback to original if compression fails
+
   });
 }
 
@@ -2531,7 +2533,11 @@ function renderCatchFeed() {
       `;
     }
 
+    const userOnClick = `onclick="viewUserProfile('${displayUserId}')"`;
+    const nameStyle = `style="cursor: pointer; font-weight: bold; color: var(--text-main);"`;
+
     const item = document.createElement('div');
+
     item.className = `feed-item catch-card ${c.isPinned ? 'pinned-post' : ''}`;
     item.innerHTML = `
       <div class="feed-header catch-header">
