@@ -2083,6 +2083,29 @@ function startAutoUpdate() {
 // ============================================
 // Community Logic
 // ============================================
+async function compressImage(base64Str, maxWidth = 1200, quality = 0.75) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = base64Str;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
+
+      if (width > maxWidth) {
+        height = Math.round((height * maxWidth) / width);
+        width = maxWidth;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+  });
+}
+
 function initCommunityMap() {
   state.communityMap = L.map('social-map', {
     zoomSnap: 0,
@@ -2163,27 +2186,61 @@ window.closeModal = () => {
 };
 
 window.previewImage = (input) => {
-  const preview = document.getElementById('image-preview');
-  const img = document.getElementById('preview-img');
+  const previewContainer = document.getElementById('image-preview');
+  if (!previewContainer) return;
 
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      img.src = e.target.result;
-      preview.style.display = 'block';
-    };
-    reader.readAsDataURL(input.files[0]);
+  previewContainer.innerHTML = '';
+  
+  if (input.files && input.files.length > 0) {
+    previewContainer.style.display = 'grid';
+    
+    // Limit to 5 images
+    const files = Array.from(input.files).slice(0, 5);
+    if (input.files.length > 5) alert('Maximum 5 images allowed. Only the first 5 will be uploaded.');
+
+    files.forEach((file, index) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const item = document.createElement('div');
+        item.className = 'preview-item';
+        item.innerHTML = `
+          <img src="${e.target.result}" alt="Preview">
+          <button class="remove-image" onclick="clearSpecificImage(${index})" title="Remove">✕</button>
+        `;
+        previewContainer.appendChild(item);
+      };
+      reader.readAsDataURL(file);
+    });
+  } else {
+    previewContainer.style.display = 'none';
   }
 };
 
+window.clearSpecificImage = (index) => {
+  const input = document.getElementById('catch-photo');
+  const dt = new DataTransfer();
+  const { files } = input;
+
+  for (let i = 0; i < files.length; i++) {
+    if (i !== index) dt.items.add(files[i]);
+  }
+
+  input.files = dt.files;
+  previewImage(input);
+};
+
 window.removeImage = () => {
-  document.getElementById('catch-photo').value = '';
-  document.getElementById('image-preview').style.display = 'none';
-  document.getElementById('preview-img').src = '';
+  const input = document.getElementById('catch-photo');
+  if (input) input.value = '';
+  const preview = document.getElementById('image-preview');
+  if (preview) {
+    preview.innerHTML = '';
+    preview.style.display = 'none';
+  }
 };
 
 let isSubmittingCatch = false;
-window.submitCatch = () => {
+window.submitCatch = async () => {
   if (isSubmittingCatch) return;
 
   if (!state.user) {
@@ -2191,55 +2248,101 @@ window.submitCatch = () => {
     return openPremiumModal();
   }
 
-  isSubmittingCatch = true;
-
   const sp = document.getElementById('catch-species').value;
   const dt = document.getElementById('catch-details').value;
   const photoInput = document.getElementById('catch-photo');
 
-  if (!sp) {
-    isSubmittingCatch = false;
-    return alert('Enter a title or species!');
-  }
+  if (!sp) return alert('Enter a title or species!');
 
-  const processCatch = (photoData) => {
+  isSubmittingCatch = true;
+  const postBtn = document.querySelector('#catch-modal .btn-primary');
+  const originalText = postBtn.innerText;
+  postBtn.innerText = 'Posting...';
+  postBtn.disabled = true;
+
+  try {
+    const photoDataArray = [];
+    if (photoInput.files && photoInput.files.length > 0) {
+      const files = Array.from(photoInput.files).slice(0, 5);
+      
+      for (const file of files) {
+        const base64 = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.readAsDataURL(file);
+        });
+        const compressed = await compressImage(base64);
+        photoDataArray.push(compressed);
+      }
+    }
+
     const isGeneralPost = !state.currentModalLatLng;
-
     const postTimestamp = Date.now();
-    const c = {
+    
+    const post = {
       id: postTimestamp,
-      createdAt: postTimestamp, // Dedicated creation timestamp for expiration logic
+      createdAt: postTimestamp,
       species: sp,
       details: dt,
       lat: isGeneralPost ? null : state.currentModalLatLng.lat,
       lng: isGeneralPost ? null : state.currentModalLatLng.lng,
-      isGeneralPost: isGeneralPost, // flag for easier rendering
+      isGeneralPost: isGeneralPost,
       date: new Date().toLocaleDateString('en-GB'),
       author: state.user.name,
       authorId: state.user.id,
       authorIsAdmin: state.user.isAdmin === true,
-      photo: photoData,
+      photos: photoDataArray, // Array of compressed Base64 images
       likes: 0,
       likedBy: [],
       comments: []
     };
 
-    // Sync to Firebase for cross-device visibility
-    syncCatchToFirebase(c);
+    // Legacy support: also add single photo field if at least one photo exists
+    if (photoDataArray.length > 0) {
+      post.photo = photoDataArray[0];
+    }
+
+    // Sync to Firebase
+    syncCatchToFirebase(post);
 
     closeModal();
-    // Allow new posts after 2 seconds to prevent rapid duplication
-    setTimeout(() => { isSubmittingCatch = false; }, 2000);
-  };
+    // Reset state
+    setTimeout(() => { 
+      isSubmittingCatch = false; 
+      postBtn.innerText = originalText;
+      postBtn.disabled = false;
+    }, 2000);
 
-  if (photoInput.files && photoInput.files[0]) {
-    const reader = new FileReader();
-    reader.onload = (e) => processCatch(e.target.result);
-    reader.onerror = () => { isSubmittingCatch = false; alert('Error reading image.'); };
-    reader.readAsDataURL(photoInput.files[0]);
-  } else {
-    processCatch(null);
+  } catch (err) {
+    console.error('Error submitting catch:', err);
+    alert('Failed to post. Please try again.');
+    isSubmittingCatch = false;
+    postBtn.innerText = originalText;
+    postBtn.disabled = false;
   }
+};
+
+// Slider Navigation Logic
+window.moveSlider = (postId, direction) => {
+  const slider = document.querySelector(`#slider-${postId}`);
+  if (!slider) return;
+  const scrollAmount = slider.offsetWidth;
+  slider.scrollBy({
+    left: direction * scrollAmount,
+    behavior: 'smooth'
+  });
+};
+
+// Update dots when slider scrolls
+window.updateSliderDots = (postId) => {
+  const slider = document.querySelector(`#slider-${postId}`);
+  const dots = document.querySelectorAll(`#dots-${postId} .slider-dot`);
+  if (!slider || dots.length === 0) return;
+  
+  const index = Math.round(slider.scrollLeft / slider.offsetWidth);
+  dots.forEach((dot, i) => {
+    dot.classList.toggle('active', i === index);
+  });
 };
 
 // Layer group for community markers
@@ -2402,10 +2505,31 @@ function renderCatchFeed() {
     const displayName = sanitizeHTML(c.author || c.userName || 'Anonymous');
     const displayDetails = sanitizeHTML(c.details || c.notes || '');
     const displayUserId = c.authorId || c.userId || ''; // IDs are internal, but still keep safe
-    const displayPhoto = c.photo || c.image || ''; // Base64 or URL
-
-    const userOnClick = `onclick="viewUserProfile('${displayUserId}')"`;
-    const nameStyle = `style="cursor: pointer; font-weight: bold; color: var(--text-main);"`;
+    const displayPhotos = c.photos && c.photos.length > 0 ? c.photos : (c.photo ? [c.photo] : []);
+    let photoHtml = '';
+    
+    if (displayPhotos.length === 1) {
+      photoHtml = `<img src="${displayPhotos[0]}" alt="Catch" class="catch-image feed-image" onclick="openImageModal('${displayPhotos[0]}')">`;
+    } else if (displayPhotos.length > 1) {
+      photoHtml = `
+        <div class="catch-image-container">
+          <div class="catch-slider" id="slider-${c.id}" onscroll="updateSliderDots(${c.id})">
+            ${displayPhotos.map(p => `
+              <div class="catch-slider-item">
+                <img src="${p}" alt="Catch" onclick="openImageModal('${p}')">
+              </div>
+            `).join('')}
+          </div>
+          <button class="slider-nav slider-prev" onclick="moveSlider(${c.id}, -1)">❮</button>
+          <button class="slider-nav slider-next" onclick="moveSlider(${c.id}, 1)">❯</button>
+          <div class="slider-dots" id="dots-${c.id}">
+            ${displayPhotos.map((_, i) => `
+              <div class="slider-dot ${i === 0 ? 'active' : ''}" onclick="document.getElementById('slider-${c.id}').scrollTo({left: ${i} * document.getElementById('slider-${c.id}').offsetWidth, behavior: 'smooth'})"></div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
 
     const item = document.createElement('div');
     item.className = `feed-item catch-card ${c.isPinned ? 'pinned-post' : ''}`;
@@ -2429,7 +2553,7 @@ function renderCatchFeed() {
       <div class="feed-content">
         <p class="catch-species"><strong>🎣 ${sanitizeHTML(c.species || 'Catch')}</strong></p>
         ${displayDetails ? `<p class="catch-details">${displayDetails}</p>` : ''}
-        ${displayPhoto ? `<img src="${displayPhoto}" alt="Catch" class="catch-image feed-image" onclick="openImageModal('${displayPhoto}')">` : ''}
+        ${photoHtml}
       </div>
       <div class="feed-actions catch-card-actions">
         <button class="action-btn social-btn ${isLiked ? 'active liked' : ''}" onclick="likeCatch(${c.id})">

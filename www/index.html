@@ -734,13 +734,10 @@
         <textarea id="catch-details" placeholder="How was the fight? What bait did you use?"></textarea>
       </div>
       <div class="form-group">
-        <label>Add a Photo</label>
+        <label>Add Photos (Up to 5)</label>
         <div class="file-input-wrapper">
-          <input type="file" id="catch-photo" accept="image/*" onchange="previewImage(this)">
-          <div id="image-preview" class="image-preview" style="display: none;">
-            <img id="preview-img" src="" alt="Preview">
-            <button class="remove-image" onclick="removeImage()">✕</button>
-          </div>
+          <input type="file" id="catch-photo" accept="image/*" multiple onchange="previewImage(this)">
+          <div id="image-preview" class="image-preview-grid" style="display: none;"></div>
         </div>
       </div>
       <div class="modal-actions">
