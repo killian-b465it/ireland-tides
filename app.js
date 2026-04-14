@@ -6249,9 +6249,20 @@ window.initDepthMap = function() {
     maxZoom: 18
   }).addTo(state.depthMap);
 
-  // OpenSeaMap Seamarks & Depth Contours Overlay
-  L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
-    attribution: 'Map data: &copy; <a href="http://www.openseamap.org">OpenSeaMap</a> contributors',
+  // EMODnet Colored Depth (Displays heatmaps of drop-offs)
+  L.tileLayer.wms('https://ows.emodnet-bathymetry.eu/wms', {
+    layers: 'emodnet:mean_multicolour',
+    format: 'image/png',
+    transparent: true,
+    opacity: 0.6
+  }).addTo(state.depthMap);
+
+  // EMODnet Bathymetry Contours (Displays lines with meter numbers)
+  L.tileLayer.wms('https://ows.emodnet-bathymetry.eu/wms', {
+    layers: 'emodnet:contours',
+    format: 'image/png',
+    transparent: true,
+    attribution: 'Depth Data &copy; <a href="https://emodnet.ec.europa.eu">EMODnet Bathymetry</a>',
     maxZoom: 18
   }).addTo(state.depthMap);
 
