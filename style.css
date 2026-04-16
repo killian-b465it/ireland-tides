@@ -4107,8 +4107,13 @@ input:checked+.toggle-slider:before {
     gap: 8px;
     justify-content: center;
     align-items: center;
-    padding: 15px !important;
+    padding: 20px 15px !important;
     font-size: 0.8rem;
+    margin-top: 30px;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    background: rgba(0,0,0,0.2);
+    border-top: 1px solid rgba(255,255,255,0.05);
 }
 
 .sidebar-footer a {
