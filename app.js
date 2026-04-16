@@ -4409,6 +4409,16 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 1000);
     }
   }
+
+  // Cross-page routing for Support Modal
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('support') === 'true') {
+    setTimeout(() => {
+      openSupportModal();
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }, 500);
+  }
 });
 
 window.giftProSubscription = (userId) => {
