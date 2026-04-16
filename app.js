@@ -2164,26 +2164,33 @@ window.closeModal = () => {
 
 window.previewImage = (input) => {
   const preview = document.getElementById('image-preview');
-  const img = document.getElementById('preview-img');
 
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      img.src = e.target.result;
-      preview.style.display = 'block';
-    };
-    reader.readAsDataURL(input.files[0]);
+  if (input.files && input.files.length > 0) {
+    if (input.files.length > 5) {
+      alert("You can only select up to 5 photos. Only the first 5 will be used.");
+    }
+    let html = '';
+    const maxFiles = Math.min(input.files.length, 5);
+    for(let i=0; i<maxFiles; i++) {
+        html += `<div style="width: 60px; height: 60px; flex-shrink: 0;">
+                   <img src="${URL.createObjectURL(input.files[i])}" style="width:100%; height:100%; object-fit:cover; border-radius:4px;">
+                 </div>`;
+    }
+    html += `<button class="remove-image" style="position:relative; background:rgba(255,0,0,0.8); color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.8rem; cursor:pointer;" onclick="removeImage()">✕ Remove</button>`;
+    
+    preview.innerHTML = html;
+    preview.style.display = 'flex';
   }
 };
 
 window.removeImage = () => {
   document.getElementById('catch-photo').value = '';
   document.getElementById('image-preview').style.display = 'none';
-  document.getElementById('preview-img').src = '';
+  document.getElementById('image-preview').innerHTML = '';
 };
 
 let isSubmittingCatch = false;
-window.submitCatch = () => {
+window.submitCatch = async () => {
   if (isSubmittingCatch) return;
 
   if (!state.user) {
@@ -2202,43 +2209,55 @@ window.submitCatch = () => {
     return alert('Enter a title or species!');
   }
 
-  const processCatch = (photoData) => {
+  const processCatch = (photosDataArray) => {
     const isGeneralPost = !state.currentModalLatLng;
 
     const postTimestamp = Date.now();
     const c = {
       id: postTimestamp,
-      createdAt: postTimestamp, // Dedicated creation timestamp for expiration logic
+      createdAt: postTimestamp,
       species: sp,
       details: dt,
       lat: isGeneralPost ? null : state.currentModalLatLng.lat,
       lng: isGeneralPost ? null : state.currentModalLatLng.lng,
-      isGeneralPost: isGeneralPost, // flag for easier rendering
+      isGeneralPost: isGeneralPost,
       date: new Date().toLocaleDateString('en-GB'),
       author: state.user.name,
       authorId: state.user.id,
       authorIsAdmin: state.user.isAdmin === true,
-      photo: photoData,
+      photos: photosDataArray,
+      photo: photosDataArray && photosDataArray.length > 0 ? photosDataArray[0] : null,
       likes: 0,
       likedBy: [],
       comments: []
     };
 
-    // Sync to Firebase for cross-device visibility
     syncCatchToFirebase(c);
 
     closeModal();
-    // Allow new posts after 2 seconds to prevent rapid duplication
     setTimeout(() => { isSubmittingCatch = false; }, 2000);
   };
 
-  if (photoInput.files && photoInput.files[0]) {
-    const reader = new FileReader();
-    reader.onload = (e) => processCatch(e.target.result);
-    reader.onerror = () => { isSubmittingCatch = false; alert('Error reading image.'); };
-    reader.readAsDataURL(photoInput.files[0]);
+  if (photoInput.files && photoInput.files.length > 0) {
+    const maxFiles = Math.min(photoInput.files.length, 5);
+    const promises = [];
+    for(let i=0; i<maxFiles; i++) {
+        promises.push(new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = () => reject('Error reading image.');
+            reader.readAsDataURL(photoInput.files[i]);
+        }));
+    }
+    try {
+        const photoDataArray = await Promise.all(promises);
+        processCatch(photoDataArray);
+    } catch(err) {
+        isSubmittingCatch = false;
+        alert(err);
+    }
   } else {
-    processCatch(null);
+    processCatch([]);
   }
 };
 
@@ -2403,6 +2422,17 @@ function renderCatchFeed() {
     const displayDetails = sanitizeHTML(c.details || c.notes || '');
     const displayUserId = c.authorId || c.userId || ''; // IDs are internal, but still keep safe
     const displayPhoto = c.photo || c.image || ''; // Base64 or URL
+    
+    let photosHtml = '';
+    if (c.photos && c.photos.length > 1) {
+        photosHtml = `<div class="catch-image-gallery">`;
+        c.photos.forEach(photoBase64 => {
+            photosHtml += `<img src="${photoBase64}" alt="Catch" class="catch-gallery-item" onclick="openImageModal('${photoBase64}')">`;
+        });
+        photosHtml += `</div>`;
+    } else if (displayPhoto) {
+        photosHtml = `<img src="${displayPhoto}" alt="Catch" class="catch-image feed-image" onclick="openImageModal('${displayPhoto}')">`;
+    }
 
     const userOnClick = `onclick="viewUserProfile('${displayUserId}')"`;
     const nameStyle = `style="cursor: pointer; font-weight: bold; color: var(--text-main);"`;
@@ -2422,6 +2452,8 @@ function renderCatchFeed() {
             <button class="pin-post-btn" onclick="togglePinCatch(${c.id})" title="${c.isPinned ? 'Unpin Post' : 'Pin Post'}">
               ${c.isPinned ? '📍' : '📌'}
             </button>
+          ` : ''}
+          ${isAdmin || (state.user && state.user.id === displayUserId) ? `
             <button class="delete-post-btn" onclick="deleteCatch(${c.id})" title="Delete Post">🗑️</button>
           ` : ''}
         </div>
@@ -2429,7 +2461,7 @@ function renderCatchFeed() {
       <div class="feed-content">
         <p class="catch-species"><strong>🎣 ${sanitizeHTML(c.species || 'Catch')}</strong></p>
         ${displayDetails ? `<p class="catch-details">${displayDetails}</p>` : ''}
-        ${displayPhoto ? `<img src="${displayPhoto}" alt="Catch" class="catch-image feed-image" onclick="openImageModal('${displayPhoto}')">` : ''}
+        ${photosHtml}
       </div>
       <div class="feed-actions catch-card-actions">
         <button class="action-btn social-btn ${isLiked ? 'active liked' : ''}" onclick="likeCatch(${c.id})">
@@ -2502,10 +2534,18 @@ window.togglePinCatch = (catchId) => {
   renderCatchFeed();
 };
 
-// Admin Delete Post Function
+// Delete Post Function (Admin or Author)
 window.deleteCatch = (catchId) => {
-  if (!state.user || !state.user.isAdmin) {
-    return alert('Only admins can delete posts.');
+  if (!state.user) {
+    return alert('You must be logged in to delete posts.');
+  }
+
+  const targetCatch = state.catches.find(c => c.id === catchId);
+  if (!targetCatch) return;
+
+  const authorId = targetCatch.authorId || targetCatch.userId;
+  if (!state.user.isAdmin && state.user.id !== authorId) {
+    return alert('You can only delete your own posts.');
   }
 
   if (!confirm('Are you sure you want to delete this post? This cannot be undone.')) {
@@ -6378,5 +6418,43 @@ function renderInlandDepths() {
     L.marker([pt.lat, pt.lon], { icon }).addTo(state.depthMap);
   });
 }
+
+// ============================================
+// Admin Blog Management
+// ============================================
+window.publishBlogPost = () => {
+  if (!state.user || !state.user.isAdmin) return alert('Only admins can publish blog posts.');
+  
+  const title = document.getElementById('admin-blog-title').value;
+  const snippet = document.getElementById('admin-blog-snippet').value;
+  const content = document.getElementById('admin-blog-content').value;
+  const image = document.getElementById('admin-blog-image').value;
+  
+  if (!title || !content) return alert('Title and Content are required!');
+  
+  const newPost = {
+    id: 'blog_' + Date.now(),
+    title: title,
+    snippet: snippet,
+    content: content,
+    image: image || null,
+    author: state.user.name,
+    date: Date.now()
+  };
+  
+  if (typeof firebaseDB !== 'undefined') {
+    firebaseDB.ref('blogPosts/' + newPost.id).set(newPost)
+      .then(() => {
+        alert('Blog Post Published Successfully!');
+        document.getElementById('admin-blog-title').value = '';
+        document.getElementById('admin-blog-snippet').value = '';
+        document.getElementById('admin-blog-content').value = '';
+        document.getElementById('admin-blog-image').value = '';
+      })
+      .catch(err => alert('Failed to publish: ' + err.message));
+  } else {
+    alert('Firebase not connected. Cannot publish right now.');
+  }
+};
 
 

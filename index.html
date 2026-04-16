@@ -736,10 +736,10 @@
       <div class="form-group">
         <label>Add a Photo</label>
         <div class="file-input-wrapper">
-          <input type="file" id="catch-photo" accept="image/*" onchange="previewImage(this)">
-          <div id="image-preview" class="image-preview" style="display: none;">
-            <img id="preview-img" src="" alt="Preview">
-            <button class="remove-image" onclick="removeImage()">✕</button>
+          <input type="file" id="catch-photo" accept="image/*" multiple onchange="previewImage(this)">
+          <small style="color:var(--text-muted); display:block; margin-top:5px; margin-bottom:8px;">You can select up to 5 photos.</small>
+          <div id="image-preview" class="multi-image-preview" style="display: none; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
+            <!-- Thumbnails dynamically injected here -->
           </div>
         </div>
       </div>
@@ -1219,6 +1219,32 @@
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 15px;">
               Tracks every unique page load across all visitors.
             </p>
+          </div>
+        </div>
+
+        <!-- Blog Management -->
+        <div class="admin-card admin-card-full">
+          <div class="admin-card-header">
+            <h3>📝 Blog Management</h3>
+          </div>
+          <div class="admin-card-body">
+            <div class="form-group">
+              <label>Post Title</label>
+              <input type="text" id="admin-blog-title" class="auth-input" placeholder="e.g. Best Pike Spots 2026">
+            </div>
+            <div class="form-group">
+              <label>Summary / Snippet</label>
+              <input type="text" id="admin-blog-snippet" class="auth-input" placeholder="A short description for the preview card">
+            </div>
+            <div class="form-group">
+              <label>Content (HTML/Text)</label>
+              <textarea id="admin-blog-content" class="auth-input" rows="8" placeholder="Write your blog post content here... You can use HTML tags like <p>, <h2>, <strong> etc."></textarea>
+            </div>
+            <div class="form-group">
+              <label>Main Image URL (Optional)</label>
+              <input type="text" id="admin-blog-image" class="auth-input" placeholder="https://example.com/image.jpg">
+            </div>
+            <button class="btn btn-primary" onclick="publishBlogPost()">Publish to Blog</button>
           </div>
         </div>
 

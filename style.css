@@ -5420,3 +5420,53 @@ input:checked+.toggle-slider:before {
     background-color: rgba(21, 34, 56, 0.4) !important;
     z-index: 9999999 !important;
 }
+
+/* Community Multi-Image Gallery */
+.multi-image-preview {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.catch-image-gallery {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    padding-bottom: 8px;
+    margin-bottom: var(--space-md);
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+}
+
+.catch-image-gallery::-webkit-scrollbar {
+    height: 6px;
+}
+
+.catch-image-gallery::-webkit-scrollbar-thumb {
+    background: var(--text-muted);
+    border-radius: 4px;
+}
+
+.catch-gallery-item {
+    flex: 0 0 85%;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--border-glass);
+    scroll-snap-align: center;
+    cursor: pointer;
+}
+
+/* Landscape orientation top bar layout fix */
+@media screen and (orientation: landscape) and (max-width: 950px) {
+    .nav-brand {
+        position: static;
+        transform: none;
+        margin-right: auto;
+    }
+    
+    .nav-container {
+        justify-content: flex-start;
+    }
+}
