@@ -1,4 +1,4 @@
-package com.irishfishinghub.app;
+package com.irishfishinghub.official;
 
 import com.getcapacitor.BridgeActivity;
 
