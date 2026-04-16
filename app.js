@@ -3355,7 +3355,13 @@ window.openAuthModal = () => {
   modal.classList.add('active');
 };
 
-window.closeAuthModal = () => document.getElementById('auth-modal').classList.remove('active');
+window.closeAuthModal = () => {
+  const modal = document.getElementById('auth-modal');
+  if (modal) {
+    modal.classList.remove('active');
+    modal.style.display = 'none';
+  }
+};
 
 window.toggleAuthMode = () => {
   state.authMode = state.authMode === 'login' ? 'signup' : 'login';
