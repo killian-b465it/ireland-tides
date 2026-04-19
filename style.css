@@ -321,6 +321,7 @@ body {
     flex-direction: column;
     gap: var(--space-lg);
     padding-right: var(--space-sm);
+    min-width: 0; /* Critical: Prevents grid column blowout from big images */
 }
 
 .sidebar::-webkit-scrollbar {
@@ -689,6 +690,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: var(--space-md);
+    min-width: 0;
 }
 
 .catch-card {
@@ -696,6 +698,7 @@ body {
     border-radius: 12px;
     padding: var(--space-md);
     border-bottom: 2px solid var(--accent-secondary);
+    min-width: 0;
 }
 
 .catch-header {
