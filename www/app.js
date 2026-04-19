@@ -2242,22 +2242,15 @@ window.submitCatch = async () => {
     const maxFiles = Math.min(photoInput.files.length, 5);
     const promises = [];
     for(let i=0; i<maxFiles; i++) {
-        promises.push(new Promise((resolve, reject) => {
-            const file = photoInput.files[i];
-            const blobUrl = URL.createObjectURL(file);
-            compressImage(blobUrl, 800)
-                .then(compressed => {
-                    URL.revokeObjectURL(blobUrl);
-                    resolve(compressed);
-                })
-                .catch(err => {
-                    URL.revokeObjectURL(blobUrl);
-                    console.warn('Compression failed, falling back to original FileReader array:', err);
-                    const reader = new FileReader();
-                    reader.onload = (e) => resolve(e.target.result);
-                    reader.onerror = () => reject('Error reading image.');
-                    reader.readAsDataURL(file);
-                });
+        promises.push(new Promise(async (resolve, reject) => {
+            try {
+                const file = photoInput.files[i];
+                const compressed = await compressImage(file, 800);
+                resolve(compressed);
+            } catch (err) {
+                console.error("Compression entirely failed for file", i, err);
+                reject('Error compressing image limit reached or unsupported format.');
+            }
         }));
     }
     try {
@@ -3748,14 +3741,11 @@ window.closeProfileModal = () => document.getElementById('profile-modal').classL
 window.handleAvatarSelect = async (input) => {
   if (input.files && input.files[0]) {
     const file = input.files[0];
-    const blobUrl = URL.createObjectURL(file);
     try {
-      const compressed = await compressImage(blobUrl, 400);
+      const compressed = await compressImage(file, 400);
       document.getElementById('profile-avatar-preview').src = compressed;
     } catch (err) {
       console.warn('Avatar compression failed:', err);
-    } finally {
-      URL.revokeObjectURL(blobUrl);
     }
   }
 };
@@ -5984,10 +5974,9 @@ window.handleSpeciesPhotoUpload = async function (input) {
   if (!input.files || !input.files[0]) return;
 
   const file = input.files[0];
-  const blobUrl = URL.createObjectURL(file);
 
   try {
-    const compressed = await compressImage(blobUrl, 800);
+    const compressed = await compressImage(file, 800);
     const preview = document.getElementById('species-preview');
     const previewImg = document.getElementById('species-preview-img');
     const uploadContent = document.getElementById('species-upload-content');
@@ -6000,8 +5989,6 @@ window.handleSpeciesPhotoUpload = async function (input) {
     identifyFishSpecies(compressed);
   } catch (err) {
     console.error('Error processing species image:', err);
-  } finally {
-    URL.revokeObjectURL(blobUrl);
   }
 };
 
@@ -6021,22 +6008,33 @@ window.clearSpeciesPhoto = function () {
 
 // AI Fish Identification - via Vercel serverless function
 
-// Compress image before sending to API
-function compressImage(dataUrl, maxWidth = 1024) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      let w = img.width, h = img.height;
-      if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
-      canvas.width = w;
-      canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      resolve(canvas.toDataURL('image/jpeg', 0.7));
+// Compress image before sending to API using browser-image-compression
+async function compressImage(file, maxWidth = 1024) {
+  try {
+    const options = {
+      maxSizeMB: 0.8,
+      maxWidthOrHeight: maxWidth,
+      useWebWorker: true,
+      fileType: 'image/jpeg'
     };
-    img.onerror = () => reject(new Error('Image failed to load for compression'));
-    img.src = dataUrl;
-  });
+    
+    // Fallback if browser-image-compression script somehow failed to load
+    if (typeof imageCompression === 'undefined') {
+       console.warn('browser-image-compression not loaded, falling back to FileReader');
+       return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.onerror = () => reject(new Error('FileReader fallback failed.'));
+          reader.readAsDataURL(file);
+       });
+    }
+
+    const compressedFile = await imageCompression(file, options);
+    return await imageCompression.getDataUrlFromFile(compressedFile);
+  } catch (error) {
+    console.error('Image compression failed:', error);
+    throw error;
+  }
 }
 
 async function identifyFishSpecies(imageDataUrl) {

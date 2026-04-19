@@ -17,7 +17,8 @@ const includeItems = [
     'index.html',
     'loading.css',
     'style.css',
-    'sponsors.js'
+    'sponsors.js',
+    'api'
 ];
 
 // Add any other .html files found in the root
