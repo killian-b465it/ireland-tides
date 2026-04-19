@@ -6041,7 +6041,8 @@ async function identifyFishSpecies(imageDataUrl) {
     const compressedImage = await compressImage(imageDataUrl);
 
     // Call our server backend (API key is stored server-side)
-    const response = await fetch(`${CONFIG.STRIPE_API_ENDPOINT}/api/identify-fish`, {
+    const baseUrl = window.Capacitor ? 'https://irishfishinghub.com' : '';
+    const response = await fetch(`${baseUrl}/api/identify-fish`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ image: compressedImage })
