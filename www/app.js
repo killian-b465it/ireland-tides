@@ -2243,18 +2243,21 @@ window.submitCatch = async () => {
     const promises = [];
     for(let i=0; i<maxFiles; i++) {
         promises.push(new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                try {
-                    const compressed = await compressImage(e.target.result, 800);
+            const file = photoInput.files[i];
+            const blobUrl = URL.createObjectURL(file);
+            compressImage(blobUrl, 800)
+                .then(compressed => {
+                    URL.revokeObjectURL(blobUrl);
                     resolve(compressed);
-                } catch(err) {
-                    console.warn('Compression failed, using original', err);
-                    resolve(e.target.result);
-                }
-            };
-            reader.onerror = () => reject('Error reading image.');
-            reader.readAsDataURL(photoInput.files[i]);
+                })
+                .catch(err => {
+                    URL.revokeObjectURL(blobUrl);
+                    console.warn('Compression failed, falling back to original FileReader array:', err);
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.onerror = () => reject('Error reading image.');
+                    reader.readAsDataURL(file);
+                });
         }));
     }
     try {
@@ -3742,13 +3745,18 @@ window.openProfileModal = () => {
 
 window.closeProfileModal = () => document.getElementById('profile-modal').classList.remove('active');
 
-window.handleAvatarSelect = (input) => {
+window.handleAvatarSelect = async (input) => {
   if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      document.getElementById('profile-avatar-preview').src = e.target.result;
-    };
-    reader.readAsDataURL(input.files[0]);
+    const file = input.files[0];
+    const blobUrl = URL.createObjectURL(file);
+    try {
+      const compressed = await compressImage(blobUrl, 400);
+      document.getElementById('profile-avatar-preview').src = compressed;
+    } catch (err) {
+      console.warn('Avatar compression failed:', err);
+    } finally {
+      URL.revokeObjectURL(blobUrl);
+    }
   }
 };
 
@@ -5972,26 +5980,29 @@ window.openSpeciesCamera = function () {
 };
 
 // Handle photo upload/capture
-window.handleSpeciesPhotoUpload = function (input) {
+window.handleSpeciesPhotoUpload = async function (input) {
   if (!input.files || !input.files[0]) return;
 
   const file = input.files[0];
-  const reader = new FileReader();
+  const blobUrl = URL.createObjectURL(file);
 
-  reader.onload = function (e) {
+  try {
+    const compressed = await compressImage(blobUrl, 800);
     const preview = document.getElementById('species-preview');
     const previewImg = document.getElementById('species-preview-img');
     const uploadContent = document.getElementById('species-upload-content');
 
-    previewImg.src = e.target.result;
+    previewImg.src = compressed;
     preview.style.display = 'block';
     uploadContent.style.display = 'none';
 
     // Auto-trigger AI identification
-    identifyFishSpecies(e.target.result);
-  };
-
-  reader.readAsDataURL(file);
+    identifyFishSpecies(compressed);
+  } catch (err) {
+    console.error('Error processing species image:', err);
+  } finally {
+    URL.revokeObjectURL(blobUrl);
+  }
 };
 
 // Clear photo and reset
@@ -6012,7 +6023,7 @@ window.clearSpeciesPhoto = function () {
 
 // Compress image before sending to API
 function compressImage(dataUrl, maxWidth = 1024) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
       const canvas = document.createElement('canvas');
@@ -6023,6 +6034,7 @@ function compressImage(dataUrl, maxWidth = 1024) {
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
       resolve(canvas.toDataURL('image/jpeg', 0.7));
     };
+    img.onerror = () => reject(new Error('Image failed to load for compression'));
     img.src = dataUrl;
   });
 }
