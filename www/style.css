@@ -670,6 +670,21 @@ body {
 }
 
 /* Community Styles */
+#page-community {
+    max-width: 1050px; /* Highly contained sleek feel */
+}
+
+#page-community .app-container {
+    grid-template-columns: 360px 1fr; 
+}
+
+@media (max-width: 1024px) {
+    #page-community .app-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+
 .catch-feed {
     display: flex;
     flex-direction: column;
