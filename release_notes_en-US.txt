@@ -1,0 +1,8 @@
+Welcome to the official public release of the Irish Fishing Hub! 🎣
+
+In this new update, we've added exciting new features and squashed some bugs:
+- 📸 Multi-Image Uploads: You can now add multiple photos to your community posts and view them in a sleek new carousel.
+- 🐞 Bug Fixes: We've resolved issues with the login modal and form submissions for a smoother experience.
+- 🚀 Stability and UI improvements to keep everything running fast and looking great.
+
+Tight lines, and happy fishing!

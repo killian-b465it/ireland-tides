@@ -104,7 +104,7 @@ const CONFIG = {
   // Use Firebase Authentication's custom claims or a secure backend for admin verification.
   ADMIN_PASSWORD: 'IrishTides2026!',
   // Integration endpoints
-  STRIPE_API_ENDPOINT: window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://api.irishfishinghub.com'
+  STRIPE_API_ENDPOINT: (window.location.hostname === 'localhost' && !window.Capacitor) ? 'http://localhost:3000' : 'https://api.irishfishinghub.com'
 };
 
 // ============================================
@@ -2244,7 +2244,15 @@ window.submitCatch = async () => {
     for(let i=0; i<maxFiles; i++) {
         promises.push(new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onload = (e) => resolve(e.target.result);
+            reader.onload = async (e) => {
+                try {
+                    const compressed = await compressImage(e.target.result, 800);
+                    resolve(compressed);
+                } catch(err) {
+                    console.warn('Compression failed, using original', err);
+                    resolve(e.target.result);
+                }
+            };
             reader.onerror = () => reject('Error reading image.');
             reader.readAsDataURL(photoInput.files[i]);
         }));
@@ -6032,8 +6040,8 @@ async function identifyFishSpecies(imageDataUrl) {
     // Compress image first
     const compressedImage = await compressImage(imageDataUrl);
 
-    // Call our Vercel serverless function (API key is stored server-side)
-    const response = await fetch('/api/identify-fish', {
+    // Call our server backend (API key is stored server-side)
+    const response = await fetch(`${CONFIG.STRIPE_API_ENDPOINT}/api/identify-fish`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ image: compressedImage })

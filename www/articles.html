@@ -37,6 +37,10 @@
       <h1>🎣 Irish Fishing Hub Blog</h1>
       <p style="margin-bottom: 30px;">Read our latest guides, tips, and insights on fishing across the Irish coast. Designed to help you catch more fish and fish safely.</p>
       
+      <!-- Dynamic Blog Posts Container -->
+      <div id="dynamic-blog-posts" style="display: flex; flex-direction: column; gap: 20px; margin-bottom: 20px;">
+      </div>
+
       <div style="display: flex; flex-direction: column; gap: 20px;">
         <!-- Article 4 (NEW) -->
         <a href="articles/top-10-wild-atlantic-way-spots.html" class="article-card">
@@ -75,5 +79,60 @@
       </div>
     </div>
   </main>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB1dhBLpKJdlkFVQ3R9lajHyuU2L_z_2b0",
+      authDomain: "irish-fishing-hub.firebaseapp.com",
+      databaseURL: "https://irish-fishing-hub-default-rtdb.firebaseio.com",
+      projectId: "irish-fishing-hub",
+      storageBucket: "irish-fishing-hub.firebasestorage.app",
+      messagingSenderId: "975072154696",
+      appId: "1:975072154696:web:d7fc268ea7e89ece63347d",
+      measurementId: "G-ETMBTS4K96"
+    };
+    if (typeof firebase !== 'undefined') {
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.database();
+
+      function loadDynamicPosts() {
+        db.ref('blogPosts').once('value').then(snapshot => {
+          const postsContainer = document.getElementById('dynamic-blog-posts');
+          if (!postsContainer) return;
+          
+          const posts = [];
+          snapshot.forEach(child => {
+            posts.push(child.val());
+          });
+          
+          if (posts.length === 0) {
+            postsContainer.style.display = 'none';
+            return;
+          }
+          
+          // Sort descending by date
+          posts.sort((a,b) => b.date - a.date);
+          
+          let html = '';
+          posts.forEach(post => {
+            const dateStr = new Date(post.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            html += `
+              <a href="article-view.html?id=${post.id}" class="article-card">
+                <span class="article-date">${dateStr}</span>
+                <h2>${post.title}</h2>
+                <p style="margin-bottom:0;">${post.snippet}</p>
+              </a>
+            `;
+          });
+          postsContainer.innerHTML = html;
+        }).catch(err => console.error("Error loading blog posts:", err));
+      }
+      
+      // Load posts on page load
+      loadDynamicPosts();
+    }
+  </script>
 </body>
 </html>

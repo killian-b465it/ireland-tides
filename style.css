@@ -1168,6 +1168,8 @@ body {
     width: 100%;
     max-width: 500px;
     border: 1px solid var(--border-glass);
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .modal-large {
@@ -4642,6 +4644,9 @@ input:checked+.toggle-slider:before {
     background: rgba(0, 212, 255, 0.05);
     border-radius: 8px;
     line-height: 1.6;
+    max-height: 250px;
+    overflow-y: auto;
+    text-align: left;
 }
 
 .sponsor-info-contacts {

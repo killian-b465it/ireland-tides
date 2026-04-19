@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loading Article... - Irish Fishing Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .content-card { padding: 3rem; margin-top: 100px; background: rgba(21, 34, 56, 0.95); border-radius: var(--radius-lg); border: 1px solid rgba(255, 255, 255, 0.05); }
+    h1 { margin-bottom: 5px; color: var(--text-primary); font-size: 2.5rem; }
+    .article-meta { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+    .article-body { color: var(--text-secondary); line-height: 1.8; font-size: 1.1rem; }
+    .article-body h2 { color: var(--accent-primary); margin-top: 30px; margin-bottom: 15px; }
+    .article-body h3 { color: var(--text-main); margin-top: 25px; margin-bottom: 10px; }
+    .article-body p { margin-bottom: 20px; }
+    .article-body img { max-width: 100%; border-radius: 8px; margin: 20px 0; }
+    .article-body ul, .article-body ol { margin-bottom: 20px; padding-left: 20px; }
+    .article-body li { margin-bottom: 10px; color: var(--text-secondary); }
+    .main-image { width: 100%; max-height: 400px; object-fit: cover; border-radius: 12px; margin-bottom: 30px; }
+    #loading-state { text-align: center; padding: 50px 0; }
+    #error-state { display: none; text-align: center; color: var(--accent-danger); padding: 50px 0; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <a href="index.html" style="display:flex; align-items:center; text-decoration:none;">
+          <img src="assets/logo.png" alt="Logo" class="nav-logo-img" style="height: 32px; margin-right: 8px;">
+          <span class="nav-title" style="color:white;">Irish Fishing Hub</span>
+        </a>
+      </div>
+      <div class="nav-right">
+        <a href="articles.html" class="btn btn-outline" style="text-decoration:none;">Back to Blog</a>
+      </div>
+    </div>
+  </nav>
+
+  <main style="max-width: 900px; margin: 0 auto; padding: 0 20px; min-height: calc(100vh - 100px); padding-bottom: 50px;">
+    <div class="content-card">
+      <div id="loading-state">
+        <div class="loading-spinner" style="margin: 0 auto 20px auto;"></div>
+        <p>Loading article...</p>
+      </div>
+
+      <div id="error-state">
+        <h2>Article Not Found</h2>
+        <p>The article you are looking for does not exist or has been removed.</p>
+        <a href="articles.html" class="btn btn-primary" style="text-decoration:none; display:inline-block; margin-top:20px;">Return to Blog</a>
+      </div>
+
+      <div id="article-content" style="display:none;">
+        <h1 id="post-title"></h1>
+        <div class="article-meta">
+          <span id="post-date"></span> • <span id="post-author"></span>
+        </div>
+        <img id="post-image" src="" class="main-image" style="display:none;" alt="Post Image">
+        <div class="article-body" id="post-body"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB1dhBLpKJdlkFVQ3R9lajHyuU2L_z_2b0",
+      authDomain: "irish-fishing-hub.firebaseapp.com",
+      databaseURL: "https://irish-fishing-hub-default-rtdb.firebaseio.com",
+      projectId: "irish-fishing-hub",
+      storageBucket: "irish-fishing-hub.firebasestorage.app",
+      messagingSenderId: "975072154696",
+      appId: "1:975072154696:web:d7fc268ea7e89ece63347d",
+      measurementId: "G-ETMBTS4K96"
+    };
+
+    if (typeof firebase !== 'undefined') {
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.database();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const articleId = urlParams.get('id');
+
+      if (!articleId) {
+        document.getElementById('loading-state').style.display = 'none';
+        document.getElementById('error-state').style.display = 'block';
+      } else {
+        db.ref('blogPosts/' + articleId).once('value').then(snapshot => {
+          const post = snapshot.val();
+          document.getElementById('loading-state').style.display = 'none';
+
+          if (!post) {
+            document.getElementById('error-state').style.display = 'block';
+            return;
+          }
+
+          document.title = post.title + " - Irish Fishing Hub Blog";
+          document.getElementById('post-title').innerText = post.title;
+          
+          const dateStr = new Date(post.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+          document.getElementById('post-date').innerText = dateStr;
+          document.getElementById('post-author').innerText = "By " + (post.author || "Admin");
+
+          if (post.image) {
+            const img = document.getElementById('post-image');
+            img.src = post.image;
+            img.style.display = 'block';
+          }
+
+          document.getElementById('post-body').innerHTML = post.content;
+          document.getElementById('article-content').style.display = 'block';
+        }).catch(err => {
+          console.error(err);
+          document.getElementById('loading-state').style.display = 'none';
+          document.getElementById('error-state').style.display = 'block';
+        });
+      }
+    }
+  </script>
+</body>
+</html>

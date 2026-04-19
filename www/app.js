@@ -104,7 +104,7 @@ const CONFIG = {
   // Use Firebase Authentication's custom claims or a secure backend for admin verification.
   ADMIN_PASSWORD: 'IrishTides2026!',
   // Integration endpoints
-  STRIPE_API_ENDPOINT: window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://api.irishfishinghub.com'
+  STRIPE_API_ENDPOINT: (window.location.hostname === 'localhost' && !window.Capacitor) ? 'http://localhost:3000' : 'https://api.irishfishinghub.com'
 };
 
 // ============================================
@@ -2083,31 +2083,6 @@ function startAutoUpdate() {
 // ============================================
 // Community Logic
 // ============================================
-async function compressImage(base64Str, maxWidth = 1200, quality = 0.75) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.src = base64Str;
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      let width = img.width;
-      let height = img.height;
-
-      if (width > maxWidth) {
-        height = Math.round((height * maxWidth) / width);
-        width = maxWidth;
-      }
-
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, width, height);
-      resolve(canvas.toDataURL('image/jpeg', quality));
-    };
-    img.onerror = () => resolve(base64Str); // Fallback to original if compression fails
-
-  });
-}
-
 function initCommunityMap() {
   state.communityMap = L.map('social-map', {
     zoomSnap: 0,
@@ -2188,57 +2163,30 @@ window.closeModal = () => {
 };
 
 window.previewImage = (input) => {
-  const previewContainer = document.getElementById('image-preview');
-  if (!previewContainer) return;
+  const preview = document.getElementById('image-preview');
 
-  previewContainer.innerHTML = '';
-  
   if (input.files && input.files.length > 0) {
-    previewContainer.style.display = 'grid';
+    if (input.files.length > 5) {
+      alert("You can only select up to 5 photos. Only the first 5 will be used.");
+    }
+    let html = '';
+    const maxFiles = Math.min(input.files.length, 5);
+    for(let i=0; i<maxFiles; i++) {
+        html += `<div style="width: 60px; height: 60px; flex-shrink: 0;">
+                   <img src="${URL.createObjectURL(input.files[i])}" style="width:100%; height:100%; object-fit:cover; border-radius:4px;">
+                 </div>`;
+    }
+    html += `<button class="remove-image" style="position:relative; background:rgba(255,0,0,0.8); color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.8rem; cursor:pointer;" onclick="removeImage()">✕ Remove</button>`;
     
-    // Limit to 5 images
-    const files = Array.from(input.files).slice(0, 5);
-    if (input.files.length > 5) alert('Maximum 5 images allowed. Only the first 5 will be uploaded.');
-
-    files.forEach((file, index) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const item = document.createElement('div');
-        item.className = 'preview-item';
-        item.innerHTML = `
-          <img src="${e.target.result}" alt="Preview">
-          <button class="remove-image" onclick="clearSpecificImage(${index})" title="Remove">✕</button>
-        `;
-        previewContainer.appendChild(item);
-      };
-      reader.readAsDataURL(file);
-    });
-  } else {
-    previewContainer.style.display = 'none';
+    preview.innerHTML = html;
+    preview.style.display = 'flex';
   }
-};
-
-window.clearSpecificImage = (index) => {
-  const input = document.getElementById('catch-photo');
-  const dt = new DataTransfer();
-  const { files } = input;
-
-  for (let i = 0; i < files.length; i++) {
-    if (i !== index) dt.items.add(files[i]);
-  }
-
-  input.files = dt.files;
-  previewImage(input);
 };
 
 window.removeImage = () => {
-  const input = document.getElementById('catch-photo');
-  if (input) input.value = '';
-  const preview = document.getElementById('image-preview');
-  if (preview) {
-    preview.innerHTML = '';
-    preview.style.display = 'none';
-  }
+  document.getElementById('catch-photo').value = '';
+  document.getElementById('image-preview').style.display = 'none';
+  document.getElementById('image-preview').innerHTML = '';
 };
 
 let isSubmittingCatch = false;
@@ -2250,38 +2198,22 @@ window.submitCatch = async () => {
     return openPremiumModal();
   }
 
+  isSubmittingCatch = true;
+
   const sp = document.getElementById('catch-species').value;
   const dt = document.getElementById('catch-details').value;
   const photoInput = document.getElementById('catch-photo');
 
-  if (!sp) return alert('Enter a title or species!');
+  if (!sp) {
+    isSubmittingCatch = false;
+    return alert('Enter a title or species!');
+  }
 
-  isSubmittingCatch = true;
-  const postBtn = document.querySelector('#catch-modal .btn-primary');
-  const originalText = postBtn.innerText;
-  postBtn.innerText = 'Posting...';
-  postBtn.disabled = true;
-
-  try {
-    const photoDataArray = [];
-    if (photoInput.files && photoInput.files.length > 0) {
-      const files = Array.from(photoInput.files).slice(0, 5);
-      
-      for (const file of files) {
-        const base64 = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onload = (e) => resolve(e.target.result);
-          reader.readAsDataURL(file);
-        });
-        const compressed = await compressImage(base64);
-        photoDataArray.push(compressed);
-      }
-    }
-
+  const processCatch = (photosDataArray) => {
     const isGeneralPost = !state.currentModalLatLng;
+
     const postTimestamp = Date.now();
-    
-    const post = {
+    const c = {
       id: postTimestamp,
       createdAt: postTimestamp,
       species: sp,
@@ -2293,58 +2225,48 @@ window.submitCatch = async () => {
       author: state.user.name,
       authorId: state.user.id,
       authorIsAdmin: state.user.isAdmin === true,
-      photos: photoDataArray, // Array of compressed Base64 images
+      photos: photosDataArray,
+      photo: photosDataArray && photosDataArray.length > 0 ? photosDataArray[0] : null,
       likes: 0,
       likedBy: [],
       comments: []
     };
 
-    // Legacy support: also add single photo field if at least one photo exists
-    if (photoDataArray.length > 0) {
-      post.photo = photoDataArray[0];
-    }
-
-    // Sync to Firebase
-    syncCatchToFirebase(post);
+    syncCatchToFirebase(c);
 
     closeModal();
-    // Reset state
-    setTimeout(() => { 
-      isSubmittingCatch = false; 
-      postBtn.innerText = originalText;
-      postBtn.disabled = false;
-    }, 2000);
+    setTimeout(() => { isSubmittingCatch = false; }, 2000);
+  };
 
-  } catch (err) {
-    console.error('Error submitting catch:', err);
-    alert('Failed to post. Please try again.');
-    isSubmittingCatch = false;
-    postBtn.innerText = originalText;
-    postBtn.disabled = false;
+  if (photoInput.files && photoInput.files.length > 0) {
+    const maxFiles = Math.min(photoInput.files.length, 5);
+    const promises = [];
+    for(let i=0; i<maxFiles; i++) {
+        promises.push(new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const compressed = await compressImage(e.target.result, 800);
+                    resolve(compressed);
+                } catch(err) {
+                    console.warn('Compression failed, using original', err);
+                    resolve(e.target.result);
+                }
+            };
+            reader.onerror = () => reject('Error reading image.');
+            reader.readAsDataURL(photoInput.files[i]);
+        }));
+    }
+    try {
+        const photoDataArray = await Promise.all(promises);
+        processCatch(photoDataArray);
+    } catch(err) {
+        isSubmittingCatch = false;
+        alert(err);
+    }
+  } else {
+    processCatch([]);
   }
-};
-
-// Slider Navigation Logic
-window.moveSlider = (postId, direction) => {
-  const slider = document.querySelector(`#slider-${postId}`);
-  if (!slider) return;
-  const scrollAmount = slider.offsetWidth;
-  slider.scrollBy({
-    left: direction * scrollAmount,
-    behavior: 'smooth'
-  });
-};
-
-// Update dots when slider scrolls
-window.updateSliderDots = (postId) => {
-  const slider = document.querySelector(`#slider-${postId}`);
-  const dots = document.querySelectorAll(`#dots-${postId} .slider-dot`);
-  if (!slider || dots.length === 0) return;
-  
-  const index = Math.round(slider.scrollLeft / slider.offsetWidth);
-  dots.forEach((dot, i) => {
-    dot.classList.toggle('active', i === index);
-  });
 };
 
 // Layer group for community markers
@@ -2507,37 +2429,23 @@ function renderCatchFeed() {
     const displayName = sanitizeHTML(c.author || c.userName || 'Anonymous');
     const displayDetails = sanitizeHTML(c.details || c.notes || '');
     const displayUserId = c.authorId || c.userId || ''; // IDs are internal, but still keep safe
-    const displayPhotos = c.photos && c.photos.length > 0 ? c.photos : (c.photo ? [c.photo] : []);
-    let photoHtml = '';
+    const displayPhoto = c.photo || c.image || ''; // Base64 or URL
     
-    if (displayPhotos.length === 1) {
-      photoHtml = `<img src="${displayPhotos[0]}" alt="Catch" class="catch-image feed-image" onclick="openImageModal('${displayPhotos[0]}')">`;
-    } else if (displayPhotos.length > 1) {
-      photoHtml = `
-        <div class="catch-image-container">
-          <div class="catch-slider" id="slider-${c.id}" onscroll="updateSliderDots(${c.id})">
-            ${displayPhotos.map(p => `
-              <div class="catch-slider-item">
-                <img src="${p}" alt="Catch" onclick="openImageModal('${p}')">
-              </div>
-            `).join('')}
-          </div>
-          <button class="slider-nav slider-prev" onclick="moveSlider(${c.id}, -1)">❮</button>
-          <button class="slider-nav slider-next" onclick="moveSlider(${c.id}, 1)">❯</button>
-          <div class="slider-dots" id="dots-${c.id}">
-            ${displayPhotos.map((_, i) => `
-              <div class="slider-dot ${i === 0 ? 'active' : ''}" onclick="document.getElementById('slider-${c.id}').scrollTo({left: ${i} * document.getElementById('slider-${c.id}').offsetWidth, behavior: 'smooth'})"></div>
-            `).join('')}
-          </div>
-        </div>
-      `;
+    let photosHtml = '';
+    if (c.photos && c.photos.length > 1) {
+        photosHtml = `<div class="catch-image-gallery">`;
+        c.photos.forEach(photoBase64 => {
+            photosHtml += `<img src="${photoBase64}" alt="Catch" class="catch-gallery-item" onclick="openImageModal('${photoBase64}')">`;
+        });
+        photosHtml += `</div>`;
+    } else if (displayPhoto) {
+        photosHtml = `<img src="${displayPhoto}" alt="Catch" class="catch-image feed-image" onclick="openImageModal('${displayPhoto}')">`;
     }
 
     const userOnClick = `onclick="viewUserProfile('${displayUserId}')"`;
     const nameStyle = `style="cursor: pointer; font-weight: bold; color: var(--text-main);"`;
 
     const item = document.createElement('div');
-
     item.className = `feed-item catch-card ${c.isPinned ? 'pinned-post' : ''}`;
     item.innerHTML = `
       <div class="feed-header catch-header">
@@ -2552,6 +2460,8 @@ function renderCatchFeed() {
             <button class="pin-post-btn" onclick="togglePinCatch(${c.id})" title="${c.isPinned ? 'Unpin Post' : 'Pin Post'}">
               ${c.isPinned ? '📍' : '📌'}
             </button>
+          ` : ''}
+          ${isAdmin || (state.user && state.user.id === displayUserId) ? `
             <button class="delete-post-btn" onclick="deleteCatch(${c.id})" title="Delete Post">🗑️</button>
           ` : ''}
         </div>
@@ -2559,7 +2469,7 @@ function renderCatchFeed() {
       <div class="feed-content">
         <p class="catch-species"><strong>🎣 ${sanitizeHTML(c.species || 'Catch')}</strong></p>
         ${displayDetails ? `<p class="catch-details">${displayDetails}</p>` : ''}
-        ${photoHtml}
+        ${photosHtml}
       </div>
       <div class="feed-actions catch-card-actions">
         <button class="action-btn social-btn ${isLiked ? 'active liked' : ''}" onclick="likeCatch(${c.id})">
@@ -2632,10 +2542,18 @@ window.togglePinCatch = (catchId) => {
   renderCatchFeed();
 };
 
-// Admin Delete Post Function
+// Delete Post Function (Admin or Author)
 window.deleteCatch = (catchId) => {
-  if (!state.user || !state.user.isAdmin) {
-    return alert('Only admins can delete posts.');
+  if (!state.user) {
+    return alert('You must be logged in to delete posts.');
+  }
+
+  const targetCatch = state.catches.find(c => c.id === catchId);
+  if (!targetCatch) return;
+
+  const authorId = targetCatch.authorId || targetCatch.userId;
+  if (!state.user.isAdmin && state.user.id !== authorId) {
+    return alert('You can only delete your own posts.');
   }
 
   if (!confirm('Are you sure you want to delete this post? This cannot be undone.')) {
@@ -3485,7 +3403,13 @@ window.openAuthModal = () => {
   modal.classList.add('active');
 };
 
-window.closeAuthModal = () => document.getElementById('auth-modal').classList.remove('active');
+window.closeAuthModal = () => {
+  const modal = document.getElementById('auth-modal');
+  if (modal) {
+    modal.classList.remove('active');
+    modal.style.display = 'none';
+  }
+};
 
 window.toggleAuthMode = () => {
   state.authMode = state.authMode === 'login' ? 'signup' : 'login';
@@ -4492,6 +4416,16 @@ document.addEventListener('DOMContentLoaded', () => {
         banner.style.display = 'block';
       }, 1000);
     }
+  }
+
+  // Cross-page routing for Support Modal
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('support') === 'true') {
+    setTimeout(() => {
+      openSupportModal();
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }, 500);
   }
 });
 
@@ -6106,8 +6040,8 @@ async function identifyFishSpecies(imageDataUrl) {
     // Compress image first
     const compressedImage = await compressImage(imageDataUrl);
 
-    // Call our Vercel serverless function (API key is stored server-side)
-    const response = await fetch('/api/identify-fish', {
+    // Call our server backend (API key is stored server-side)
+    const response = await fetch(`${CONFIG.STRIPE_API_ENDPOINT}/api/identify-fish`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ image: compressedImage })
@@ -6502,5 +6436,43 @@ function renderInlandDepths() {
     L.marker([pt.lat, pt.lon], { icon }).addTo(state.depthMap);
   });
 }
+
+// ============================================
+// Admin Blog Management
+// ============================================
+window.publishBlogPost = () => {
+  if (!state.user || !state.user.isAdmin) return alert('Only admins can publish blog posts.');
+  
+  const title = document.getElementById('admin-blog-title').value;
+  const snippet = document.getElementById('admin-blog-snippet').value;
+  const content = document.getElementById('admin-blog-content').value;
+  const image = document.getElementById('admin-blog-image').value;
+  
+  if (!title || !content) return alert('Title and Content are required!');
+  
+  const newPost = {
+    id: 'blog_' + Date.now(),
+    title: title,
+    snippet: snippet,
+    content: content,
+    image: image || null,
+    author: state.user.name,
+    date: Date.now()
+  };
+  
+  if (typeof firebaseDB !== 'undefined') {
+    firebaseDB.ref('blogPosts/' + newPost.id).set(newPost)
+      .then(() => {
+        alert('Blog Post Published Successfully!');
+        document.getElementById('admin-blog-title').value = '';
+        document.getElementById('admin-blog-snippet').value = '';
+        document.getElementById('admin-blog-content').value = '';
+        document.getElementById('admin-blog-image').value = '';
+      })
+      .catch(err => alert('Failed to publish: ' + err.message));
+  } else {
+    alert('Firebase not connected. Cannot publish right now.');
+  }
+};
 
 
