@@ -5867,8 +5867,14 @@ function renderSpeciesGallery() {
 
   grid.innerHTML = filtered.map(species => `
     <div class="species-card" onclick="openSpeciesDetail('${species.id}')">
-      <div class="species-card-image" style="display:flex;align-items:center;justify-content:center;font-size:4rem;background:linear-gradient(135deg, ${getCategoryGradient(species.category)});">
-        ${species.emoji}
+      <div class="species-card-image" style="background:linear-gradient(135deg, ${getCategoryGradient(species.category)}); overflow:hidden; position:relative;">
+        <img 
+          src="assets/species/${species.id}.jpg" 
+          alt="${species.name}"
+          style="width:100%; height:100%; object-fit:cover; display:block;"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+        >
+        <div style="display:none; align-items:center; justify-content:center; width:100%; height:100%; position:absolute; top:0; left:0; font-size:4rem;">${species.emoji}</div>
       </div>
       <div class="species-card-body">
         <div class="species-card-name">${species.name}</div>
@@ -5880,6 +5886,7 @@ function renderSpeciesGallery() {
       </div>
     </div>
   `).join('');
+
 }
 
 function getCategoryGradient(category) {
@@ -5923,8 +5930,14 @@ window.openSpeciesDetail = function (speciesId) {
   modal.onclick = function (e) { if (e.target === modal) modal.remove(); };
   modal.innerHTML = `
     <div class="modal-content species-detail-modal-content">
-      <div class="species-detail-image" style="display:flex;align-items:center;justify-content:center;font-size:6rem;background:linear-gradient(135deg, ${getCategoryGradient(species.category)});">
-        ${species.emoji}
+      <div class="species-detail-image" style="background:linear-gradient(135deg, ${getCategoryGradient(species.category)}); overflow:hidden; position:relative;">
+        <img 
+          src="assets/species/${species.id}.jpg"
+          alt="${species.name}"
+          style="width:100%; height:100%; object-fit:cover; display:block;"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+        >
+        <div style="display:none; align-items:center; justify-content:center; width:100%; height:100%; position:absolute; top:0; left:0; font-size:6rem;">${species.emoji}</div>
       </div>
       <div class="species-detail-body">
         <h2>${species.name}</h2>
