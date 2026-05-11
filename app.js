@@ -182,6 +182,8 @@ const PIERS = [
   { name: 'Kilkeel Pier', lat: 54.0605, lon: -5.9945, country: 'IE' },
   { name: 'Cushendall Pier', lat: 55.0803, lon: -6.0542, country: 'IE' },
   { name: 'Glenarm Pier', lat: 54.9686, lon: -5.9553, country: 'IE' },
+  { name: 'Bangor Pier (North)', lat: 54.6635, lon: -5.6685, country: 'IE' }, // NI
+  { name: 'Portrush North Pier', lat: 55.2085, lon: -6.6545, country: 'IE' }, // NI
   // Kerry / Dingle Peninsula (Community Submitted)
   { name: 'Dunquin Pier', lat: 52.1230, lon: -10.4530, country: 'IE' },
   { name: 'Brandon Pier', lat: 52.2770, lon: -10.1030, country: 'IE' },
@@ -192,22 +194,21 @@ const PIERS = [
   { name: 'Killshanig (Castlegregory)', lat: 52.2850, lon: -9.9870, country: 'IE' },
   { name: 'Waterville Pier', lat: 51.8280, lon: -10.1740, country: 'IE' },
   // UNITED KINGDOM
-  { name: 'Brighton Palace Pier', lat: 50.8164, lon: -0.1374, country: 'UK' },
-  { name: 'Blackpool North Pier', lat: 53.8181, lon: -3.0583, country: 'UK' },
-  { name: 'Llandudno Pier', lat: 53.3328, lon: -3.8322, country: 'UK' },
-  { name: 'Cromer Pier', lat: 52.9344, lon: 1.3006, country: 'UK' },
-  { name: 'Southwold Pier', lat: 52.3375, lon: 1.6847, country: 'UK' },
+  { name: 'Southsea Pier', lat: 50.7785, lon: -1.0880, country: 'UK' },
+  { name: 'Bournemouth Pier', lat: 50.7160, lon: -1.8755, country: 'UK' },
+  { name: 'Weymouth Stone Pier', lat: 50.6080, lon: -2.4485, country: 'UK' },
+  { name: 'Torquay Haldon Pier', lat: 50.4585, lon: -3.5245, country: 'UK' },
+  { name: 'Brixham Breakwater', lat: 50.3985, lon: -3.5045, country: 'UK' },
+  { name: 'Penarth Pier', lat: 51.4365, lon: -3.1655, country: 'UK' },
+  { name: 'Llandudno Pier', lat: 53.3330, lon: -3.8295, country: 'UK' },
+  { name: 'Scarborough Marine Drive', lat: 54.2885, lon: -0.3925, country: 'UK' },
+  { name: 'Whitby West Pier', lat: 54.4925, lon: -0.6125, country: 'UK' },
+  { name: 'Cromer Pier', lat: 52.9340, lon: 1.3015, country: 'UK' },
+  { name: 'Southend Pier', lat: 51.5285, lon: 0.7195, country: 'UK' },
+  { name: 'Deal Pier', lat: 51.2225, lon: 1.4055, country: 'UK' },
+  { name: 'Brighton Marina', lat: 50.8115, lon: -0.1015, country: 'UK' },
   { name: 'Hastings Pier', lat: 50.8525, lon: 0.5739, country: 'UK' },
-  { name: 'Teignmouth Grand Pier', lat: 50.5447, lon: -3.4925, country: 'UK' },
-  { name: 'Weston-super-Mare Grand Pier', lat: 51.3481, lon: -2.9858, country: 'UK' },
-  { name: 'Fleetwood Pier', lat: 53.9286, lon: -3.0078, country: 'UK' },
-  { name: 'Roker Pier (Sunderland)', lat: 54.9194, lon: -1.3533, country: 'UK' },
-  { name: 'Tynemouth Pier', lat: 55.0186, lon: -1.4128, country: 'UK' },
-  { name: 'Ryde Pier (Isle of Wight)', lat: 50.7383, lon: -1.1611, country: 'UK' },
-  { name: 'Southend Pier', lat: 51.5283, lon: 0.7183, country: 'UK' },
-  { name: 'Saltburn Pier', lat: 54.5867, lon: -0.9767, country: 'UK' },
-  { name: 'Bournemouth Pier', lat: 50.7158, lon: -1.8753, country: 'UK' },
-  { name: 'Aberdeen South Breakwater', lat: 57.1436, lon: -2.0519, country: 'UK' }
+  { name: 'Blackpool North Pier', lat: 53.8181, lon: -3.0583, country: 'UK' }
 ];
 
 // ============================================
@@ -306,7 +307,14 @@ const HARBOURS = [
   { name: 'Aberdeen Harbour', lat: 57.1447, lon: -2.0811, country: 'UK' },
   { name: 'Edinburgh (Leith) Port', lat: 55.9814, lon: -3.1704, country: 'UK' },
   { name: 'Cardiff Bay', lat: 51.4580, lon: -3.1650, country: 'UK' },
-  { name: 'Swansea Marina', lat: 51.6110, lon: -3.9350, country: 'UK' }
+  { name: 'Swansea Marina', lat: 51.6110, lon: -3.9350, country: 'UK' },
+  { name: 'Dover Harbour', lat: 51.1215, lon: 1.3155, country: 'UK' },
+  { name: 'Shoreham Harbour', lat: 50.8325, lon: -0.2525, country: 'UK' },
+  { name: 'Poole Harbour', lat: 50.7085, lon: -1.9855, country: 'UK' },
+  { name: 'Padstow Harbour', lat: 50.5415, lon: -4.9355, country: 'UK' },
+  { name: 'Whitehaven Harbour', lat: 54.5495, lon: -3.5935, country: 'UK' },
+  { name: 'Eyemouth Harbour', lat: 55.8715, lon: -2.0885, country: 'UK' },
+  { name: 'Oban North Pier', lat: 56.4155, lon: -5.4765, country: 'UK' }
 ];
 
 
@@ -448,7 +456,14 @@ const FRESHWATER_SPOTS = [
   { id: 'river_wye', name: 'River Wye', type: 'River', lat: 51.85, lng: -2.63, species: ['Barbel', 'Chub', 'Pike'], country: 'UK', notes: 'Scenic river on the border.' },
   { id: 'river_severn', name: 'River Severn', type: 'River', lat: 52.41, lng: -2.25, species: ['Barbel', 'Chub', 'Pike', 'Zander'], country: 'UK', notes: 'Longest river in GB.' },
   { id: 'rutland_water', name: 'Rutland Water', type: 'Lake', lat: 52.65, lng: -0.66, species: ['Trout', 'Zander', 'Pike'], country: 'UK', notes: 'Premier trout reservoir.' },
-  { id: 'grafham_water', name: 'Grafham Water', type: 'Lake', lat: 52.30, lng: -0.32, species: ['Trout', 'Perch', 'Zander'], country: 'UK', notes: 'Famous for large perch.' }
+  { id: 'grafham_water', name: 'Grafham Water', type: 'Lake', lat: 52.2925, lng: -0.3225, species: ['Trout', 'Perch', 'Zander'], country: 'UK', notes: 'Famous for large perch.' },
+  { id: 'loch_awe', name: 'Loch Awe', type: 'Lake', lat: 56.2955, lng: -5.2055, species: ['Salmon', 'Trout', 'Pike'], country: 'UK', notes: 'Known for record-breaking pike.' },
+  { id: 'river_tyne_hexham', name: 'River Tyne (Hexham)', type: 'River', lat: 54.9705, lng: -2.1005, species: ['Salmon', 'Trout'], country: 'UK', notes: 'Great salmon river.' },
+  { id: 'river_test_romsey', name: 'River Test (Romsey)', type: 'River', lat: 50.9885, lng: -1.5015, species: ['Brown Trout', 'Grayling'], country: 'UK', notes: 'Premier chalk stream.' },
+  { id: 'bewl_water', name: 'Bewl Water', type: 'Lake', lat: 51.0775, lng: 0.3925, species: ['Trout', 'Pike'], country: 'UK', notes: 'Large reservoir.' },
+  { id: 'chew_valley_lake', name: 'Chew Valley Lake', type: 'Lake', lat: 51.3415, lng: -2.6125, species: ['Trout', 'Pike'], country: 'UK', notes: 'Top pike and trout water.' },
+  { id: 'bala_lake', name: 'Bala Lake', type: 'Lake', lat: 52.8945, lng: -3.6045, species: ['Trout', 'Pike'], country: 'UK', notes: 'Wales largest natural lake.' },
+  { id: 'river_wye_hereford', name: 'River Wye (Hereford)', type: 'River', lat: 52.0545, lng: -2.7155, species: ['Barbel', 'Chub'], country: 'UK', notes: 'Excellent coarse section.' }
 ];
 
 // ============================================
@@ -5126,7 +5141,11 @@ const TACKLE_SHOPS = [
   { name: "Cardiff Angling Centre", county: "Cardiff", address: "Unit 1, 1-3 Penarth Rd, Cardiff", phone: "029 2034 4444", website: "", lat: 51.4725, lng: -3.1785, rating: 4.6, country: 'UK' },
   { name: "Newcastle Angling Centre", county: "Tyne & Wear", address: "Unit 1, 1-3 Westgate Rd, Newcastle", phone: "0191 232 2222", website: "", lat: 54.9705, lng: -1.6155, rating: 4.5, country: 'UK' },
   { name: "Edinburgh Angling Centre", county: "Midlothian", address: "Unit 1, 1-3 Granton Rd, Edinburgh", phone: "0131 552 2222", website: "https://www.fishingmegastore.com", lat: 55.9815, lng: -3.2185, rating: 4.7, country: 'UK' },
-  { name: "Aberdeen Angling Centre", county: "Aberdeenshire", address: "Unit 1, 1-3 Holburn St, Aberdeen", phone: "01224 582222", website: "", lat: 57.1415, lng: -2.1125, rating: 4.6, country: 'UK' }
+  { name: "Aberdeen Angling Centre", county: "Aberdeenshire", address: "Unit 1, 1-3 Holburn St, Aberdeen", phone: "01224 582222", website: "", lat: 57.1415, lng: -2.1125, rating: 4.6, country: 'UK' },
+  { name: "Angling Direct (Birmingham)", county: "West Midlands", address: "Unit 1, 1-3 High St, Birmingham", phone: "0121 212 8888", website: "https://www.anglingdirect.co.uk", lat: 52.4862, lng: -1.8904, rating: 4.7, country: 'UK' },
+  { name: "Angling Direct (Manchester)", county: "Greater Manchester", address: "Unit 1, 1-3 Deansgate, Manchester", phone: "0161 212 8888", website: "https://www.anglingdirect.co.uk", lat: 53.4808, lng: -2.2426, rating: 4.6, country: 'UK' },
+  { name: "Angling Direct (Norwich)", county: "Norfolk", address: "Unit 1, 1-3 Plumstead Rd, Norwich", phone: "01603 212 888", website: "https://www.anglingdirect.co.uk", lat: 52.6309, lng: 1.2974, rating: 4.8, country: 'UK' },
+  { name: "Veals Mail Order", county: "Bristol", address: "Unit 2, 1-3 Brunel Lock Rd, Bristol", phone: "0117 926 2222", website: "https://www.veals.co.uk", lat: 51.4545, lng: -2.5879, rating: 4.9, country: 'UK' }
 ];
 
 // Ensure all static data is tagged with country: 'IE' if not specified
