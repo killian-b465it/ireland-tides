@@ -2581,57 +2581,77 @@ window.deleteCatch = (catchId) => {
 window.viewUserProfile = (userId) => {
   if (!userId) return;
 
-  // Find user in local state (synced from Firebase)
+  const renderProfile = (user) => {
+    const modal = document.getElementById('public-profile-modal');
+    const avatarEl = document.getElementById('public-profile-avatar');
+
+    document.getElementById('public-profile-name').textContent = user.name;
+    document.getElementById('public-profile-badge').textContent = (user.plan === 'pro') ? 'Pro Angler' : 'Member';
+    document.getElementById('public-profile-badge').style.background = (user.plan === 'pro') ? 'var(--accent-primary)' : 'var(--glass)';
+
+    // Bio
+    const bioEl = document.getElementById('public-profile-bio');
+    if (bioEl) bioEl.textContent = user.bio || 'No bio yet.';
+
+    // Avatar
+    if (user.avatar && user.avatar.startsWith('data:image')) {
+      avatarEl.innerHTML = '';
+      avatarEl.style.backgroundImage = `url(${user.avatar})`;
+      avatarEl.style.backgroundSize = 'cover';
+      avatarEl.style.backgroundPosition = 'center';
+      avatarEl.style.border = '2px solid var(--accent-primary)';
+    } else if (user.isAdmin || (user.email && (user.email.includes('admin') || user.email.includes('support')))) {
+      avatarEl.innerHTML = '';
+      avatarEl.style.backgroundImage = 'url("assets/logo.png")';
+      avatarEl.style.backgroundSize = '80%';
+      avatarEl.style.backgroundPosition = 'center';
+      avatarEl.style.backgroundRepeat = 'no-repeat';
+      avatarEl.style.backgroundImage = 'url("assets/logo.png")';
+      avatarEl.style.border = '2px solid var(--accent-warning)';
+    } else {
+      avatarEl.style.backgroundImage = 'none';
+      avatarEl.innerHTML = (user.name || 'U').charAt(0).toUpperCase();
+      avatarEl.style.border = '2px solid var(--accent-primary)';
+    }
+
+    const userCatches = state.catches.filter(c => c.userId === userId);
+    document.getElementById('public-profile-catches').textContent = userCatches.length;
+
+    if (user.joinDate) {
+      document.getElementById('public-profile-joined').textContent = new Date(user.joinDate).toLocaleDateString();
+    } else {
+      document.getElementById('public-profile-joined').textContent = 'N/A';
+    }
+
+    modal.classList.add('active');
+  };
+
+  // Try local state first
   let user = state.allUsers.find(u => u.id === userId);
 
-  if (!user) {
-    const userCatches = state.catches.filter(c => c.userId === userId);
-    if (userCatches.length > 0) {
-      user = {
-        name: userCatches[0].userName,
-        joinDate: null,
-        plan: 'Standard'
-      };
-    } else {
-      return alert('User profile not found.');
-    }
-  }
-
-  const modal = document.getElementById('public-profile-modal');
-  const avatarEl = document.getElementById('public-profile-avatar');
-
-  document.getElementById('public-profile-name').textContent = user.name;
-  document.getElementById('public-profile-badge').textContent = (user.plan === 'pro') ? 'Pro Angler' : 'Member';
-  document.getElementById('public-profile-badge').style.background = (user.plan === 'pro') ? 'var(--accent-primary)' : 'var(--glass)';
-
-  document.getElementById('public-profile-badge').style.background = (user.plan === 'pro') ? 'var(--accent-primary)' : 'var(--glass)';
-
-  // Custom Avatar for Admin/Support
-  if (user.isAdmin || user.email.includes('admin') || user.email.includes('support')) {
-    avatarEl.textContent = '';
-    avatarEl.style.backgroundImage = 'url("assets/logo.png")';
-    avatarEl.style.backgroundSize = '80%';
-    avatarEl.style.backgroundPosition = 'center';
-    avatarEl.style.backgroundRepeat = 'no-repeat';
-    avatarEl.style.border = '2px solid var(--accent-warning)';
+  if (user) {
+    renderProfile(user);
+  } else if (firebaseDB) {
+    // Fetch directly from Firebase (e.g. user not yet in local allUsers cache)
+    firebaseDB.ref('users/' + userId).once('value').then(snap => {
+      const fbUser = snap.val();
+      if (fbUser) {
+        renderProfile(fbUser);
+      } else {
+        // Fallback: build minimal profile from catches
+        const userCatches = state.catches.filter(c => c.userId === userId);
+        if (userCatches.length > 0) {
+          renderProfile({ name: userCatches[0].userName || userCatches[0].author, plan: 'free', bio: '', joinDate: null });
+        } else {
+          alert('User profile not found.');
+        }
+      }
+    }).catch(() => alert('Could not load user profile.'));
   } else {
-    // Default
-    avatarEl.style.backgroundImage = 'none';
-    avatarEl.textContent = user.name.charAt(0).toUpperCase();
-    avatarEl.style.border = '2px solid var(--accent-primary)';
+    alert('User profile not found.');
   }
-
-  const userCatches = state.catches.filter(c => c.userId === userId);
-  document.getElementById('public-profile-catches').textContent = userCatches.length;
-
-  if (user.joinDate) {
-    document.getElementById('public-profile-joined').textContent = new Date(user.joinDate).toLocaleDateString();
-  } else {
-    document.getElementById('public-profile-joined').textContent = 'N/A';
-  }
-
-  modal.classList.add('active');
 };
+
 
 window.closePublicProfileModal = () => {
   document.getElementById('public-profile-modal').classList.remove('active');
@@ -4746,9 +4766,16 @@ function registerUserInSystem(user) {
     plan: user.plan || (existingIndex !== -1 ? state.allUsers[existingIndex].plan : 'free'),
     proExpirationDate: user.proExpirationDate || (existingIndex !== -1 ? state.allUsers[existingIndex].proExpirationDate : null),
     bio: user.bio || (existingIndex !== -1 ? state.allUsers[existingIndex].bio : ''),
+    avatar: user.avatar || (existingIndex !== -1 ? state.allUsers[existingIndex].avatar : null),
     joinDate: existingIndex === -1 ? Date.now() : state.allUsers[existingIndex].joinDate,
     active: existingIndex === -1 ? true : state.allUsers[existingIndex].active
   };
+
+  // Preserve password if present (don't overwrite with undefined)
+  if (user.password) userData.password = user.password;
+  else if (existingIndex !== -1 && state.allUsers[existingIndex].password) {
+    userData.password = state.allUsers[existingIndex].password;
+  }
 
   if (existingIndex === -1) {
     state.allUsers.push(userData);
