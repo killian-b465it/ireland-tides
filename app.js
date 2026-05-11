@@ -951,23 +951,23 @@ function initMap() {
   state.harbourMarkers = L.layerGroup();
 
   // Prepare station markers (but don't add to map yet)
-  CONFIG.stations.filter(s => !s.country || s.country === state.currentRegion).forEach(station => {
+  CONFIG.stations.filter(s => s.country === state.currentRegion).forEach(station => {
     addStationMarker(station);
   });
 
   // Prepare pier markers
   // Prepare pier markers
-  PIERS.filter(p => !p.country || p.country === state.currentRegion).forEach(pier => {
+  PIERS.filter(p => p.country === state.currentRegion).forEach(pier => {
     addPierMarker(pier);
   });
 
   // Prepare boat ramp markers
-  BOAT_RAMPS.filter(r => !r.country || r.country === state.currentRegion).forEach(ramp => {
+  BOAT_RAMPS.filter(r => r.country === state.currentRegion).forEach(ramp => {
     addRampMarker(ramp);
   });
 
   // Prepare harbour markers
-  HARBOURS.filter(h => !h.country || h.country === state.currentRegion).forEach(harbour => {
+  HARBOURS.filter(h => h.country === state.currentRegion).forEach(harbour => {
     addHarbourMarker(harbour);
   });
 
@@ -1003,17 +1003,33 @@ window.setRegion = (region) => {
       state.rampMarkers.clearLayers();
       state.harbourMarkers.clearLayers();
       
-      // Re-initialize markers (this logic should be abstracted, but for now we'll call init helpers)
-      CONFIG.stations.filter(s => !s.country || s.country === state.currentRegion).forEach(station => addStationMarker(station));
-      PIERS.filter(p => !p.country || p.country === state.currentRegion).forEach(p => addPierMarker(p)); // I need to define addPierMarker or similar
-      BOAT_RAMPS.filter(r => !r.country || r.country === state.currentRegion).forEach(r => addRampMarker(r));
-      HARBOURS.filter(h => !h.country || h.country === state.currentRegion).forEach(h => addHarbourMarker(h));
+      // CRITICAL: Clear and remove old station markers
+      Object.values(state.markers).forEach(m => state.map.removeLayer(m));
+      state.markers = {};
+      
+      // Re-initialize markers
+      CONFIG.stations.filter(s => s.country === state.currentRegion).forEach(station => addStationMarker(station));
+      PIERS.filter(p => p.country === state.currentRegion).forEach(p => addPierMarker(p));
+      BOAT_RAMPS.filter(r => r.country === state.currentRegion).forEach(r => addRampMarker(r));
+      HARBOURS.filter(h => h.country === state.currentRegion).forEach(h => addHarbourMarker(h));
       
       loadShopsToMainMap();
       renderFreshwaterSpots();
       renderFreshwaterParks();
       renderFreshwaterRamps();
       renderFreshwaterPiers();
+      
+      // Refresh the station list sidebar
+      loadStationList();
+      
+      // Ensure dashboard shows the first station of the new region
+      const firstStation = CONFIG.stations.find(s => s.country === state.currentRegion);
+      if (firstStation) {
+          selectStation(firstStation);
+      }
+      
+      // Refresh map view to show all markers
+      applyFilters(false);
   }
 
   updateRegionUI();
@@ -1044,7 +1060,7 @@ async function loadShopsToMainMap() {
   state.shopMarkers.clearLayers();
 
   // Add static TACKLE_SHOPS
-  TACKLE_SHOPS.filter(s => !s.country || s.country === state.currentRegion).forEach(shop => {
+  TACKLE_SHOPS.filter(s => s.country === state.currentRegion).forEach(shop => {
     const icon = L.divIcon({
       className: 'shop-marker-wrapper',
       html: '<div class="shop-marker">🏪</div>',
@@ -1488,7 +1504,7 @@ function loadStationList() {
   const stationsByRegion = {};
   const now = new Date();
 
-  CONFIG.stations.filter(s => !s.country || s.country === state.currentRegion).forEach(station => {
+  CONFIG.stations.filter(s => s.country === state.currentRegion).forEach(station => {
     const region = station.region || 'Other';
     if (!stationsByRegion[region]) stationsByRegion[region] = [];
     stationsByRegion[region].push(station);
@@ -5114,7 +5130,7 @@ const TACKLE_SHOPS = [
 ];
 
 // Ensure all static data is tagged with country: 'IE' if not specified
-[PIERS, BOAT_RAMPS, HARBOURS, FRESHWATER_SPOTS, FRESHWATER_PARKS, FRESHWATER_RAMPS, FRESHWATER_PIERS, TACKLE_SHOPS].forEach(arr => {
+[PIERS, BOAT_RAMPS, HARBOURS, FRESHWATER_SPOTS, FRESHWATER_PARKS, FRESHWATER_RAMPS, FRESHWATER_PIERS, TACKLE_SHOPS, CONFIG.stations].forEach(arr => {
   arr.forEach(item => {
     if (!item.country) item.country = 'IE';
   });
