@@ -2614,7 +2614,11 @@ window.viewUserProfile = (userId) => {
     }
 
     const userCatches = state.catches.filter(c => c.userId === userId);
-    document.getElementById('public-profile-catches').textContent = userCatches.length;
+    // Prefer user-set totalCatches, fall back to community post count
+    const catchCount = (user.totalCatches !== undefined && user.totalCatches !== null)
+      ? user.totalCatches
+      : userCatches.length;
+    document.getElementById('public-profile-catches').textContent = catchCount;
 
     if (user.joinDate) {
       document.getElementById('public-profile-joined').textContent = new Date(user.joinDate).toLocaleDateString();
@@ -3713,6 +3717,8 @@ window.openProfileModal = () => {
 
   document.getElementById('profile-name').value = state.user.name || '';
   document.getElementById('profile-bio').value = state.user.bio || '';
+  const catchesInput = document.getElementById('profile-total-catches');
+  if (catchesInput) catchesInput.value = state.user.totalCatches !== undefined ? state.user.totalCatches : '';
 
   const preview = document.getElementById('profile-avatar-preview');
   if (state.user.avatar) {
@@ -3778,6 +3784,12 @@ window.saveProfile = () => {
 
   state.user.name = name;
   state.user.bio = bio;
+
+  // Save totalCatches if entered
+  const catchesInput = document.getElementById('profile-total-catches');
+  if (catchesInput && catchesInput.value !== '') {
+    state.user.totalCatches = parseInt(catchesInput.value, 10) || 0;
+  }
 
   // Only save avatar if it's data URI (new upload) or existing. 
   if (imgSrc.startsWith('data:image')) {
