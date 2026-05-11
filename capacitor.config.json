@@ -1,5 +1,10 @@
 {
   "appId": "com.irishfishinghub.app",
   "appName": "Irish Fishing Hub",
-  "webDir": "www"
+  "webDir": "www",
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
 }

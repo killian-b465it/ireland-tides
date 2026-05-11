@@ -5493,3 +5493,19 @@ input:checked+.toggle-slider:before {
         justify-content: flex-start;
     }
 }
+
+@media (max-width: 1024px) {
+    .support-text {
+        display: none;
+    }
+    .nav-right > a.btn {
+        padding: 4px 6px !important;
+        margin-right: 5px !important;
+    }
+}
+
+@media (min-width: 768px) {
+    .catch-image, .catch-gallery-item {
+        max-height: 500px;
+    }
+}
