@@ -129,7 +129,7 @@
     </div>
   </div>
 
-  <!-- Irish Fishing Hub v1.1.2 Official Release -->
+  <!-- Irish Fishing Hub v3.0.0 Official Release - UK & Ireland Expansion -->
 
   <!-- Navigation bar -->
   <nav class="navbar">
@@ -209,6 +209,11 @@
     <!-- Fishing Mode Toggle (Moved inside page container) -->
     <div class="fishing-mode-toggle-wrapper">
       <div class="fishing-mode-toggle" id="fishing-mode-toggle-container">
+        <!-- Region Toggle -->
+        <div class="region-selector" style="display: flex; gap: 4px; margin-right: 15px; border-right: 1px solid rgba(255,255,255,0.1); padding-right: 15px;">
+           <button id="region-btn-ie" class="btn btn-sm btn-outline active" onclick="setRegion('IE')" style="padding: 4px 8px; font-size: 0.8rem; min-width: 44px;">🇮🇪 IE</button>
+           <button id="region-btn-uk" class="btn btn-sm btn-outline" onclick="setRegion('UK')" style="padding: 4px 8px; font-size: 0.8rem; min-width: 44px;">🇬🇧 UK</button>
+        </div>
         <span class="mode-label active" id="mode-label-sea">🌊 Sea</span>
         <label class="toggle-switch">
           <input type="checkbox" id="fishing-mode-toggle" onchange="toggleFishingMode()">
@@ -1969,12 +1974,12 @@
       <div>
         <h3 style="color: #e6f1ff; font-size: 1.1rem; margin-bottom: 15px;">About Irish Fishing Hub</h3>
         <p style="line-height: 1.6; margin-bottom: 10px;">Irish Fishing Hub is the ultimate online platform for anglers
-          across Ireland. We provide real-time tide charts, marine weather conditions, and precise fishing spot
+          across Ireland and the United Kingdom. We provide real-time tide charts, marine weather conditions, and precise fishing spot
           directories spanning both seawater coastal areas and inland freshwater lakes. Whether you're targeting
           Atlantic Mackerel from a pier or seeking European Seabass, our interactive fishing map gives you the
           environmental edge.</p>
-        <p style="line-height: 1.6;">Our comprehensive database is built on live data from the Irish Marine Institute
-          and community submissions, ensuring you always know exactly when high tide hits and where to find the absolute
+        <p style="line-height: 1.6;">Our comprehensive database is built on live data from the Irish Marine Institute,
+          UK tidal sources, and community submissions, ensuring you always know exactly when high tide hits and where to find the absolute
           best fishing locations near you.</p>
       </div>
       <div>

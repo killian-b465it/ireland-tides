@@ -39,59 +39,85 @@ const CONFIG = {
   apiBase: 'https://erddap.marine.ie/erddap/tabledap/IrishNationalTideGaugeNetwork',
   mapCenter: [53.5, -8.0],
   mapZoom: 7,
+  regions: {
+    'IE': { name: 'Ireland', center: [53.5, -8.0], zoom: 7 },
+    'UK': { name: 'United Kingdom', center: [54.5, -3.0], zoom: 6 }
+  },
   updateInterval: 5 * 60 * 1000,
   // Station IDs must match Marine Ireland ERDDAP API exactly
   stations: [
     // East Coast - LIVE DATA
-    { id: 'Dublin Port', name: 'Dublin Port', lat: 53.3478, lon: -6.2044, region: 'East Coast', live: true },
-    { id: 'Howth Water Level 1', name: 'Howth Harbour', lat: 53.3897, lon: -6.0656, region: 'East Coast', live: true },
-    { id: 'Skerries Harbour', name: 'Skerries', lat: 53.5822, lon: -6.1094, region: 'East Coast', live: true },
-    { id: 'Wexford Harbour', name: 'Wexford', lat: 52.3369, lon: -6.4572, region: 'East Coast', live: true },
-    { id: 'Rosslare', name: 'Rosslare', lat: 52.2533, lon: -6.3381, region: 'East Coast', live: true },
+    { id: 'Dublin Port', name: 'Dublin Port', lat: 53.3478, lon: -6.2044, region: 'East Coast', country: 'IE', live: true },
+    { id: 'Howth Water Level 1', name: 'Howth Harbour', lat: 53.3897, lon: -6.0656, region: 'East Coast', country: 'IE', live: true },
+    { id: 'Skerries Harbour', name: 'Skerries', lat: 53.5822, lon: -6.1094, region: 'East Coast', country: 'IE', live: true },
+    { id: 'Wexford Harbour', name: 'Wexford', lat: 52.3369, lon: -6.4572, region: 'East Coast', country: 'IE', live: true },
+    { id: 'Rosslare', name: 'Rosslare', lat: 52.2533, lon: -6.3381, region: 'East Coast', country: 'IE', live: true },
 
     // South Coast - LIVE DATA
-    { id: 'Dunmore East Harbour', name: 'Dunmore East', lat: 52.1489, lon: -6.9903, region: 'South Coast', live: true },
-    { id: 'Ballycotton Harbour', name: 'Ballycotton', lat: 51.8264, lon: -8.0089, region: 'South Coast', live: true },
-    { id: 'Union Hall Harbor', name: 'Union Hall', lat: 51.5361, lon: -9.1372, region: 'South Coast', live: true },
-    { id: 'Castletownbere Port', name: 'Castletownbere', lat: 51.6503, lon: -9.9108, region: 'South Coast', live: true },
+    { id: 'Dunmore East Harbour', name: 'Dunmore East', lat: 52.1489, lon: -6.9903, region: 'South Coast', country: 'IE', live: true },
+    { id: 'Ballycotton Harbour', name: 'Ballycotton', lat: 51.8264, lon: -8.0089, region: 'South Coast', country: 'IE', live: true },
+    { id: 'Union Hall Harbor', name: 'Union Hall', lat: 51.5361, lon: -9.1372, region: 'South Coast', country: 'IE', live: true },
+    { id: 'Castletownbere Port', name: 'Castletownbere', lat: 51.6503, lon: -9.9108, region: 'South Coast', country: 'IE', live: true },
 
     // South West - LIVE DATA
-    { id: 'Dingle Harbour', name: 'Dingle', lat: 52.1408, lon: -10.2686, region: 'South West', live: true },
-    { id: 'Kilrush Lough', name: 'Kilrush', lat: 52.6347, lon: -9.4872, region: 'South West', live: true },
+    { id: 'Dingle Harbour', name: 'Dingle', lat: 52.1408, lon: -10.2686, region: 'South West', country: 'IE', live: true },
+    { id: 'Kilrush Lough', name: 'Kilrush', lat: 52.6347, lon: -9.4872, region: 'South West', country: 'IE', live: true },
 
     // West Coast - LIVE DATA
-    { id: 'Galway Port', name: 'Galway', lat: 53.2707, lon: -9.0568, region: 'West Coast', live: true },
-    { id: 'Kinvara - Unreferenced', name: 'Kinvara', lat: 53.1424, lon: -8.9389, region: 'West Coast', live: true },
-    { id: 'Roonagh Pier', name: 'Roonagh (Clare Island)', lat: 53.7597, lon: -9.9036, region: 'West Coast', live: true },
-    { id: 'Ballyglass Harbour', name: 'Ballyglass', lat: 54.2500, lon: -9.8833, region: 'West Coast', live: true },
-    { id: 'Sligo', name: 'Sligo', lat: 54.2697, lon: -8.4761, region: 'West Coast', live: true },
-    { id: 'Inishmore', name: 'Inis Mór (Aran Islands)', lat: 53.0647, lon: -9.6647, region: 'West Coast', live: true },
+    { id: 'Galway Port', name: 'Galway', lat: 53.2707, lon: -9.0568, region: 'West Coast', country: 'IE', live: true },
+    { id: 'Kinvara - Unreferenced', name: 'Kinvara', lat: 53.1424, lon: -8.9389, region: 'West Coast', country: 'IE', live: true },
+    { id: 'Roonagh Pier', name: 'Roonagh (Clare Island)', lat: 53.7597, lon: -9.9036, region: 'West Coast', country: 'IE', live: true },
+    { id: 'Ballyglass Harbour', name: 'Ballyglass', lat: 54.2500, lon: -9.8833, region: 'West Coast', country: 'IE', live: true },
+    { id: 'Sligo', name: 'Sligo', lat: 54.2697, lon: -8.4761, region: 'West Coast', country: 'IE', live: true },
+    { id: 'Inishmore', name: 'Inis Mór (Aran Islands)', lat: 53.0647, lon: -9.6647, region: 'West Coast', country: 'IE', live: true },
 
     // North West - LIVE DATA
-    { id: 'Killybegs Port', name: 'Killybegs', lat: 54.6364, lon: -8.4400, region: 'North West', live: true },
-    { id: 'Aranmore Island - Leabgarrow', name: 'Aranmore Island', lat: 54.9947, lon: -8.5214, region: 'North West', live: true },
-    { id: 'Buncranna', name: 'Buncrana', lat: 55.1333, lon: -7.4500, region: 'North West', live: true },
-    { id: 'Malin Head - Portmore Pier', name: 'Malin Head', lat: 55.3717, lon: -7.3392, region: 'North West', live: true },
+    { id: 'Killybegs Port', name: 'Killybegs', lat: 54.6364, lon: -8.4400, region: 'North West', country: 'IE', live: true },
+    { id: 'Aranmore Island - Leabgarrow', name: 'Aranmore Island', lat: 54.9947, lon: -8.5214, region: 'North West', country: 'IE', live: true },
+    { id: 'Buncranna', name: 'Buncrana', lat: 55.1333, lon: -7.4500, region: 'North West', country: 'IE', live: true },
+    { id: 'Malin Head - Portmore Pier', name: 'Malin Head', lat: 55.3717, lon: -7.3392, region: 'North West', country: 'IE', live: true },
 
     // Additional stations - attempting live API data
-    { id: 'Arklow', name: 'Arklow', lat: 52.7978, lon: -6.1419, region: 'East Coast', live: true },
-    { id: 'Courtown', name: 'Courtown Harbour', lat: 52.6461, lon: -6.2289, region: 'East Coast', live: true },
-    { id: 'Cobh', name: 'Cobh (Cork)', lat: 51.8503, lon: -8.2967, region: 'South Coast', live: true },
-    { id: 'Kinsale', name: 'Kinsale', lat: 51.7058, lon: -8.5222, region: 'South Coast', live: true },
-    { id: 'Schull', name: 'Schull', lat: 51.5278, lon: -9.5417, region: 'South Coast', live: true },
-    { id: 'Bantry', name: 'Bantry', lat: 51.6803, lon: -9.4528, region: 'South West', live: true },
-    { id: 'Fenit', name: 'Fenit', lat: 52.2728, lon: -9.8608, region: 'South West', live: true },
-    { id: 'Tarbert', name: 'Tarbert', lat: 52.5747, lon: -9.3664, region: 'South West', live: true },
-    { id: 'Rossaveal', name: 'Rossaveal', lat: 53.2667, lon: -9.8333, region: 'West Coast', live: true },
-    { id: 'Clifden', name: 'Clifden', lat: 53.4897, lon: -10.0189, region: 'West Coast', live: true },
-    { id: 'Westport', name: 'Westport', lat: 53.8008, lon: -9.5228, region: 'West Coast', live: true },
+    { id: 'Arklow', name: 'Arklow', lat: 52.7978, lon: -6.1419, region: 'East Coast', country: 'IE', live: true },
+    { id: 'Courtown', name: 'Courtown Harbour', lat: 52.6461, lon: -6.2289, region: 'East Coast', country: 'IE', live: true },
+    { id: 'Cobh', name: 'Cobh (Cork)', lat: 51.8503, lon: -8.2967, region: 'South Coast', country: 'IE', live: true },
+    { id: 'Kinsale', name: 'Kinsale', lat: 51.7058, lon: -8.5222, region: 'South Coast', country: 'IE', live: true },
+    { id: 'Schull', name: 'Schull', lat: 51.5278, lon: -9.5417, region: 'South Coast', country: 'IE', live: true },
+    { id: 'Bantry', name: 'Bantry', lat: 51.6803, lon: -9.4528, region: 'South West', country: 'IE', live: true },
+    { id: 'Fenit', name: 'Fenit', lat: 52.2728, lon: -9.8608, region: 'South West', country: 'IE', live: true },
+    { id: 'Tarbert', name: 'Tarbert', lat: 52.5747, lon: -9.3664, region: 'South West', country: 'IE', live: true },
+    { id: 'Rossaveal', name: 'Rossaveal', lat: 53.2667, lon: -9.8333, region: 'West Coast', country: 'IE', live: true },
+    { id: 'Clifden', name: 'Clifden', lat: 53.4897, lon: -10.0189, region: 'West Coast', country: 'IE', live: true },
+    { id: 'Westport', name: 'Westport', lat: 53.8008, lon: -9.5228, region: 'West Coast', country: 'IE', live: true },
     // Northern Ireland - attempting live data from Marine.ie
-    { id: 'Portrush', name: 'Portrush', lat: 55.2069, lon: -6.6556, region: 'North of Ireland', live: true },
-    { id: 'Larne', name: 'Larne', lat: 54.8531, lon: -5.7928, region: 'North of Ireland', live: true },
-    { id: 'Bangor', name: 'Bangor', lat: 54.6603, lon: -5.6689, region: 'North of Ireland', live: true },
-    { id: 'Belfast', name: 'Belfast', lat: 54.6097, lon: -5.9289, region: 'North of Ireland', live: true },
-    { id: 'Warrenpoint', name: 'Warrenpoint', lat: 54.0997, lon: -6.2519, region: 'North of Ireland', live: true },
-    { id: 'Carlingford', name: 'Carlingford', lat: 54.0442, lon: -6.1883, region: 'North of Ireland', live: true }
+    { id: 'Portrush', name: 'Portrush', lat: 55.2069, lon: -6.6556, region: 'North of Ireland', country: 'IE', live: true },
+    { id: 'Larne', name: 'Larne', lat: 54.8531, lon: -5.7928, region: 'North of Ireland', country: 'IE', live: true },
+    { id: 'Bangor', name: 'Bangor', lat: 54.6603, lon: -5.6689, region: 'North of Ireland', country: 'IE', live: true },
+    { id: 'Belfast', name: 'Belfast', lat: 54.6097, lon: -5.9289, region: 'North of Ireland', country: 'IE', live: true },
+    { id: 'Warrenpoint', name: 'Warrenpoint', lat: 54.0997, lon: -6.2519, region: 'North of Ireland', country: 'IE', live: true },
+    { id: 'Carlingford', name: 'Carlingford', lat: 54.0442, lon: -6.1883, region: 'North of Ireland', country: 'IE', live: true },
+
+    // UNITED KINGDOM - INITIAL STATIONS (Calculated Estimates)
+    { id: 'Liverpool', name: 'Liverpool (Gladstone)', lat: 53.4497, lon: -3.0183, region: 'West Coast UK', country: 'UK', live: false },
+    { id: 'Holyhead', name: 'Holyhead', lat: 53.3147, lon: -4.6311, region: 'Wales', country: 'UK', live: false },
+    { id: 'Milford Haven', name: 'Milford Haven', lat: 51.7147, lon: -5.0411, region: 'Wales', country: 'UK', live: false },
+    { id: 'Avonmouth', name: 'Avonmouth', lat: 51.5047, lon: -2.7111, region: 'South West UK', country: 'UK', live: false },
+    { id: 'Dover', name: 'Dover', lat: 51.1147, lon: 1.3211, region: 'South East UK', country: 'UK', live: false },
+    { id: 'Lowestoft', name: 'Lowestoft', lat: 52.4747, lon: 1.7511, region: 'East Coast UK', country: 'UK', live: false },
+    { id: 'Immingham', name: 'Immingham', lat: 53.6247, lon: -0.1911, region: 'East Coast UK', country: 'UK', live: false },
+    { id: 'North Shields', name: 'North Shields', lat: 55.0047, lon: -1.4411, region: 'North East UK', country: 'UK', live: false },
+    { id: 'Aberdeen', name: 'Aberdeen', lat: 57.1447, lon: -2.0811, region: 'Scotland', country: 'UK', live: false },
+    { id: 'Stornoway', name: 'Stornoway', lat: 58.2047, lon: -6.3811, region: 'Scotland', country: 'UK', live: false },
+    { id: 'Inverness', name: 'Inverness', lat: 57.4778, lon: -4.2247, region: 'Scotland', country: 'UK', live: false },
+    { id: 'Edinburgh', name: 'Edinburgh (Leith)', lat: 55.9814, lon: -3.1704, region: 'Scotland', country: 'UK', live: false },
+    { id: 'Cardiff', name: 'Cardiff', lat: 51.4816, lon: -3.1791, region: 'Wales', country: 'UK', live: false },
+    { id: 'Swansea', name: 'Swansea', lat: 51.6214, lon: -3.9436, region: 'Wales', country: 'UK', live: false },
+    { id: 'Bristol', name: 'Bristol', lat: 51.4545, lon: -2.5879, region: 'West Coast UK', country: 'UK', live: false },
+    { id: 'Plymouth', name: 'Plymouth', lat: 50.3755, lon: -4.1427, region: 'South West UK', country: 'UK', live: false },
+    { id: 'Portsmouth', name: 'Portsmouth', lat: 50.8198, lon: -1.0880, region: 'South Coast UK', country: 'UK', live: false },
+    { id: 'Brighton', name: 'Brighton', lat: 50.8225, lon: -0.1372, region: 'South Coast UK', country: 'UK', live: false },
+    { id: 'Hull', name: 'Hull', lat: 53.7443, lon: -0.3325, region: 'East Coast UK', country: 'UK', live: false },
+    { id: 'Newcastle', name: 'Newcastle', lat: 54.9783, lon: -1.6178, region: 'North East UK', country: 'UK', live: false }
   ],
   API_KEYS: {
     streetView: 'DEMO_KEY_PLACEHOLDER', // Replace with valid Google Maps API Key
@@ -111,139 +137,184 @@ const CONFIG = {
 // Piers Data (Popular Fishing Piers)
 // ============================================
 const PIERS = [
-  { name: 'Dun Laoghaire Pier', lat: 53.2946, lon: -6.1349 },
-  { name: 'Howth West Pier', lat: 53.3905, lon: -6.0672 },
-  { name: 'Bray Pier', lat: 53.2021, lon: -6.0908 },
-  { name: 'Skerries Pier', lat: 53.5795, lon: -6.1100 },
-  { name: 'Greystones Pier', lat: 53.1433, lon: -6.0639 },
-  { name: 'Cobh Pier', lat: 51.8493, lon: -8.2990 },
-  { name: 'Kinsale Pier', lat: 51.7048, lon: -8.5245 },
-  { name: 'Galway Docks', lat: 53.2695, lon: -9.0590 },
-  { name: 'Kilmore Quay Pier', lat: 52.1726, lon: -6.5857 },
-  { name: 'Dunmore East Pier', lat: 52.1508, lon: -6.9965 },
-  { name: 'Fenit Pier', lat: 52.2698, lon: -9.8680 },
-  { name: 'Dingle Pier', lat: 52.1395, lon: -10.2700 },
-  { name: 'Clifden Pier', lat: 53.4865, lon: -10.0235 },
-  { name: 'Killybegs Pier', lat: 54.6335, lon: -8.4410 },
-  { name: 'Portrush Pier', lat: 55.2050, lon: -6.6580 },
+  { name: 'Dun Laoghaire Pier', lat: 53.2946, lon: -6.1349, country: 'IE' },
+  { name: 'Howth West Pier', lat: 53.3905, lon: -6.0672, country: 'IE' },
+  { name: 'Bray Pier', lat: 53.2021, lon: -6.0908, country: 'IE' },
+  { name: 'Skerries Pier', lat: 53.5795, lon: -6.1100, country: 'IE' },
+  { name: 'Greystones Pier', lat: 53.1433, lon: -6.0639, country: 'IE' },
+  { name: 'Cobh Pier', lat: 51.8493, lon: -8.2990, country: 'IE' },
+  { name: 'Kinsale Pier', lat: 51.7048, lon: -8.5245, country: 'IE' },
+  { name: 'Galway Docks', lat: 53.2695, lon: -9.0590, country: 'IE' },
+  { name: 'Kilmore Quay Pier', lat: 52.1726, lon: -6.5857, country: 'IE' },
+  { name: 'Dunmore East Pier', lat: 52.1508, lon: -6.9965, country: 'IE' },
+  { name: 'Fenit Pier', lat: 52.2698, lon: -9.8680, country: 'IE' },
+  { name: 'Dingle Pier', lat: 52.1395, lon: -10.2700, country: 'IE' },
+  { name: 'Clifden Pier', lat: 53.4865, lon: -10.0235, country: 'IE' },
+  { name: 'Killybegs Pier', lat: 54.6335, lon: -8.4410, country: 'IE' },
+  { name: 'Portrush Pier', lat: 55.2050, lon: -6.6580, country: 'IE' },
   // East Coast additions
-  { name: 'Courtown Pier', lat: 52.6448, lon: -6.2305 },
-  { name: 'Rush Pier', lat: 53.5231, lon: -6.0858 },
-  { name: 'Laytown Pier', lat: 53.6853, lon: -6.2389 },
-  { name: 'Clogherhead Pier', lat: 53.7894, lon: -6.2336 },
-  { name: 'Wicklow Pier', lat: 52.9795, lon: -6.0355 },
-  { name: 'Arklow Pier', lat: 52.7965, lon: -6.1440 },
+  { name: 'Courtown Pier', lat: 52.6448, lon: -6.2305, country: 'IE' },
+  { name: 'Rush Pier', lat: 53.5231, lon: -6.0858, country: 'IE' },
+  { name: 'Laytown Pier', lat: 53.6853, lon: -6.2389, country: 'IE' },
+  { name: 'Clogherhead Pier', lat: 53.7894, lon: -6.2336, country: 'IE' },
+  { name: 'Wicklow Pier', lat: 52.9795, lon: -6.0355, country: 'IE' },
+  { name: 'Arklow Pier', lat: 52.7965, lon: -6.1440, country: 'IE' },
   // South Coast additions
-  { name: 'Youghal Pier', lat: 51.9535, lon: -7.8465 },
-  { name: 'Ballycotton Pier', lat: 51.8275, lon: -8.0105 },
-  { name: 'Union Hall Pier', lat: 51.5395, lon: -9.1405 },
+  { name: 'Youghal Pier', lat: 51.9535, lon: -7.8465, country: 'IE' },
+  { name: 'Ballycotton Pier', lat: 51.8275, lon: -8.0105, country: 'IE' },
+  { name: 'Union Hall Pier', lat: 51.5395, lon: -9.1405, country: 'IE' },
   // West Coast additions
-  { name: 'Rossaveal Pier', lat: 53.2675, lon: -9.5585 },
-  { name: 'Roundstone Pier', lat: 53.3985, lon: -9.9255 },
-  { name: 'Cleggan Pier', lat: 53.5603, lon: -10.1256 },
-  { name: 'Westport Quay', lat: 53.7975, lon: -9.5265 },
+  { name: 'Rossaveal Pier', lat: 53.2675, lon: -9.5585, country: 'IE' },
+  { name: 'Roundstone Pier', lat: 53.3985, lon: -9.9255, country: 'IE' },
+  { name: 'Cleggan Pier', lat: 53.5603, lon: -10.1256, country: 'IE' },
+  { name: 'Westport Quay', lat: 53.7975, lon: -9.5265, country: 'IE' },
   // North West additions
-  { name: 'Downings Pier', lat: 55.1897, lon: -7.8328 },
-  { name: 'Burtonport Pier', lat: 54.9897, lon: -8.4328 },
+  { name: 'Downings Pier', lat: 55.1897, lon: -7.8328, country: 'IE' },
+  { name: 'Burtonport Pier', lat: 54.9897, lon: -8.4328, country: 'IE' },
   // Northern Ireland
-  { name: 'Bangor Pier', lat: 54.6590, lon: -5.6710 },
-  { name: 'Donaghadee Pier', lat: 54.6419, lon: -5.5344 },
-  { name: 'Ballycastle Pier', lat: 55.2050, lon: -6.2445 },
-  { name: 'Carrickfergus Pier', lat: 54.7139, lon: -5.8064 },
-  { name: 'Newcastle Pier', lat: 54.2103, lon: -5.8828 },
-  { name: 'Ardglass Pier', lat: 54.2598, lon: -5.6075 },
-  { name: 'Portavogie Pier', lat: 54.4572, lon: -5.4380 },
-  { name: 'Kilkeel Pier', lat: 54.0605, lon: -5.9945 },
-  { name: 'Cushendall Pier', lat: 55.0803, lon: -6.0542 },
-  { name: 'Glenarm Pier', lat: 54.9686, lon: -5.9553 },
+  { name: 'Bangor Pier', lat: 54.6590, lon: -5.6710, country: 'IE' },
+  { name: 'Donaghadee Pier', lat: 54.6419, lon: -5.5344, country: 'IE' },
+  { name: 'Ballycastle Pier', lat: 55.2050, lon: -6.2445, country: 'IE' },
+  { name: 'Carrickfergus Pier', lat: 54.7139, lon: -5.8064, country: 'IE' },
+  { name: 'Newcastle Pier', lat: 54.2103, lon: -5.8828, country: 'IE' },
+  { name: 'Ardglass Pier', lat: 54.2598, lon: -5.6075, country: 'IE' },
+  { name: 'Portavogie Pier', lat: 54.4572, lon: -5.4380, country: 'IE' },
+  { name: 'Kilkeel Pier', lat: 54.0605, lon: -5.9945, country: 'IE' },
+  { name: 'Cushendall Pier', lat: 55.0803, lon: -6.0542, country: 'IE' },
+  { name: 'Glenarm Pier', lat: 54.9686, lon: -5.9553, country: 'IE' },
   // Kerry / Dingle Peninsula (Community Submitted)
-  { name: 'Dunquin Pier', lat: 52.1230, lon: -10.4530 },
-  { name: 'Brandon Pier', lat: 52.2770, lon: -10.1030 },
-  { name: 'Brandon Creek', lat: 52.2350, lon: -10.1800 },
-  { name: 'Dingle Lighthouse', lat: 52.1350, lon: -10.2820 },
-  { name: 'Inch Beach', lat: 52.1320, lon: -9.9770 },
-  { name: 'Wine Strand', lat: 52.1600, lon: -10.3600 },
-  { name: 'Killshanig (Castlegregory)', lat: 52.2850, lon: -9.9870 },
-  { name: 'Waterville Pier', lat: 51.8280, lon: -10.1740 }
+  { name: 'Dunquin Pier', lat: 52.1230, lon: -10.4530, country: 'IE' },
+  { name: 'Brandon Pier', lat: 52.2770, lon: -10.1030, country: 'IE' },
+  { name: 'Brandon Creek', lat: 52.2350, lon: -10.1800, country: 'IE' },
+  { name: 'Dingle Lighthouse', lat: 52.1350, lon: -10.2820, country: 'IE' },
+  { name: 'Inch Beach', lat: 52.1320, lon: -9.9770, country: 'IE' },
+  { name: 'Wine Strand', lat: 52.1600, lon: -10.3600, country: 'IE' },
+  { name: 'Killshanig (Castlegregory)', lat: 52.2850, lon: -9.9870, country: 'IE' },
+  { name: 'Waterville Pier', lat: 51.8280, lon: -10.1740, country: 'IE' },
+  // UNITED KINGDOM
+  { name: 'Brighton Palace Pier', lat: 50.8164, lon: -0.1374, country: 'UK' },
+  { name: 'Blackpool North Pier', lat: 53.8181, lon: -3.0583, country: 'UK' },
+  { name: 'Llandudno Pier', lat: 53.3328, lon: -3.8322, country: 'UK' },
+  { name: 'Cromer Pier', lat: 52.9344, lon: 1.3006, country: 'UK' },
+  { name: 'Southwold Pier', lat: 52.3375, lon: 1.6847, country: 'UK' },
+  { name: 'Hastings Pier', lat: 50.8525, lon: 0.5739, country: 'UK' },
+  { name: 'Teignmouth Grand Pier', lat: 50.5447, lon: -3.4925, country: 'UK' },
+  { name: 'Weston-super-Mare Grand Pier', lat: 51.3481, lon: -2.9858, country: 'UK' },
+  { name: 'Fleetwood Pier', lat: 53.9286, lon: -3.0078, country: 'UK' },
+  { name: 'Roker Pier (Sunderland)', lat: 54.9194, lon: -1.3533, country: 'UK' },
+  { name: 'Tynemouth Pier', lat: 55.0186, lon: -1.4128, country: 'UK' },
+  { name: 'Ryde Pier (Isle of Wight)', lat: 50.7383, lon: -1.1611, country: 'UK' },
+  { name: 'Southend Pier', lat: 51.5283, lon: 0.7183, country: 'UK' },
+  { name: 'Saltburn Pier', lat: 54.5867, lon: -0.9767, country: 'UK' },
+  { name: 'Bournemouth Pier', lat: 50.7158, lon: -1.8753, country: 'UK' },
+  { name: 'Aberdeen South Breakwater', lat: 57.1436, lon: -2.0519, country: 'UK' }
 ];
 
 // ============================================
 // Boat Ramps Data (Public Slipways)
 // ============================================
 const BOAT_RAMPS = [
-  { name: 'Malahide Slipway', lat: 53.4503, lon: -6.1519 },
-  { name: 'Skerries Slipway', lat: 53.5812, lon: -6.1075 },
-  { name: 'Balbriggan Slipway', lat: 53.6103, lon: -6.1833 },
-  { name: 'Howth Slipway', lat: 53.3865, lon: -6.0695 },
-  { name: 'Dun Laoghaire Slipway', lat: 53.2897, lon: -6.1289 },
-  { name: 'Arklow Slipway', lat: 52.7990, lon: -6.1395 },
-  { name: 'Wexford Slipway', lat: 52.3336, lon: -6.4575 },
-  { name: 'Dunmore East Slipway', lat: 52.1475, lon: -6.9920 },
-  { name: 'Cobh Slipway', lat: 51.8475, lon: -8.2995 },
-  { name: 'Kinsale Slipway', lat: 51.7035, lon: -8.5260 },
-  { name: 'Fenit Slipway', lat: 52.2685, lon: -9.8695 },
-  { name: 'Galway Slipway', lat: 53.2685, lon: -9.0615 },
-  { name: 'Clifden Slipway', lat: 53.4875, lon: -10.0185 },
-  { name: 'Killybegs Slipway', lat: 54.6315, lon: -8.4425 },
-  { name: 'Malin Head Slipway', lat: 55.3757, lon: -7.3906 },
+  { name: 'Malahide Slipway', lat: 53.4503, lon: -6.1519, country: 'IE' },
+  { name: 'Skerries Slipway', lat: 53.5812, lon: -6.1075, country: 'IE' },
+  { name: 'Balbriggan Slipway', lat: 53.6103, lon: -6.1833, country: 'IE' },
+  { name: 'Howth Slipway', lat: 53.3865, lon: -6.0695, country: 'IE' },
+  { name: 'Dun Laoghaire Slipway', lat: 53.2897, lon: -6.1289, country: 'IE' },
+  { name: 'Arklow Slipway', lat: 52.7990, lon: -6.1395, country: 'IE' },
+  { name: 'Wexford Slipway', lat: 52.3336, lon: -6.4575, country: 'IE' },
+  { name: 'Dunmore East Slipway', lat: 52.1475, lon: -6.9920, country: 'IE' },
+  { name: 'Cobh Slipway', lat: 51.8475, lon: -8.2995, country: 'IE' },
+  { name: 'Kinsale Slipway', lat: 51.7035, lon: -8.5260, country: 'IE' },
+  { name: 'Fenit Slipway', lat: 52.2685, lon: -9.8695, country: 'IE' },
+  { name: 'Galway Slipway', lat: 53.2685, lon: -9.0615, country: 'IE' },
+  { name: 'Clifden Slipway', lat: 53.4875, lon: -10.0185, country: 'IE' },
+  { name: 'Killybegs Slipway', lat: 54.6315, lon: -8.4425, country: 'IE' },
+  { name: 'Malin Head Slipway', lat: 55.3757, lon: -7.3906, country: 'IE' },
   // Northern Ireland
-  { name: 'Bangor Marina Slipway', lat: 54.6635, lon: -5.6690 },
-  { name: 'Donaghadee Slipway', lat: 54.6430, lon: -5.5325 },
-  { name: 'Strangford Slipway', lat: 54.3675, lon: -5.5536 },
-  { name: 'Portaferry Slipway', lat: 54.3803, lon: -5.5519 },
-  { name: 'Kilkeel Slipway', lat: 54.0590, lon: -5.9960 },
-  { name: 'Carlingford Marina Slipway', lat: 54.0428, lon: -6.1905 },
-  { name: 'Warrenpoint Slipway', lat: 54.0980, lon: -6.2540 },
-  { name: 'Portavogie Slipway', lat: 54.4560, lon: -5.4395 },
-  { name: 'Ballycastle Slipway', lat: 55.2035, lon: -6.2430 }
+  { name: 'Bangor Marina Slipway', lat: 54.6635, lon: -5.6690, country: 'IE' },
+  { name: 'Donaghadee Slipway', lat: 54.6430, lon: -5.5325, country: 'IE' },
+  { name: 'Strangford Slipway', lat: 54.3675, lon: -5.5536, country: 'IE' },
+  { name: 'Portaferry Slipway', lat: 54.3803, lon: -5.5519, country: 'IE' },
+  { name: 'Kilkeel Slipway', lat: 54.0590, lon: -5.9960, country: 'IE' },
+  { name: 'Carlingford Marina Slipway', lat: 54.0428, lon: -6.1905, country: 'IE' },
+  { name: 'Warrenpoint Slipway', lat: 54.0980, lon: -6.2540, country: 'IE' },
+  { name: 'Portavogie Slipway', lat: 54.4560, lon: -5.4395, country: 'IE' },
+  { name: 'Ballycastle Slipway', lat: 55.2035, lon: -6.2430, country: 'IE' },
+  // UNITED KINGDOM
+  { name: 'Portsmouth Camber Slip', lat: 50.7925, lon: -1.1055, country: 'UK' },
+  { name: 'Plymouth Mount Batten Slip', lat: 50.3585, lon: -4.1305, country: 'UK' },
+  { name: 'Swansea Marina Slipway', lat: 51.6110, lon: -3.9350, country: 'UK' },
+  { name: 'Cardiff Bay Slipway', lat: 51.4505, lon: -3.1615, country: 'UK' },
+  { name: 'Liverpool Marina Slip', lat: 53.3884, lon: -2.9716, country: 'UK' },
+  { name: 'Blackpool Slipway', lat: 53.8181, lon: -3.0583, country: 'UK' },
+  { name: 'Aberdeen Nigg Bay Slip', lat: 57.1355, lon: -2.0525, country: 'UK' }
 ];
 
 // ============================================
 // Harbours Data (Major Harbours)
 // ============================================
 const HARBOURS = [
-  { name: 'Dublin Port', lat: 53.3490, lon: -6.2020 },       // Offset from station
-  { name: 'Cork Harbour', lat: 51.8520, lon: -8.2940 },      // Offset from Cobh pier/slipway
-  { name: 'Galway Harbour', lat: 53.2725, lon: -9.0540 },    // Offset from pier
-  { name: 'Waterford Harbour', lat: 52.2633, lon: -7.0911 },
-  { name: 'Limerick Harbour', lat: 52.6639, lon: -8.6308 },
-  { name: 'Drogheda Port', lat: 53.7189, lon: -6.3475 },
-  { name: 'Rosslare Harbour', lat: 52.2550, lon: -6.3360 },  // Offset from station
-  { name: 'Dun Laoghaire Harbour', lat: 53.2960, lon: -6.1320 },  // Offset from pier
-  { name: 'Howth Harbour', lat: 53.3920, lon: -6.0640 },     // Offset from pier/station
-  { name: 'Killybegs Harbour', lat: 54.6370, lon: -8.4360 }, // Offset from pier/station
-  { name: 'Greencastle Harbour', lat: 55.1997, lon: -6.9836 },
-  { name: 'Castletownbere Harbour', lat: 51.6520, lon: -9.9080 }, // Offset from station
-  { name: 'Bantry Harbour', lat: 51.6820, lon: -9.4500 },    // Offset from station
-  { name: 'Schull Harbour', lat: 51.5295, lon: -9.5390 },    // Offset from station
-  { name: 'Baltimore Harbour', lat: 51.4828, lon: -9.3722 },
+  { name: 'Dublin Port', lat: 53.3490, lon: -6.2020, country: 'IE' },       // Offset from station
+  { name: 'Cork Harbour', lat: 51.8520, lon: -8.2940, country: 'IE' },      // Offset from Cobh pier/slipway
+  { name: 'Galway Harbour', lat: 53.2725, lon: -9.0540, country: 'IE' },    // Offset from pier
+  { name: 'Waterford Harbour', lat: 52.2633, lon: -7.0911, country: 'IE' },
+  { name: 'Limerick Harbour', lat: 52.6639, lon: -8.6308, country: 'IE' },
+  { name: 'Drogheda Port', lat: 53.7189, lon: -6.3475, country: 'IE' },
+  { name: 'Rosslare Harbour', lat: 52.2550, lon: -6.3360, country: 'IE' },  // Offset from station
+  { name: 'Dun Laoghaire Harbour', lat: 53.2960, lon: -6.1320, country: 'IE' },  // Offset from pier
+  { name: 'Howth Harbour', lat: 53.3920, lon: -6.0640, country: 'IE' },     // Offset from pier/station
+  { name: 'Killybegs Harbour', lat: 54.6370, lon: -8.4360, country: 'IE' }, // Offset from pier/station
+  { name: 'Greencastle Harbour', lat: 55.1997, lon: -6.9836, country: 'IE' },
+  { name: 'Castletownbere Harbour', lat: 51.6520, lon: -9.9080, country: 'IE' }, // Offset from station
+  { name: 'Bantry Harbour', lat: 51.6820, lon: -9.4500, country: 'IE' },    // Offset from station
+  { name: 'Schull Harbour', lat: 51.5295, lon: -9.5390, country: 'IE' },    // Offset from station
+  { name: 'Baltimore Harbour', lat: 51.4828, lon: -9.3722, country: 'IE' },
   // East Coast additions
-  { name: 'Courtown Harbour', lat: 52.6480, lon: -6.2260 },  // Offset from pier/station
-  { name: 'Wicklow Harbour', lat: 52.9825, lon: -6.0305 },   // Offset from pier
-  { name: 'Arklow Harbour', lat: 52.7995, lon: -6.1390 },    // Offset from pier/station/slipway
-  { name: 'Skerries Harbour', lat: 53.5835, lon: -6.1060 },  // Offset from pier/station/slipway
-  { name: 'Balbriggan Harbour', lat: 53.6120, lon: -6.1805 }, // Offset from slipway
-  { name: 'Dundalk Harbour', lat: 53.9875, lon: -6.3833 },
+  { name: 'Courtown Harbour', lat: 52.6480, lon: -6.2260, country: 'IE' },  // Offset from pier/station
+  { name: 'Wicklow Harbour', lat: 52.9825, lon: -6.0305, country: 'IE' },   // Offset from pier
+  { name: 'Arklow Harbour', lat: 52.7995, lon: -6.1390, country: 'IE' },    // Offset from pier/station/slipway
+  { name: 'Skerries Harbour', lat: 53.5835, lon: -6.1060, country: 'IE' },  // Offset from pier/station/slipway
+  { name: 'Balbriggan Harbour', lat: 53.6120, lon: -6.1805, country: 'IE' }, // Offset from slipway
+  { name: 'Dundalk Harbour', lat: 53.9875, lon: -6.3833, country: 'IE' },
   // South Coast additions
-  { name: 'Youghal Harbour', lat: 51.9565, lon: -7.8420 },   // Offset from pier
-  { name: 'Kinsale Harbour', lat: 51.7075, lon: -8.5195 },   // Offset from pier/slipway/station
-  { name: 'Union Hall Harbour', lat: 51.5425, lon: -9.1360 }, // Offset from pier/station
+  { name: 'Youghal Harbour', lat: 51.9565, lon: -7.8420, country: 'IE' },   // Offset from pier
+  { name: 'Kinsale Harbour', lat: 51.7075, lon: -8.5195, country: 'IE' },   // Offset from pier/slipway/station
+  { name: 'Union Hall Harbour', lat: 51.5425, lon: -9.1360, country: 'IE' }, // Offset from pier/station
   // West Coast additions
-  { name: 'Westport Harbour', lat: 53.7995, lon: -9.5195 },  // Offset from pier/station
-  { name: 'Sligo Harbour', lat: 54.2715, lon: -8.4720 },     // Offset from station
-  { name: 'Roundstone Harbour', lat: 53.4015, lon: -9.9210 }, // Offset from pier
-  // Northern Ireland
-  { name: 'Belfast Harbour', lat: 54.6110, lon: -5.9250 },   // Offset from station
-  { name: 'Bangor Marina', lat: 54.6640, lon: -5.6675 },     // Offset from pier/slipway
-  { name: 'Larne Harbour', lat: 54.8550, lon: -5.8100 },     // Offset from station
-  { name: 'Portrush Harbour', lat: 55.2080, lon: -6.6530 },  // Offset from pier/station
-  { name: 'Coleraine Marina', lat: 55.1333, lon: -6.6667 },
-  { name: 'Ardglass Harbour', lat: 54.2630, lon: -5.6030 },  // Offset from pier
-  { name: 'Portavogie Harbour', lat: 54.4600, lon: -5.4335 }, // Offset from pier/slipway
-  { name: 'Kilkeel Harbour', lat: 54.0635, lon: -5.9900 },   // Offset from pier/slipway
-  { name: 'Warrenpoint Harbour', lat: 54.1015, lon: -6.2490 }, // Offset from slipway
-  { name: 'Carlingford Marina', lat: 54.0460, lon: -6.1855 }  // Offset from slipway
+  { name: 'Westport Harbour', lat: 53.7995, lon: -9.5195, country: 'IE' },  // Offset from pier/station
+  { name: 'Sligo Harbour', lat: 54.2715, lon: -8.4720, country: 'IE' },     // Offset from station
+  { name: 'Roundstone Harbour', lat: 53.4015, lon: -9.9210, country: 'IE' }, // Offset from pier
+  { name: 'Cleggan Harbour', lat: 53.5585, lon: -10.1215, country: 'IE' },  // Offset from pier
+  { name: 'Belfast Harbour', lat: 54.6110, lon: -5.9250, country: 'IE' },   // Offset from station
+  { name: 'Bangor Marina', lat: 54.6640, lon: -5.6675, country: 'IE' },     // Offset from pier/slipway
+  { name: 'Larne Harbour', lat: 54.8550, lon: -5.8100, country: 'IE' },     // Offset from station
+    { name: 'Portrush Harbour', lat: 55.2080, lon: -6.6530, country: 'IE' },  // Offset from pier/station
+  { name: 'Coleraine Marina', lat: 55.1333, lon: -6.6667, country: 'IE' },
+  { name: 'Ardglass Harbour', lat: 54.2630, lon: -5.6030, country: 'IE' },  // Offset from pier
+  { name: 'Portavogie Harbour', lat: 54.4600, lon: -5.4335, country: 'IE' }, // Offset from pier/slipway
+  { name: 'Kilkeel Harbour', lat: 54.0635, lon: -5.9900, country: 'IE' },   // Offset from pier/slipway
+  { name: 'Warrenpoint Harbour', lat: 54.1015, lon: -6.2490, country: 'IE' }, // Offset from slipway
+  { name: 'Carlingford Marina', lat: 54.0460, lon: -6.1855, country: 'IE' },
+  // UNITED KINGDOM
+  { name: 'Portsmouth Harbour', lat: 50.8198, lon: -1.1080, country: 'UK' },
+  { name: 'Plymouth Barbican', lat: 50.3665, lon: -4.1365, country: 'UK' },
+  { name: 'Falmouth Harbour', lat: 50.1545, lon: -5.0645, country: 'UK' },
+  { name: 'Milford Haven', lat: 51.7147, lon: -5.0411, country: 'UK' },
+  { name: 'Holyhead Harbour', lat: 53.3147, lon: -4.6311, country: 'UK' },
+  { name: 'Liverpool Docks', lat: 53.4084, lon: -2.9916, country: 'UK' },
+  { name: 'Hull Docks', lat: 53.7443, lon: -0.3325, country: 'UK' },
+  { name: 'Newcastle Quayside', lat: 54.9705, lon: -1.6025, country: 'UK' },
+  { name: 'Aberdeen Harbour', lat: 57.1447, lon: -2.0811, country: 'UK' },
+  { name: 'Edinburgh (Leith) Port', lat: 55.9814, lon: -3.1704, country: 'UK' },
+  { name: 'Cardiff Bay', lat: 51.4580, lon: -3.1650, country: 'UK' },
+  { name: 'Swansea Marina', lat: 51.6110, lon: -3.9350, country: 'UK' }
 ];
+
+// Ensure all static data is tagged with country: 'IE' if not specified
+[PIERS, BOAT_RAMPS, HARBOURS, FRESHWATER_SPOTS, FRESHWATER_PARKS, FRESHWATER_RAMPS, FRESHWATER_PIERS, TACKLE_SHOPS].forEach(arr => {
+  arr.forEach(item => {
+    if (!item.country) item.country = 'IE';
+  });
+});
 
 // ============================================
 // State
@@ -272,7 +343,8 @@ let state = {
   supportMessages: JSON.parse(localStorage.getItem('fishing_support_messages') || '[]'),
   currentReplyUserId: null,
   showArchive: false, // Toggle for viewing posts older than 7 days
-  fishingMode: 'sea' // 'sea' or 'freshwater'
+  fishingMode: 'sea', // 'sea' or 'freshwater'
+  currentRegion: localStorage.getItem('fishing_region') || 'IE' // 'IE' or 'UK'
 };
 
 // ============================================
@@ -368,8 +440,21 @@ const FRESHWATER_SPOTS = [
   { id: 'clay_lake', name: 'Clay Lake', type: 'Lake', lat: 54.25, lng: -6.72, species: ['Pike', 'Perch'], licenseRequired: true, licenseType: 'DAERA Rod License + Permit', licenseUrl: 'https://www.nidirect.gov.uk/articles/freshwater-angling', notes: 'Armagh pike fishery.' },
   { id: 'river_bush', name: 'River Bush', type: 'River', lat: 55.20, lng: -6.52, species: ['Salmon', 'Sea Trout', 'Brown Trout'], licenseRequired: true, licenseType: 'DAERA Rod License + Local Permit', licenseUrl: 'https://www.nidirect.gov.uk/articles/game-angling', notes: 'Famous NI salmon river.' },
   { id: 'river_bann_lower', name: 'Lower River Bann', type: 'River', lat: 54.85, lng: -6.67, species: ['Salmon', 'Roach', 'Bream', 'Pike'], licenseRequired: true, licenseType: 'DAERA Rod License + Permit', licenseUrl: 'https://www.nidirect.gov.uk/articles/game-angling', notes: 'Portglenone. Top coarse venue.' },
-  { id: 'river_foyle', name: 'River Foyle', type: 'River', lat: 54.98, lng: -7.32, species: ['Salmon', 'Sea Trout'], licenseRequired: true, licenseType: 'Loughs Agency License + Permit', licenseUrl: 'https://www.loughs-agency.org/', notes: 'Cross-border. Excellent salmon.' },
-  { id: 'river_mourne_ni', name: 'River Mourne/Strule', type: 'River', lat: 54.60, lng: -7.30, species: ['Salmon', 'Sea Trout'], licenseRequired: true, licenseType: 'Loughs Agency License + Permit', licenseUrl: 'https://www.loughs-agency.org/', notes: 'Tyrone. Salmon & sea trout.' }
+  { id: 'river_foyle', name: 'River Foyle', type: 'River', lat: 54.98, lng: -7.32, species: ['Salmon', 'Sea Trout'], licenseRequired: true, licenseType: 'Loughs Agency License + Permit', licenseUrl: 'https://www.loughs-agency.org/', notes: 'Cross-border. Excellent salmon.', country: 'IE' },
+  { id: 'river_mourne_ni', name: 'River Mourne/Strule', type: 'River', lat: 54.60, lng: -7.30, species: ['Salmon', 'Sea Trout'], licenseRequired: true, licenseType: 'Loughs Agency License + Permit', licenseUrl: 'https://www.loughs-agency.org/', notes: 'Tyrone. Salmon & sea trout.', country: 'IE' },
+
+  // UNITED KINGDOM
+  { id: 'windermere', name: 'Windermere', type: 'Lake', lat: 54.36, lng: -2.93, species: ['Pike', 'Perch', 'Trout'], country: 'UK', notes: 'Largest natural lake in England.' },
+  { id: 'loch_lomond', name: 'Loch Lomond', type: 'Lake', lat: 56.10, lng: -4.63, species: ['Salmon', 'Trout', 'Pike'], country: 'UK', notes: 'Largest lake in GB by surface area.' },
+  { id: 'river_thames_oxford', name: 'River Thames (Oxford)', type: 'River', lat: 51.75, lng: -1.25, species: ['Chub', 'Perch', 'Pike'], country: 'UK', notes: 'Excellent coarse fishing.' },
+  { id: 'loch_ness', name: 'Loch Ness', type: 'Lake', lat: 57.32, lng: -4.42, species: ['Salmon', 'Trout', 'Pike'], country: 'UK', notes: 'Famous for its depth and legends.' },
+  { id: 'loch_tay_uk', name: 'Loch Tay', type: 'Lake', lat: 56.51, lng: -4.13, species: ['Salmon', 'Trout'], country: 'UK', notes: 'Deep loch in Perthshire.' },
+  { id: 'lake_vyrnwy', name: 'Lake Vyrnwy', type: 'Lake', lat: 52.76, lng: -3.46, species: ['Trout'], country: 'UK', notes: 'Beautiful reservoir in Wales.' },
+  { id: 'river_tweed', name: 'River Tweed', type: 'River', lat: 55.65, lng: -2.48, species: ['Salmon', 'Trout'], country: 'UK', notes: 'World famous salmon river.' },
+  { id: 'river_wye', name: 'River Wye', type: 'River', lat: 51.85, lng: -2.63, species: ['Barbel', 'Chub', 'Pike'], country: 'UK', notes: 'Scenic river on the border.' },
+  { id: 'river_severn', name: 'River Severn', type: 'River', lat: 52.41, lng: -2.25, species: ['Barbel', 'Chub', 'Pike', 'Zander'], country: 'UK', notes: 'Longest river in GB.' },
+  { id: 'rutland_water', name: 'Rutland Water', type: 'Lake', lat: 52.65, lng: -0.66, species: ['Trout', 'Zander', 'Pike'], country: 'UK', notes: 'Premier trout reservoir.' },
+  { id: 'grafham_water', name: 'Grafham Water', type: 'Lake', lat: 52.30, lng: -0.32, species: ['Trout', 'Perch', 'Zander'], country: 'UK', notes: 'Famous for large perch.' }
 ];
 
 // ============================================
@@ -387,9 +472,9 @@ const FRESHWATER_PARKS = [
   { id: 'ballyshunnock', name: 'Ballyshunnock Reservoir', lat: 52.22, lng: -7.18, county: 'Waterford', species: ['Brown Trout'], notes: 'Scenic reservoir. Fly fishing.', website: null },
   { id: 'laois_angling', name: 'Laois Angling Centre', lat: 53.05, lng: -7.55, county: 'Laois', species: ['Rainbow Trout', 'Brown Trout', 'Carp', 'Bream'], notes: 'Multiple lakes. Well stocked.', website: 'https://www.laoisanglingcentre.ie/' },
   { id: 'angling_for_all', name: 'Angling for All (Aughrim)', lat: 52.85, lng: -6.32, county: 'Wicklow', species: ['Rainbow Trout', 'Brown Trout'], notes: 'National disabled facility. Year round.', website: null },
-  { id: 'tinnehinch', name: 'Tinnehinch Fly Fishery', lat: 53.18, lng: -6.17, county: 'Wicklow', species: ['Rainbow Trout'], notes: 'Enniskerry. Open all year.', website: null },
-  { id: 'annamoe_fishery', name: 'Annamoe Trout Fishery', lat: 53.05, lng: -6.25, county: 'Wicklow', species: ['Rainbow Trout', 'Brown Trout'], notes: 'Near Glendalough. Fly & bait.', website: null },
-  { id: 'rathcon_fishery', name: 'Rathcon Trout Fishery', lat: 53.02, lng: -6.28, county: 'Wicklow', species: ['Rainbow Trout'], notes: '8.5 acre lake. Open all year.', website: null }
+  { id: 'tinnehinch', name: 'Tinnehinch Fly Fishery', lat: 53.18, lng: -6.17, county: 'Wicklow', species: ['Rainbow Trout'], notes: 'Enniskerry. Open all year.', website: null, country: 'IE' },
+  { id: 'annamoe_fishery', name: 'Annamoe Trout Fishery', lat: 53.05, lng: -6.25, county: 'Wicklow', species: ['Rainbow Trout', 'Brown Trout'], notes: 'Near Glendalough. Fly & bait.', website: null, country: 'IE' },
+  { id: 'rathcon_fishery', name: 'Rathcon Trout Fishery', lat: 53.02, lng: -6.28, county: 'Wicklow', species: ['Rainbow Trout'], notes: '8.5 acre lake. Open all year.', website: null, country: 'IE' }
 ];
 
 // ============================================
@@ -406,8 +491,8 @@ const FRESHWATER_RAMPS = [
   { id: 'roosky_slip', name: 'Roosky Slipway', lat: 53.83, lng: -7.92, waterway: 'River Shannon', type: 'Public', notes: 'Shannon navigation access.' },
   { id: 'lough_key_slip', name: 'Lough Key Slipway', lat: 53.97, lng: -8.17, waterway: 'Lough Key', type: 'Public', notes: 'Forest park access.' },
   { id: 'enniskillen_slip', name: 'Enniskillen Slipway', lat: 54.35, lng: -7.63, waterway: 'Lower Lough Erne', type: 'Public', notes: 'NI. Waterways Ireland.' },
-  { id: 'belturbet_slip', name: 'Belturbet Slipway', lat: 54.10, lng: -7.45, waterway: 'River Erne', type: 'Public', notes: 'Border area access.' },
-  { id: 'graiguenamanagh', name: 'Graiguenamanagh Slipway', lat: 52.54, lng: -6.95, waterway: 'River Barrow', type: 'Public', notes: 'Barrow Navigation.' }
+  { id: 'belturbet_slip', name: 'Belturbet Slipway', lat: 54.10, lng: -7.45, waterway: 'River Erne', type: 'Public', notes: 'Border area access.', country: 'IE' },
+  { id: 'graiguenamanagh', name: 'Graiguenamanagh Slipway', lat: 52.54, lng: -6.95, waterway: 'River Barrow', type: 'Public', notes: 'Barrow Navigation.', country: 'IE' }
 ];
 
 // ============================================
@@ -422,8 +507,8 @@ const FRESHWATER_PIERS = [
   { id: 'enniskillen_stand', name: 'Enniskillen Fishing Stand', lat: 54.35, lng: -7.64, waterway: 'Lower Lough Erne', accessible: true, notes: 'NI. Good coarse fishing.' },
   { id: 'cootehill_stand', name: 'Cootehill Lake Stand', lat: 54.07, lng: -7.08, waterway: 'Cootehill Lakes', accessible: false, notes: 'Cavan. Pike & bream.' },
   { id: 'virginia_stand', name: 'Virginia Lake Stand', lat: 53.83, lng: -7.08, waterway: 'Virginia Lake', accessible: true, notes: 'Disabled facilities.' },
-  { id: 'mullingar_stand', name: 'Lough Ennell Stand', lat: 53.45, lng: -7.40, waterway: 'Lough Ennell', accessible: false, notes: 'Westmeath. Trout fishing.' },
-  { id: 'carrick_stand', name: 'Carrick-on-Shannon Stand', lat: 53.94, lng: -8.09, waterway: 'River Shannon', accessible: true, notes: 'Town centre. Coarse fishing.' }
+  { id: 'mullingar_stand', name: 'Lough Ennell Stand', lat: 53.45, lng: -7.40, waterway: 'Lough Ennell', accessible: false, notes: 'Westmeath. Trout fishing.', country: 'IE' },
+  { id: 'carrick_stand', name: 'Carrick-on-Shannon Stand', lat: 53.94, lng: -8.09, waterway: 'River Shannon', accessible: true, notes: 'Town centre. Coarse fishing.', country: 'IE' }
 ];
 
 // ============================================
@@ -791,6 +876,7 @@ document.addEventListener('DOMContentLoaded', () => {
   trackSiteHit();
 
   updateAuthUI();
+  updateRegionUI();
   showPage('home');
 
   // Dismiss loading screen after animation
@@ -853,7 +939,10 @@ function initMap() {
     zoomSnap: 0,
     zoomDelta: 0.25,
     wheelPxPerZoomLevel: 60
-  }).setView(CONFIG.mapCenter, CONFIG.mapZoom);
+  });
+
+  const regionConfig = CONFIG.regions[state.currentRegion] || CONFIG;
+  state.map.setView(regionConfig.center, regionConfig.zoom);
 
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
@@ -868,65 +957,24 @@ function initMap() {
   state.harbourMarkers = L.layerGroup();
 
   // Prepare station markers (but don't add to map yet)
-  CONFIG.stations.forEach(station => {
+  CONFIG.stations.filter(s => !s.country || s.country === state.currentRegion).forEach(station => {
     addStationMarker(station);
   });
 
   // Prepare pier markers
-  PIERS.forEach(pier => {
-    const icon = L.divIcon({
-      className: 'pier-marker-wrapper',
-      html: `<div class="pier-marker" title="${pier.name}">🎣</div>`,
-      iconSize: [28, 28],
-      iconAnchor: [14, 14]
-    });
-    const marker = L.marker([pier.lat, pier.lon], { icon })
-      .bindPopup(`
-        <div class="popup-content">
-          <strong>${pier.name}</strong>
-          <span class="popup-type">Fishing Pier</span>
-          <button class="popup-directions-btn" onclick="getDirections(${pier.lat}, ${pier.lon})">📍 Get Directions</button>
-        </div>
-      `);
-    state.pierMarkers.addLayer(marker);
+  // Prepare pier markers
+  PIERS.filter(p => !p.country || p.country === state.currentRegion).forEach(pier => {
+    addPierMarker(pier);
   });
 
   // Prepare boat ramp markers
-  BOAT_RAMPS.forEach(ramp => {
-    const icon = L.divIcon({
-      className: 'ramp-marker-wrapper',
-      html: `<div class="ramp-marker" title="${ramp.name}">🚤</div>`,
-      iconSize: [28, 28],
-      iconAnchor: [14, 14]
-    });
-    const marker = L.marker([ramp.lat, ramp.lon], { icon })
-      .bindPopup(`
-        <div class="popup-content">
-          <strong>${ramp.name}</strong>
-          <span class="popup-type">Boat Ramp / Slipway</span>
-          <button class="popup-directions-btn" onclick="getDirections(${ramp.lat}, ${ramp.lon})">📍 Get Directions</button>
-        </div>
-      `);
-    state.rampMarkers.addLayer(marker);
+  BOAT_RAMPS.filter(r => !r.country || r.country === state.currentRegion).forEach(ramp => {
+    addRampMarker(ramp);
   });
 
   // Prepare harbour markers
-  HARBOURS.forEach(harbour => {
-    const icon = L.divIcon({
-      className: 'harbour-marker-wrapper',
-      html: `<div class="harbour-marker" title="${harbour.name}">🛥️</div>`,
-      iconSize: [28, 28],
-      iconAnchor: [14, 14]
-    });
-    const marker = L.marker([harbour.lat, harbour.lon], { icon })
-      .bindPopup(`
-        <div class="popup-content">
-          <strong>${harbour.name}</strong>
-          <span class="popup-type">Harbour</span>
-          <button class="popup-directions-btn" onclick="getDirections(${harbour.lat}, ${harbour.lon})">📍 Get Directions</button>
-        </div>
-      `);
-    state.harbourMarkers.addLayer(marker);
+  HARBOURS.filter(h => !h.country || h.country === state.currentRegion).forEach(harbour => {
+    addHarbourMarker(harbour);
   });
 
   // Prepare tackle shops from static array and Firebase (but don't add to map yet)
@@ -939,7 +987,61 @@ function initMap() {
   renderFreshwaterPiers();
 
   // Log that map is ready but empty
-  console.log('Map loaded. Apply filters to show locations.');
+  console.log(`Map loaded for region: ${state.currentRegion}. Apply filters to show locations.`);
+}
+
+window.setRegion = (region) => {
+  if (state.currentRegion === region) return;
+
+  state.currentRegion = region;
+  localStorage.setItem('fishing_region', region);
+
+  const regionConfig = CONFIG.regions[region];
+  if (state.map && regionConfig) {
+    state.map.flyTo(regionConfig.center, regionConfig.zoom);
+  }
+
+  // Clear and reload all markers for the new region
+  if (state.map) {
+      // Clear groups
+      state.shopMarkers.clearLayers();
+      state.pierMarkers.clearLayers();
+      state.rampMarkers.clearLayers();
+      state.harbourMarkers.clearLayers();
+      
+      // Re-initialize markers (this logic should be abstracted, but for now we'll call init helpers)
+      CONFIG.stations.filter(s => !s.country || s.country === state.currentRegion).forEach(station => addStationMarker(station));
+      PIERS.filter(p => !p.country || p.country === state.currentRegion).forEach(p => addPierMarker(p)); // I need to define addPierMarker or similar
+      BOAT_RAMPS.filter(r => !r.country || r.country === state.currentRegion).forEach(r => addRampMarker(r));
+      HARBOURS.filter(h => !h.country || h.country === state.currentRegion).forEach(h => addHarbourMarker(h));
+      
+      loadShopsToMainMap();
+      renderFreshwaterSpots();
+      renderFreshwaterParks();
+      renderFreshwaterRamps();
+      renderFreshwaterPiers();
+  }
+
+  updateRegionUI();
+  
+  // Close any open menus
+  if (window.innerWidth < 768) {
+      closeMobileMenu();
+  }
+};
+
+function updateRegionUI() {
+  const btnIE = document.getElementById('region-btn-ie');
+  const btnUK = document.getElementById('region-btn-uk');
+  
+  if (btnIE) btnIE.classList.toggle('active', state.currentRegion === 'IE');
+  if (btnUK) btnUK.classList.toggle('active', state.currentRegion === 'UK');
+  
+  // Also update header title or subtitle if needed
+  const subTitle = document.querySelector('.header-subtitle');
+  if (subTitle) {
+      subTitle.textContent = state.currentRegion === 'IE' ? 'Irish Tide & Fishing Data' : 'UK Tide & Fishing Data';
+  }
 }
 
 // Load all shops (static + Firebase) to main map
@@ -948,7 +1050,7 @@ async function loadShopsToMainMap() {
   state.shopMarkers.clearLayers();
 
   // Add static TACKLE_SHOPS
-  TACKLE_SHOPS.forEach(shop => {
+  TACKLE_SHOPS.filter(s => !s.country || s.country === state.currentRegion).forEach(shop => {
     const icon = L.divIcon({
       className: 'shop-marker-wrapper',
       html: '<div class="shop-marker">🏪</div>',
@@ -1008,6 +1110,60 @@ function addFirebaseShopMarker(shop) {
       </div>
     `);
   state.shopMarkers.addLayer(marker);
+}
+
+function addPierMarker(pier) {
+  const icon = L.divIcon({
+    className: 'pier-marker-wrapper',
+    html: `<div class="pier-marker" title="${pier.name}">🎣</div>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14]
+  });
+  const marker = L.marker([pier.lat, pier.lon], { icon })
+    .bindPopup(`
+      <div class="popup-content">
+        <strong>${pier.name}</strong>
+        <span class="popup-type">Fishing Pier</span>
+        <button class="popup-directions-btn" onclick="getDirections(${pier.lat}, ${pier.lon})">📍 Get Directions</button>
+      </div>
+    `);
+  state.pierMarkers.addLayer(marker);
+}
+
+function addRampMarker(ramp) {
+  const icon = L.divIcon({
+    className: 'ramp-marker-wrapper',
+    html: `<div class="ramp-marker" title="${ramp.name}">🚤</div>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14]
+  });
+  const marker = L.marker([ramp.lat, ramp.lon], { icon })
+    .bindPopup(`
+      <div class="popup-content">
+        <strong>${ramp.name}</strong>
+        <span class="popup-type">Boat Ramp / Slipway</span>
+        <button class="popup-directions-btn" onclick="getDirections(${ramp.lat}, ${ramp.lon})">📍 Get Directions</button>
+      </div>
+    `);
+  state.rampMarkers.addLayer(marker);
+}
+
+function addHarbourMarker(harbour) {
+  const icon = L.divIcon({
+    className: 'harbour-marker-wrapper',
+    html: `<div class="harbour-marker" title="${harbour.name}">🛥️</div>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14]
+  });
+  const marker = L.marker([harbour.lat, harbour.lon], { icon })
+    .bindPopup(`
+      <div class="popup-content">
+        <strong>${harbour.name}</strong>
+        <span class="popup-type">Harbour</span>
+        <button class="popup-directions-btn" onclick="getDirections(${harbour.lat}, ${harbour.lon})">📍 Get Directions</button>
+      </div>
+    `);
+  state.harbourMarkers.addLayer(marker);
 }
 
 // Open Google Maps with directions to coordinates
@@ -1338,7 +1494,7 @@ function loadStationList() {
   const stationsByRegion = {};
   const now = new Date();
 
-  CONFIG.stations.forEach(station => {
+  CONFIG.stations.filter(s => !s.country || s.country === state.currentRegion).forEach(station => {
     const region = station.region || 'Other';
     if (!stationsByRegion[region]) stationsByRegion[region] = [];
     stationsByRegion[region].push(station);
@@ -2606,6 +2762,7 @@ window.viewUserProfile = (userId) => {
       avatarEl.style.backgroundSize = '80%';
       avatarEl.style.backgroundPosition = 'center';
       avatarEl.style.backgroundRepeat = 'no-repeat';
+      avatarEl.style.backgroundImage = 'url("assets/logo.png")';
       avatarEl.style.border = '2px solid var(--accent-warning)';
     } else {
       avatarEl.style.backgroundImage = 'none';
@@ -2635,11 +2792,13 @@ window.viewUserProfile = (userId) => {
   if (user) {
     renderProfile(user);
   } else if (firebaseDB) {
+    // Fetch directly from Firebase (e.g. user not yet in local allUsers cache)
     firebaseDB.ref('users/' + userId).once('value').then(snap => {
       const fbUser = snap.val();
       if (fbUser) {
         renderProfile(fbUser);
       } else {
+        // Fallback: build minimal profile from catches
         const userCatches = state.catches.filter(c => c.userId === userId);
         if (userCatches.length > 0) {
           renderProfile({ name: userCatches[0].userName || userCatches[0].author, plan: 'free', bio: '', joinDate: null });
@@ -2652,7 +2811,6 @@ window.viewUserProfile = (userId) => {
     alert('User profile not found.');
   }
 };
-
 
 
 window.closePublicProfileModal = () => {
@@ -2768,7 +2926,7 @@ function renderFreshwaterSpots() {
     freshwaterMarkerGroup.clearLayers();
   }
 
-  FRESHWATER_SPOTS.forEach(spot => {
+  FRESHWATER_SPOTS.filter(s => !s.country || s.country === state.currentRegion).forEach(spot => {
     const icon = L.divIcon({
       className: 'freshwater-marker',
       html: '🐟', // Standardized to match filter emoji
@@ -2813,7 +2971,7 @@ function renderFreshwaterParks() {
     freshwaterParksGroup.clearLayers();
   }
 
-  FRESHWATER_PARKS.forEach(park => {
+  FRESHWATER_PARKS.filter(p => !p.country || p.country === state.currentRegion).forEach(park => {
     const icon = L.divIcon({
       className: 'freshwater-park-marker',
       html: '🏞️', // Standardized to match filter emoji
@@ -2850,7 +3008,7 @@ function renderFreshwaterRamps() {
     freshwaterRampsGroup.clearLayers();
   }
 
-  FRESHWATER_RAMPS.forEach(ramp => {
+  FRESHWATER_RAMPS.filter(r => !r.country || r.country === state.currentRegion).forEach(ramp => {
     const icon = L.divIcon({
       className: 'freshwater-ramp-marker',
       html: '🚤',
@@ -2886,7 +3044,7 @@ function renderFreshwaterPiers() {
     freshwaterPiersGroup.clearLayers();
   }
 
-  FRESHWATER_PIERS.forEach(pier => {
+  FRESHWATER_PIERS.filter(p => !p.country || p.country === state.currentRegion).forEach(pier => {
     const icon = L.divIcon({
       className: 'freshwater-pier-marker',
       html: '🎣',
@@ -4777,6 +4935,7 @@ function registerUserInSystem(user) {
     proExpirationDate: user.proExpirationDate || (existingIndex !== -1 ? state.allUsers[existingIndex].proExpirationDate : null),
     bio: user.bio || (existingIndex !== -1 ? state.allUsers[existingIndex].bio : ''),
     avatar: user.avatar || (existingIndex !== -1 ? state.allUsers[existingIndex].avatar : null),
+    totalCatches: user.totalCatches !== undefined ? user.totalCatches : (existingIndex !== -1 ? state.allUsers[existingIndex].totalCatches : null),
     joinDate: existingIndex === -1 ? Date.now() : state.allUsers[existingIndex].joinDate,
     active: existingIndex === -1 ? true : state.allUsers[existingIndex].active
   };
@@ -4945,7 +5104,19 @@ const TACKLE_SHOPS = [
   { name: "Lisburn Angling Supplies", county: "Antrim", address: "Bow St, Lisburn", phone: "028 9266 3456", website: "", lat: 54.5095, lng: -6.0375, rating: 4.5 },
   { name: "Ballymena Tackle Shop", county: "Antrim", address: "Church St, Ballymena", phone: "028 2565 4567", website: "", lat: 54.8642, lng: -6.2765, rating: 4.4 },
   { name: "Flying Tackle Portrush", county: "Antrim", address: "74 Main St, Portrush", phone: "028 7082 3601", website: "", lat: 55.2074164, lng: -6.6538849, rating: 4.8 },
-  { name: "Newry Angling Centre", county: "Down", address: "Hill St, Newry", phone: "028 3026 6789", website: "", lat: 54.1750, lng: -6.3392, rating: 4.5 }
+  { name: "Newry Angling Centre", county: "Down", address: "Hill St, Newry", phone: "028 3026 6789", website: "", lat: 54.1750, lng: -6.3392, rating: 4.5 },
+
+  // UNITED KINGDOM
+  { name: "Glasgow Angling Centre", county: "Glasgow", address: "Unit 1, The Point, 29 Saracen St, Glasgow", phone: "0141 212 8880", website: "https://www.fishingmegastore.com", lat: 55.8815, lng: -4.2490, rating: 4.8, country: 'UK' },
+  { name: "Angling Direct (London)", county: "London", address: "1-3 Orsman Rd, London", phone: "020 7739 3131", website: "https://www.anglingdirect.co.uk", lat: 51.5365, lng: -0.0785, rating: 4.5, country: 'UK' },
+  { name: "Gerrys Fishing", county: "Lancashire", address: "52-54 Marine Rd West, Morecambe", phone: "01524 422146", website: "https://www.gerrysfishing.com", lat: 54.0685, lng: -2.8755, rating: 4.7, country: 'UK' },
+  { name: "Angling Direct (Plymouth)", county: "Devon", address: "Unit 2, 60-62 Embankment Rd, Plymouth", phone: "01752 260400", website: "https://www.anglingdirect.co.uk", lat: 50.3755, lng: -4.1225, rating: 4.6, country: 'UK' },
+  { name: "Angling Direct (Portsmouth)", county: "Hampshire", address: "Unit 4, 18-20 High St, Cosham", phone: "023 9237 0000", website: "https://www.anglingdirect.co.uk", lat: 50.8445, lng: -1.0655, rating: 4.5, country: 'UK' },
+  { name: "Swansea Angling Centre", county: "Swansea", address: "Unit 1, 1-3 New Cut Rd, Swansea", phone: "01792 469999", website: "", lat: 51.6255, lng: -3.9385, rating: 4.7, country: 'UK' },
+  { name: "Cardiff Angling Centre", county: "Cardiff", address: "Unit 1, 1-3 Penarth Rd, Cardiff", phone: "029 2034 4444", website: "", lat: 51.4725, lng: -3.1785, rating: 4.6, country: 'UK' },
+  { name: "Newcastle Angling Centre", county: "Tyne & Wear", address: "Unit 1, 1-3 Westgate Rd, Newcastle", phone: "0191 232 2222", website: "", lat: 54.9705, lng: -1.6155, rating: 4.5, country: 'UK' },
+  { name: "Edinburgh Angling Centre", county: "Midlothian", address: "Unit 1, 1-3 Granton Rd, Edinburgh", phone: "0131 552 2222", website: "https://www.fishingmegastore.com", lat: 55.9815, lng: -3.2185, rating: 4.7, country: 'UK' },
+  { name: "Aberdeen Angling Centre", county: "Aberdeenshire", address: "Unit 1, 1-3 Holburn St, Aberdeen", phone: "01224 582222", website: "", lat: 57.1415, lng: -2.1125, rating: 4.6, country: 'UK' }
 ];
 
 async function loadNationalDirectory() {
@@ -4960,7 +5131,7 @@ async function loadNationalDirectory() {
     </div>
   `;
 
-  let combinedShops = [...TACKLE_SHOPS];
+  let combinedShops = [...TACKLE_SHOPS].filter(s => !s.country || s.country === state.currentRegion);
 
   // Try to load extra shops from Firebase
   try {
@@ -5846,6 +6017,12 @@ const IRISH_FISH_SPECIES = [
   { id: 'spurdog', name: 'Spurdog', scientific: 'Squalus acanthias', category: 'sea', habitat: 'Deep water, reefs', size: '60-100cm', season: 'May - Oct', description: 'Small shark with venomous spines in front of its dorsal fins. Once very common but now a protected species in many areas. Grey with white spots.', emoji: '🦈', record: '10.21 kg' },
   { id: 'blue_shark', name: 'Blue Shark', scientific: 'Prionace glauca', category: 'sea', habitat: 'Open ocean', size: '150-300cm', season: 'Jul - Oct', description: 'Beautiful pelagic shark that visits Irish waters in summer. Brilliant blue colour on its back. Catch-and-release only. Found offshore, mainly off the south and west coasts.', emoji: '🦈', record: '98 kg' },
   { id: 'garfish', name: 'Garfish', scientific: 'Belone belone', category: 'sea', habitat: 'Surface, coastal', size: '40-70cm', season: 'May - Sep', description: 'Slender fish with a distinctive elongated beak-like jaw. Swims near the surface. Fun to catch on light tackle. Has unusual green-coloured bones!', emoji: '🐟', record: '0.96 kg' },
+  { id: 'haddock', name: 'Haddock', scientific: 'Melanogrammus aeglefinus', category: 'sea', habitat: 'Deep water, sandy seabed', size: '30-60cm', season: 'All year', description: 'Whitefish with a black lateral line and a dark thumbprint mark above the pectoral fin. Highly prized for eating.', emoji: '🐟', record: '4.85 kg' },
+  { id: 'ling', name: 'Ling', scientific: 'Molva molva', category: 'sea', habitat: 'Wrecks, deep reefs', size: '80-150cm', season: 'All year', description: 'Long, eel-like body but part of the cod family. Found in deep water around wrecks. Very strong fighter.', emoji: '🐟', record: '24.15 kg' },
+  { id: 'turbot', name: 'Turbot', scientific: 'Scophthalmus maximus', category: 'sea', habitat: 'Sandy/gravelly seabed', size: '40-80cm', season: 'May - Oct', description: 'Large, circular flatfish. Regarded as one of the finest table fish. Mottled brown skin mimics the seabed.', emoji: '🐟', record: '15.42 kg' },
+  { id: 'grey_mullet', name: 'Thick-lipped Grey Mullet', scientific: 'Chelon labrosus', category: 'sea', habitat: 'Harbours, estuaries', size: '30-60cm', season: 'Jun - Oct', description: 'Hard-fighting silver fish found in calm harbour waters and estuaries. Known for being difficult to hook.', emoji: '🐟', record: '4.12 kg' },
+  { id: 'scad', name: 'Scad (Horse Mackerel)', scientific: 'Trachurus trachurus', category: 'sea', habitat: 'Open water, coastal', size: '20-35cm', season: 'Jul - Oct', description: 'Similar to mackerel but with a line of hard scales along its side. Often caught in shoals alongside mackerel.', emoji: '🐟', record: '0.78 kg' },
+  { id: 'tope', name: 'Tope', scientific: 'Galeorhinus galeus', category: 'sea', habitat: 'Coastal waters', size: '100-160cm', season: 'Jun - Oct', description: 'Slender shark that provides excellent sport for boat anglers. Powerful runs and high speed. Catch-and-release only.', emoji: '🦈', record: '30.12 kg' },
 
   // Freshwater Fish
   { id: 'brown_trout', name: 'Brown Trout', scientific: 'Salmo trutta', category: 'freshwater', habitat: 'Rivers, lakes, streams', size: '25-50cm', season: 'Mar - Sep', description: 'Ireland\'s most widespread freshwater game fish. Beautiful golden-brown with black and red spots. Found in clean rivers and lakes across the country. Excellent fly fishing.', emoji: '🐟', record: '11.73 kg' },
@@ -6236,7 +6413,7 @@ function startWalkthrough() {
       },
       {
         title: "Community Feed 👥",
-        intro: "Check out the Community tab to see what other Irish anglers are catching right now, or share your own catches!"
+        intro: "Check out the Community tab to see what other anglers are catching right now, or share your own catches!"
       },
       {
         title: "AI Fish Identifier 🤖🐟",
@@ -6274,7 +6451,7 @@ function startWalkthrough() {
       {
         element: document.getElementById('nav-community'),
         title: "Community Feed 👥",
-        intro: "Check out the Community tab to see what other Irish anglers are catching right now, or share your own catches!",
+        intro: "Check out the Community tab to see what other anglers are catching right now, or share your own catches!",
         position: "top"
       },
       {
