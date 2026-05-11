@@ -5498,10 +5498,6 @@ input:checked+.toggle-slider:before {
     .support-text {
         display: none;
     }
-    .nav-right > a.btn {
-        padding: 4px 6px !important;
-        margin-right: 5px !important;
-    }
 }
 
 @media (min-width: 768px) {
