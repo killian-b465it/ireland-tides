@@ -309,12 +309,6 @@ const HARBOURS = [
   { name: 'Swansea Marina', lat: 51.6110, lon: -3.9350, country: 'UK' }
 ];
 
-// Ensure all static data is tagged with country: 'IE' if not specified
-[PIERS, BOAT_RAMPS, HARBOURS, FRESHWATER_SPOTS, FRESHWATER_PARKS, FRESHWATER_RAMPS, FRESHWATER_PIERS, TACKLE_SHOPS].forEach(arr => {
-  arr.forEach(item => {
-    if (!item.country) item.country = 'IE';
-  });
-});
 
 // ============================================
 // State
@@ -5118,6 +5112,13 @@ const TACKLE_SHOPS = [
   { name: "Edinburgh Angling Centre", county: "Midlothian", address: "Unit 1, 1-3 Granton Rd, Edinburgh", phone: "0131 552 2222", website: "https://www.fishingmegastore.com", lat: 55.9815, lng: -3.2185, rating: 4.7, country: 'UK' },
   { name: "Aberdeen Angling Centre", county: "Aberdeenshire", address: "Unit 1, 1-3 Holburn St, Aberdeen", phone: "01224 582222", website: "", lat: 57.1415, lng: -2.1125, rating: 4.6, country: 'UK' }
 ];
+
+// Ensure all static data is tagged with country: 'IE' if not specified
+[PIERS, BOAT_RAMPS, HARBOURS, FRESHWATER_SPOTS, FRESHWATER_PARKS, FRESHWATER_RAMPS, FRESHWATER_PIERS, TACKLE_SHOPS].forEach(arr => {
+  arr.forEach(item => {
+    if (!item.country) item.country = 'IE';
+  });
+});
 
 async function loadNationalDirectory() {
   const container = document.getElementById('county-directory');
