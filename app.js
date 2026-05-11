@@ -2486,17 +2486,18 @@ function renderCatchFeed() {
             <div class="comment comment-item">
               <div class="comment-content">
                 <span class="comment-user comment-author" onclick="viewUserProfile('${comment.authorId || ''}')" style="cursor:pointer">${sanitizeHTML(comment.author || 'User')}:</span>
-                <span class="comment-text">${sanitizeHTML(comment.text)}</span>
+                <span class="comment-text" data-full-text="${sanitizeHTML(comment.text).replace(/"/g, '&quot;')}">${comment.text && comment.text.length > 60 ? sanitizeHTML(comment.text.substring(0, 60)) + '... <a href="javascript:void(0)" onclick="this.parentElement.innerHTML = this.parentElement.getAttribute(\'data-full-text\');" style="color: #ffab00; font-size: 0.8rem;">Show more</a>' : sanitizeHTML(comment.text)}</span>
               </div>
-      <div class="comment-actions">
-        ${state.user && state.user.id !== comment.authorId ? `
+              <div class="comment-actions">
+                ${state.user && state.user.id !== comment.authorId ? `
                   <button class="comment-report-btn" onclick="reportComment(${c.id}, ${commentIndex}, \`${sanitizeHTML(comment.text || '').replace(/`/g, '\\`')}\`, \`${sanitizeHTML(comment.author || 'User').replace(/`/g, '\\`')}\`, '${comment.authorId || ''}')" title="Report Comment">⚠️</button>
                 ` : ''}
-        ${isAdmin ? `
+                ${isAdmin ? `
                   <button class="comment-delete-btn" onclick="deleteComment(${c.id}, ${commentIndex})" title="Delete Comment">🗑️</button>
                 ` : ''}
-      </div>
-    `).join('')}
+              </div>
+            </div>
+          `).join('')}
         </div>
         <div class="comment-input-area">
           <input type="text" placeholder="Add a comment..." id="input-${c.id}" class="comment-input" onkeypress="handleCommentKey(event, ${c.id})">
