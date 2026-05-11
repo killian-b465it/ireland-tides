@@ -33,6 +33,10 @@
         ".read": true,
         ".write": true
       }
+    },
+    "blogPosts": {
+      ".read": true,
+      ".write": true
     }
   }
 }
