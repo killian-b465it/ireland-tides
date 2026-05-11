@@ -1223,6 +1223,15 @@
               <input type="text" id="admin-blog-image" class="auth-input" placeholder="https://example.com/image.jpg">
             </div>
             <button class="btn btn-primary" onclick="publishBlogPost()">Publish to Blog</button>
+            
+            <hr style="border-color:rgba(255,255,255,0.1); margin: 25px 0 15px 0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+              <h4 style="margin:0;">Published Posts</h4>
+              <button class="btn btn-sm btn-outline" onclick="loadAdminBlogPosts()">Refresh List</button>
+            </div>
+            <div id="admin-blog-posts-list" style="display:flex; flex-direction:column; gap:10px; max-height:250px; overflow-y:auto; padding-right:5px;">
+              <p style="color:var(--text-muted); font-size:0.9rem;">Click Refresh to load posts...</p>
+            </div>
           </div>
         </div>
 

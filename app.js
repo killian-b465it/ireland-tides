@@ -6480,10 +6480,63 @@ window.publishBlogPost = () => {
         document.getElementById('admin-blog-snippet').value = '';
         document.getElementById('admin-blog-content').value = '';
         document.getElementById('admin-blog-image').value = '';
+        if (typeof loadAdminBlogPosts === 'function') loadAdminBlogPosts();
       })
       .catch(err => alert('Failed to publish: ' + err.message));
   } else {
     alert('Firebase not connected. Cannot publish right now.');
+  }
+};
+
+window.loadAdminBlogPosts = () => {
+  if (!state.user || !state.user.isAdmin) return;
+  const listEl = document.getElementById('admin-blog-posts-list');
+  if (!listEl) return;
+  
+  listEl.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">Loading posts...</p>';
+  
+  if (typeof firebaseDB !== 'undefined') {
+    firebaseDB.ref('blogPosts').once('value').then(snapshot => {
+      const posts = [];
+      snapshot.forEach(child => posts.push(child.val()));
+      
+      if (posts.length === 0) {
+        listEl.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">No published posts found.</p>';
+        return;
+      }
+      
+      posts.sort((a,b) => b.date - a.date);
+      let html = '';
+      posts.forEach(post => {
+        const dateStr = new Date(post.date).toLocaleDateString();
+        html += `
+          <div style="background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.05); border-radius:8px; padding:10px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong style="display:block; color:var(--accent-primary);">${post.title}</strong>
+              <span style="font-size:0.8rem; color:var(--text-muted);">${dateStr}</span>
+            </div>
+            <button class="btn btn-sm btn-danger" onclick="deleteBlogPost('${post.id}')" title="Delete Post">🗑️</button>
+          </div>
+        `;
+      });
+      listEl.innerHTML = html;
+    }).catch(err => {
+      listEl.innerHTML = '<p style="color:red; font-size:0.9rem;">Error loading posts.</p>';
+    });
+  }
+};
+
+window.deleteBlogPost = (id) => {
+  if (!state.user || !state.user.isAdmin) return;
+  if (!confirm('Are you sure you want to delete this blog post?')) return;
+  
+  if (typeof firebaseDB !== 'undefined') {
+    firebaseDB.ref('blogPosts/' + id).remove()
+      .then(() => {
+        alert('Blog post deleted.');
+        loadAdminBlogPosts();
+      })
+      .catch(err => alert('Failed to delete: ' + err.message));
   }
 };
 
