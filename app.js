@@ -7034,6 +7034,14 @@ function startWalkthrough() {
         intro: "Looking for a tackle shop or a boat ramp? Use these filters to turn different types of locations on or off."
       },
       {
+        title: "Live Solunar Radar 🗺️⚡",
+        intro: "Check out the Live Solunar Radar in the sidebar to see which fishing spots are hot right now with pulsing green sonar map overlays!"
+      },
+      {
+        title: "Solunar Peak Feeding 🌙🐟",
+        intro: "View the moon phase visualizer and exact daily major/minor feeding times, complete with sunrise/sunset and tide overlap alerts!"
+      },
+      {
         title: "Community Feed 👥",
         intro: "Check out the Community tab to see what other anglers are catching right now, or share your own catches!"
       },
@@ -7069,6 +7077,18 @@ function startWalkthrough() {
         title: "Map Layers 🗺️",
         intro: "Looking for a tackle shop or a boat ramp? Use these filters to turn different types of locations on or off.",
         position: "bottom"
+      },
+      {
+        element: document.getElementById('hotspots-card'),
+        title: "Live Solunar Radar 🗺️⚡",
+        intro: "Our Live Solunar Radar scans all stations in real-time, showing currently active hotspots with Tide Peaks and pulsing green sonar map overlays!",
+        position: "top"
+      },
+      {
+        element: document.getElementById('solunar-card'),
+        title: "Solunar Peak Feeding 🌙🐟",
+        intro: "Use this premium astronomical engine to view the dynamic moon phase visual, circular activity index, and exact daily feeding windows overlapping tide changes!",
+        position: "top"
       },
       {
         element: document.getElementById('nav-community'),

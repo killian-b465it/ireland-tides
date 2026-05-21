@@ -5992,4 +5992,48 @@ input:checked+.toggle-slider:before {
 .hotspot-row:hover .hotspot-name {
     color: #fff;
 }
+
+/* Perfect Center Anchoring for Leaflet DivIcons to prevent moving/sliding on zoom */
+.tide-marker-wrapper,
+.shop-marker-wrapper,
+.pier-marker-wrapper,
+.ramp-marker-wrapper,
+.harbour-marker-wrapper,
+.freshwater-marker,
+.freshwater-park-marker,
+.freshwater-ramp-marker,
+.freshwater-pier-marker {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 28px !important;
+    height: 28px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+}
+
+.tide-marker,
+.shop-marker,
+.pier-marker,
+.ramp-marker,
+.harbour-marker,
+.freshwater-marker div,
+.freshwater-park-marker div,
+.freshwater-ramp-marker div,
+.freshwater-pier-marker div {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 28px !important;
+    height: 28px !important;
+    line-height: 28px !important;
+    text-align: center !important;
+    font-size: 1.3rem !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    transform-origin: center center !important;
+}
+
 
