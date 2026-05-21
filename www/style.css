@@ -5550,3 +5550,292 @@ input:checked+.toggle-slider:before {
         max-height: 500px;
     }
 }
+
+/* ============================================   Solunar Activity Card Styles   ============================================ */
+.solunar-display {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px 0;
+}
+
+.solunar-header-stats {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-glass);
+    padding: 12px;
+    border-radius: 14px;
+}
+
+/* Dynamic Moon Phase SVG Container */
+.moon-phase-visualizer {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle, rgba(0, 212, 255, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.moon-svg {
+    width: 48px;
+    height: 48px;
+    filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.6));
+}
+
+.moon-light {
+    fill: #e6f1ff;
+    transition: all 0.5s ease;
+}
+
+.moon-shadow {
+    fill: #0c1524;
+    opacity: 0.85;
+    transition: all 0.5s ease;
+}
+
+.moon-phase-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.moon-phase-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.moon-phase-ill {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.moon-phase-age {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2px 6px;
+    border-radius: 4px;
+    width: fit-content;
+    margin-top: 2px;
+}
+
+/* Solunar circular dial index */
+.solunar-dial-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 80px;
+    height: 80px;
+    position: relative;
+}
+
+.solunar-dial-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: conic-gradient(var(--dial-color, #00d4ff) var(--dial-deg, 0deg), rgba(255,255,255,0.05) var(--dial-deg, 0deg));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.solunar-dial-inner {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: #0f1c30;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.8);
+}
+
+.solunar-dial-percent {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+}
+
+.solunar-dial-rating {
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--dial-color, #00d4ff);
+    letter-spacing: 0.03em;
+}
+
+/* Feeding Timeline Styles */
+.feeding-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.feeding-timeline-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 2px;
+}
+
+.feeding-slot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-glass);
+    padding: 10px 12px;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.feeding-slot:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateX(3px);
+}
+
+.feeding-slot.active-now {
+    border-color: var(--accent-success);
+    background: rgba(0, 255, 136, 0.04);
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.1);
+    position: relative;
+    animation: activePulse 2s infinite;
+}
+
+@keyframes activePulse {
+    0% { border-color: rgba(0, 255, 136, 0.3); }
+    50% { border-color: rgba(0, 255, 136, 0.8); }
+    100% { border-color: rgba(0, 255, 136, 0.3); }
+}
+
+.feeding-slot-type {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.feeding-icon {
+    font-size: 1.1rem;
+}
+
+.feeding-label {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.feeding-label-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.feeding-label-desc {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+}
+
+.feeding-slot-time {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.feeding-time-range {
+    font-size: 0.85rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    color: var(--accent-primary);
+}
+
+.overlap-badges {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.overlap-badge {
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.overlap-badge.sunrise {
+    background: rgba(255, 122, 0, 0.15);
+    color: #ffaa44;
+    border: 1px solid rgba(255, 122, 0, 0.3);
+}
+
+.overlap-badge.sunset {
+    background: rgba(255, 0, 128, 0.15);
+    color: #ff55aa;
+    border: 1px solid rgba(255, 0, 128, 0.3);
+}
+
+.overlap-badge.tide {
+    background: rgba(0, 212, 255, 0.15);
+    color: #4facfe;
+    border: 1px solid rgba(0, 212, 255, 0.3);
+}
+
+.overlap-badge.active-indicator {
+    background: rgba(0, 255, 136, 0.15);
+    color: var(--accent-success);
+    border: 1px solid rgba(0, 255, 136, 0.3);
+    animation: pulseLabel 1.5s infinite;
+}
+
+@keyframes pulseLabel {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+/* Solunar Forecast Tip Message Box */
+.solunar-tip-box {
+    display: flex;
+    gap: 8px;
+    background: rgba(255, 171, 0, 0.03);
+    border: 1px solid rgba(255, 171, 0, 0.15);
+    padding: 10px 12px;
+    border-radius: 10px;
+    margin-top: 4px;
+}
+
+.solunar-tip-icon {
+    font-size: 1.2rem;
+    color: #ffb800;
+    line-height: 1;
+}
+
+.solunar-tip-text {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.35;
+    font-style: italic;
+}

@@ -1529,6 +1529,7 @@ function selectStation(station) {
 
   fetchWeatherData(station);
   fetchNearbyShops(station);
+  renderSolunarCard();
 }
 
 // Fetch and display nearby fishing shops based on station region
@@ -1620,7 +1621,7 @@ function findNearestLiveStation(inputStation) {
 
 
 function showTideCards() {
-  const cards = ['tide-card', 'weather-card', 'shops-card', 'tide-times-card', 'fishing-card', 'chart-card'];
+  const cards = ['tide-card', 'weather-card', 'solunar-card', 'shops-card', 'tide-times-card', 'fishing-card', 'chart-card'];
   cards.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = 'block';
@@ -1904,6 +1905,9 @@ window.navigateForecast = (delta) => {
 
   // Re-render tides
   displayTideTimes([]);
+
+  // Re-render Solunar
+  renderSolunarCard();
 };
 
 function updateForecastHeaders() {
@@ -2137,7 +2141,7 @@ function displayCalculatedTides(station) {
 async function fetchWeatherData(station) {
   const container = document.getElementById('weather-display');
   try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${station.lat}&longitude=${station.lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${station.lat}&longitude=${station.lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto`;
     const res = await fetch(url);
     const data = await res.json();
     displayWeatherData(data.current);
@@ -2147,6 +2151,9 @@ async function fetchWeatherData(station) {
 
     // Initial Render of Forecast View (Today)
     renderForecastView();
+
+    // Re-render Solunar with precise weather sunrise/sunset values
+    renderSolunarCard();
 
   } catch (err) {
     console.warn(`Weather fetch failed for ${station.id}:`, err);
@@ -3228,6 +3235,323 @@ function renderFreshwaterPiers() {
   });
 
   // Don't add to map yet - controlled by applyFreshwaterFilters()
+}
+
+/* ============================================   Solunar Activity & Peak Feeding Times Engine   ============================================ */
+function calculateMoonState(date) {
+  // Base new moon reference date: January 6, 2000 at 18:14 UTC
+  const baseNewMoon = new Date(Date.UTC(2000, 0, 6, 18, 14, 0));
+  const diffMs = date.getTime() - baseNewMoon.getTime();
+  const diffDays = diffMs / (1000 * 60 * 60 * 24);
+  const cycle = 29.530588853;
+  const rawAge = (diffDays % cycle + cycle) % cycle;
+  
+  let phaseName = "";
+  let illumination = 0;
+  let phaseKey = "";
+
+  if (rawAge < 1.38 || rawAge > 28.15) {
+    phaseName = "New Moon";
+    illumination = 0;
+    phaseKey = "new";
+  } else if (rawAge < 6.0) {
+    phaseName = "Waxing Crescent";
+    illumination = (rawAge / 14.76) * 100;
+    phaseKey = "waxing-crescent";
+  } else if (rawAge < 8.76) {
+    phaseName = "First Quarter";
+    illumination = 50;
+    phaseKey = "first-quarter";
+  } else if (rawAge < 13.38) {
+    phaseName = "Waxing Gibbous";
+    illumination = (rawAge / 14.76) * 100;
+    phaseKey = "waxing-gibbous";
+  } else if (rawAge < 16.15) {
+    phaseName = "Full Moon";
+    illumination = 100;
+    phaseKey = "full";
+  } else if (rawAge < 20.77) {
+    phaseName = "Waning Gibbous";
+    illumination = ((29.53 - rawAge) / 14.76) * 100;
+    phaseKey = "waning-gibbous";
+  } else if (rawAge < 23.53) {
+    phaseName = "Last Quarter";
+    illumination = 50;
+    phaseKey = "last-quarter";
+  } else {
+    phaseName = "Waning Crescent";
+    illumination = ((29.53 - rawAge) / 14.76) * 100;
+    phaseKey = "waning-crescent";
+  }
+
+  return {
+    age: rawAge,
+    phaseName,
+    illumination: Math.round(illumination),
+    phaseKey
+  };
+}
+
+function getMoonSVG(phaseKey, illumination) {
+  let shadowPath = "";
+  if (phaseKey === "new") {
+    shadowPath = `<circle cx="24" cy="24" r="20" class="moon-shadow" />`;
+  } else if (phaseKey === "full") {
+    shadowPath = "";
+  } else if (phaseKey === "first-quarter") {
+    shadowPath = `<path d="M 24 4 A 20 20 0 0 0 24 44 Z" class="moon-shadow" />`;
+  } else if (phaseKey === "last-quarter") {
+    shadowPath = `<path d="M 24 4 A 20 20 0 0 1 24 44 Z" class="moon-shadow" />`;
+  } else if (phaseKey === "waxing-crescent") {
+    const x = 24 - 20 * (1 - (illumination / 50));
+    shadowPath = `<path d="M 24 4 A 20 20 0 0 0 24 44 A ${Math.max(1, Math.abs(x))} 20 0 0 1 24 4 Z" class="moon-shadow" />`;
+  } else if (phaseKey === "waning-crescent") {
+    const x = 24 + 20 * (1 - (illumination / 50));
+    shadowPath = `<path d="M 24 4 A 20 20 0 0 1 24 44 A ${Math.max(1, Math.abs(x))} 20 0 0 0 24 4 Z" class="moon-shadow" />`;
+  } else if (phaseKey === "waxing-gibbous") {
+    const x = 24 - 20 * ((illumination - 50) / 50);
+    shadowPath = `<path d="M 24 4 A 20 20 0 0 0 24 44 A ${Math.max(1, Math.abs(x))} 20 0 0 0 24 4 Z" class="moon-shadow" />`;
+  } else if (phaseKey === "waning-gibbous") {
+    const x = 24 + 20 * ((illumination - 50) / 50);
+    shadowPath = `<path d="M 24 4 A 20 20 0 0 1 24 44 A ${Math.max(1, Math.abs(x))} 20 0 0 1 24 4 Z" class="moon-shadow" />`;
+  }
+
+  return `
+    <svg viewBox="0 0 48 48" class="moon-svg">
+      <circle cx="24" cy="24" r="20" class="moon-light" />
+      ${shadowPath}
+    </svg>
+  `;
+}
+
+function parseTimeToDecimal(isoString) {
+  if (!isoString) return null;
+  const d = new Date(isoString);
+  if (isNaN(d.getTime())) return null;
+  return d.getHours() + d.getMinutes() / 60;
+}
+
+function formatDecimalTimeWindow(start, end) {
+  const toHourMin = (val) => {
+    const h = Math.floor(val);
+    const m = Math.floor((val - h) * 60);
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  };
+  return `${toHourMin(start)} - ${toHourMin(end)}`;
+}
+
+function renderSolunarCard() {
+  const container = document.getElementById('solunar-display');
+  if (!container || !state.selectedStation) return;
+
+  const station = state.selectedStation;
+  const targetDate = new Date();
+  targetDate.setDate(targetDate.getDate() + (state.forecastOffset || 0));
+
+  // 1. Calculate moon cycle
+  const moon = calculateMoonState(targetDate);
+
+  // 2. Base Activity Level (Full moon & New moon = highest score)
+  const distToExtreme = Math.min(moon.age, 29.53059 - moon.age, Math.abs(moon.age - 14.76));
+  let baseScore = 50 + 45 * (1 - (distToExtreme / 7.38));
+  baseScore = Math.max(15, Math.min(99, Math.round(baseScore)));
+
+  let ratingName = "Poor";
+  let dialColor = "#ff4d4d";
+  if (baseScore >= 80) {
+    ratingName = "Peak";
+    dialColor = "#00ff88";
+  } else if (baseScore >= 60) {
+    ratingName = "Good";
+    dialColor = "#00d4ff";
+  } else if (baseScore >= 40) {
+    ratingName = "Fair";
+    dialColor = "#ffaa44";
+  }
+
+  // 3. Moon overhead transit hour
+  const transitHour = ((moon.age / 29.53059) * 24) % 24;
+  let overheadHour = (12 + transitHour) % 24;
+  let underfootHour = (overheadHour + 12) % 24;
+  let moonriseHour = (overheadHour - 6.2 + 24) % 24;
+  let moonsetHour = (overheadHour + 6.2) % 24;
+
+  // 4. Sunrise / Sunset Decimal Time
+  let sunriseHour = 6.0;
+  let sunsetHour = 18.0;
+  const weatherData = state.currentWeatherDaily;
+  if (weatherData && weatherData.sunrise && weatherData.sunset) {
+    const idx = state.forecastOffset;
+    if (idx >= 0 && idx < weatherData.time.length) {
+      const parsedSunrise = parseTimeToDecimal(weatherData.sunrise[idx]);
+      const parsedSunset = parseTimeToDecimal(weatherData.sunset[idx]);
+      if (parsedSunrise !== null) sunriseHour = parsedSunrise;
+      if (parsedSunset !== null) sunsetHour = parsedSunset;
+    }
+  } else {
+    const month = targetDate.getMonth();
+    if (month >= 4 && month <= 8) {
+      sunriseHour = 5.0;
+      sunsetHour = 21.5;
+    } else if (month <= 1 || month >= 10) {
+      sunriseHour = 8.25;
+      sunsetHour = 16.5;
+    } else {
+      sunriseHour = 6.5;
+      sunsetHour = 19.5;
+    }
+  }
+
+  // 5. High Tide Decimal Times for Overlap
+  const dayStart = new Date(targetDate);
+  dayStart.setHours(0, 0, 0, 0);
+  const dayExtremes = [];
+  const step = 15 * 60 * 1000;
+  const tStart = dayStart.getTime();
+  const tEnd = tStart + 24 * 60 * 60 * 1000;
+
+  let prevLvl = calculateTideLevel(new Date(tStart - step), station).level;
+  let currLvl = calculateTideLevel(new Date(tStart), station).level;
+
+  for (let t = tStart + step; t <= tEnd; t += step) {
+    const nextLvl = calculateTideLevel(new Date(t), station).level;
+    if (currLvl > prevLvl && currLvl > nextLvl) dayExtremes.push({ type: 'High', time: t, level: currLvl });
+    else if (currLvl < prevLvl && currLvl < nextLvl) dayExtremes.push({ type: 'Low', time: t, level: currLvl });
+    prevLvl = currLvl;
+    currLvl = nextLvl;
+  }
+
+  const highTideHours = dayExtremes
+    .filter(e => e.type === 'High')
+    .map(e => {
+      const d = new Date(e.time);
+      return d.getHours() + d.getMinutes() / 60;
+    });
+
+  // 6. Define timelines
+  const slots = [
+    {
+      title: "Major Overhead",
+      desc: "Peak lunar alignment overhead",
+      icon: "🌟",
+      start: (overheadHour - 1 + 24) % 24,
+      end: (overheadHour + 1) % 24
+    },
+    {
+      title: "Major Underfoot",
+      desc: "Peak lunar alignment underfoot",
+      icon: "🌟",
+      start: (underfootHour - 1 + 24) % 24,
+      end: (underfootHour + 1) % 24
+    },
+    {
+      title: "Minor Moonrise",
+      desc: "Moderate activity at moonrise",
+      icon: "🌘",
+      start: (moonriseHour - 0.5 + 24) % 24,
+      end: (moonriseHour + 0.5) % 24
+    },
+    {
+      title: "Minor Moonset",
+      desc: "Moderate activity at moonset",
+      icon: "🌘",
+      start: (moonsetHour - 0.5 + 24) % 24,
+      end: (moonsetHour + 0.5) % 24
+    }
+  ];
+
+  const isDecimalInWindow = (val, start, end) => {
+    if (start <= end) return val >= start && val <= end;
+    return val >= start || val <= end;
+  };
+
+  const now = new Date();
+  const currentDecimalHour = now.getHours() + now.getMinutes() / 60;
+  const isToday = targetDate.toDateString() === now.toDateString();
+
+  let hasPeakTideOverlap = false;
+  let hasPeakSunOverlap = false;
+
+  const renderedSlots = slots.map(slot => {
+    const isActiveNow = isToday && isDecimalInWindow(currentDecimalHour, slot.start, slot.end);
+    const hasSunrise = isDecimalInWindow(sunriseHour, slot.start, slot.end);
+    const hasSunset = isDecimalInWindow(sunsetHour, slot.start, slot.end);
+    const matchingTide = highTideHours.find(tide => isDecimalInWindow(tide, slot.start, slot.end));
+
+    if (matchingTide) hasPeakTideOverlap = true;
+    if (hasSunrise || hasSunset) hasPeakSunOverlap = true;
+
+    let badgesHtml = "";
+    if (isActiveNow) badgesHtml += `<span class="overlap-badge active-indicator">Active Now</span>`;
+    if (hasSunrise) badgesHtml += `<span class="overlap-badge sunrise">🌅 Sunrise Peak</span>`;
+    if (hasSunset) badgesHtml += `<span class="overlap-badge sunset">🌇 Sunset Peak</span>`;
+    if (matchingTide) badgesHtml += `<span class="overlap-badge tide">🌊 Tide Peak</span>`;
+
+    return `
+      <div class="feeding-slot ${isActiveNow ? 'active-now' : ''}">
+        <div class="feeding-slot-type">
+          <span class="feeding-icon">${slot.icon}</span>
+          <div class="feeding-label">
+            <span class="feeding-label-title">${slot.title}</span>
+            <span class="feeding-label-desc">${slot.desc}</span>
+          </div>
+        </div>
+        <div class="feeding-slot-time">
+          <span class="feeding-time-range">${formatDecimalTimeWindow(slot.start, slot.end)}</span>
+          <div class="overlap-badges">${badgesHtml}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // 7. Dynamic Fishing Tip
+  let tipText = "Standard feeding conditions today. Target feeding windows around moving tides.";
+  if (baseScore >= 80) {
+    if (hasPeakTideOverlap && hasPeakSunOverlap) {
+      tipText = "🔥 EXTREME SOLUNAR ALIGNMENT today! Feeding windows overlap with sunset/sunrise AND high tide. Fish will be in a massive feeding frenzy.";
+    } else if (hasPeakTideOverlap) {
+      tipText = "🌊 Peak feeding levels expected as moon overhead/underfoot transit aligns directly with high tide! Focus effort during the Tide Peak window.";
+    } else {
+      tipText = "🌅 Strong feeding indices today. Sunrise and sunset windows are highly active. Perfect for spinning and lure fishing.";
+    }
+  } else if (baseScore >= 50) {
+    tipText = "Moderate activity predicted. Best action is expected around moon transits overlapping tide changes.";
+  } else {
+    tipText = "Neap tide and quarter moon cycle indicates slower overall bite. Try fishing deeper drop-offs or use highly scented natural baits.";
+  }
+
+  const dialDeg = (baseScore / 100) * 360;
+
+  container.innerHTML = `
+    <div class="solunar-header-stats">
+      <div class="moon-phase-visualizer" title="Moon Phase: ${moon.phaseName}">
+        ${getMoonSVG(moon.phaseKey, moon.illumination)}
+      </div>
+      <div class="moon-phase-info">
+        <span class="moon-phase-name">${moon.phaseName}</span>
+        <span class="moon-phase-ill">${moon.illumination}% Illumination</span>
+        <span class="moon-phase-age">Moon Age: ${moon.age.toFixed(1)}d</span>
+      </div>
+      <div class="solunar-dial-wrapper">
+        <div class="solunar-dial-bg" style="--dial-color: ${dialColor}; --dial-deg: ${dialDeg}deg;">
+          <div class="solunar-dial-inner">
+            <span class="solunar-dial-percent">${baseScore}%</span>
+            <span class="solunar-dial-rating">${ratingName}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feeding-timeline">
+      <div class="feeding-timeline-title">Feeding Windows Today</div>
+      ${renderedSlots}
+    </div>
+
+    <div class="solunar-tip-box">
+      <span class="solunar-tip-icon">💡</span>
+      <span class="solunar-tip-text">${tipText}</span>
+    </div>
+  `;
 }
 
 // Freshwater filter functions
