@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Irish Fishing Hub - Social Post Builder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #050b14;
+            --card-bg: rgba(10, 25, 47, 0.85);
+            --accent-cyan: #00c8ff;
+            --accent-blue: #0070ff;
+            --accent-green: #00ff80;
+            --accent-orange: #ff883e;
+            --border-color: rgba(0, 200, 255, 0.2);
+            --text-light: #f8fafc;
+            --text-muted: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 112, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 200, 255, 0.08) 0%, transparent 45%);
+        }
+
+        header {
+            padding: 24px 40px;
+            background: rgba(2, 6, 12, 0.6);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-cyan);
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.6; }
+        }
+
+        .logo-text {
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 18px;
+            background: linear-gradient(90deg, #fff, rgba(255,255,255,0.7));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-badge {
+            background: rgba(0, 200, 255, 0.1);
+            border: 1px solid rgba(0, 200, 255, 0.3);
+            color: var(--accent-cyan);
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            padding: 40px;
+            gap: 40px;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* === EDITOR / CONTROL PANEL === */
+        .control-panel {
+            flex: 1;
+            max-width: 480px;
+            background: rgba(10, 20, 35, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            height: fit-content;
+        }
+
+        .panel-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 12px;
+            margin-bottom: 8px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        input[type="text"], textarea {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: white;
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(0, 200, 255, 0.2);
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        .option-emoji-input {
+            width: 50px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .option-text-input {
+            flex: 1;
+        }
+
+        .view-toggle {
+            display: flex;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 4px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 112, 255, 0.3);
+        }
+
+        /* === PREVIEW WORKSPACE === */
+        .preview-workspace {
+            flex: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 24px;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            min-height: 700px;
+            padding: 20px;
+        }
+
+        .preview-info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(0,0,0,0.4);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        /* === INSTAGRAM SQUARE 1:1 POST === */
+        .insta-container {
+            width: 540px;
+            height: 540px;
+            position: relative;
+            overflow: hidden;
+            background: #010a15;
+            border-radius: 12px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .insta-bg {
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 80% 20%, rgba(0, 200, 255, 0.2) 0%, transparent 60%),
+                radial-gradient(circle at 15% 80%, rgba(0, 112, 255, 0.25) 0%, transparent 55%),
+                linear-gradient(135deg, #010810 0%, #031428 50%, #051b36 100%);
+            z-index: 1;
+        }
+
+        .insta-grid {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(0, 200, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 200, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            mask-image: radial-gradient(circle at 50% 50%, black 40%, transparent 80%);
+            -webkit-mask-image: radial-gradient(circle at 50% 50%, black 40%, transparent 80%);
+            z-index: 2;
+        }
+
+        .insta-particles {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            z-index: 3;
+        }
+
+        .insta-content {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 38px;
+        }
+
+        .insta-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .insta-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 200, 255, 0.08);
+            border: 1px solid rgba(0, 200, 255, 0.25);
+            padding: 6px 14px;
+            border-radius: 100px;
+            backdrop-filter: blur(8px);
+        }
+
+        .insta-brand-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 6px var(--accent-cyan);
+        }
+
+        .insta-brand-name {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+        }
+
+        .insta-badge-right {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            background: rgba(255,255,255,0.05);
+            padding: 5px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .insta-main {
+            text-align: center;
+            margin: auto 0;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        .insta-title-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .insta-subtitle {
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 4px;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(0, 200, 255, 0.3);
+        }
+
+        .insta-title {
+            font-size: 38px;
+            font-weight: 900;
+            line-height: 1.05;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+            color: white;
+            text-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .insta-title span.accent-grad {
+            background: linear-gradient(90deg, #ffffff 0%, rgba(255,255,255,0.85) 50%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .insta-open-comment-box {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 380px;
+            margin: 0 auto;
+            width: 100%;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+        .comment-icon {
+            font-size: 32px;
+            background: rgba(0, 200, 255, 0.1);
+            width: 54px;
+            height: 54px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(0, 200, 255, 0.25);
+            color: var(--accent-cyan);
+            box-shadow: 0 0 15px rgba(0, 200, 255, 0.1);
+            animation: bounce-float 3s ease-in-out infinite;
+        }
+        @keyframes bounce-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        .comment-body {
+            flex: 1;
+        }
+        .comment-placeholder {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.4);
+            font-style: italic;
+        }
+        .comment-glow-bar {
+            margin-top: 10px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-cyan), transparent);
+            width: 80%;
+            border-radius: 100px;
+        }
+        .tiktok-open-comment-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(5, 18, 36, 0.75);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 24px 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            text-align: left;
+            position: relative; 
+            overflow: hidden;
+            width: 100%;
+        }
+        .comment-icon-mini {
+            font-size: 24px;
+            background: rgba(0, 200, 255, 0.1);
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(0, 200, 255, 0.25);
+            color: var(--accent-cyan);
+            animation: bounce-float 3s ease-in-out infinite;
+        }
+        .comment-placeholder-mini {
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.4);
+            font-style: italic;
+        }
+        .comment-glow-bar-mini {
+            margin-top: 8px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-cyan), transparent);
+            width: 60%;
+            border-radius: 100px;
+        }
+        .insta-poll-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 380px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .insta-poll-option {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .insta-poll-option::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--accent-cyan);
+            opacity: 0.7;
+        }
+
+        .insta-poll-emoji {
+            font-size: 20px;
+            background: rgba(255,255,255,0.05);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .insta-poll-text {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.85);
+            text-align: left;
+        }
+
+        .insta-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 18px;
+        }
+
+        .insta-prompt {
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: bounce-horizontal 2s infinite;
+        }
+
+        @keyframes bounce-horizontal {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(4px); }
+        }
+
+        .insta-prompt-arrow {
+            color: var(--accent-cyan);
+            font-weight: 900;
+        }
+
+        .insta-url {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.25);
+            letter-spacing: 1.5px;
+        }
+
+        .flag-stripe {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            display: flex;
+            z-index: 15;
+        }
+        .flag-stripe div { flex: 1; }
+        .flag-green { background: #169b62; }
+        .flag-white { background: white; }
+        .flag-orange { background: #ff883e; }
+
+
+        /* === TIKTOK VERTICAL 9:16 POST === */
+        .tiktok-container {
+            width: 360px;
+            height: 640px;
+            position: relative;
+            overflow: hidden;
+            background: #000c1a;
+            border-radius: 16px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
+            display: none;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .tiktok-bg {
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse at 50% 0%, rgba(0, 120, 200, 0.3) 0%, transparent 60%),
+                linear-gradient(180deg, #000a14 0%, #001224 30%, #002244 70%, #003666 100%);
+            z-index: 1;
+        }
+
+        .tiktok-stars {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            z-index: 2;
+        }
+
+        .tiktok-waves {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 180px;
+            z-index: 3;
+            opacity: 0.8;
+        }
+
+        .tiktok-wave-svg {
+            width: 200%;
+            height: 100%;
+            position: absolute;
+            bottom: 0;
+            animation: waveShift 6s linear infinite;
+        }
+
+        @keyframes waveShift {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+        }
+
+        .tiktok-content {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px 28px 30px;
+        }
+
+        .tiktok-header {
+            display: flex;
+            justify-content: center;
+        }
+
+        .tiktok-brand {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(0, 200, 255, 0.12);
+            border: 1px solid rgba(0, 200, 255, 0.35);
+            padding: 6px 14px;
+            border-radius: 100px;
+            backdrop-filter: blur(8px);
+        }
+
+        .tiktok-main {
+            text-align: center;
+            margin: auto 0;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .tiktok-title-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .tiktok-subtitle {
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 5px;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+        }
+
+        .tiktok-title {
+            font-size: 38px;
+            font-weight: 900;
+            line-height: 0.95;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            color: white;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .tiktok-title span.accent-blue-grad {
+            background: linear-gradient(90deg, var(--accent-cyan), #00a2ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: block;
+        }
+
+        .tiktok-poll-box {
+            background: rgba(5, 18, 36, 0.75);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 20px 16px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .tiktok-poll-header {
+            font-size: 11px;
+            font-weight: 800;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+        }
+
+        .tiktok-poll-option {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-align: left;
+        }
+
+        .tiktok-poll-emoji {
+            font-size: 18px;
+            background: rgba(0, 200, 255, 0.1);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(0, 200, 255, 0.2);
+            color: var(--accent-cyan);
+        }
+
+        .tiktok-poll-text {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .tiktok-footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 18px;
+            text-align: center;
+        }
+
+        .tiktok-cta {
+            display: inline-block;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
+            color: white;
+            text-decoration: none;
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 25px rgba(0, 112, 255, 0.4);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .tiktok-cta::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 2.5s infinite;
+        }
+
+        .tiktok-url {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 2px;
+        }
+
+        /* Particles container generator */
+        .particle {
+            position: absolute;
+            background: rgba(0, 200, 255, 0.25);
+            border-radius: 50%;
+            animation: floatUp var(--dur, 8s) linear infinite;
+            animation-delay: var(--delay, 0s);
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(105%) scale(0); opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translateY(-10px) scale(1); opacity: 0; }
+        }
+
+        .stars-sparkle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--dur, 3s) ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.15; }
+            50% { opacity: 0.85; }
+        }
+
+        .screenshot-hint {
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* Toast feedback */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--accent-green);
+            color: #010a15;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 10px 30px rgba(0,255,128,0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-logo">
+            <div class="logo-dot"></div>
+            <span class="logo-text">Irish Fishing Hub</span>
+        </div>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <span class="header-badge">Social Post Builder</span>
+        </div>
+    </header>
+
+    <main>
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <div class="panel-title">Post Designer</div>
+            
+            <div class="form-group">
+                <label>Format Select</label>
+                <div class="view-toggle">
+                    <button class="toggle-btn active" onclick="switchFormat('insta')">Instagram (1:1)</button>
+                    <button class="toggle-btn" onclick="switchFormat('tiktok')">TikTok/Story (9:16)</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Post Style Mode</label>
+                <div class="view-toggle" id="style-mode-toggle">
+                    <button class="toggle-btn" id="btn-mode-poll" onclick="switchStyleMode('poll')">Poll Options</button>
+                    <button class="toggle-btn active" id="btn-mode-open" onclick="switchStyleMode('open')">Open Comments</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Overlay Title Tag</label>
+                <input type="text" id="input-tag" value="Feedback Needed" oninput="updateMockup()">
+            </div>
+
+            <div class="form-group">
+                <label>Main Headline</label>
+                <input type="text" id="input-headline" value="What should we add next?" oninput="updateMockup()">
+            </div>
+
+            <div class="form-group" style="gap: 12px;">
+                <label>Poll Feature Suggestions</label>
+                <div class="options-grid">
+                    <div class="option-input-wrapper">
+                        <input type="text" class="option-emoji-input" id="emoji-1" value="🗺️" maxlength="2" oninput="updateMockup()">
+                        <input type="text" class="option-text-input" id="text-1" value="Coastal Bathymetry Maps" oninput="updateMockup()">
+                    </div>
+                    <div class="option-input-wrapper">
+                        <input type="text" class="option-emoji-input" id="emoji-2" value="💨" maxlength="2" oninput="updateMockup()">
+                        <input type="text" class="option-text-input" id="text-2" value="Wind & Swell Custom Alerts" oninput="updateMockup()">
+                    </div>
+                    <div class="option-input-wrapper">
+                        <input type="text" class="option-emoji-input" id="emoji-3" value="🎣" maxlength="2" oninput="updateMockup()">
+                        <input type="text" class="option-text-input" id="text-3" value="Personal Digital Logbook" oninput="updateMockup()">
+                    </div>
+                    <div class="option-input-wrapper">
+                        <input type="text" class="option-emoji-input" id="emoji-4" value="🏆" maxlength="2" oninput="updateMockup()">
+                        <input type="text" class="option-text-input" id="text-4" value="Local Angler Leaderboard" oninput="updateMockup()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Call To Action</label>
+                <input type="text" id="input-cta" value="Comment Your Ideas Below" oninput="updateMockup()">
+            </div>
+
+            <button onclick="copyIdeaCode()" style="background: rgba(255,255,255,0.06); color: white; border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: all 0.3s; margin-top: 10px;">
+                🔗 Copy Config as Text
+            </button>
+            
+            <div class="screenshot-hint">
+                💡 Tip: Use your browser's screenshot tool or windows snippet (Win+Shift+S) on the workspace area to grab a crisp graphic for socials!
+            </div>
+        </div>
+
+        <!-- Preview Workspace -->
+        <div class="preview-workspace">
+            <div class="preview-info" id="preview-info-label">Mode: Instagram Square (1080x1080 equivalent)</div>
+
+            <!-- Instagram Preview Container -->
+            <div class="insta-container" id="insta-post">
+                <div class="insta-bg"></div>
+                <div class="insta-grid"></div>
+                <div class="insta-particles" id="insta-particles"></div>
+                
+                <div class="insta-content">
+                    <div class="insta-header">
+                        <div class="insta-brand">
+                            <div class="insta-brand-dot"></div>
+                            <span class="insta-brand-name">Irish Fishing Hub</span>
+                        </div>
+                        <div class="insta-badge-right" id="tag-preview-insta">Feedback Needed</div>
+                             <div class="insta-main">
+                        <div class="insta-title-wrapper">
+                            <div class="insta-subtitle">Community Poll</div>
+                            <h2 class="insta-title" id="headline-preview-insta">What should we<br><span class="accent-grad">add next?</span></h2>
+                        </div>
+
+                        <!-- Open comment box preview -->
+                        <div class="insta-open-comment-box" id="insta-comment-box" style="display: flex;">
+                            <div class="comment-icon">💬</div>
+                            <div class="comment-body">
+                                <div class="comment-placeholder">Your brilliant feature ideas...</div>
+                                <div class="comment-glow-bar"></div>
+                            </div>
+                        </div>
+
+                        <div class="insta-poll-options" id="insta-poll-options" style="display: none;">
+                            <div class="insta-poll-option">
+                                <span class="insta-poll-emoji" id="op-emoji-insta-1">🗺️</span>
+                                <span class="insta-poll-text" id="op-text-insta-1">Coastal Bathymetry Maps</span>
+                            </div>
+                            <div class="insta-poll-option">
+                                <span class="insta-poll-emoji" id="op-emoji-insta-2">💨</span>
+                                <span class="insta-poll-text" id="op-text-insta-2">Wind & Swell Custom Alerts</span>
+                            </div>
+                            <div class="insta-poll-option">
+                                <span class="insta-poll-emoji" id="op-emoji-insta-3">🎣</span>
+                                <span class="insta-poll-text" id="op-text-insta-3">Personal Digital Logbook</span>
+                            </div>
+                            <div class="insta-poll-option">
+                                <span class="insta-poll-emoji" id="op-emoji-insta-4">🏆</span>
+                                <span class="insta-poll-text" id="op-text-insta-4">Local Angler Leaderboard</span>
+                            </div>
+                        </div>
+                    </div> </div>
+                    </div>
+
+                    <div class="insta-footer">
+                        <div class="insta-prompt">
+                            <span id="cta-preview-insta">Comment Your Ideas Below</span>
+                            <span class="insta-prompt-arrow">👇</span>
+                        </div>
+                        <span class="insta-url">irishfishinghub.com</span>
+                    </div>
+                </div>
+
+                <!-- Accent stripe -->
+                <div class="flag-stripe">
+                    <div class="flag-green"></div>
+                    <div class="flag-white"></div>
+                    <div class="flag-orange"></div>
+                </div>
+            </div>
+
+            <!-- TikTok Preview Container -->
+            <div class="tiktok-container" id="tiktok-post">
+                <div class="tiktok-bg"></div>
+                <div class="tiktok-stars" id="tiktok-stars"></div>
+                <div class="tiktok-waves">
+                    <!-- Layer 1 -->
+                    <svg viewBox="0 0 720 180" class="tiktok-wave-svg" style="--speed: 6s; opacity: 0.4; bottom: -10px;">
+                        <path d="M0,50 C80,20 160,80 240,50 C320,20 400,80 480,50 C560,20 640,80 720,50 L720,180 L0,180 Z" fill="#0070ff"/>
+                    </svg>
+                    <!-- Layer 2 -->
+                    <svg viewBox="0 0 720 180" class="tiktok-wave-svg" style="--speed: 4s; opacity: 0.6; bottom: -5px;">
+                        <path d="M0,60 C90,30 180,90 270,60 C360,30 450,90 540,60 C630,30 720,60 720,60 L720,180 L0,180 Z" fill="#005f9e"/>
+                    </svg>
+                    <!-- Layer 3 -->
+                    <svg viewBox="0 0 720 180" class="tiktok-wave-svg" style="--speed: 2.5s; bottom: 0;">
+                        <path d="M0,70 C100,50 200,90 300,70 C400,50 500,90 600,70 C700,50 720,70 720,70 L720,180 L0,180 Z" fill="#000c1a"/>
+                    </svg>
+                </div>
+
+                <div class="tiktok-content">
+                    <div class="tiktok-header">
+                        <div class="tiktok-brand">
+                            <div class="insta-brand-dot"></div>
+                            <span class="insta-brand-name">Irish Fishing Hub</span>
+                                        <div class="tiktok-main">
+                        <div class="tiktok-title-wrapper">
+                            <div class="tiktok-subtitle" id="tag-preview-tiktok">Feedback Needed</div>
+                            <h2 class="tiktok-title">
+                                WHAT SHOULD WE
+                                <span class="accent-blue-grad" id="headline-preview-tiktok">ADD NEXT?</span>
+                            </h2>
+                        </div>
+
+                        <!-- Open comment box preview -->
+                        <div class="tiktok-open-comment-box" id="tiktok-comment-box" style="display: flex;">
+                            <div class="comment-icon-mini">💬</div>
+                            <div style="flex:1;">
+                                <div class="comment-placeholder-mini">Your custom features...</div>
+                                <div class="comment-glow-bar-mini"></div>
+                            </div>
+                        </div>
+
+                        <div class="tiktok-poll-box" id="tiktok-poll-box" style="display: none;">
+                            <div class="tiktok-poll-header">Drop a comment for your pick</div>
+                            
+                            <div class="tiktok-poll-option">
+                                <span class="tiktok-poll-emoji" id="op-emoji-tiktok-1">🗺️</span>
+                                <span class="tiktok-poll-text" id="op-text-tiktok-1">Coastal Bathymetry Maps</span>
+                            </div>
+                            <div class="tiktok-poll-option">
+                                <span class="tiktok-poll-emoji" id="op-emoji-tiktok-2">💨</span>
+                                <span class="tiktok-poll-text" id="op-text-tiktok-2">Wind & Swell Custom Alerts</span>
+                            </div>
+                            <div class="tiktok-poll-option">
+                                <span class="tiktok-poll-emoji" id="op-emoji-tiktok-3">🎣</span>
+                                <span class="tiktok-poll-text" id="op-text-tiktok-3">Personal Digital Logbook</span>
+                            </div>
+                            <div class="tiktok-poll-option">
+                                <span class="tiktok-poll-emoji" id="op-emoji-tiktok-4">🏆</span>
+                                <span class="tiktok-poll-text" id="op-text-tiktok-4">Local Angler Leaderboard</span>
+                            </div>
+                        </div>
+                    </div>                     </div>
+                    </div>
+
+                    <div class="tiktok-footer">
+                        <a href="#" class="tiktok-cta" id="cta-preview-tiktok">Comment Your Ideas Below</a>
+                        <div class="tiktok-url">IRISHFISHINGHUB.COM</div>
+                    </div>
+                </div>
+
+                <!-- Accent stripe -->
+                <div class="flag-stripe">
+                    <div class="flag-green"></div>
+                    <div class="flag-white"></div>
+                    <div class="flag-orange"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Success Toast -->
+    <div class="toast" id="copy-toast">
+        <span>✓</span> Copied Config to Clipboard!
+    </div>
+
+    <script>
+        // Init particles for Instagram
+        const instaParticles = document.getElementById('insta-particles');
+        for (let i = 0; i < 20; i++) {
+            const p = document.createElement('div');
+            const size = Math.random() * 3 + 1;
+            p.className = 'particle';
+            p.style.cssText = `
+                width: ${size}px; height: ${size}px;
+                left: ${Math.random() * 100}%;
+                bottom: ${Math.random() * 20}%;
+                --dur: ${Math.random() * 8 + 5}s;
+                --delay: ${Math.random() * 6}s;
+            `;
+            instaParticles.appendChild(p);
+        }
+
+        // Init stars for TikTok
+        const tiktokStars = document.getElementById('tiktok-stars');
+        for (let i = 0; i < 50; i++) {
+            const s = document.createElement('div');
+            const size = Math.random() * 1.5 + 0.5;
+            s.className = 'stars-sparkle';
+            s.style.cssText = `
+                width: ${size}px; height: ${size}px;
+                top: ${Math.random() * 60}%;
+                left: ${Math.random() * 100}%;
+                --dur: ${Math.random() * 3 + 2}s;
+                animation-delay: ${Math.random() * 3}s;
+            `;
+            tiktokStars.appendChild(s);
+        }
+
+        // Format Switcher
+        function switchFormat(format) {
+            const parent = event.target.parentElement;
+            const buttons = parent.querySelectorAll('.toggle-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            event.target.classList.add('active');
+ 
+            const instaPost = document.getElementById('insta-post');
+            const tiktokPost = document.getElementById('tiktok-post');
+            const infoLabel = document.getElementById('preview-info-label');
+ 
+            if (format === 'insta') {
+                instaPost.style.display = 'flex';
+                tiktokPost.style.display = 'none';
+                infoLabel.innerText = "Mode: Instagram Square (1080x1080 equivalent)";
+            } else {
+                instaPost.style.display = 'none';
+                tiktokPost.style.display = 'flex';
+                infoLabel.innerText = "Mode: TikTok/Story Vertical (1080x1920 equivalent)";
+            }
+        }
+
+        // Style Mode Switcher (Poll vs Open Comment)
+        function switchStyleMode(mode) {
+            const btnPoll = document.getElementById('btn-mode-poll');
+            const btnOpen = document.getElementById('btn-mode-open');
+            
+            const instaPoll = document.getElementById('insta-poll-options');
+            const instaComment = document.getElementById('insta-comment-box');
+            
+            const tiktokPoll = document.getElementById('tiktok-poll-box');
+            const tiktokComment = document.getElementById('tiktok-comment-box');
+            
+            if (mode === 'poll') {
+                btnPoll.classList.add('active');
+                btnOpen.classList.remove('active');
+                
+                instaPoll.style.display = 'flex';
+                instaComment.style.display = 'none';
+                
+                tiktokPoll.style.display = 'flex';
+                tiktokComment.style.display = 'none';
+            } else {
+                btnPoll.classList.remove('active');
+                btnOpen.classList.add('active');
+                
+                instaPoll.style.display = 'none';
+                instaComment.style.display = 'flex';
+                
+                tiktokPoll.style.display = 'none';
+                tiktokComment.style.display = 'flex';
+            }
+        }
+
+        // Update live preview labels from input fields
+        function updateMockup() {
+            const tagVal = document.getElementById('input-tag').value;
+            const headlineVal = document.getElementById('input-headline').value;
+            const ctaVal = document.getElementById('input-cta').value;
+
+            // Header tag
+            document.getElementById('tag-preview-insta').innerText = tagVal;
+            document.getElementById('tag-preview-tiktok').innerText = tagVal;
+
+            // Headline
+            // Format headline for instagram (split words if long)
+            const words = headlineVal.split(" ");
+            if (words.length > 2) {
+                const mid = Math.ceil(words.length / 2);
+                const part1 = words.slice(0, mid).join(" ");
+                const part2 = words.slice(mid).join(" ");
+                document.getElementById('headline-preview-insta').innerHTML = `${part1}<br><span class="accent-grad">${part2}</span>`;
+            } else {
+                document.getElementById('headline-preview-insta').innerHTML = `${headlineVal}`;
+            }
+            
+            document.getElementById('headline-preview-tiktok').innerText = headlineVal.toUpperCase();
+
+            // Poll options
+            for (let i = 1; i <= 4; i++) {
+                const emoji = document.getElementById(`emoji-${i}`).value;
+                const text = document.getElementById(`text-${i}`).value;
+
+                document.getElementById(`op-emoji-insta-${i}`).innerText = emoji;
+                document.getElementById(`op-text-insta-${i}`).innerText = text;
+
+                document.getElementById(`op-emoji-tiktok-${i}`).innerText = emoji;
+                document.getElementById(`op-text-tiktok-${i}`).innerText = text;
+            }
+
+            // CTA
+            document.getElementById('cta-preview-insta').innerText = ctaVal;
+            document.getElementById('cta-preview-tiktok').innerText = ctaVal.toUpperCase();
+        }
+
+        // Copy config helper
+        function copyIdeaCode() {
+            const config = {
+                tag: document.getElementById('input-tag').value,
+                headline: document.getElementById('input-headline').value,
+                options: [
+                    { emoji: document.getElementById('emoji-1').value, text: document.getElementById('text-1').value },
+                    { emoji: document.getElementById('emoji-2').value, text: document.getElementById('text-2').value },
+                    { emoji: document.getElementById('emoji-3').value, text: document.getElementById('text-3').value },
+                    { emoji: document.getElementById('emoji-4').value, text: document.getElementById('text-4').value }
+                ],
+                cta: document.getElementById('input-cta').value
+            };
+
+            const textStr = JSON.stringify(config, null, 2);
+            navigator.clipboard.writeText(textStr).then(() => {
+                const toast = document.getElementById('copy-toast');
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 2500);
+            });
+        }
+    </script>
+</body>
+</html>

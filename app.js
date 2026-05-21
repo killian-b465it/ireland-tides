@@ -1095,26 +1095,118 @@ async function loadShopsToMainMap() {
     state.shopMarkers.addLayer(marker);
   });
 
-  // Load admin-added shops from Firebase
+  // Load admin-added locations from Firebase
   try {
     const snapshot = await firebase.database().ref('locations').once('value');
     const data = snapshot.val();
     if (data) {
-      // Sea shops
-      if (data.sea && data.sea.shops) {
-        Object.values(data.sea.shops).forEach(shop => {
-          if (shop.id) addFirebaseShopMarker(shop);
-        });
+      // Parse Sea locations into adminLocations
+      if (data.sea) {
+        adminLocations.sea.piers = Object.values(data.sea.piers || {});
+        adminLocations.sea.ramps = Object.values(data.sea.ramps || {});
+        adminLocations.sea.harbours = Object.values(data.sea.harbours || {});
+        adminLocations.sea.shops = Object.values(data.sea.shops || {});
       }
-      // Freshwater shops
-      if (data.freshwater && data.freshwater.shops) {
-        Object.values(data.freshwater.shops).forEach(shop => {
-          if (shop.id) addFirebaseShopMarker(shop);
-        });
+
+      // Parse Freshwater locations into adminLocations
+      if (data.freshwater) {
+        adminLocations.freshwater.spots = Object.values(data.freshwater.spots || {});
+        adminLocations.freshwater.parks = Object.values(data.freshwater.parks || {});
+        adminLocations.freshwater.ramps = Object.values(data.freshwater.ramps || {});
+        adminLocations.freshwater.piers = Object.values(data.freshwater.piers || {});
+        adminLocations.freshwater.shops = Object.values(data.freshwater.shops || {});
       }
+
+      // Repopulate all main map layers with combined custom locations
+      repopulateMapLayers();
     }
   } catch (err) {
-    console.warn('Failed to load admin shops:', err);
+    console.warn('Failed to load admin locations from Firebase:', err);
+  }
+}
+
+// Dynamically repopulates all map layers with merged static + custom data
+function repopulateMapLayers() {
+  if (!state.map) return;
+
+  // 1. Sea Piers
+  if (state.pierMarkers) {
+    state.pierMarkers.clearLayers();
+    const customPiers = (adminLocations.sea && adminLocations.sea.piers) || [];
+    const allPiers = [...PIERS, ...customPiers];
+    allPiers.filter(p => p.country === state.currentRegion).forEach(pier => {
+      addPierMarker(pier);
+    });
+  }
+
+  // 2. Sea Ramps
+  if (state.rampMarkers) {
+    state.rampMarkers.clearLayers();
+    const customRamps = (adminLocations.sea && adminLocations.sea.ramps) || [];
+    const allRamps = [...BOAT_RAMPS, ...customRamps];
+    allRamps.filter(r => r.country === state.currentRegion).forEach(ramp => {
+      addRampMarker(ramp);
+    });
+  }
+
+  // 3. Sea Harbours
+  if (state.harbourMarkers) {
+    state.harbourMarkers.clearLayers();
+    const customHarbours = (adminLocations.sea && adminLocations.sea.harbours) || [];
+    const allHarbours = [...HARBOURS, ...customHarbours];
+    allHarbours.filter(h => h.country === state.currentRegion).forEach(harbour => {
+      addHarbourMarker(harbour);
+    });
+  }
+
+  // 4. Tackle Shops (Freshwater + Sea Shops from Firebase)
+  if (state.shopMarkers) {
+    // Clear and add static shops first
+    state.shopMarkers.clearLayers();
+    TACKLE_SHOPS.filter(s => s.country === state.currentRegion).forEach(shop => {
+      const icon = L.divIcon({
+        className: 'shop-marker-wrapper',
+        html: '<div class="shop-marker">🏪</div>',
+        iconSize: [28, 28],
+        iconAnchor: [14, 14]
+      });
+      const marker = L.marker([shop.lat, shop.lng || shop.lon], { icon })
+        .bindPopup(`
+          <div class="popup-content">
+            <strong>${shop.name}</strong>
+            <span class="popup-type">Tackle Shop</span>
+            ${shop.address ? `<p style="font-size:0.8rem;margin:4px 0">${shop.address}</p>` : ''}
+            ${shop.phone ? `<a href="tel:${shop.phone}" style="font-size:0.8rem">📞 ${shop.phone}</a>` : ''}
+            <button class="popup-directions-btn" onclick="getDirections(${shop.lat}, ${shop.lng || shop.lon})">📍 Get Directions</button>
+          </div>
+        `);
+      state.shopMarkers.addLayer(marker);
+    });
+
+    // Add custom shops
+    const customShops = [
+      ...((adminLocations.sea && adminLocations.sea.shops) || []),
+      ...((adminLocations.freshwater && adminLocations.freshwater.shops) || [])
+    ];
+    customShops.forEach(shop => {
+      if (shop.id) addFirebaseShopMarker(shop);
+    });
+  }
+
+  // 5. Freshwater Layers
+  renderFreshwaterSpots();
+  renderFreshwaterParks();
+  renderFreshwaterRamps();
+  renderFreshwaterPiers();
+
+  // 6. Refresh Visible Layers based on current filter check boxes
+  if (typeof state.activeFilters !== 'undefined') {
+    applyFilters(false);
+  }
+  
+  const fwSidebar = document.getElementById('freshwater-filter-sidebar');
+  if (fwSidebar) {
+    applyFreshwaterFilters(false);
   }
 }
 
@@ -2951,7 +3043,10 @@ function renderFreshwaterSpots() {
     freshwaterMarkerGroup.clearLayers();
   }
 
-  FRESHWATER_SPOTS.filter(s => !s.country || s.country === state.currentRegion).forEach(spot => {
+  const customSpots = (adminLocations.freshwater && adminLocations.freshwater.spots) || [];
+  const allSpots = [...FRESHWATER_SPOTS, ...customSpots];
+
+  allSpots.filter(s => !s.country || s.country === state.currentRegion).forEach(spot => {
     const icon = L.divIcon({
       className: 'freshwater-marker',
       html: '🐟', // Standardized to match filter emoji
@@ -2959,21 +3054,25 @@ function renderFreshwaterSpots() {
       iconAnchor: [14, 14]
     });
 
+    const speciesList = Array.isArray(spot.species) 
+      ? spot.species.join(', ') 
+      : (spot.species || 'Various');
+
     const popupContent = `
       <div class="freshwater-popup">
         <h3>${spot.name}</h3>
-        <p><strong>Type:</strong> ${spot.type}</p>
-        <p><strong>Species:</strong> ${spot.species.join(', ')}</p>
-        ${spot.notes ? `<p><em>${spot.notes}</em></p>` : ''}
+        <p><strong>Type:</strong> ${spot.type || 'Fishing Spot'}</p>
+        <p><strong>Species:</strong> ${speciesList}</p>
+        ${spot.notes || spot.description ? `<p><em>${spot.notes || spot.description}</em></p>` : ''}
         ${spot.licenseRequired
-        ? `<a href="${spot.licenseUrl}" target="_blank" class="license-btn">🎫 ${spot.licenseType} - Get Info</a>`
+        ? `<a href="${spot.licenseUrl || '#'}" target="_blank" class="license-btn">🎫 ${spot.licenseType || 'State License'} - Get Info</a>`
         : '<span class="no-license">✅ No State License Required</span>'
       }
-        <a href="https://www.google.com/maps/dir/?api=1&destination=${spot.lat},${spot.lng}" target="_blank" class="directions-btn">📍 Get Directions</a>
+        <a href="https://www.google.com/maps/dir/?api=1&destination=${spot.lat},${spot.lng || spot.lon}" target="_blank" class="directions-btn">📍 Get Directions</a>
       </div>
     `;
 
-    const marker = L.marker([spot.lat, spot.lng], { icon })
+    const marker = L.marker([spot.lat, spot.lng || spot.lon], { icon })
       .bindPopup(popupContent);
 
     freshwaterMarkerGroup.addLayer(marker);
@@ -2996,7 +3095,10 @@ function renderFreshwaterParks() {
     freshwaterParksGroup.clearLayers();
   }
 
-  FRESHWATER_PARKS.filter(p => !p.country || p.country === state.currentRegion).forEach(park => {
+  const customParks = (adminLocations.freshwater && adminLocations.freshwater.parks) || [];
+  const allParks = [...FRESHWATER_PARKS, ...customParks];
+
+  allParks.filter(p => !p.country || p.country === state.currentRegion).forEach(park => {
     const icon = L.divIcon({
       className: 'freshwater-park-marker',
       html: '🏞️', // Standardized to match filter emoji
@@ -3004,18 +3106,22 @@ function renderFreshwaterParks() {
       iconAnchor: [14, 14]
     });
 
+    const speciesList = Array.isArray(park.species) 
+      ? park.species.join(', ') 
+      : (park.species || 'Various');
+
     const popupContent = `
       <div class="freshwater-popup">
         <h3>🏕️ ${park.name}</h3>
-        <p><strong>County:</strong> ${park.county}</p>
-        <p><strong>Species:</strong> ${park.species.join(', ')}</p>
-        ${park.notes ? `<p><em>${park.notes}</em></p>` : ''}
+        <p><strong>County:</strong> ${park.county || 'Ireland'}</p>
+        <p><strong>Species:</strong> ${speciesList}</p>
+        ${park.notes || park.description ? `<p><em>${park.notes || park.description}</em></p>` : ''}
         ${park.website ? `<a href="${park.website}" target="_blank" class="license-btn">🌐 Visit Website</a>` : ''}
-        <a href="https://www.google.com/maps/dir/?api=1&destination=${park.lat},${park.lng}" target="_blank" class="directions-btn">📍 Get Directions</a>
+        <a href="https://www.google.com/maps/dir/?api=1&destination=${park.lat},${park.lng || park.lon}" target="_blank" class="directions-btn">📍 Get Directions</a>
       </div>
     `;
 
-    const marker = L.marker([park.lat, park.lng], { icon })
+    const marker = L.marker([park.lat, park.lng || park.lon], { icon })
       .bindPopup(popupContent);
 
     freshwaterParksGroup.addLayer(marker);
@@ -3033,7 +3139,10 @@ function renderFreshwaterRamps() {
     freshwaterRampsGroup.clearLayers();
   }
 
-  FRESHWATER_RAMPS.filter(r => !r.country || r.country === state.currentRegion).forEach(ramp => {
+  const customRamps = (adminLocations.freshwater && adminLocations.freshwater.ramps) || [];
+  const allRamps = [...FRESHWATER_RAMPS, ...customRamps];
+
+  allRamps.filter(r => !r.country || r.country === state.currentRegion).forEach(ramp => {
     const icon = L.divIcon({
       className: 'freshwater-ramp-marker',
       html: '🚤',
@@ -3044,14 +3153,14 @@ function renderFreshwaterRamps() {
     const popupContent = `
       <div class="freshwater-popup">
         <h3>🚤 ${ramp.name}</h3>
-        <p><strong>Waterway:</strong> ${ramp.waterway}</p>
-        <p><strong>Type:</strong> ${ramp.type}</p>
-        ${ramp.notes ? `<p><em>${ramp.notes}</em></p>` : ''}
-        <a href="https://www.google.com/maps/dir/?api=1&destination=${ramp.lat},${ramp.lng}" target="_blank" class="directions-btn">📍 Get Directions</a>
+        <p><strong>Waterway:</strong> ${ramp.waterway || 'Freshwater'}</p>
+        <p><strong>Type:</strong> ${ramp.type || 'Boat Ramp'}</p>
+        ${ramp.notes || ramp.description ? `<p><em>${ramp.notes || ramp.description}</em></p>` : ''}
+        <a href="https://www.google.com/maps/dir/?api=1&destination=${ramp.lat},${ramp.lng || ramp.lon}" target="_blank" class="directions-btn">📍 Get Directions</a>
       </div>
     `;
 
-    const marker = L.marker([ramp.lat, ramp.lng], { icon })
+    const marker = L.marker([ramp.lat, ramp.lng || ramp.lon], { icon })
       .bindPopup(popupContent);
 
     freshwaterRampsGroup.addLayer(marker);
@@ -3069,7 +3178,10 @@ function renderFreshwaterPiers() {
     freshwaterPiersGroup.clearLayers();
   }
 
-  FRESHWATER_PIERS.filter(p => !p.country || p.country === state.currentRegion).forEach(pier => {
+  const customPiers = (adminLocations.freshwater && adminLocations.freshwater.piers) || [];
+  const allPiers = [...FRESHWATER_PIERS, ...customPiers];
+
+  allPiers.filter(p => !p.country || p.country === state.currentRegion).forEach(pier => {
     const icon = L.divIcon({
       className: 'freshwater-pier-marker',
       html: '🎣',
@@ -3081,14 +3193,14 @@ function renderFreshwaterPiers() {
     const popupContent = `
       <div class="freshwater-popup">
         <h3>🎣 ${pier.name}</h3>
-        <p><strong>Waterway:</strong> ${pier.waterway}</p>
-        ${pier.accessible ? `<p class="accessible-badge">♿ Wheelchair Accessible</p>` : ''}
-        ${pier.notes ? `<p><em>${pier.notes}</em></p>` : ''}
-        <a href="https://www.google.com/maps/dir/?api=1&destination=${pier.lat},${pier.lng}" target="_blank" class="directions-btn">📍 Get Directions</a>
+        <p><strong>Waterway:</strong> ${pier.waterway || 'Freshwater'}</p>
+        ${accessibleBadge ? `<p class="accessible-badge">♿ Wheelchair Accessible</p>` : ''}
+        ${pier.notes || pier.description ? `<p><em>${pier.notes || pier.description}</em></p>` : ''}
+        <a href="https://www.google.com/maps/dir/?api=1&destination=${pier.lat},${pier.lng || pier.lon}" target="_blank" class="directions-btn">📍 Get Directions</a>
       </div>
     `;
 
-    const marker = L.marker([pier.lat, pier.lng], { icon })
+    const marker = L.marker([pier.lat, pier.lng || pier.lon], { icon })
       .bindPopup(popupContent);
 
     freshwaterPiersGroup.addLayer(marker);
@@ -5698,13 +5810,20 @@ function loadAdminLocations() {
     adminMarkers.addLayer(marker);
   });
 
-  // Update location list
-  renderAdminLocationList(locations);
-  document.getElementById('admin-location-count').textContent = `(${locations.length})`;
+  // Update location list with defensive null check
+  const listContainer = document.getElementById('admin-location-list');
+  if (listContainer) {
+    renderAdminLocationList(locations);
+  }
+  const countEl = document.getElementById('admin-location-count');
+  if (countEl) {
+    countEl.textContent = `(${locations.length})`;
+  }
 }
 
 function renderAdminLocationList(locations) {
   const container = document.getElementById('admin-location-list');
+  if (!container) return;
   const typeIcons = { pier: '🎣', ramp: '🚤', harbour: '🛥️', spot: '🐟', park: '🌲', shop: '🏪' };
 
   container.innerHTML = locations.map(loc => {
