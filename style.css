@@ -5993,6 +5993,12 @@ input:checked+.toggle-slider:before {
     color: #fff;
 }
 
+/* Reset Leaflet default divIcon background and border styles once and for all */
+.leaflet-div-icon {
+    background: transparent !important;
+    border: none !important;
+}
+
 /* Perfect Center Anchoring for Leaflet DivIcons to prevent moving/sliding on zoom */
 .tide-marker-wrapper,
 .shop-marker-wrapper,
@@ -6006,10 +6012,6 @@ input:checked+.toggle-slider:before {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    width: 28px !important;
-    height: 28px !important;
-    margin: 0 !important;
-    padding: 0 !important;
     overflow: visible !important;
 }
 
@@ -6035,5 +6037,6 @@ input:checked+.toggle-slider:before {
     box-sizing: border-box !important;
     transform-origin: center center !important;
 }
+
 
 
