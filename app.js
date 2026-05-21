@@ -483,7 +483,13 @@ const FRESHWATER_PARKS = [
   { id: 'angling_for_all', name: 'Angling for All (Aughrim)', lat: 52.85, lng: -6.32, county: 'Wicklow', species: ['Rainbow Trout', 'Brown Trout'], notes: 'National disabled facility. Year round.', website: null },
   { id: 'tinnehinch', name: 'Tinnehinch Fly Fishery', lat: 53.18, lng: -6.17, county: 'Wicklow', species: ['Rainbow Trout'], notes: 'Enniskerry. Open all year.', website: null, country: 'IE' },
   { id: 'annamoe_fishery', name: 'Annamoe Trout Fishery', lat: 53.05, lng: -6.25, county: 'Wicklow', species: ['Rainbow Trout', 'Brown Trout'], notes: 'Near Glendalough. Fly & bait.', website: null, country: 'IE' },
-  { id: 'rathcon_fishery', name: 'Rathcon Trout Fishery', lat: 53.02, lng: -6.28, county: 'Wicklow', species: ['Rainbow Trout'], notes: '8.5 acre lake. Open all year.', website: null, country: 'IE' }
+  { id: 'rathcon_fishery', name: 'Rathcon Trout Fishery', lat: 53.02, lng: -6.28, county: 'Wicklow', species: ['Rainbow Trout'], notes: '8.5 acre lake. Open all year.', website: null, country: 'IE' },
+  { id: 'loch_mahon_wexford', name: 'Loch Mahon Fishing Lakes', lat: 52.3780, lng: -6.6430, county: 'Wexford', species: ['Rainbow Trout', 'Brown Trout', 'Carp', 'Roach', 'Tench'], notes: 'Adamstown, Enniscorthy. Three spring-fed lakes, specimen carp & coarse lake.', website: 'https://lochmahon.com/', country: 'IE' },
+  { id: 'linear_fisheries_oxford', name: 'Linear Fisheries', lat: 51.7280, lng: -1.4110, county: 'Oxfordshire', species: ['Carp', 'Pike', 'Tench', 'Roach'], notes: 'Witney. The premier day-ticket carp complex in the UK.', website: 'https://www.linear-fisheries.co.uk/', country: 'UK' },
+  { id: 'bluebell_lakes_oundle', name: 'Bluebell Lakes', lat: 52.5204, lng: -0.4516, county: 'Northamptonshire', species: ['Carp', 'Pike', 'Bream', 'Tench'], notes: 'Tansor, Oundle. Famous specimen carp waters (Kingfisher Lake).', website: 'http://www.bluebelllakes.co.uk/', country: 'UK' },
+  { id: 'avington_trout_fishery', name: 'Avington Trout Fishery', lat: 51.0925, lng: -1.2260, county: 'Hampshire', species: ['Rainbow Trout', 'Brown Trout'], notes: 'Winchester. Famous crystal-clear stillwater stalking trout fishery.', website: 'https://www.avingtontrout.org.uk/', country: 'UK' },
+  { id: 'anglers_paradise_devon', name: 'Anglers Paradise', lat: 50.7863, lng: -4.2103, county: 'Devon', species: ['Carp', 'Rainbow Trout', 'Catfish', 'Perch'], notes: 'Halwill. Famous holiday park with 30 fishing lakes.', website: 'https://www.anglers-paradise.co.uk/', country: 'UK' },
+  { id: 'redmire_pool_hereford', name: 'Redmire Pool', lat: 51.8545, lng: -2.6325, county: 'Herefordshire', species: ['Carp'], notes: 'The legendary birthplace of modern UK carp fishing.', website: 'https://www.carpsociety.com/', country: 'UK' }
 ];
 
 // ============================================
