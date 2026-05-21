@@ -208,7 +208,12 @@ const PIERS = [
   { name: 'Deal Pier', lat: 51.2225, lon: 1.4055, country: 'UK' },
   { name: 'Brighton Marina', lat: 50.8115, lon: -0.1015, country: 'UK' },
   { name: 'Hastings Pier', lat: 50.8525, lon: 0.5739, country: 'UK' },
-  { name: 'Blackpool North Pier', lat: 53.8181, lon: -3.0583, country: 'UK' }
+  { name: 'Blackpool North Pier', lat: 53.8181, lon: -3.0583, country: 'UK' },
+  { name: 'Roker Pier', lat: 54.9215, lon: -1.3530, country: 'UK' },
+  { name: 'Holyhead Breakwater', lat: 53.3225, lon: -4.6395, country: 'UK' },
+  { name: "St Ives Smeaton's Pier", lat: 50.2155, lon: -5.4785, country: 'UK' },
+  { name: 'Middleton Pier', lat: 54.6935, lon: -1.1895, country: 'UK' },
+  { name: 'Ayr Harbour Pier', lat: 55.4665, lon: -4.6415, country: 'UK' }
 ];
 
 // ============================================
@@ -247,7 +252,10 @@ const BOAT_RAMPS = [
   { name: 'Cardiff Bay Slipway', lat: 51.4505, lon: -3.1615, country: 'UK' },
   { name: 'Liverpool Marina Slip', lat: 53.3884, lon: -2.9716, country: 'UK' },
   { name: 'Blackpool Slipway', lat: 53.8181, lon: -3.0583, country: 'UK' },
-  { name: 'Aberdeen Nigg Bay Slip', lat: 57.1355, lon: -2.0525, country: 'UK' }
+  { name: 'Aberdeen Nigg Bay Slip', lat: 57.1355, lon: -2.0525, country: 'UK' },
+  { name: 'Weymouth Slipway', lat: 50.6075, lon: -2.4465, country: 'UK' },
+  { name: 'St Ives Harbour Slipway', lat: 50.2145, lon: -5.4795, country: 'UK' },
+  { name: 'Largs Marina Slipway', lat: 55.7725, lon: -4.8585, country: 'UK' }
 ];
 
 // ============================================
@@ -314,7 +322,11 @@ const HARBOURS = [
   { name: 'Padstow Harbour', lat: 50.5415, lon: -4.9355, country: 'UK' },
   { name: 'Whitehaven Harbour', lat: 54.5495, lon: -3.5935, country: 'UK' },
   { name: 'Eyemouth Harbour', lat: 55.8715, lon: -2.0885, country: 'UK' },
-  { name: 'Oban North Pier', lat: 56.4155, lon: -5.4765, country: 'UK' }
+  { name: 'Oban North Pier', lat: 56.4155, lon: -5.4765, country: 'UK' },
+  { name: 'Whitby Harbour', lat: 54.4885, lon: -0.6125, country: 'UK' },
+  { name: 'Falmouth Custom House Quay', lat: 50.1525, lon: -5.0685, country: 'UK' },
+  { name: 'Crail Harbour', lat: 56.2585, lon: -2.6245, country: 'UK' },
+  { name: 'Pittenweem Harbour', lat: 56.2125, lon: -2.7295, country: 'UK' }
 ];
 
 
@@ -507,7 +519,9 @@ const FRESHWATER_RAMPS = [
   { id: 'lough_key_slip', name: 'Lough Key Slipway', lat: 53.97, lng: -8.17, waterway: 'Lough Key', type: 'Public', notes: 'Forest park access.' },
   { id: 'enniskillen_slip', name: 'Enniskillen Slipway', lat: 54.35, lng: -7.63, waterway: 'Lower Lough Erne', type: 'Public', notes: 'NI. Waterways Ireland.' },
   { id: 'belturbet_slip', name: 'Belturbet Slipway', lat: 54.10, lng: -7.45, waterway: 'River Erne', type: 'Public', notes: 'Border area access.', country: 'IE' },
-  { id: 'graiguenamanagh', name: 'Graiguenamanagh Slipway', lat: 52.54, lng: -6.95, waterway: 'River Barrow', type: 'Public', notes: 'Barrow Navigation.', country: 'IE' }
+  { id: 'graiguenamanagh', name: 'Graiguenamanagh Slipway', lat: 52.54, lng: -6.95, waterway: 'River Barrow', type: 'Public', notes: 'Barrow Navigation.', country: 'IE' },
+  { id: 'windermere_slipway', name: 'Windermere Ferry Nab Slipway', lat: 54.3545, lng: -2.9185, waterway: 'Windermere', type: 'Public', notes: 'Main public launch point on Windermere.', country: 'UK' },
+  { id: 'loch_lomond_slipway', name: 'Loch Lomond Balloch Castle Slipway', lat: 56.0095, lng: -4.5935, waterway: 'Loch Lomond', type: 'Public', notes: 'Excellent slipway at Balloch Castle Country Park.', country: 'UK' }
 ];
 
 // ============================================
@@ -523,7 +537,8 @@ const FRESHWATER_PIERS = [
   { id: 'cootehill_stand', name: 'Cootehill Lake Stand', lat: 54.07, lng: -7.08, waterway: 'Cootehill Lakes', accessible: false, notes: 'Cavan. Pike & bream.' },
   { id: 'virginia_stand', name: 'Virginia Lake Stand', lat: 53.83, lng: -7.08, waterway: 'Virginia Lake', accessible: true, notes: 'Disabled facilities.' },
   { id: 'mullingar_stand', name: 'Lough Ennell Stand', lat: 53.45, lng: -7.40, waterway: 'Lough Ennell', accessible: false, notes: 'Westmeath. Trout fishing.', country: 'IE' },
-  { id: 'carrick_stand', name: 'Carrick-on-Shannon Stand', lat: 53.94, lng: -8.09, waterway: 'River Shannon', accessible: true, notes: 'Town centre. Coarse fishing.', country: 'IE' }
+  { id: 'carrick_stand', name: 'Carrick-on-Shannon Stand', lat: 53.94, lng: -8.09, waterway: 'River Shannon', accessible: true, notes: 'Town centre. Coarse fishing.', country: 'IE' },
+  { id: 'derwentwater_platform', name: 'Derwentwater Kettlewell Platform', lat: 54.5825, lng: -3.1415, waterway: 'Derwentwater', accessible: true, notes: 'Scenic accessible fishing platform near Keswick.', country: 'UK' }
 ];
 
 // ============================================
@@ -5272,7 +5287,12 @@ const TACKLE_SHOPS = [
   { name: "Angling Direct (Birmingham)", county: "West Midlands", address: "Unit 1, 1-3 High St, Birmingham", phone: "0121 212 8888", website: "https://www.anglingdirect.co.uk", lat: 52.4862, lng: -1.8904, rating: 4.7, country: 'UK' },
   { name: "Angling Direct (Manchester)", county: "Greater Manchester", address: "Unit 1, 1-3 Deansgate, Manchester", phone: "0161 212 8888", website: "https://www.anglingdirect.co.uk", lat: 53.4808, lng: -2.2426, rating: 4.6, country: 'UK' },
   { name: "Angling Direct (Norwich)", county: "Norfolk", address: "Unit 1, 1-3 Plumstead Rd, Norwich", phone: "01603 212 888", website: "https://www.anglingdirect.co.uk", lat: 52.6309, lng: 1.2974, rating: 4.8, country: 'UK' },
-  { name: "Veals Mail Order", county: "Bristol", address: "Unit 2, 1-3 Brunel Lock Rd, Bristol", phone: "0117 926 2222", website: "https://www.veals.co.uk", lat: 51.4545, lng: -2.5879, rating: 4.9, country: 'UK' }
+  { name: "Veals Mail Order", county: "Bristol", address: "Unit 2, 1-3 Brunel Lock Rd, Bristol", phone: "0117 926 2222", website: "https://www.veals.co.uk", lat: 51.4545, lng: -2.5879, rating: 4.9, country: 'UK' },
+  { name: "ABC Fishing Tackle Specialists", county: "Dublin", address: "Smithfield, Dublin 7", phone: "01 873 2187", website: "", lat: 53.3485, lng: -6.2778, rating: 4.5 },
+  { name: "Halfway Angling Centre", county: "Cork", address: "Halfway, Ballinhassig, Co. Cork", phone: "021 488 5800", website: "", lat: 51.8155, lng: -8.5410, rating: 4.7 },
+  { name: "Corrib Tackle", county: "Galway", address: "Liosban Industrial Estate, Galway", phone: "091 762 931", website: "https://www.corribtackle.com", lat: 53.2872, lng: -9.0395, rating: 4.8 },
+  { name: "Tight Lines Belfast", county: "Antrim", address: "198 Albert Bridge Rd, Belfast", phone: "028 9045 4488", website: "", lat: 54.5955, lng: -5.9085, rating: 4.6 },
+  { name: "Farlows Pall Mall", county: "London", address: "9 Pall Mall, London SW1Y 5NP", phone: "020 7484 1000", website: "https://www.farlows.co.uk", lat: 51.5074, lng: -0.1308, rating: 4.8, country: 'UK' }
 ];
 
 // Ensure all static data is tagged with country: 'IE' if not specified
