@@ -1155,7 +1155,7 @@ function repopulateMapLayers() {
     state.pierMarkers.clearLayers();
     const customPiers = (adminLocations.sea && adminLocations.sea.piers) || [];
     const allPiers = [...PIERS, ...customPiers];
-    allPiers.filter(p => p.country === state.currentRegion).forEach(pier => {
+    allPiers.filter(p => (p.country || 'IE') === state.currentRegion).forEach(pier => {
       addPierMarker(pier);
     });
   }
@@ -1165,7 +1165,7 @@ function repopulateMapLayers() {
     state.rampMarkers.clearLayers();
     const customRamps = (adminLocations.sea && adminLocations.sea.ramps) || [];
     const allRamps = [...BOAT_RAMPS, ...customRamps];
-    allRamps.filter(r => r.country === state.currentRegion).forEach(ramp => {
+    allRamps.filter(r => (r.country || 'IE') === state.currentRegion).forEach(ramp => {
       addRampMarker(ramp);
     });
   }
@@ -1175,7 +1175,7 @@ function repopulateMapLayers() {
     state.harbourMarkers.clearLayers();
     const customHarbours = (adminLocations.sea && adminLocations.sea.harbours) || [];
     const allHarbours = [...HARBOURS, ...customHarbours];
-    allHarbours.filter(h => h.country === state.currentRegion).forEach(harbour => {
+    allHarbours.filter(h => (h.country || 'IE') === state.currentRegion).forEach(harbour => {
       addHarbourMarker(harbour);
     });
   }
@@ -1184,7 +1184,7 @@ function repopulateMapLayers() {
   if (state.shopMarkers) {
     // Clear and add static shops first
     state.shopMarkers.clearLayers();
-    TACKLE_SHOPS.filter(s => s.country === state.currentRegion).forEach(shop => {
+    TACKLE_SHOPS.filter(s => (s.country || 'IE') === state.currentRegion).forEach(shop => {
       const icon = L.divIcon({
         className: 'shop-marker-wrapper',
         html: '<div class="shop-marker">🏪</div>',
@@ -1209,7 +1209,7 @@ function repopulateMapLayers() {
       ...((adminLocations.sea && adminLocations.sea.shops) || []),
       ...((adminLocations.freshwater && adminLocations.freshwater.shops) || [])
     ];
-    customShops.forEach(shop => {
+    customShops.filter(s => (s.country || 'IE') === state.currentRegion).forEach(shop => {
       if (shop.id) addFirebaseShopMarker(shop);
     });
   }
@@ -3067,7 +3067,7 @@ function renderFreshwaterSpots() {
   const customSpots = (adminLocations.freshwater && adminLocations.freshwater.spots) || [];
   const allSpots = [...FRESHWATER_SPOTS, ...customSpots];
 
-  allSpots.filter(s => !s.country || s.country === state.currentRegion).forEach(spot => {
+  allSpots.filter(s => (s.country || 'IE') === state.currentRegion).forEach(spot => {
     const icon = L.divIcon({
       className: 'freshwater-marker',
       html: '🐟', // Standardized to match filter emoji
@@ -3119,7 +3119,7 @@ function renderFreshwaterParks() {
   const customParks = (adminLocations.freshwater && adminLocations.freshwater.parks) || [];
   const allParks = [...FRESHWATER_PARKS, ...customParks];
 
-  allParks.filter(p => !p.country || p.country === state.currentRegion).forEach(park => {
+  allParks.filter(p => (p.country || 'IE') === state.currentRegion).forEach(park => {
     const icon = L.divIcon({
       className: 'freshwater-park-marker',
       html: '🏞️', // Standardized to match filter emoji
@@ -3163,7 +3163,7 @@ function renderFreshwaterRamps() {
   const customRamps = (adminLocations.freshwater && adminLocations.freshwater.ramps) || [];
   const allRamps = [...FRESHWATER_RAMPS, ...customRamps];
 
-  allRamps.filter(r => !r.country || r.country === state.currentRegion).forEach(ramp => {
+  allRamps.filter(r => (r.country || 'IE') === state.currentRegion).forEach(ramp => {
     const icon = L.divIcon({
       className: 'freshwater-ramp-marker',
       html: '🚤',
@@ -3202,7 +3202,7 @@ function renderFreshwaterPiers() {
   const customPiers = (adminLocations.freshwater && adminLocations.freshwater.piers) || [];
   const allPiers = [...FRESHWATER_PIERS, ...customPiers];
 
-  allPiers.filter(p => !p.country || p.country === state.currentRegion).forEach(pier => {
+  allPiers.filter(p => (p.country || 'IE') === state.currentRegion).forEach(pier => {
     const icon = L.divIcon({
       className: 'freshwater-pier-marker',
       html: '🎣',
@@ -5970,6 +5970,7 @@ window.saveLocation = async (event) => {
     type: document.getElementById('location-type-edit').value,
     mode: document.getElementById('location-mode').value,
     description: document.getElementById('location-description').value,
+    country: state.currentRegion,
     addedBy: state.user?.email || 'admin',
     addedAt: new Date().toISOString(),
     originalName: editingLocation?.source === 'static' ? editingLocation.name : null
