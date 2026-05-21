@@ -1492,9 +1492,10 @@ window.toggleMapFilter = (layerName) => {
 
 
 function addStationMarker(station) {
+  const isActiveNow = checkIfStationActiveNow(station);
   const icon = L.divIcon({
     className: 'tide-marker-wrapper',
-    html: `<div class="tide-marker ${station.status === 'offline' ? 'offline' : ''}" data-station="${station.id}">🌊</div>`,
+    html: `<div class="tide-marker ${station.status === 'offline' ? 'offline' : ''} ${isActiveNow ? 'solunar-hotspot-active' : ''}" data-station="${station.id}">🌊</div>`,
     iconSize: [28, 28],
     iconAnchor: [14, 14]
   });
@@ -1676,6 +1677,7 @@ function loadStationList() {
   });
 
   setInterval(updateAllStationLevels, 60000);
+  renderLiveHotspotsPanel();
 }
 
 window.toggleRegion = (header) => {
@@ -3553,6 +3555,111 @@ function renderSolunarCard() {
     </div>
   `;
 }
+
+function checkIfStationActiveNow(station, targetDate = new Date()) {
+  const moon = calculateMoonState(targetDate);
+  const transitHour = ((moon.age / 29.53059) * 24) % 24;
+  let overheadHour = (12 + transitHour) % 24;
+  let underfootHour = (overheadHour + 12) % 24;
+  let moonriseHour = (overheadHour - 6.2 + 24) % 24;
+  let moonsetHour = (overheadHour + 6.2) % 24;
+
+  const currentHour = targetDate.getHours() + targetDate.getMinutes() / 60;
+  const isDecimalInWindow = (val, start, end) => {
+    if (start <= end) return val >= start && val <= end;
+    return val >= start || val <= end;
+  };
+
+  if (isDecimalInWindow(currentHour, (overheadHour - 1 + 24) % 24, (overheadHour + 1) % 24)) return "Major Overhead";
+  if (isDecimalInWindow(currentHour, (underfootHour - 1 + 24) % 24, (underfootHour + 1) % 24)) return "Major Underfoot";
+  if (isDecimalInWindow(currentHour, (moonriseHour - 0.5 + 24) % 24, (moonriseHour + 0.5) % 24)) return "Minor Moonrise";
+  if (isDecimalInWindow(currentHour, (moonsetHour - 0.5 + 24) % 24, (moonsetHour + 0.5) % 24)) return "Minor Moonset";
+
+  return null;
+}
+
+function renderLiveHotspotsPanel() {
+  const container = document.getElementById('live-hotspots-container');
+  if (!container) return;
+
+  const regionStations = CONFIG.stations.filter(s => s.country === state.currentRegion);
+  const activeHotspots = [];
+
+  regionStations.forEach(station => {
+    const activeWindow = checkIfStationActiveNow(station);
+    if (activeWindow) {
+      // Calculate high tides of today
+      const dayStart = new Date();
+      dayStart.setHours(0, 0, 0, 0);
+      const dayExtremes = [];
+      const step = 15 * 60 * 1000;
+      const tStart = dayStart.getTime();
+      const tEnd = tStart + 24 * 60 * 60 * 1000;
+
+      let prevLvl = calculateTideLevel(new Date(tStart - step), station).level;
+      let currLvl = calculateTideLevel(new Date(tStart), station).level;
+
+      for (let t = tStart + step; t <= tEnd; t += step) {
+        const nextLvl = calculateTideLevel(new Date(t), station).level;
+        if (currLvl > prevLvl && currLvl > nextLvl) dayExtremes.push({ type: 'High', time: t });
+        prevLvl = currLvl;
+        currLvl = nextLvl;
+      }
+
+      const currentHourDecimal = new Date().getHours() + new Date().getMinutes() / 60;
+      const hasTidePeak = dayExtremes.some(e => {
+        const d = new Date(e.time);
+        const tideHourDecimal = d.getHours() + d.getMinutes() / 60;
+        return Math.abs(currentHourDecimal - tideHourDecimal) <= 1.5;
+      });
+
+      activeHotspots.push({
+        station,
+        activeWindow,
+        hasTidePeak
+      });
+    }
+  });
+
+  if (activeHotspots.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state" style="padding:16px; font-size:0.75rem; text-align:center;">
+        <div class="empty-state-icon">🌊</div>
+        <p>No stations currently in active feeding windows. Try checking incoming tides!</p>
+      </div>
+    `;
+    return;
+  }
+
+  const rowsHtml = activeHotspots.slice(0, 4).map(item => {
+    const s = item.station;
+    return `
+      <div class="hotspot-row" onclick="selectLiveHotspot('${s.id}')">
+        <div class="hotspot-info">
+          <div class="hotspot-name">${s.name}</div>
+          <div class="hotspot-meta">
+            <span>📍 ${s.region || 'Coast'}</span>
+            ${item.hasTidePeak ? '<span style="color:#00ff88; font-weight:700;">🌊 Tide Peak</span>' : ''}
+          </div>
+        </div>
+        <div class="hotspot-badge">${item.activeWindow}</div>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="live-hotspots-list">
+      ${rowsHtml}
+    </div>
+  `;
+}
+
+window.selectLiveHotspot = (stationId) => {
+  const station = CONFIG.stations.find(s => s.id === stationId);
+  if (station) {
+    selectStation(station);
+  }
+};
 
 // Freshwater filter functions
 window.toggleFreshwaterFilterPanel = () => {
