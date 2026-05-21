@@ -4535,10 +4535,19 @@ function loadStationInsights() {
 
 function loadUsersTable() {
   const searchTerm = (document.getElementById('admin-user-search')?.value || '').toLowerCase();
-  const filteredUsers = state.allUsers.filter(u =>
-    u.email.toLowerCase().includes(searchTerm) ||
-    (u.name && u.name.toLowerCase().includes(searchTerm))
-  );
+  
+  // Create a copy of users and sort by joinDate descending (newest first)
+  const sortedUsers = [...state.allUsers].sort((a, b) => {
+    const timeA = a.joinDate || 0;
+    const timeB = b.joinDate || 0;
+    return timeB - timeA;
+  });
+
+  const filteredUsers = sortedUsers.filter(u => {
+    const email = u.email || '';
+    const name = u.name || '';
+    return email.toLowerCase().includes(searchTerm) || name.toLowerCase().includes(searchTerm);
+  });
 
   document.getElementById('total-users-badge').textContent = `${filteredUsers.length} users`;
 
