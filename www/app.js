@@ -1099,7 +1099,7 @@ async function loadShopsToMainMap() {
   TACKLE_SHOPS.filter(s => s.country === state.currentRegion).forEach(shop => {
     const icon = L.divIcon({
       className: 'shop-marker-wrapper',
-      html: '<div class="shop-marker">🏪</div>',
+      html: '<div class="shop-marker" style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;">🏪</div>',
       iconSize: [28, 28],
       iconAnchor: [14, 14]
     });
@@ -1187,7 +1187,7 @@ function repopulateMapLayers() {
     TACKLE_SHOPS.filter(s => (s.country || 'IE') === state.currentRegion).forEach(shop => {
       const icon = L.divIcon({
         className: 'shop-marker-wrapper',
-        html: '<div class="shop-marker">🏪</div>',
+        html: '<div class="shop-marker" style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;">🏪</div>',
         iconSize: [28, 28],
         iconAnchor: [14, 14]
       });
@@ -1234,7 +1234,7 @@ function repopulateMapLayers() {
 function addFirebaseShopMarker(shop) {
   const icon = L.divIcon({
     className: 'shop-marker-wrapper',
-    html: '<div class="shop-marker">🏪</div>',
+    html: '<div class="shop-marker" style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;">🏪</div>',
     iconSize: [28, 28],
     iconAnchor: [14, 14]
   });
@@ -1253,7 +1253,7 @@ function addFirebaseShopMarker(shop) {
 function addPierMarker(pier) {
   const icon = L.divIcon({
     className: 'pier-marker-wrapper',
-    html: `<div class="pier-marker" title="${pier.name}">🎣</div>`,
+    html: `<div class="pier-marker" title="${pier.name}" style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;">🎣</div>`,
     iconSize: [28, 28],
     iconAnchor: [14, 14]
   });
@@ -1271,7 +1271,7 @@ function addPierMarker(pier) {
 function addRampMarker(ramp) {
   const icon = L.divIcon({
     className: 'ramp-marker-wrapper',
-    html: `<div class="ramp-marker" title="${ramp.name}">🚤</div>`,
+    html: `<div class="ramp-marker" title="${ramp.name}" style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;">🚤</div>`,
     iconSize: [28, 28],
     iconAnchor: [14, 14]
   });
@@ -1289,7 +1289,7 @@ function addRampMarker(ramp) {
 function addHarbourMarker(harbour) {
   const icon = L.divIcon({
     className: 'harbour-marker-wrapper',
-    html: `<div class="harbour-marker" title="${harbour.name}">🛥️</div>`,
+    html: `<div class="harbour-marker" title="${harbour.name}" style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;">🛥️</div>`,
     iconSize: [28, 28],
     iconAnchor: [14, 14]
   });
@@ -1495,7 +1495,7 @@ function addStationMarker(station) {
   const isActiveNow = checkIfStationActiveNow(station);
   const icon = L.divIcon({
     className: 'tide-marker-wrapper',
-    html: `<div class="tide-marker ${station.status === 'offline' ? 'offline' : ''} ${isActiveNow ? 'solunar-hotspot-active' : ''}" data-station="${station.id}">🌊</div>`,
+    html: `<div class="tide-marker ${station.status === 'offline' ? 'offline' : ''} ${isActiveNow ? 'solunar-hotspot-active' : ''}" data-station="${station.id}" style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;">🌊</div>`,
     iconSize: [28, 28],
     iconAnchor: [14, 14]
   });
@@ -3079,7 +3079,7 @@ function renderFreshwaterSpots() {
   allSpots.filter(s => (s.country || 'IE') === state.currentRegion).forEach(spot => {
     const icon = L.divIcon({
       className: 'freshwater-marker',
-      html: '🐟', // Standardized to match filter emoji
+      html: '<div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;">🐟</div>',
       iconSize: [28, 28],
       iconAnchor: [14, 14]
     });
@@ -3131,7 +3131,7 @@ function renderFreshwaterParks() {
   allParks.filter(p => (p.country || 'IE') === state.currentRegion).forEach(park => {
     const icon = L.divIcon({
       className: 'freshwater-park-marker',
-      html: '🏞️', // Standardized to match filter emoji
+      html: '<div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;">🏞️</div>',
       iconSize: [28, 28],
       iconAnchor: [14, 14]
     });
@@ -3175,7 +3175,7 @@ function renderFreshwaterRamps() {
   allRamps.filter(r => (r.country || 'IE') === state.currentRegion).forEach(ramp => {
     const icon = L.divIcon({
       className: 'freshwater-ramp-marker',
-      html: '🚤',
+      html: '<div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;">🚤</div>',
       iconSize: [28, 28],
       iconAnchor: [14, 14]
     });
@@ -3214,7 +3214,7 @@ function renderFreshwaterPiers() {
   allPiers.filter(p => (p.country || 'IE') === state.currentRegion).forEach(pier => {
     const icon = L.divIcon({
       className: 'freshwater-pier-marker',
-      html: '🎣',
+      html: '<div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;">🎣</div>',
       iconSize: [28, 28],
       iconAnchor: [14, 14]
     });

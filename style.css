@@ -5842,9 +5842,8 @@ input:checked+.toggle-slider:before {
 
 /* ============================================   Live Solunar Radar & Pulsing Hotspots Styles   ============================================ */
 
-/* Map marker pulsing green sonar ring */
+/* Map marker pulsing green sonar ring - overflow visible only, let Leaflet control position */
 .tide-marker-wrapper {
-    position: relative;
     overflow: visible !important;
 }
 
@@ -5993,13 +5992,16 @@ input:checked+.toggle-slider:before {
     color: #fff;
 }
 
-/* Reset Leaflet default divIcon background and border styles once and for all */
+/* Reset Leaflet default divIcon background and border */
 .leaflet-div-icon {
     background: transparent !important;
     border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
-/* Perfect Center Anchoring for Leaflet DivIcons to prevent moving/sliding on zoom */
+/* All custom marker wrappers: do NOT interfere with Leaflet's inline position/width/height/margin.
+   Only ensure overflow visible so sonar rings can expand outside the icon boundary. */
 .tide-marker-wrapper,
 .shop-marker-wrapper,
 .pier-marker-wrapper,
@@ -6009,34 +6011,9 @@ input:checked+.toggle-slider:before {
 .freshwater-park-marker,
 .freshwater-ramp-marker,
 .freshwater-pier-marker {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
     overflow: visible !important;
 }
 
-.tide-marker,
-.shop-marker,
-.pier-marker,
-.ramp-marker,
-.harbour-marker,
-.freshwater-marker div,
-.freshwater-park-marker div,
-.freshwater-ramp-marker div,
-.freshwater-pier-marker div {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 28px !important;
-    height: 28px !important;
-    line-height: 28px !important;
-    text-align: center !important;
-    font-size: 1.3rem !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    box-sizing: border-box !important;
-    transform-origin: center center !important;
-}
 
 
 
