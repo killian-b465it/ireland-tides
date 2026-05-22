@@ -1064,8 +1064,8 @@ window.setRegion = (region) => {
           selectStation(firstStation);
       }
       
-      // Refresh map view to show all markers
-      applyFilters(false);
+      // Re-apply the correct mode's markers — DO NOT mix sea + freshwater on region switch
+      updateMapForFishingMode();
   }
 
   updateRegionUI();
@@ -1225,8 +1225,9 @@ function repopulateMapLayers() {
     applyFilters(false);
   }
   
+  // Only show freshwater layers if we're actually in freshwater mode
   const fwSidebar = document.getElementById('freshwater-filter-sidebar');
-  if (fwSidebar) {
+  if (fwSidebar && state.fishingMode === 'freshwater') {
     applyFreshwaterFilters(false);
   }
 }
