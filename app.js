@@ -2148,20 +2148,21 @@ async function fetchWeatherData(station) {
   const container = document.getElementById('weather-display');
 
   // Determine proxy URL: use server-side proxy when running locally or on Vercel
-  // Falls back to direct Open-Meteo call on static hosts (e.g. Firebase Hosting)
+  // Falls back to direct calls on static/mobile/Capacitor hosts
   const isLocalOrVercel = window.location.hostname === 'localhost' ||
     window.location.hostname === '127.0.0.1' ||
     window.location.hostname.includes('vercel.app') ||
     window.location.hostname.includes('irishfishinghub.com');
 
   const proxyUrl = `/api/weather?lat=${station.lat}&lon=${station.lon}`;
-  const directUrl = `https://api.open-meteo.com/v1/forecast?latitude=${station.lat}&longitude=${station.lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto`;
+  const directWttrUrl = `https://wttr.in/${station.lat},${station.lon}?format=j1`;
+  const directMeteoUrl = `https://api.open-meteo.com/v1/forecast?latitude=${station.lat}&longitude=${station.lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto`;
 
   const tryFetch = async (url, timeoutMs) => {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      const res = await fetch(url, { signal: controller.signal });
+      const res = await fetch(url, { signal: controller.signal, headers: { 'User-Agent': 'IrishFishingHub/3.0' } });
       clearTimeout(timer);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
@@ -2171,19 +2172,77 @@ async function fetchWeatherData(station) {
     }
   };
 
+  const parseWttrData = (wttr) => {
+    const wttrToWmo = {
+      113:0, 116:2, 119:3, 122:3, 143:45, 176:61, 179:71, 182:66,
+      185:56, 200:95, 227:75, 230:75, 248:45, 260:48, 263:51, 266:51,
+      281:56, 284:57, 293:61, 296:61, 299:63, 302:63, 305:65, 308:65,
+      311:66, 314:67, 317:66, 320:67, 323:71, 326:71, 329:73, 332:73,
+      335:75, 338:75, 350:77, 353:80, 356:81, 359:82, 362:85, 365:85,
+      368:85, 371:86, 374:85, 377:86, 386:95, 389:95, 392:95, 395:95
+    };
+    const mapCode = c => wttrToWmo[parseInt(c)] ?? 0;
+
+    const parseTime = (dateStr, timeStr) => {
+      const match = timeStr.trim().match(/(\d+):(\d+)\s*(AM|PM)/i);
+      if (!match) return `${dateStr}T06:00`;
+      let h = parseInt(match[1]), m = parseInt(match[2]);
+      const pm = match[3].toUpperCase() === 'PM';
+      if (pm && h !== 12) h += 12;
+      if (!pm && h === 12) h = 0;
+      return `${dateStr}T${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+    };
+
+    const cur = wttr.current_condition[0];
+    const days = wttr.weather;
+
+    return {
+      current: {
+        temperature_2m:       parseFloat(cur.temp_C),
+        apparent_temperature: parseFloat(cur.FeelsLikeC),
+        weather_code:         mapCode(cur.weatherCode),
+        wind_speed_10m:       parseFloat(cur.windspeedKmph),
+        wind_direction_10m:   parseFloat(cur.winddirDegree),
+        relative_humidity_2m: parseFloat(cur.humidity)
+      },
+      daily: {
+        time:               days.map(d => d.date),
+        weather_code:       days.map(d => mapCode(d.hourly[4]?.weatherCode ?? 113)),
+        temperature_2m_max: days.map(d => parseFloat(d.maxtempC)),
+        temperature_2m_min: days.map(d => parseFloat(d.mintempC)),
+        sunrise:            days.map(d => parseTime(d.date, d.astronomy[0].sunrise)),
+        sunset:             days.map(d => parseTime(d.date, d.astronomy[0].sunset))
+      }
+    };
+  };
+
   try {
     let data;
     if (isLocalOrVercel) {
-      // Try proxy first (server-side, bypasses network restrictions)
+      // 1. Try server proxy first
       try {
         data = await tryFetch(proxyUrl, 8000);
       } catch (proxyErr) {
-        console.warn('Weather proxy failed, trying direct:', proxyErr.message);
-        data = await tryFetch(directUrl, 8000);
+        console.warn('Weather proxy failed, trying direct wttr.in:', proxyErr.message);
+        // 2. Fall back to direct wttr.in
+        try {
+          const rawWttr = await tryFetch(directWttrUrl, 8000);
+          data = parseWttrData(rawWttr);
+        } catch (wttrErr) {
+          console.warn('Direct wttr.in failed, trying direct Open-Meteo:', wttrErr.message);
+          // 3. Fall back to direct Open-Meteo
+          data = await tryFetch(directMeteoUrl, 8000);
+        }
       }
     } else {
-      // Static host — go direct
-      data = await tryFetch(directUrl, 8000);
+      // Direct mobile / Capacitor client: Try wttr.in first, fall back to Open-Meteo
+      try {
+        const rawWttr = await tryFetch(directWttrUrl, 8000);
+        data = parseWttrData(rawWttr);
+      } catch (wttrErr) {
+        console.warn('Direct wttr.in failed, trying direct Open-Meteo:', wttrErr.message);
+        data = await tryFetch(directMeteoUrl, 8000);
+      }
     }
 
     displayWeatherData(data.current);
