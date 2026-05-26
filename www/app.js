@@ -1624,7 +1624,7 @@ function findNearestLiveStation(inputStation) {
 
 
 function showTideCards() {
-  const cards = ['tide-card', 'weather-card', 'swell-card', 'solunar-card', 'shops-card', 'tide-times-card', 'fishing-card', 'chart-card'];
+  const cards = ['tide-card', 'weather-card', 'swell-card', 'solunar-card', 'shops-card', 'tide-times-card', 'chart-card'];
   cards.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = 'block';
@@ -1923,9 +1923,11 @@ function updateForecastHeaders() {
 
   const weatherTitle = document.getElementById('weather-card-title');
   const tideTitle = document.getElementById('tide-card-title');
+  const solunarTitle = document.getElementById('solunar-card-title');
 
   if (weatherTitle) weatherTitle.innerText = state.forecastOffset === 0 ? "🌦️ Local Weather" : `🌦️ Weather(${dateStr})`;
   if (tideTitle) tideTitle.innerText = state.forecastOffset === 0 ? "⏰ Today's Tides" : `⏰ Tides(${dateStr})`;
+  if (solunarTitle) solunarTitle.innerText = state.forecastOffset === 0 ? "🌙 Solunar Activity" : `🌙 Solunar(${dateStr})`;
 }
 
 function renderForecastView() {
@@ -3698,14 +3700,15 @@ function renderSolunarCard() {
   }).join('');
 
   // 7. Dynamic Fishing Tip
-  let tipText = "Standard feeding conditions today. Target feeding windows around moving tides.";
+  const dayTextStr = isToday ? "today" : "on this day";
+  let tipText = `Standard feeding conditions ${dayTextStr}. Target feeding windows around moving tides.`;
   if (baseScore >= 80) {
     if (hasPeakTideOverlap && hasPeakSunOverlap) {
-      tipText = "🔥 EXTREME SOLUNAR ALIGNMENT today! Feeding windows overlap with sunset/sunrise AND high tide. Fish will be in a massive feeding frenzy.";
+      tipText = `🔥 EXTREME SOLUNAR ALIGNMENT ${dayTextStr}! Feeding windows overlap with sunset/sunrise AND high tide. Fish will be in a massive feeding frenzy.`;
     } else if (hasPeakTideOverlap) {
       tipText = "🌊 Peak feeding levels expected as moon overhead/underfoot transit aligns directly with high tide! Focus effort during the Tide Peak window.";
     } else {
-      tipText = "🌅 Strong feeding indices today. Sunrise and sunset windows are highly active. Perfect for spinning and lure fishing.";
+      tipText = `🌅 Strong feeding indices ${dayTextStr}. Sunrise and sunset windows are highly active. Perfect for spinning and lure fishing.`;
     }
   } else if (baseScore >= 50) {
     tipText = "Moderate activity predicted. Best action is expected around moon transits overlapping tide changes.";
@@ -3714,6 +3717,7 @@ function renderSolunarCard() {
   }
 
   const dialDeg = (baseScore / 100) * 360;
+  const timelineTitle = isToday ? "Feeding Windows Today" : `Feeding Windows (${targetDate.toLocaleDateString('en-IE', { weekday: 'short', day: 'numeric', month: 'short' })})`;
 
   container.innerHTML = `
     <div class="solunar-header-stats">
@@ -3736,7 +3740,7 @@ function renderSolunarCard() {
     </div>
 
     <div class="feeding-timeline">
-      <div class="feeding-timeline-title">Feeding Windows Today</div>
+      <div class="feeding-timeline-title">${timelineTitle}</div>
       ${renderedSlots}
     </div>
 
