@@ -2144,9 +2144,12 @@ function displayCalculatedTides(station) {
 // ============================================
 async function fetchWeatherData(station) {
   const container = document.getElementById('weather-display');
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
   try {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${station.lat}&longitude=${station.lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto`;
-    const res = await fetch(url);
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeout);
     const data = await res.json();
     displayWeatherData(data.current);
 
@@ -2160,10 +2163,12 @@ async function fetchWeatherData(station) {
     renderSolunarCard();
 
   } catch (err) {
-    console.warn(`Weather fetch failed for ${station.id}:`, err);
+    clearTimeout(timeout);
+    const isTimeout = err.name === 'AbortError';
+    console.warn(`Weather fetch ${isTimeout ? 'timed out' : 'failed'} for ${station.id}:`, err);
     container.innerHTML = `
       <div class="error-message fade-in">
-        <span>⚠️ Weather unavailable</span>
+        <span>⚠️ ${isTimeout ? 'Weather timed out' : 'Weather unavailable'}</span>
         <button class="btn btn-sm btn-outline" onclick="fetchWeatherData(state.selectedStation)" style="margin-top:8px">Retry</button>
       </div>`;
   }
