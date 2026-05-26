@@ -3536,11 +3536,11 @@ input:checked+.toggle-slider:before {
 
 .pier-marker:hover,
 .ramp-marker:hover,
-.harbour-marker:hover {
-    transform: scale(1.15);
-}
-
-.harbour-marker:hover {
+.harbour-marker:hover,
+.freshwater-marker:hover,
+.freshwater-park-marker:hover,
+.freshwater-ramp-marker:hover,
+.freshwater-pier-marker:hover {
     transform: scale(1.15);
 }
 
