@@ -368,6 +368,12 @@
           <div class="card-header">
             <span class="card-title">📋 All Stations</span>
           </div>
+          <div class="station-search-container" style="padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.06); background: rgba(0,0,0,0.1);">
+            <div class="search-input-wrapper" style="position: relative; display: flex; align-items: center;">
+              <span style="position: absolute; left: 10px; color: rgba(255,255,255,0.4); font-size: 0.85rem; pointer-events: none;">🔍</span>
+              <input type="text" id="station-search" placeholder="Search station or county..." oninput="filterStations(this.value)" style="width: 100%; padding: 8px 10px 8px 30px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.03); color: #fff; font-size: 0.8rem; outline: none; transition: all 0.2s ease;">
+            </div>
+          </div>
           <div class="station-list" id="station-list">
             <div class="loading">
               <div class="loading-spinner"></div>

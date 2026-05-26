@@ -5807,6 +5807,12 @@ input:checked+.toggle-slider:before {
     letter-spacing: 0.03em;
 }
 
+#station-search:focus {
+    border-color: var(--accent-primary) !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    box-shadow: 0 0 8px rgba(0, 242, 255, 0.15);
+}
+
 /* Feeding Timeline Styles */
 .feeding-timeline {
     display: flex;

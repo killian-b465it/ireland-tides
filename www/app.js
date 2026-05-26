@@ -1686,6 +1686,36 @@ window.toggleRegion = (header) => {
   header.parentElement.classList.toggle('collapsed');
 };
 
+window.filterStations = (query) => {
+  const cleanQuery = query.toLowerCase().trim();
+  const regionGroups = document.querySelectorAll('#station-list .region-group');
+
+  regionGroups.forEach(group => {
+    const stationItems = group.querySelectorAll('.station-item');
+    let visibleCount = 0;
+
+    stationItems.forEach(item => {
+      const name = item.querySelector('.station-name').innerText.toLowerCase();
+      if (name.includes(cleanQuery)) {
+        item.style.display = 'flex';
+        visibleCount++;
+      } else {
+        item.style.display = 'none';
+      }
+    });
+
+    if (cleanQuery === '') {
+      group.classList.add('collapsed');
+      group.style.display = 'block';
+    } else if (visibleCount > 0) {
+      group.classList.remove('collapsed');
+      group.style.display = 'block';
+    } else {
+      group.style.display = 'none';
+    }
+  });
+};
+
 function updateAllStationLevels() {
   const now = new Date();
   // Update non-live stations with calculated values
