@@ -907,6 +907,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   updateAuthUI();
   updateRegionUI();
+  initConnectionMonitoring();
   showPage('home');
 
   // Dismiss loading screen after animation
@@ -7812,5 +7813,49 @@ window.deleteBlogPost = (id) => {
       .catch(err => alert('Failed to delete: ' + err.message));
   }
 };
+
+function initConnectionMonitoring() {
+  const toast = document.getElementById('connection-toast');
+  if (!toast) return;
+
+  const showToast = (isOnline) => {
+    const icon = toast.querySelector('.connection-toast-icon');
+    const text = toast.querySelector('.connection-toast-text');
+
+    if (isOnline) {
+      toast.classList.add('online-state');
+      icon.textContent = '💚';
+      text.textContent = 'Back Online - Syncing live weather & community data!';
+      
+      // Show online state
+      toast.classList.add('active');
+
+      // Auto-hide online toast after 3.5 seconds
+      setTimeout(() => {
+        toast.classList.remove('active');
+      }, 3500);
+      
+      // Sync weather & station data on back online
+      if (typeof fetchAllLiveStationData === 'function') {
+        fetchAllLiveStationData();
+      }
+    } else {
+      toast.classList.remove('online-state');
+      icon.textContent = '⚠️';
+      text.textContent = 'Offline Mode - Local Tide calculations are functional!';
+      toast.classList.add('active');
+    }
+  };
+
+  // Listen for connection changes
+  window.addEventListener('online', () => showToast(true));
+  window.addEventListener('offline', () => showToast(false));
+
+  // Check initial state (only show offline initially if offline)
+  if (!navigator.onLine) {
+    showToast(false);
+  }
+}
+
 
 
