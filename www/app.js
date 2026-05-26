@@ -1530,6 +1530,7 @@ function selectStation(station) {
   }
 
   fetchWeatherData(station);
+  fetchSwellData(station);
   fetchNearbyShops(station);
   renderSolunarCard();
 }
@@ -1623,7 +1624,7 @@ function findNearestLiveStation(inputStation) {
 
 
 function showTideCards() {
-  const cards = ['tide-card', 'weather-card', 'solunar-card', 'shops-card', 'tide-times-card', 'fishing-card', 'chart-card'];
+  const cards = ['tide-card', 'weather-card', 'swell-card', 'solunar-card', 'shops-card', 'tide-times-card', 'fishing-card', 'chart-card'];
   cards.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = 'block';
@@ -2286,6 +2287,164 @@ function mapWeatherCode(c) {
   };
   const desc = map[c] || 'Unknown';
   return { icon: desc.split(' ')[0], description: desc.split(' ').slice(1).join(' ') };
+}
+
+// ============================================
+// Wave & Swell Forecast
+// ============================================
+
+async function fetchSwellData(station) {
+  const container = document.getElementById('swell-display');
+  if (!container) return;
+
+  container.innerHTML = '<div class="loading"><div class="loading-spinner"></div><span>Fetching swell data...</span></div>';
+
+  try {
+    const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${station.lat}&longitude=${station.lon}` +
+      `&hourly=wave_height,wave_period,wave_direction,swell_wave_height,swell_wave_period,swell_wave_direction,wind_wave_height` +
+      `&length_unit=metric&timezone=auto&forecast_days=2`;
+
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Marine API ${res.status}`);
+    const data = await res.json();
+
+    displaySwellData(data);
+  } catch (err) {
+    console.warn(`Swell fetch failed for ${station.id}:`, err);
+    container.innerHTML = `
+      <div class="swell-unavailable">
+        <span style="font-size:1.8rem;">🏔️</span>
+        <p style="color:var(--text-secondary); margin: 6px 0 0; font-size:0.85rem;">Marine swell data is only available for coastal locations.</p>
+      </div>`;
+  }
+}
+
+function displaySwellData(data) {
+  const container = document.getElementById('swell-display');
+  const hourly = data.hourly;
+  if (!hourly || !hourly.time) {
+    container.innerHTML = '<div class="empty-state"><p>No swell data available.</p></div>';
+    return;
+  }
+
+  // Find current hour index
+  const now = new Date();
+  const nowIso = now.toISOString().slice(0, 13); // 'YYYY-MM-DDTHH'
+  let currentIdx = hourly.time.findIndex(t => t.startsWith(nowIso));
+  if (currentIdx === -1) currentIdx = 0;
+
+  // Current readings
+  const waveH  = hourly.wave_height[currentIdx];
+  const wavePer = hourly.wave_period?.[currentIdx];
+  const waveDir = hourly.wave_direction?.[currentIdx];
+  const swellH  = hourly.swell_wave_height?.[currentIdx];
+  const swellPer = hourly.swell_wave_period?.[currentIdx];
+  const swellDir = hourly.swell_wave_direction?.[currentIdx];
+  const windWave = hourly.wind_wave_height?.[currentIdx];
+
+  // Safety rating based on wave height
+  let safety, safetyClass, safetyIcon;
+  if (waveH === null || waveH === undefined) {
+    safety = 'Unknown'; safetyClass = 'swell-unknown'; safetyIcon = '❓';
+  } else if (waveH < 0.5) {
+    safety = 'Calm — Excellent'; safetyClass = 'swell-safe'; safetyIcon = '✅';
+  } else if (waveH < 1.0) {
+    safety = 'Slight — Good'; safetyClass = 'swell-safe'; safetyIcon = '🟢';
+  } else if (waveH < 1.5) {
+    safety = 'Moderate — Fair'; safetyClass = 'swell-caution'; safetyIcon = '🟡';
+  } else if (waveH < 2.5) {
+    safety = 'Rough — Caution'; safetyClass = 'swell-caution'; safetyIcon = '🟠';
+  } else if (waveH < 4.0) {
+    safety = 'Very Rough — Danger'; safetyClass = 'swell-danger'; safetyIcon = '🔴';
+  } else {
+    safety = 'High Seas — Stay Ashore'; safetyClass = 'swell-danger'; safetyIcon = '⛔';
+  }
+
+  // Compass direction helper
+  function bearingToCompass(deg) {
+    if (deg === null || deg === undefined) return '—';
+    const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+    return dirs[Math.round(deg / 22.5) % 16];
+  }
+
+  // Next 6 hours bar chart
+  const barCount = 6;
+  const barData = [];
+  for (let i = 0; i < barCount; i++) {
+    const idx = currentIdx + i;
+    if (idx >= hourly.time.length) break;
+    const t = new Date(hourly.time[idx]);
+    const label = t.toLocaleTimeString('en-IE', { hour: '2-digit', minute: '2-digit', hour12: false });
+    barData.push({ label, h: hourly.wave_height[idx] ?? 0 });
+  }
+  const maxH = Math.max(...barData.map(b => b.h), 0.5);
+
+  const barsHtml = barData.map(b => {
+    const pct = Math.min(100, (b.h / maxH) * 100);
+    let barColor = '#00d4ff';
+    if (b.h >= 2.5) barColor = '#ff4444';
+    else if (b.h >= 1.0) barColor = '#ffab00';
+    return `
+      <div class="swell-bar-col">
+        <div class="swell-bar-track">
+          <div class="swell-bar-fill" style="height:${pct}%; background:${barColor};"></div>
+        </div>
+        <div class="swell-bar-val">${b.h !== null ? b.h.toFixed(1) : '—'}m</div>
+        <div class="swell-bar-lbl">${b.label}</div>
+      </div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="swell-main fade-in">
+      <div class="swell-safety ${safetyClass}">
+        <span class="swell-safety-icon">${safetyIcon}</span>
+        <div>
+          <div class="swell-safety-label">Fishing Safety</div>
+          <div class="swell-safety-status">${safety}</div>
+        </div>
+      </div>
+
+      <div class="swell-stats-grid">
+        <div class="swell-stat">
+          <span class="swell-stat-label">Wave Height</span>
+          <span class="swell-stat-value">${waveH !== null && waveH !== undefined ? waveH.toFixed(2) + 'm' : '—'}</span>
+        </div>
+        <div class="swell-stat">
+          <span class="swell-stat-label">Wave Period</span>
+          <span class="swell-stat-value">${wavePer !== null && wavePer !== undefined ? Math.round(wavePer) + 's' : '—'}</span>
+        </div>
+        <div class="swell-stat">
+          <span class="swell-stat-label">Wave Dir</span>
+          <span class="swell-stat-value">
+            <span style="display:inline-block; transform:rotate(${waveDir ?? 0}deg); margin-right:3px;">⬆</span>${bearingToCompass(waveDir)}
+          </span>
+        </div>
+        <div class="swell-stat">
+          <span class="swell-stat-label">Swell Height</span>
+          <span class="swell-stat-value">${swellH !== null && swellH !== undefined ? swellH.toFixed(2) + 'm' : '—'}</span>
+        </div>
+        <div class="swell-stat">
+          <span class="swell-stat-label">Swell Period</span>
+          <span class="swell-stat-value">${swellPer !== null && swellPer !== undefined ? Math.round(swellPer) + 's' : '—'}</span>
+        </div>
+        <div class="swell-stat">
+          <span class="swell-stat-label">Swell Dir</span>
+          <span class="swell-stat-value">
+            <span style="display:inline-block; transform:rotate(${swellDir ?? 0}deg); margin-right:3px;">⬆</span>${bearingToCompass(swellDir)}
+          </span>
+        </div>
+      </div>
+
+      <div class="swell-bars-section">
+        <div class="swell-bars-title">6-Hour Outlook</div>
+        <div class="swell-bars">${barsHtml}</div>
+      </div>
+
+      ${windWave !== null && windWave !== undefined ? `
+      <div style="margin-top:10px; font-size:0.78rem; color:var(--text-secondary); border-top:1px solid rgba(255,255,255,0.06); padding-top:8px;">
+        💨 Wind Wave: <strong>${windWave.toFixed(2)}m</strong> &nbsp;·&nbsp; Data: Open-Meteo Marine
+      </div>` : ''}
+    </div>`;
 }
 
 // ============================================
