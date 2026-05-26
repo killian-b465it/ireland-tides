@@ -2216,32 +2216,146 @@ async function fetchWeatherData(station) {
     };
   };
 
-  try {
-    let data;
-    if (isLocalOrVercel) {
-      // 1. Try server proxy first
-      try {
-        data = await tryFetch(proxyUrl, 8000);
-      } catch (proxyErr) {
-        console.warn('Weather proxy failed, trying direct wttr.in:', proxyErr.message);
-        // 2. Fall back to direct wttr.in
+  const parseMetNoData = (metNo, lat, lon) => {
+    const timeseries = metNo.properties.timeseries;
+    const currentItem = timeseries[0];
+    const curDetails = currentItem.data.instant.details;
+    const curSymbol = currentItem.data.next_1_hours?.summary?.symbol_code || 
+                      currentItem.data.next_6_hours?.summary?.symbol_code || 'clearsky';
+                      
+    const metNoSymbolToWmo = (sym) => {
+      const s = sym.toLowerCase();
+      if (s.includes('thunder')) return 95;
+      if (s.includes('heavyrain')) return 63;
+      if (s.includes('rain')) return 61;
+      if (s.includes('showers')) return 80;
+      if (s.includes('sleet')) return 66;
+      if (s.includes('snow')) return 71;
+      if (s.includes('fog')) return 45;
+      if (s.includes('cloudy')) return 3;
+      if (s.includes('partlycloudy')) return 2;
+      if (s.includes('fair')) return 1;
+      return 0; // clearsky
+    };
+
+    const currentWeatherCode = metNoSymbolToWmo(curSymbol);
+
+    // Group forecast data by YYYY-MM-DD
+    const daysMap = {};
+    timeseries.forEach(item => {
+      const dateStr = item.time.substring(0, 10);
+      if (!daysMap[dateStr]) {
+        daysMap[dateStr] = { temps: [], symbols: [] };
+      }
+      const temp = item.data.instant.details.air_temperature;
+      if (temp !== undefined && temp !== null) {
+        daysMap[dateStr].temps.push(temp);
+      }
+      const sym = item.data.next_1_hours?.summary?.symbol_code || 
+                  item.data.next_6_hours?.summary?.symbol_code;
+      if (sym) {
+        daysMap[dateStr].symbols.push(sym);
+      }
+    });
+
+    const dailyDates = Object.keys(daysMap).sort().slice(0, 7);
+    const dailyWeatherCode = [];
+    const dailyTempMax = [];
+    const dailyTempMin = [];
+    const dailySunrise = [];
+    const dailySunset = [];
+
+    dailyDates.forEach(dateStr => {
+      const dayData = daysMap[dateStr];
+      const maxTemp = dayData.temps.length > 0 ? Math.max(...dayData.temps) : 15;
+      const minTemp = dayData.temps.length > 0 ? Math.min(...dayData.temps) : 10;
+      dailyTempMax.push(maxTemp);
+      dailyTempMin.push(minTemp);
+
+      const sym = dayData.symbols[Math.floor(dayData.symbols.length / 2)] || 'clearsky';
+      dailyWeatherCode.push(metNoSymbolToWmo(sym));
+
+      // SunCalc precision sunrise/sunset
+      const date = new Date(dateStr + 'T12:00:00');
+      let sunriseStr = `${dateStr}T06:00`;
+      let sunsetStr = `${dateStr}T21:00`;
+      if (typeof SunCalc !== 'undefined' && SunCalc.getTimes) {
         try {
-          const rawWttr = await tryFetch(directWttrUrl, 8000);
-          data = parseWttrData(rawWttr);
-        } catch (wttrErr) {
-          console.warn('Direct wttr.in failed, trying direct Open-Meteo:', wttrErr.message);
-          // 3. Fall back to direct Open-Meteo
-          data = await tryFetch(directMeteoUrl, 8000);
+          const sunTimes = SunCalc.getTimes(date, lat, lon);
+          if (sunTimes && sunTimes.sunrise && sunTimes.sunset) {
+            const pad = n => String(n).padStart(2, '0');
+            sunriseStr = `${dateStr}T${pad(sunTimes.sunrise.getHours())}:${pad(sunTimes.sunrise.getMinutes())}`;
+            sunsetStr = `${dateStr}T${pad(sunTimes.sunset.getHours())}:${pad(sunTimes.sunset.getMinutes())}`;
+          }
+        } catch (e) {
+          console.warn('SunCalc sunrise/sunset failed:', e);
         }
       }
-    } else {
-      // Direct mobile / Capacitor client: Try wttr.in first, fall back to Open-Meteo
+      dailySunrise.push(sunriseStr);
+      dailySunset.push(sunsetStr);
+    });
+
+    return {
+      current: {
+        temperature_2m:       curDetails.air_temperature,
+        apparent_temperature: curDetails.air_temperature,
+        weather_code:         currentWeatherCode,
+        wind_speed_10m:       (curDetails.wind_speed || 0) * 3.6, // m/s to km/h
+        wind_direction_10m:   curDetails.wind_from_direction || 0,
+        relative_humidity_2m: curDetails.relative_humidity || 80
+      },
+      daily: {
+        time:               dailyDates,
+        weather_code:       dailyWeatherCode,
+        temperature_2m_max: dailyTempMax,
+        temperature_2m_min: dailyTempMin,
+        sunrise:            dailySunrise,
+        sunset:             dailySunset
+      }
+    };
+  };
+
+  try {
+    let data = null;
+    let fetchErrors = [];
+
+    // 1. Try Local Node Proxy first (on web environments)
+    if (isLocalOrVercel) {
       try {
-        const rawWttr = await tryFetch(directWttrUrl, 8000);
+        data = await tryFetch(proxyUrl, 6000);
+      } catch (e) {
+        fetchErrors.push(`Proxy API error: ${e.message}`);
+      }
+    }
+
+    // 2. Fall back to direct client-side MET Norway locationforecast API (fully open CORS, highly reliable)
+    if (!data) {
+      try {
+        const directMetNoUrl = `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${station.lat}&lon=${station.lon}`;
+        const rawMetNo = await tryFetch(directMetNoUrl, 6000);
+        data = parseMetNoData(rawMetNo, station.lat, station.lon);
+      } catch (e) {
+        fetchErrors.push(`Direct MET Norway error: ${e.message}`);
+      }
+    }
+
+    // 3. Fall back to direct client-side wttr.in
+    if (!data) {
+      try {
+        const rawWttr = await tryFetch(directWttrUrl, 6000);
         data = parseWttrData(rawWttr);
-      } catch (wttrErr) {
-        console.warn('Direct wttr.in failed, trying direct Open-Meteo:', wttrErr.message);
-        data = await tryFetch(directMeteoUrl, 8000);
+      } catch (e) {
+        fetchErrors.push(`Direct wttr.in error: ${e.message}`);
+      }
+    }
+
+    // 4. Fall back to direct client-side Open-Meteo
+    if (!data) {
+      try {
+        data = await tryFetch(directMeteoUrl, 6000);
+      } catch (e) {
+        fetchErrors.push(`Direct Open-Meteo error: ${e.message}`);
+        throw new Error(`All weather sources failed: [${fetchErrors.join(', ')}]`);
       }
     }
 

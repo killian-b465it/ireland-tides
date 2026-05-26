@@ -247,6 +247,7 @@ app.get('/api/weather', async (req, res) => {
                 relative_humidity_2m: parseFloat(cur.humidity)
             },
             daily: {
+                time:               days.map(d => d.date),
                 weather_code:       days.map(d => mapCode(d.hourly[4]?.weatherCode ?? 113)),
                 temperature_2m_max: days.map(d => parseFloat(d.maxtempC)),
                 temperature_2m_min: days.map(d => parseFloat(d.mintempC)),
