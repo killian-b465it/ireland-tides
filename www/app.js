@@ -1943,16 +1943,19 @@ function renderForecastView() {
     const w = mapWeatherCode(d.weather_code[idx]);
 
     container.innerHTML = `
-      <div class="weather-main fade-in">
-        <div class="weather-temp-section">
+      <div class="weather-main fade-in" style="display: flex; flex-direction: column; width: 100%;">
+        <div class="weather-temp-section" style="display: flex; align-items: center; width: 100%;">
           <div class="weather-icon">${w.icon}</div>
-          <div>
+          <div style="flex: 1;">
             <div class="weather-temp">${Math.round(d.temperature_2m_max[idx])}°C</div>
             <div class="weather-condition">${w.description}</div>
             <div class="weather-label">Low: ${Math.round(d.temperature_2m_min[idx])}°C</div>
           </div>
         </div>
-      </div >
+        <button class="btn btn-xs btn-outline" style="margin-top: 12px; width: 100%; border-radius: 8px; font-size: 0.75rem; padding: 6px 10px;" onclick="openForecastModal()">
+          📅 View 7-Day Forecast
+        </button>
+      </div>
       `;
   } else {
     document.getElementById('weather-display').innerHTML = '<div class="empty-state"><p>No forecast data available for this day.</p></div>';
@@ -2457,6 +2460,9 @@ function displayWeatherData(d) {
         <span class="weather-value">${d.relative_humidity_2m}%</span>
       </div>
     </div>
+    <button class="btn btn-xs btn-outline" style="margin-top: 12px; width: 100%; border-radius: 8px; font-size: 0.75rem; padding: 6px 10px;" onclick="openForecastModal()">
+      📅 View 7-Day Forecast
+    </button>
   `;
 }
 
