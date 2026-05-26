@@ -195,5 +195,23 @@ If you cannot identify a fish in the image, respond with:
     }
 });
 
+// ============================================
+// Weather Proxy (avoids client-side CORS/network issues)
+// ============================================
+app.get('/api/weather', async (req, res) => {
+    try {
+        const { lat, lon } = req.query;
+        if (!lat || !lon) return res.status(400).json({ error: 'lat and lon required' });
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Open-Meteo ${response.status}`);
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        console.error('Weather proxy error:', error);
+        res.status(502).json({ error: 'Weather data unavailable' });
+    }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Secure Stripe server running on port ${PORT}`));

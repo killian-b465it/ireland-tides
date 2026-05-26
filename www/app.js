@@ -2144,26 +2144,52 @@ function displayCalculatedTides(station) {
 // ============================================
 async function fetchWeatherData(station) {
   const container = document.getElementById('weather-display');
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 8000);
+
+  // Determine proxy URL: use server-side proxy when running locally or on Vercel
+  // Falls back to direct Open-Meteo call on static hosts (e.g. Firebase Hosting)
+  const isLocalOrVercel = window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1' ||
+    window.location.hostname.includes('vercel.app') ||
+    window.location.hostname.includes('irishfishinghub.com');
+
+  const proxyUrl = `/api/weather?lat=${station.lat}&lon=${station.lon}`;
+  const directUrl = `https://api.open-meteo.com/v1/forecast?latitude=${station.lat}&longitude=${station.lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto`;
+
+  const tryFetch = async (url, timeoutMs) => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timer);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (e) {
+      clearTimeout(timer);
+      throw e;
+    }
+  };
+
   try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${station.lat}&longitude=${station.lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto`;
-    const res = await fetch(url, { signal: controller.signal });
-    clearTimeout(timeout);
-    const data = await res.json();
+    let data;
+    if (isLocalOrVercel) {
+      // Try proxy first (server-side, bypasses network restrictions)
+      try {
+        data = await tryFetch(proxyUrl, 8000);
+      } catch (proxyErr) {
+        console.warn('Weather proxy failed, trying direct:', proxyErr.message);
+        data = await tryFetch(directUrl, 8000);
+      }
+    } else {
+      // Static host — go direct
+      data = await tryFetch(directUrl, 8000);
+    }
+
     displayWeatherData(data.current);
-
-    // Store daily data for 7-day forecast
     state.currentWeatherDaily = data.daily;
-
-    // Initial Render of Forecast View (Today)
     renderForecastView();
-
-    // Re-render Solunar with precise weather sunrise/sunset values
     renderSolunarCard();
 
   } catch (err) {
-    clearTimeout(timeout);
     const isTimeout = err.name === 'AbortError';
     console.warn(`Weather fetch ${isTimeout ? 'timed out' : 'failed'} for ${station.id}:`, err);
     container.innerHTML = `
