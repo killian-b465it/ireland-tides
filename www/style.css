@@ -808,17 +808,20 @@ body {
     color: var(--accent-danger);
 }
 
-/* Archive Toggle Button */
-.archive-toggle-btn {
+/* Show More Button */
+.show-more-posts-btn {
     width: 100%;
+    margin-top: var(--space-md);
     margin-bottom: var(--space-md);
     text-align: center;
     background: rgba(0, 212, 255, 0.1);
-    border: 1px dashed var(--accent-primary);
+    border: 1px solid var(--accent-primary);
+    color: var(--text-main);
 }
 
-.archive-toggle-btn:hover {
-    background: rgba(0, 212, 255, 0.2);
+.show-more-posts-btn:hover {
+    background: var(--accent-primary);
+    color: var(--bg-dark);
 }
 
 /* Admin Delete Post Button */

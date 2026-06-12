@@ -356,7 +356,7 @@ let state = {
   allUsers: JSON.parse(localStorage.getItem('fishing_all_users') || '[]'),
   supportMessages: JSON.parse(localStorage.getItem('fishing_support_messages') || '[]'),
   currentReplyUserId: null,
-  showArchive: false, // Toggle for viewing posts older than 7 days
+  visibleCatchesCount: 10, // Limit of catches displayed in community feed
   fishingMode: 'sea', // 'sea' or 'freshwater'
   currentRegion: localStorage.getItem('fishing_region') || 'IE' // 'IE' or 'UK'
 };
@@ -726,12 +726,14 @@ window.showPage = (pageId, skipHistory = false) => {
     setTimeout(() => state.map.invalidateSize(), 50);
   }
   if (pageId === 'community') {
+    state.visibleCatchesCount = 10;
     if (!state.communityMap) {
       if (typeof window.initCommunityMap === 'function') {
          window.initCommunityMap();
       }
     } else {
       setTimeout(() => state.communityMap.invalidateSize(), 50);
+      renderCatchFeed();
     }
   }
   if (pageId === 'depth') {
@@ -2995,24 +2997,10 @@ function loadCommunityCatches() {
   const catchesRef = firebaseDB.ref('catches');
   catchesRef.on('value', (snapshot) => {
     const catches = [];
-    const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
-    const now = Date.now();
 
     snapshot.forEach((childSnapshot) => {
       const catchData = childSnapshot.val();
       if (!catchData) return;
-
-      // Use createdAt if available, otherwise fall back to id (both are timestamps)
-      const postTime = catchData.createdAt || catchData.id;
-
-      // Auto-delete posts older than 30 days (unless pinned)
-      if (!catchData.isPinned && postTime && (now - postTime) > thirtyDaysMs) {
-        if (firebaseDB) {
-          firebaseDB.ref('catches/' + catchData.id).remove()
-            .catch(err => console.warn('Auto-cleanup catch failed:', err));
-        }
-        return; // Skip adding to local state
-      }
 
       catches.push(catchData);
     });
@@ -3069,9 +3057,6 @@ function renderCatchFeed() {
   if (!feed) return; // Guard against null element
   feed.innerHTML = '';
 
-  const now = Date.now();
-  const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
-
   // Sort all catches: First by pinned status, then by time (id is the timestamp)
   const allSortedCatches = [...(state.catches || [])].sort((a, b) => {
     // Both pinned or both unpinned, sort by time
@@ -3082,35 +3067,13 @@ function renderCatchFeed() {
     return a.isPinned ? -1 : 1;
   });
 
-  // Use createdAt if present (new posts), otherwise fall back to id (old posts)
-  const getPostTime = (c) => c.createdAt || c.id || null;
-
-  // Filter based on archive mode - Pinned posts ALWAYS show regardless of 30-day filter
-  const catchesToShow = state.showArchive
-    ? allSortedCatches
-    : allSortedCatches.filter(c => {
-      if (c.isPinned) return true;
-      const postTime = getPostTime(c);
-      return postTime && (now - postTime) <= thirtyDaysMs;
-    });
-
-  // Check if there are older posts available (within what Firebase kept)
-  const hasOlderPosts = allSortedCatches.some(c => {
-    const postTime = getPostTime(c);
-    return !c.isPinned && postTime && (now - postTime) > thirtyDaysMs;
-  });
-
-  // Archive toggle button at top
-  if (hasOlderPosts || state.showArchive) {
-    const toggleBtn = document.createElement('button');
-    toggleBtn.className = 'btn btn-sm btn-outline archive-toggle-btn';
-    toggleBtn.innerHTML = state.showArchive ? '📅 Show Recent (Last 30 Days)' : '📜 View Older Posts';
-    toggleBtn.onclick = () => {
-      state.showArchive = !state.showArchive;
-      renderCatchFeed();
-    };
-    feed.appendChild(toggleBtn);
+  // Default limit if not set
+  if (typeof state.visibleCatchesCount === 'undefined') {
+    state.visibleCatchesCount = 10;
   }
+
+  // Slice catches to show based on visibleCatchesCount limit
+  const catchesToShow = allSortedCatches.slice(0, state.visibleCatchesCount);
 
   if (catchesToShow.length === 0) {
     const emptyMsg = document.createElement('div');
@@ -3213,6 +3176,18 @@ function renderCatchFeed() {
     `;
     feed.appendChild(item);
   });
+
+  // Show More button at the end of all the posts
+  if (allSortedCatches.length > state.visibleCatchesCount) {
+    const showMoreBtn = document.createElement('button');
+    showMoreBtn.className = 'btn show-more-posts-btn';
+    showMoreBtn.innerText = 'Show More';
+    showMoreBtn.onclick = () => {
+      state.visibleCatchesCount += 10;
+      renderCatchFeed();
+    };
+    feed.appendChild(showMoreBtn);
+  }
 }
 
 // Admin Pin/Unpin Post Function
