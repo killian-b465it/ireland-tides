@@ -3327,6 +3327,16 @@ function renderCatchFeed() {
       if (u && u.badges) authorBadges = u.badges;
     }
 
+    const rawText = c.details || c.notes || '';
+    const isLongText = rawText.length > 250 || (rawText.match(/\n/g) || []).length >= 3;
+    let detailsHtml = '';
+    if (displayDetails) {
+       detailsHtml = `<p class="catch-details ${isLongText ? 'collapsed-post-text' : ''}" id="post-text-${c.id}">${displayDetails}</p>`;
+       if (isLongText) {
+         detailsHtml += `<button class="show-more-post-btn" id="show-more-post-${c.id}" onclick="togglePostText(${c.id})" style="margin-top: 5px; margin-bottom: 10px; font-size: 0.8rem; padding: 4px 10px; background: transparent; border: 1px solid var(--accent-primary); color: var(--accent-primary); border-radius: 12px; cursor: pointer; display: inline-block;">Show more</button>`;
+       }
+    }
+
     const item = document.createElement('div');
     item.className = `feed-item catch-card ${c.isPinned ? 'pinned-post' : ''}`;
     item.innerHTML = `
@@ -3352,7 +3362,7 @@ function renderCatchFeed() {
       </div>
       <div class="feed-content">
         <p class="catch-species"><strong>🎣 ${sanitizeHTML(c.species || 'Catch')}</strong></p>
-        ${displayDetails ? `<p class="catch-details">${displayDetails}</p>` : ''}
+        ${detailsHtml}
         ${c.loadout ? `
           <div style="margin-top: 8px; padding: 8px 10px; background: rgba(0, 212, 255, 0.05); border: 1px solid rgba(0, 212, 255, 0.15); border-radius: 6px; font-size: 0.8rem;">
             <strong style="color: var(--accent-primary);">🎒 ${sanitizeHTML(c.loadout.name)}:</strong>
@@ -3419,9 +3429,11 @@ function renderCatchFeed() {
 function formatPostText(str) {
   if (!str) return '';
   const sanitized = sanitizeHTML(str);
-  return sanitized.replace(/#([a-zA-Z0-9_\u00C0-\u00FF]+)/g, (match, tag) => {
-    return `<span class="hashtag-link" onclick="event.stopPropagation(); setFeedSearch('${match}')">${match}</span>`;
-  });
+  return sanitized
+    .replace(/\n/g, '<br>')
+    .replace(/#([a-zA-Z0-9_\u00C0-\u00FF]+)/g, (match, tag) => {
+      return `<span class="hashtag-link" onclick="event.stopPropagation(); setFeedSearch('${match}')">${match}</span>`;
+    });
 }
 
 window.handleFeedSearch = (val) => {
@@ -3447,6 +3459,20 @@ window.setFeedSearch = (query) => {
 };
 
 // Admin Pin/Unpin Post Function
+window.togglePostText = (id) => {
+  const textEl = document.getElementById('post-text-' + id);
+  const btnEl = document.getElementById('show-more-post-' + id);
+  if (textEl && btnEl) {
+    if (textEl.classList.contains('collapsed-post-text')) {
+      textEl.classList.remove('collapsed-post-text');
+      btnEl.innerText = 'Show less';
+    } else {
+      textEl.classList.add('collapsed-post-text');
+      btnEl.innerText = 'Show more';
+    }
+  }
+};
+
 window.togglePinCatch = (catchId) => {
   if (!state.user || !state.user.isAdmin) {
     return alert('Only admins can pin posts.');

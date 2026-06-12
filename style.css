@@ -6485,4 +6485,12 @@ input:checked+.toggle-slider:before {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 255, 136, 0.2);
 }
 
-
+
+/* Post Text Collapsing */
+.collapsed-post-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
