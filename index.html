@@ -8,6 +8,9 @@
     content="Real-time tide data for fishing around Ireland's coast. View current water levels, high/low tide times, and fishing conditions for all Irish coastal locations.">
   <title>Irish Fishing Hub - Real-Time Fishing Tide Data</title>
 
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -772,6 +775,12 @@
         <input type="text" id="catch-species" placeholder="e.g., Sea Bass, Mackerel">
       </div>
       <div class="form-group">
+        <label>Gear Loadout <small style="color:var(--text-muted); font-weight:400;">(Optional)</small></label>
+        <select id="catch-loadout" class="auth-input" style="appearance: auto; background-color: rgba(0,0,0,0.2); width: 100%; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; color: var(--text-main);">
+           <option value="">No specific loadout</option>
+        </select>
+      </div>
+      <div class="form-group">
         <label>Details</label>
         <textarea id="catch-details" placeholder="How was the fight? What bait did you use?"></textarea>
       </div>
@@ -1011,6 +1020,16 @@
       <div class="form-group">
         <label>Total Catches 🎣 <small style="color:var(--text-muted); font-weight:400;">(lifetime count, not just posts)</small></label>
         <input type="number" id="profile-total-catches" class="auth-input" min="0" placeholder="e.g. 150">
+      </div>
+
+      <div class="form-group" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; margin-top: 5px;">
+        <label style="display: flex; justify-content: space-between; align-items: center;">
+          <span>Gear Loadouts 🎒 <small style="color:var(--text-muted); font-weight:400;">(Pro Feature)</small></span>
+          <button class="btn btn-sm btn-outline" style="padding: 2px 8px; font-size: 0.75rem;" onclick="addProfileLoadout()">+ Add</button>
+        </label>
+        <div id="profile-loadouts-container" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+           <p style="color: var(--text-muted); font-size: 0.8rem;">No loadouts saved.</p>
+        </div>
       </div>
 
       <div class="modal-actions" style="justify-content: space-between; margin-top: 20px;">
@@ -2102,6 +2121,17 @@
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
   <script src="app.js"></script>
   <script src="sponsors.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(registration => {
+          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }, err => {
+          console.log('ServiceWorker registration failed: ', err);
+        });
+      });
+    }
+  </script>
 </body>
 
 </html>

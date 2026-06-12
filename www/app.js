@@ -2845,6 +2845,16 @@ window.openPostModal = (latlng) => {
 
   state.currentModalLatLng = latlng; // null if general post
 
+  const loadoutSelect = document.getElementById('catch-loadout');
+  if (loadoutSelect) {
+    loadoutSelect.innerHTML = '<option value="">No specific loadout</option>';
+    if (state.user && state.user.loadouts) {
+      state.user.loadouts.forEach(l => {
+        loadoutSelect.innerHTML += `<option value="${l.id}">${sanitizeHTML(l.name)}</option>`;
+      });
+    }
+  }
+
   const modalTitle = document.querySelector('#catch-modal h3');
   const detailsLabel = document.querySelector('#catch-details').previousElementSibling; // Label for details
   const speciesLabel = document.querySelector('#catch-species').previousElementSibling; // Label for species
@@ -2924,6 +2934,12 @@ window.submitCatch = async () => {
   const processCatch = (photosDataArray) => {
     const isGeneralPost = !state.currentModalLatLng;
 
+    const loadoutId = document.getElementById('catch-loadout') ? document.getElementById('catch-loadout').value : "";
+    let selectedLoadout = null;
+    if (loadoutId && state.user && state.user.loadouts) {
+      selectedLoadout = state.user.loadouts.find(l => l.id.toString() === loadoutId);
+    }
+
     const postTimestamp = Date.now();
     const c = {
       id: postTimestamp,
@@ -2939,6 +2955,7 @@ window.submitCatch = async () => {
       authorIsAdmin: state.user.isAdmin === true,
       photos: photosDataArray,
       photo: photosDataArray && photosDataArray.length > 0 ? photosDataArray[0] : null,
+      loadout: selectedLoadout,
       likes: 0,
       likedBy: [],
       comments: []
@@ -3212,6 +3229,12 @@ function renderCatchFeed() {
       <div class="feed-content">
         <p class="catch-species"><strong>🎣 ${sanitizeHTML(c.species || 'Catch')}</strong></p>
         ${displayDetails ? `<p class="catch-details">${displayDetails}</p>` : ''}
+        ${c.loadout ? `
+          <div style="margin-top: 8px; padding: 8px 10px; background: rgba(0, 212, 255, 0.05); border: 1px solid rgba(0, 212, 255, 0.15); border-radius: 6px; font-size: 0.8rem;">
+            <strong style="color: var(--accent-primary);">🎒 ${sanitizeHTML(c.loadout.name)}:</strong>
+            <span style="color: var(--text-secondary); margin-left: 4px;">${sanitizeHTML(c.loadout.details)}</span>
+          </div>
+        ` : ''}
         ${photosHtml}
       </div>
       <div class="feed-actions catch-card-actions">
@@ -4956,6 +4979,8 @@ window.openProfileModal = () => {
   const catchesInput = document.getElementById('profile-total-catches');
   if (catchesInput) catchesInput.value = state.user.totalCatches !== undefined ? state.user.totalCatches : '';
 
+  if (typeof renderProfileLoadouts === 'function') renderProfileLoadouts();
+
   const preview = document.getElementById('profile-avatar-preview');
   if (state.user.avatar) {
     preview.src = state.user.avatar;
@@ -5046,6 +5071,46 @@ window.saveProfile = () => {
   updateAuthUI();
   closeProfileModal();
   alert('Profile saved!');
+};
+
+window.renderProfileLoadouts = () => {
+  const container = document.getElementById('profile-loadouts-container');
+  if (!container) return;
+  
+  if (!state.user || !state.user.loadouts || state.user.loadouts.length === 0) {
+    container.innerHTML = '<p style="color: var(--text-muted); font-size: 0.8rem;">No loadouts saved.</p>';
+    return;
+  }
+  
+  container.innerHTML = state.user.loadouts.map(l => `
+    <div style="background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <div style="font-weight: 600; font-size: 0.85rem; color: var(--accent-primary);">${sanitizeHTML(l.name)}</div>
+        <div style="font-size: 0.75rem; color: var(--text-secondary);">${sanitizeHTML(l.details)}</div>
+      </div>
+      <button class="btn btn-sm" style="background: transparent; color: #ff5252; padding: 4px; border: none; font-size: 1rem; cursor: pointer;" onclick="removeProfileLoadout(${l.id})">✕</button>
+    </div>
+  `).join('');
+};
+
+window.addProfileLoadout = () => {
+  if (!state.user) return;
+  const name = prompt("Enter a name for this loadout (e.g. Winter Pike Rig):");
+  if (!name) return;
+  const details = prompt("Enter gear details (e.g. 9ft Penn Rod, 20lb Braid):");
+  if (!details) return;
+  
+  if (!state.user.loadouts) state.user.loadouts = [];
+  state.user.loadouts.push({ id: Date.now(), name, details });
+  renderProfileLoadouts();
+  saveProfile(); // Auto-save
+};
+
+window.removeProfileLoadout = (id) => {
+  if (!state.user || !state.user.loadouts) return;
+  state.user.loadouts = state.user.loadouts.filter(l => l.id !== id);
+  renderProfileLoadouts();
+  saveProfile();
 };
 
 
