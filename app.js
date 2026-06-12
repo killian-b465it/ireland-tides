@@ -3208,6 +3208,12 @@ function renderCatchFeed() {
 
     const userOnClick = `onclick="viewUserProfile('${displayUserId}')"`;
     const nameStyle = `style="cursor: pointer; font-weight: bold; color: var(--text-main);"`;
+    
+    let authorBadges = [];
+    if (state.allUsers && displayUserId) {
+      const u = state.allUsers.find(u => u.id === displayUserId);
+      if (u && u.badges) authorBadges = u.badges;
+    }
 
     const item = document.createElement('div');
     item.className = `feed-item catch-card ${c.isPinned ? 'pinned-post' : ''}`;
@@ -3215,6 +3221,8 @@ function renderCatchFeed() {
       <div class="feed-header catch-header">
         <div class="header-left">
           <span class="feed-user" ${userOnClick} ${nameStyle}>${displayName}</span>
+          ${authorBadges.includes('Fish of the Month') ? '<span class="admin-badge" style="background: linear-gradient(135deg, #FFD700, #FDB931); color: #000; font-weight: bold; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);">🏆 Fish of the Month</span>' : ''}
+          ${authorBadges.includes('Pro Angler') ? '<span class="admin-badge" style="background: linear-gradient(135deg, #00d4ff, #005bb5); color: #fff;">🎣 Pro Angler</span>' : ''}
           ${c.authorIsAdmin ? '<span class="admin-badge">🛡️ Admin</span>' : ''}
           ${c.isPinned ? '<span class="pinned-badge">📌 Pinned</span>' : ''}
         </div>
@@ -8119,3 +8127,44 @@ function renderLogbookMarkers() {
     state.logbookMap.fitBounds(bounds, { padding: [30, 30] });
   }
 }
+
+
+// ============================================
+// Admin Badge Logic
+// ============================================
+window.adminAwardBadge = async () => {
+  if (!state.user || !state.user.isAdmin) return;
+  const targetId = document.getElementById('admin-badge-userid').value.trim();
+  const badgeType = document.getElementById('admin-badge-type').value;
+
+  if (!targetId) return alert('Please enter a User ID.');
+
+  try {
+    const userRef = firebaseDB.ref('users/' + targetId);
+    const snapshot = await userRef.once('value');
+    
+    if (!snapshot.exists()) {
+      return alert('User not found!');
+    }
+    
+    const userData = snapshot.val();
+    const badges = userData.badges || [];
+    
+    if (!badges.includes(badgeType)) {
+      badges.push(badgeType);
+      await userRef.update({ badges });
+      alert('Successfully awarded "' + badgeType + '" to ' + (userData.name || targetId));
+      
+      // Update local state.allUsers if loaded
+      const userIdx = state.allUsers.findIndex(u => u.id === targetId);
+      if (userIdx !== -1) {
+        state.allUsers[userIdx].badges = badges;
+        renderCatchFeed(); // re-render to show badge immediately
+      }
+    } else {
+      alert('User already has this badge.');
+    }
+  } catch (err) {
+    alert('Error awarding badge: ' + err.message);
+  }
+};
