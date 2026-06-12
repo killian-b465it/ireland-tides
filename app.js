@@ -2940,6 +2940,7 @@ window.submitCatch = async () => {
       selectedLoadout = state.user.loadouts.find(l => l.id.toString() === loadoutId);
     }
 
+    const isPrivate = document.getElementById("catch-is-private") ? document.getElementById("catch-is-private").checked : false;
     const postTimestamp = Date.now();
     const c = {
       id: postTimestamp,
@@ -2956,6 +2957,7 @@ window.submitCatch = async () => {
       photos: photosDataArray,
       photo: photosDataArray && photosDataArray.length > 0 ? photosDataArray[0] : null,
       loadout: selectedLoadout,
+      isPrivate: isPrivate,
       likes: 0,
       likedBy: [],
       comments: []
@@ -3050,7 +3052,7 @@ function addCommunityMarker(c) {
   if (!state.communityMap || !communityMarkerGroup) return;
 
   // Skip general posts (no coordinates)
-  if (!c.lat || !c.lng) return;
+  if (!c.lat || !c.lng || c.isPrivate) return;
 
   const icon = L.divIcon({
     className: 'social-marker',
@@ -3078,8 +3080,10 @@ function renderCatchFeed() {
   if (!feed) return; // Guard against null element
   feed.innerHTML = '';
 
+  const publicCatches = (state.catches || []).filter(c => !c.isPrivate);
+
   // Sort all catches: First by pinned status, then by time (id is the timestamp)
-  const allSortedCatches = [...(state.catches || [])].sort((a, b) => {
+  const allSortedCatches = [...publicCatches].sort((a, b) => {
     // Both pinned or both unpinned, sort by time
     if (!!a.isPinned === !!b.isPinned) {
       return (b.id || 0) - (a.id || 0);
@@ -3090,7 +3094,7 @@ function renderCatchFeed() {
 
   // Calculate trending hashtags from all posts dynamically
   const tagCounts = {};
-  (state.catches || []).forEach(c => {
+  publicCatches.forEach(c => {
     const text = c.details || c.notes || '';
     const tags = text.match(/#([a-zA-Z0-9_\u00C0-\u00FF]+)/g);
     if (tags) {
