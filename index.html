@@ -508,6 +508,17 @@
             <span class="card-title">📸 Pin a spot on the map or post an update</span>
             <button class="btn btn-sm btn-primary" onclick="openPostModal(null)">📝 Post Update</button>
           </div>
+          <div class="feed-search-container">
+            <div class="search-input-wrapper">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="feed-search" placeholder="Search species, tags, users..." oninput="handleFeedSearch(this.value)">
+              <button id="clear-search-btn" class="clear-search-btn" onclick="clearFeedSearch()" style="display: none;">&times;</button>
+            </div>
+            <div class="popular-tags-row">
+              <span class="tags-label">Trending:</span>
+              <div id="popular-tags-list" class="tags-list"></div>
+            </div>
+          </div>
           <div class="catch-feed" id="catch-feed">
             <div class="empty-state">
               <p>No catches shared yet. Be the first!</p>

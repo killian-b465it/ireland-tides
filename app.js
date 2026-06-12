@@ -357,6 +357,7 @@ let state = {
   supportMessages: JSON.parse(localStorage.getItem('fishing_support_messages') || '[]'),
   currentReplyUserId: null,
   visibleCatchesCount: 10, // Limit of catches displayed in community feed
+  feedSearchQuery: '', // Filter search query for the community feed
   fishingMode: 'sea', // 'sea' or 'freshwater'
   currentRegion: localStorage.getItem('fishing_region') || 'IE' // 'IE' or 'UK'
 };
@@ -727,6 +728,9 @@ window.showPage = (pageId, skipHistory = false) => {
   }
   if (pageId === 'community') {
     state.visibleCatchesCount = 10;
+    state.feedSearchQuery = '';
+    const searchInput = document.getElementById('feed-search');
+    if (searchInput) searchInput.value = '';
     if (!state.communityMap) {
       if (typeof window.initCommunityMap === 'function') {
          window.initCommunityMap();
@@ -3067,18 +3071,92 @@ function renderCatchFeed() {
     return a.isPinned ? -1 : 1;
   });
 
+  // Calculate trending hashtags from all posts dynamically
+  const tagCounts = {};
+  (state.catches || []).forEach(c => {
+    const text = c.details || c.notes || '';
+    const tags = text.match(/#([a-zA-Z0-9_\u00C0-\u00FF]+)/g);
+    if (tags) {
+      tags.forEach(t => {
+        const normalized = t.toLowerCase();
+        tagCounts[normalized] = (tagCounts[normalized] || 0) + 1;
+      });
+    }
+  });
+
+  const popularTags = Object.keys(tagCounts)
+    .sort((a, b) => tagCounts[b] - tagCounts[a])
+    .slice(0, 5);
+
+  let displayTags = popularTags;
+  if (displayTags.length === 0) {
+    displayTags = ['#bass', '#mackerel', '#pike', '#trout', '#seaangling'];
+  }
+
+  // Update search input UI state
+  const searchInput = document.getElementById('feed-search');
+  const clearBtn = document.getElementById('clear-search-btn');
+  if (searchInput) {
+    searchInput.value = state.feedSearchQuery || '';
+  }
+  if (clearBtn) {
+    clearBtn.style.display = state.feedSearchQuery ? 'block' : 'none';
+  }
+
+  // Render trending tags UI list
+  const tagsListContainer = document.getElementById('popular-tags-list');
+  if (tagsListContainer) {
+    tagsListContainer.innerHTML = '';
+    displayTags.forEach(tag => {
+      const isActive = (state.feedSearchQuery || '').toLowerCase() === tag.toLowerCase();
+      const tagBadge = document.createElement('span');
+      tagBadge.className = `tag-badge ${isActive ? 'active' : ''}`;
+      tagBadge.innerText = tag;
+      tagBadge.onclick = () => {
+        if (isActive) {
+          setFeedSearch('');
+        } else {
+          setFeedSearch(tag);
+        }
+      };
+      tagsListContainer.appendChild(tagBadge);
+    });
+  }
+
+  // Filter catches based on state.feedSearchQuery
+  const searchQuery = (state.feedSearchQuery || '').trim().toLowerCase();
+  let filteredCatches = allSortedCatches;
+
+  if (searchQuery) {
+    filteredCatches = allSortedCatches.filter(c => {
+      const speciesMatch = (c.species || '').toLowerCase().includes(searchQuery);
+      const detailsMatch = (c.details || c.notes || '').toLowerCase().includes(searchQuery);
+      const authorMatch = (c.author || c.userName || '').toLowerCase().includes(searchQuery);
+
+      if (searchQuery.startsWith('#')) {
+        const cleanedTag = searchQuery.substring(1);
+        const hashtagRegex = new RegExp(`#${cleanedTag}\\b`, 'i');
+        return hashtagRegex.test(c.details || c.notes || '');
+      }
+
+      return speciesMatch || detailsMatch || authorMatch;
+    });
+  }
+
   // Default limit if not set
   if (typeof state.visibleCatchesCount === 'undefined') {
     state.visibleCatchesCount = 10;
   }
 
   // Slice catches to show based on visibleCatchesCount limit
-  const catchesToShow = allSortedCatches.slice(0, state.visibleCatchesCount);
+  const catchesToShow = filteredCatches.slice(0, state.visibleCatchesCount);
 
   if (catchesToShow.length === 0) {
     const emptyMsg = document.createElement('div');
     emptyMsg.className = 'empty-state';
-    emptyMsg.innerHTML = '<p>No catches to show. Be the first to share!</p>';
+    emptyMsg.innerHTML = searchQuery 
+      ? '<p>No matching catches found. Try another search term!</p>' 
+      : '<p>No catches to show. Be the first to share!</p>';
     feed.appendChild(emptyMsg);
     return;
   }
@@ -3092,7 +3170,7 @@ function renderCatchFeed() {
     // Use correct field names from submitCatch: author, authorId, photo, details
     // [SECURITY] Sanitize all user-generated strings to prevent XSS
     const displayName = sanitizeHTML(c.author || c.userName || 'Anonymous');
-    const displayDetails = sanitizeHTML(c.details || c.notes || '');
+    const displayDetails = formatPostText(c.details || c.notes || '');
     const displayUserId = c.authorId || c.userId || ''; // IDs are internal, but still keep safe
     const displayPhoto = c.photo || c.image || ''; // Base64 or URL
     
@@ -3178,7 +3256,7 @@ function renderCatchFeed() {
   });
 
   // Show More button at the end of all the posts
-  if (allSortedCatches.length > state.visibleCatchesCount) {
+  if (filteredCatches.length > state.visibleCatchesCount) {
     const showMoreBtn = document.createElement('button');
     showMoreBtn.className = 'btn show-more-posts-btn';
     showMoreBtn.innerText = 'Show More';
@@ -3189,6 +3267,37 @@ function renderCatchFeed() {
     feed.appendChild(showMoreBtn);
   }
 }
+
+// Interactive hashtag and search helper functions
+function formatPostText(str) {
+  if (!str) return '';
+  const sanitized = sanitizeHTML(str);
+  return sanitized.replace(/#([a-zA-Z0-9_\u00C0-\u00FF]+)/g, (match, tag) => {
+    return `<span class="hashtag-link" onclick="event.stopPropagation(); setFeedSearch('${match}')">${match}</span>`;
+  });
+}
+
+window.handleFeedSearch = (val) => {
+  state.feedSearchQuery = val;
+  state.visibleCatchesCount = 10;
+  renderCatchFeed();
+};
+
+window.clearFeedSearch = () => {
+  state.feedSearchQuery = '';
+  const searchInput = document.getElementById('feed-search');
+  if (searchInput) searchInput.value = '';
+  state.visibleCatchesCount = 10;
+  renderCatchFeed();
+};
+
+window.setFeedSearch = (query) => {
+  state.feedSearchQuery = query;
+  const searchInput = document.getElementById('feed-search');
+  if (searchInput) searchInput.value = query;
+  state.visibleCatchesCount = 10;
+  renderCatchFeed();
+};
 
 // Admin Pin/Unpin Post Function
 window.togglePinCatch = (catchId) => {
