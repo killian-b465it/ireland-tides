@@ -5597,6 +5597,7 @@ function loadUsersTable() {
               ⚙️ Utilities ▾
             </button>
             <div class="util-dropdown-content">
+              <button style="color: #FFD700; font-weight: bold;" onclick="awardBadgeFromList('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}')">🏆 Award Fish of Month</button>
               <button onclick="openEmailCenter('${u.email}')">📧 Email Member</button>
               <button onclick="openUsernameEditor('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}', '${u.email}')">✏️ Edit Username</button>
               <button onclick="changeUserPassword('${u.id}')">🔑 Change Password</button>
@@ -8160,6 +8161,42 @@ window.adminAwardBadge = async () => {
       if (userIdx !== -1) {
         state.allUsers[userIdx].badges = badges;
         renderCatchFeed(); // re-render to show badge immediately
+      }
+    } else {
+      alert('User already has this badge.');
+    }
+  } catch (err) {
+    alert('Error awarding badge: ' + err.message);
+  }
+};
+
+
+window.awardBadgeFromList = async (userId, userName) => {
+  if (!state.user || !state.user.isAdmin) return;
+  const badgeType = 'Fish of the Month';
+  
+  if (!confirm('Are you sure you want to award "Fish of the Month" to ' + userName + '?')) return;
+
+  try {
+    const userRef = firebaseDB.ref('users/' + userId);
+    const snapshot = await userRef.once('value');
+    
+    if (!snapshot.exists()) {
+      return alert('User not found!');
+    }
+    
+    const userData = snapshot.val();
+    const badges = userData.badges || [];
+    
+    if (!badges.includes(badgeType)) {
+      badges.push(badgeType);
+      await userRef.update({ badges });
+      alert('Successfully awarded "' + badgeType + '" to ' + userName);
+      
+      const userIdx = state.allUsers.findIndex(u => u.id === userId);
+      if (userIdx !== -1) {
+        state.allUsers[userIdx].badges = badges;
+        renderCatchFeed();
       }
     } else {
       alert('User already has this badge.');
