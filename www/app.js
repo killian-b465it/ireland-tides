@@ -8006,5 +8006,112 @@ function initConnectionMonitoring() {
   }
 }
 
+// ============================================
+// Personal Logbook Logic
+// ============================================
+window.openLogbookModal = () => {
+  if (!state.user) return;
+  
+  // Close profile modal if open
+  closeProfileModal();
+  
+  const modal = document.getElementById('logbook-modal');
+  if (modal) modal.classList.add('active');
+  
+  if (!state.logbookMap) {
+    // Initialize map
+    const defaultCenter = [53.3498, -6.2603]; // Dublin
+    state.logbookMap = L.map('logbook-map', {
+      zoomControl: false,
+      attributionControl: false
+    }).setView(defaultCenter, 6);
 
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 18,
+      className: 'dark-map-layer'
+    }).addTo(state.logbookMap);
+    
+    // Add custom zoom control
+    L.control.zoom({ position: 'bottomright' }).addTo(state.logbookMap);
+  }
+  
+  // Invalidate size after modal transition completes to prevent grey tiles
+  setTimeout(() => {
+    state.logbookMap.invalidateSize();
+    renderLogbookMarkers();
+  }, 300);
+};
 
+window.closeLogbookModal = () => {
+  const modal = document.getElementById('logbook-modal');
+  if (modal) modal.classList.remove('active');
+};
+
+function renderLogbookMarkers() {
+  if (!state.logbookMap || !state.user || !state.catches) return;
+
+  // Clear existing markers
+  if (state.logbookLayerGroup) {
+    state.logbookMap.removeLayer(state.logbookLayerGroup);
+  }
+  
+  state.logbookLayerGroup = L.layerGroup().addTo(state.logbookMap);
+  
+  const myCatches = state.catches.filter(c => c.authorId === state.user.id && c.lat && c.lng);
+  
+  if (myCatches.length === 0) return;
+
+  const bounds = L.latLngBounds();
+
+  myCatches.forEach(c => {
+    const latlng = [c.lat, c.lng];
+    bounds.extend(latlng);
+    
+    const marker = L.marker(latlng, {
+      icon: L.divIcon({
+        className: 'custom-community-marker',
+        html: `<div style="font-size: 24px; filter: drop-shadow(0 0 5px rgba(0,212,255,0.8));">📍</div>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 24],
+        popupAnchor: [0, -24]
+      })
+    });
+    
+    const displayPhoto = c.photo || c.image || '';
+    const displayDetails = sanitizeHTML(c.details || c.notes || '');
+    
+    let popupContent = `<div class="catch-popup">`;
+    if (displayPhoto) {
+      popupContent += `<img src="${displayPhoto}" style="width:100%; height:120px; object-fit:cover; border-radius:4px; margin-bottom:8px;">`;
+    }
+    popupContent += `
+      <h4 style="margin:0 0 5px 0; color:var(--text-main); font-size:1rem;">🎣 ${sanitizeHTML(c.species || 'Catch')}</h4>
+      <p style="margin:0 0 5px 0; font-size:0.8rem; color:var(--text-secondary);">${c.date || getTimeAgo(c.id)}</p>
+    `;
+    
+    if (c.loadout) {
+      popupContent += `
+        <div style="margin-bottom: 5px; padding: 4px; background: rgba(0, 212, 255, 0.05); border: 1px solid rgba(0, 212, 255, 0.15); border-radius: 4px; font-size: 0.75rem;">
+          <strong style="color: var(--accent-primary);">🎒 ${sanitizeHTML(c.loadout.name)}</strong>
+        </div>
+      `;
+    }
+    
+    if (displayDetails) {
+      popupContent += `<p style="margin:0; font-size:0.85rem; color:var(--text-main);">${displayDetails}</p>`;
+    }
+    popupContent += `</div>`;
+    
+    marker.bindPopup(popupContent, {
+      maxWidth: 250,
+      minWidth: 200,
+      className: 'dark-popup'
+    });
+    
+    marker.addTo(state.logbookLayerGroup);
+  });
+  
+  if (myCatches.length > 0) {
+    state.logbookMap.fitBounds(bounds, { padding: [30, 30] });
+  }
+}

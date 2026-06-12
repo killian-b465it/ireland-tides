@@ -985,6 +985,22 @@
     </div>
   </div>
 
+  <!-- Personal Logbook Modal -->
+  <div class="modal" id="logbook-modal" style="z-index: 10000;">
+    <div class="modal-content" style="width: 95vw; height: 90vh; max-width: 1200px; display: flex; flex-direction: column; padding: 0; overflow: hidden; border-radius: 12px;">
+      <div class="modal-header" style="padding: 15px 20px; border-bottom: 1px solid var(--border-glass); background: var(--bg-card); z-index: 10;">
+        <h2 style="font-size: 1.2rem; margin: 0;">🗺️ My Personal Logbook</h2>
+        <button class="modal-close-btn-inline" onclick="closeLogbookModal()">✕</button>
+      </div>
+      <div style="flex: 1; position: relative;">
+        <div id="logbook-map" style="width: 100%; height: 100%; background: #0a192f;"></div>
+        <div class="map-overlay" style="pointer-events: none; bottom: 20px; width: 80%; left: 10%;">
+          <p>Your private history of catches and spots.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Profile Modal -->
   <div class="modal" id="profile-modal">
     <div class="modal-content">
@@ -1030,6 +1046,12 @@
         <div id="profile-loadouts-container" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
            <p style="color: var(--text-muted); font-size: 0.8rem;">No loadouts saved.</p>
         </div>
+      </div>
+
+      <div class="form-group" style="margin-top: 15px;">
+        <button class="btn btn-outline" style="width: 100%; justify-content: center; display: flex; gap: 8px; border-color: var(--accent-primary); color: var(--accent-primary);" onclick="openLogbookModal()">
+           🗺️ View My Logbook Map
+        </button>
       </div>
 
       <div class="modal-actions" style="justify-content: space-between; margin-top: 20px;">
