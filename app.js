@@ -5582,6 +5582,7 @@ function loadUsersTable() {
     const isActive = u.active !== false;
     const plan = u.plan || 'free';
     const pwd = u.password || '******';
+    const hasFishBadge = u.badges && u.badges.includes('Fish of the Month');
 
     return `
       <tr>
@@ -5597,7 +5598,10 @@ function loadUsersTable() {
               ⚙️ Utilities ▾
             </button>
             <div class="util-dropdown-content">
-              <button style="color: #FFD700; font-weight: bold;" onclick="awardBadgeFromList('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}')">🏆 Award Fish of Month</button>
+              ${hasFishBadge ? 
+                `<button style="color: #ff4d4d; font-weight: bold;" onclick="removeBadgeFromList('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}')">❌ Remove Fish of Month</button>` :
+                `<button style="color: #FFD700; font-weight: bold;" onclick="awardBadgeFromList('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}')">🏆 Award Fish of Month</button>`
+              }
               <button onclick="openEmailCenter('${u.email}')">📧 Email Member</button>
               <button onclick="openUsernameEditor('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}', '${u.email}')">✏️ Edit Username</button>
               <button onclick="changeUserPassword('${u.id}')">🔑 Change Password</button>
@@ -8171,6 +8175,41 @@ window.adminAwardBadge = async () => {
 };
 
 
+
+window.removeBadgeFromList = async (userId, userName) => {
+  if (!state.user || !state.user.isAdmin) return;
+  const badgeType = 'Fish of the Month';
+  
+  if (!confirm('Are you sure you want to remove "Fish of the Month" from ' + userName + '?')) return;
+
+  try {
+    const userRef = firebaseDB.ref('users/' + userId);
+    const snapshot = await userRef.once('value');
+    
+    if (!snapshot.exists()) return alert('User not found!');
+    
+    const userData = snapshot.val();
+    let badges = userData.badges || [];
+    
+    if (badges.includes(badgeType)) {
+      badges = badges.filter(b => b !== badgeType);
+      await userRef.update({ badges });
+      alert('Successfully removed "' + badgeType + '" from ' + userName);
+      
+      const userIdx = state.allUsers.findIndex(u => u.id === userId);
+      if (userIdx !== -1) {
+        state.allUsers[userIdx].badges = badges;
+        renderCatchFeed();
+        loadUsersTable(); // re-render the table to toggle the button back
+      }
+    } else {
+      alert('User does not have this badge.');
+    }
+  } catch (err) {
+    alert('Error removing badge: ' + err.message);
+  }
+};
+
 window.awardBadgeFromList = async (userId, userName) => {
   if (!state.user || !state.user.isAdmin) return;
   const badgeType = 'Fish of the Month';
@@ -8197,6 +8236,7 @@ window.awardBadgeFromList = async (userId, userName) => {
       if (userIdx !== -1) {
         state.allUsers[userIdx].badges = badges;
         renderCatchFeed();
+        loadUsersTable();
       }
     } else {
       alert('User already has this badge.');
