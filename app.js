@@ -3324,7 +3324,9 @@ function renderCatchFeed() {
     let authorBadges = [];
     if (state.allUsers && displayUserId) {
       const u = state.allUsers.find(u => u.id === displayUserId);
-      if (u && u.badges) authorBadges = u.badges;
+      if (u && u.badges) {
+        authorBadges = Array.isArray(u.badges) ? u.badges : (typeof u.badges === 'string' ? [u.badges] : Object.values(u.badges));
+      }
     }
 
     const rawText = c.details || c.notes || '';
@@ -5720,7 +5722,8 @@ function loadUsersTable() {
     const isActive = u.active !== false;
     const plan = u.plan || 'free';
     const pwd = u.password || '******';
-    const hasFishBadge = u.badges && u.badges.includes('Fish of the Month');
+    const userBadges = u.badges ? (Array.isArray(u.badges) ? u.badges : (typeof u.badges === 'string' ? [u.badges] : Object.values(u.badges))) : [];
+    const hasFishBadge = userBadges.includes('Fish of the Month');
 
     return `
       <tr>
@@ -8291,7 +8294,7 @@ window.adminAwardBadge = async () => {
     }
     
     const userData = snapshot.val();
-    const badges = userData.badges || [];
+    let badges = userData.badges ? (Array.isArray(userData.badges) ? userData.badges : (typeof userData.badges === 'string' ? [userData.badges] : Object.values(userData.badges))) : [];
     
     if (!badges.includes(badgeType)) {
       badges.push(badgeType);
@@ -8327,7 +8330,7 @@ window.removeBadgeFromList = async (userId, userName) => {
     if (!snapshot.exists()) return alert('User not found!');
     
     const userData = snapshot.val();
-    let badges = userData.badges || [];
+    let badges = userData.badges ? (Array.isArray(userData.badges) ? userData.badges : (typeof userData.badges === 'string' ? [userData.badges] : Object.values(userData.badges))) : [];
     
     if (badges.includes(badgeType)) {
       badges = badges.filter(b => b !== badgeType);
@@ -8363,7 +8366,7 @@ window.awardBadgeFromList = async (userId, userName) => {
     }
     
     const userData = snapshot.val();
-    const badges = userData.badges || [];
+    let badges = userData.badges ? (Array.isArray(userData.badges) ? userData.badges : (typeof userData.badges === 'string' ? [userData.badges] : Object.values(userData.badges))) : [];
     
     if (!badges.includes(badgeType)) {
       badges.push(badgeType);
