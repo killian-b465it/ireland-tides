@@ -3346,6 +3346,7 @@ function renderCatchFeed() {
         <div class="header-left">
           <span class="feed-user" ${userOnClick} ${nameStyle}>${displayName}</span>
           ${authorBadges.includes('Fish of the Month') ? '<span class="admin-badge" style="background: linear-gradient(135deg, #FFD700, #FDB931); color: #000; font-weight: bold; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);">🏆 Fish of the Month</span>' : ''}
+          ${authorBadges.includes('Ambassador') ? '<span class="admin-badge" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-weight: bold; box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);">🌟 Ambassador</span>' : ''}
           ${authorBadges.includes('Pro Angler') ? '<span class="admin-badge" style="background: linear-gradient(135deg, #00d4ff, #005bb5); color: #fff;">🎣 Pro Angler</span>' : ''}
           ${c.authorIsAdmin ? '<span class="admin-badge">🛡️ Admin</span>' : ''}
           ${c.isPinned ? '<span class="pinned-badge">📌 Pinned</span>' : ''}
@@ -5724,6 +5725,7 @@ function loadUsersTable() {
     const pwd = u.password || '******';
     const userBadges = u.badges ? (Array.isArray(u.badges) ? u.badges : (typeof u.badges === 'string' ? [u.badges] : Object.values(u.badges))) : [];
     const hasFishBadge = userBadges.includes('Fish of the Month');
+    const hasAmbassadorBadge = userBadges.includes('Ambassador');
 
     return `
       <tr>
@@ -5742,6 +5744,10 @@ function loadUsersTable() {
               ${hasFishBadge ? 
                 `<button style="color: #ff4d4d; font-weight: bold;" onclick="removeBadgeFromList('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}')">❌ Remove Fish of Month</button>` :
                 `<button style="color: #FFD700; font-weight: bold;" onclick="awardBadgeFromList('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}')">🏆 Award Fish of Month</button>`
+              }
+              ${hasAmbassadorBadge ? 
+                `<button style="color: #ff4d4d; font-weight: bold;" onclick="removeAmbassadorBadge('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}')">❌ Remove Ambassador</button>` :
+                `<button style="color: #10b981; font-weight: bold;" onclick="awardAmbassadorBadge('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}')">🌟 Award Ambassador</button>`
               }
               <button onclick="openEmailCenter('${u.email}')">📧 Email Member</button>
               <button onclick="openUsernameEditor('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}', '${u.email}')">✏️ Edit Username</button>
@@ -8356,6 +8362,76 @@ window.awardBadgeFromList = async (userId, userName) => {
   const badgeType = 'Fish of the Month';
   
   if (!confirm('Are you sure you want to award "Fish of the Month" to ' + userName + '?')) return;
+
+  try {
+    const userRef = firebaseDB.ref('users/' + userId);
+    const snapshot = await userRef.once('value');
+    
+    if (!snapshot.exists()) {
+      return alert('User not found!');
+    }
+    
+    const userData = snapshot.val();
+    let badges = userData.badges ? (Array.isArray(userData.badges) ? userData.badges : (typeof userData.badges === 'string' ? [userData.badges] : Object.values(userData.badges))) : [];
+    
+    if (!badges.includes(badgeType)) {
+      badges.push(badgeType);
+      await userRef.update({ badges });
+      alert('Successfully awarded "' + badgeType + '" to ' + userName);
+      
+      const userIdx = state.allUsers.findIndex(u => u.id === userId);
+      if (userIdx !== -1) {
+        state.allUsers[userIdx].badges = badges;
+        renderCatchFeed();
+        loadUsersTable();
+      }
+    } else {
+      alert('User already has this badge.');
+    }
+  } catch (err) {
+    alert('Error awarding badge: ' + err.message);
+  }
+};
+
+window.removeAmbassadorBadge = async (userId, userName) => {
+  if (!state.user || !state.user.isAdmin) return;
+  const badgeType = 'Ambassador';
+  
+  if (!confirm('Are you sure you want to remove "Ambassador" from ' + userName + '?')) return;
+
+  try {
+    const userRef = firebaseDB.ref('users/' + userId);
+    const snapshot = await userRef.once('value');
+    
+    if (!snapshot.exists()) return alert('User not found!');
+    
+    const userData = snapshot.val();
+    let badges = userData.badges ? (Array.isArray(userData.badges) ? userData.badges : (typeof userData.badges === 'string' ? [userData.badges] : Object.values(userData.badges))) : [];
+    
+    if (badges.includes(badgeType)) {
+      badges = badges.filter(b => b !== badgeType);
+      await userRef.update({ badges });
+      alert('Successfully removed "' + badgeType + '" from ' + userName);
+      
+      const userIdx = state.allUsers.findIndex(u => u.id === userId);
+      if (userIdx !== -1) {
+        state.allUsers[userIdx].badges = badges;
+        renderCatchFeed();
+        loadUsersTable();
+      }
+    } else {
+      alert('User does not have this badge.');
+    }
+  } catch (err) {
+    alert('Error removing badge: ' + err.message);
+  }
+};
+
+window.awardAmbassadorBadge = async (userId, userName) => {
+  if (!state.user || !state.user.isAdmin) return;
+  const badgeType = 'Ambassador';
+  
+  if (!confirm('Are you sure you want to award "Ambassador" to ' + userName + '?')) return;
 
   try {
     const userRef = firebaseDB.ref('users/' + userId);
