@@ -740,6 +740,11 @@ window.showPage = (pageId, skipHistory = false) => {
       renderCatchFeed();
     }
   }
+  if (pageId === 'leaderboard') {
+    if (typeof window.renderLeaderboard === 'function') {
+      window.renderLeaderboard();
+    }
+  }
   if (pageId === 'depth') {
     if (!state.depthMap) {
       if (typeof window.initDepthMap === 'function') {
@@ -8460,5 +8465,133 @@ window.awardAmbassadorBadge = async (userId, userName) => {
     }
   } catch (err) {
     alert('Error awarding badge: ' + err.message);
+  }
+};
+
+window.renderLeaderboard = () => {
+  const podiumEl = document.getElementById('leaderboard-podium');
+  const listEl = document.getElementById('leaderboard-list');
+  if (!podiumEl || !listEl) return;
+
+  // Aggregate user stats from all catches
+  const userStats = {};
+  
+  (state.catches || []).forEach(c => {
+    if (c.isPrivate) return;
+    const authorId = c.authorId || c.userId;
+    if (!authorId) return;
+
+    if (!userStats[authorId]) {
+      userStats[authorId] = {
+        id: authorId,
+        name: c.author || c.userName || 'Unknown Angler',
+        catches: 0,
+        likes: 0
+      };
+    }
+    userStats[authorId].catches += 1;
+    userStats[authorId].likes += (c.likes || 0);
+  });
+
+  // Calculate score: (Catches * 10) + (Likes * 2)
+  const rankedUsers = Object.values(userStats).map(u => ({
+    ...u,
+    score: (u.catches * 10) + (u.likes * 2)
+  })).sort((a, b) => b.score - a.score);
+
+  if (rankedUsers.length === 0) {
+    podiumEl.innerHTML = '<div style="color:var(--text-muted); text-align:center; width: 100%;">No catches logged yet. Be the first to reach the podium!</div>';
+    listEl.innerHTML = '';
+    return;
+  }
+
+  // Find user details from state.allUsers to get badges/avatars if available
+  rankedUsers.forEach(u => {
+    if (state.allUsers) {
+      const dbUser = state.allUsers.find(du => du.id === u.id);
+      if (dbUser) {
+        if (dbUser.avatar && dbUser.avatar.startsWith('data:image')) {
+          u.avatarUrl = dbUser.avatar;
+        }
+        let badges = dbUser.badges || [];
+        if (!Array.isArray(badges)) {
+            badges = typeof badges === 'string' ? [badges] : Object.values(badges);
+        }
+        u.badges = badges;
+      }
+    }
+  });
+
+  // Render Podium (Top 3)
+  const top3 = rankedUsers.slice(0, 3);
+  
+  // Reorder for Podium: 2nd, 1st, 3rd visually
+  let podiumHtml = '';
+  const getAvatarStyle = (u) => u && u.avatarUrl ? `background-image: url('${u.avatarUrl}'); color: transparent;` : '';
+  const getAvatarText = (u) => u && u.avatarUrl ? '' : (u ? u.name.charAt(0).toUpperCase() : '?');
+
+  // Place 2
+  if (top3[1]) {
+    podiumHtml += `
+      <div class="podium-place second" onclick="viewUserProfile('${top3[1].id}')" style="cursor:pointer;">
+        <div class="podium-rank">2</div>
+        <div class="podium-avatar" style="${getAvatarStyle(top3[1])}">${getAvatarText(top3[1])}</div>
+        <div class="podium-name">${sanitizeHTML(top3[1].name)}</div>
+        <div class="podium-score">⭐ ${top3[1].score} pts</div>
+      </div>
+    `;
+  } else {
+    podiumHtml += `<div class="podium-place second" style="opacity:0.3;"><div class="podium-rank">2</div></div>`;
+  }
+
+  // Place 1
+  if (top3[0]) {
+    podiumHtml += `
+      <div class="podium-place first" onclick="viewUserProfile('${top3[0].id}')" style="cursor:pointer;">
+        <div class="podium-rank">1</div>
+        <div class="podium-avatar" style="${getAvatarStyle(top3[0])}">${getAvatarText(top3[0])}</div>
+        <div class="podium-name">${sanitizeHTML(top3[0].name)}</div>
+        <div class="podium-score">🏆 ${top3[0].score} pts</div>
+      </div>
+    `;
+  }
+
+  // Place 3
+  if (top3[2]) {
+    podiumHtml += `
+      <div class="podium-place third" onclick="viewUserProfile('${top3[2].id}')" style="cursor:pointer;">
+        <div class="podium-rank">3</div>
+        <div class="podium-avatar" style="${getAvatarStyle(top3[2])}">${getAvatarText(top3[2])}</div>
+        <div class="podium-name">${sanitizeHTML(top3[2].name)}</div>
+        <div class="podium-score">⭐ ${top3[2].score} pts</div>
+      </div>
+    `;
+  } else {
+    podiumHtml += `<div class="podium-place third" style="opacity:0.3;"><div class="podium-rank">3</div></div>`;
+  }
+  
+  podiumEl.innerHTML = podiumHtml;
+
+  // Render List (4th onwards)
+  const restList = rankedUsers.slice(3, 50); // Limit to top 50
+  
+  if (restList.length > 0) {
+    listEl.innerHTML = restList.map((u, index) => {
+      const rank = index + 4;
+      const badgeHtml = (u.badges && u.badges.includes('Pro Angler')) ? '🎣' : (u.badges && u.badges.includes('Ambassador') ? '🌟' : '');
+      return `
+        <div class="leaderboard-item" onclick="viewUserProfile('${u.id}')">
+          <div class="lb-rank">#${rank}</div>
+          <div class="lb-avatar" style="${getAvatarStyle(u)}">${getAvatarText(u)}</div>
+          <div class="lb-info">
+            <div class="lb-name">${sanitizeHTML(u.name)} ${badgeHtml}</div>
+            <div class="lb-stats">${u.catches} Catches • ${u.likes} Likes</div>
+          </div>
+          <div class="lb-score-badge">${u.score} pts</div>
+        </div>
+      `;
+    }).join('');
+  } else {
+    listEl.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding: 20px;">Keep fishing to climb the ranks!</div>';
   }
 };

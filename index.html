@@ -146,6 +146,7 @@
       <div class="nav-links">
         <a href="javascript:void(0)" class="nav-link active" id="nav-home" onclick="showPage('home')">📊 Dashboard</a>
         <a href="javascript:void(0)" class="nav-link" id="nav-community" onclick="showPage('community')">👥 Community</a>
+        <a href="javascript:void(0)" class="nav-link" id="nav-leaderboard" onclick="showPage('leaderboard')">🏆 Leaderboard</a>
         <a href="javascript:void(0)" class="nav-link" id="nav-guide" onclick="showPage('guide')">🎣 Beginner Guide</a>
         <a href="javascript:void(0)" class="nav-link" id="nav-sponsors" onclick="showPage('sponsors')">⭐ Sponsors</a>
         <a href="javascript:void(0)" class="nav-link" id="nav-directory" onclick="showPage('directory')">🏪 Shop Directory</a>
@@ -195,6 +196,7 @@
     <div class="mobile-menu" id="mobile-menu">
       <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('home'); closeMobileMenu()">📊 Dashboard</a>
       <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('community'); closeMobileMenu()">👥 Community</a>
+      <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('leaderboard'); closeMobileMenu()">🏆 Leaderboard</a>
       <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('guide'); closeMobileMenu()">🎣 Beginner Guide</a>
       <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('sponsors'); closeMobileMenu()">⭐ Sponsors</a>
       <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('directory'); closeMobileMenu()">🏪 Shop Directory</a>
@@ -574,6 +576,29 @@
           <p>Click anywhere on the map to mark a new fishing spot!</p>
         </div>
       </section>
+    </div>
+  </main>
+
+  <!-- Leaderboard Page -->
+  <main class="page" id="page-leaderboard" style="display: none;">
+    <div class="leaderboard-container">
+      <div class="leaderboard-hero">
+        <h1>🏆 Top Anglers</h1>
+        <p>The most active and successful anglers in the Irish Fishing Hub</p>
+      </div>
+
+      <div class="podium-container" id="leaderboard-podium">
+        <div class="loading">
+           <div class="loading-spinner"></div>
+           <span>Calculating ranks...</span>
+        </div>
+      </div>
+
+      <div class="leaderboard-list-wrapper">
+        <div class="leaderboard-list" id="leaderboard-list">
+          <!-- Dynamically generated 4th to 50th -->
+        </div>
+      </div>
     </div>
   </main>
 
