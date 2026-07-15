@@ -8501,11 +8501,18 @@ window.renderLeaderboard = () => {
     userStats[authorId].likes += (c.likes || 0);
   });
 
-  // Calculate score: (Catches * 10) + (Likes * 2)
-  const rankedUsers = Object.values(userStats).map(u => ({
-    ...u,
-    score: (u.catches * 10) + (u.likes * 2)
-  })).sort((a, b) => b.score - a.score);
+  // Build a quick admin ID set so we can filter them out
+  const adminIds = new Set(
+    (state.allUsers || []).filter(u => u.isAdmin).map(u => u.id)
+  );
+
+  // Calculate score: (Catches * 10) + (Likes * 2) — exclude admins
+  const rankedUsers = Object.values(userStats)
+    .filter(u => !adminIds.has(u.id))
+    .map(u => ({
+      ...u,
+      score: (u.catches * 10) + (u.likes * 2)
+    })).sort((a, b) => b.score - a.score);
 
   if (rankedUsers.length === 0) {
     podiumEl.innerHTML = '<div style="color:var(--text-muted); text-align:center; width: 100%;">No catches logged yet. Be the first to reach the podium!</div>';
