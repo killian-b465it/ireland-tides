@@ -4884,6 +4884,14 @@ window.handleAuthSubmit = async () => {
   const username = document.getElementById('auth-username').value;
   const password = document.getElementById('auth-password').value;
   if (!email) return alert('Please enter your email address.');
+  
+  if (state.authMode === 'signup') {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return alert('Please enter a valid email address (e.g. name@example.com).');
+    }
+  }
+
   if (!password) return alert('Please enter your password.');
 
   const remember = document.getElementById('auth-remember').checked;
