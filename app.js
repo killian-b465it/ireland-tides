@@ -296,7 +296,7 @@ const HARBOURS = [
   { name: 'Belfast Harbour', lat: 54.6110, lon: -5.9250, country: 'IE' },   // Offset from station
   { name: 'Bangor Marina', lat: 54.6640, lon: -5.6675, country: 'IE' },     // Offset from pier/slipway
   { name: 'Larne Harbour', lat: 54.8550, lon: -5.8100, country: 'IE' },     // Offset from station
-    { name: 'Portrush Harbour', lat: 55.2080, lon: -6.6530, country: 'IE' },  // Offset from pier/station
+  { name: 'Portrush Harbour', lat: 55.2080, lon: -6.6530, country: 'IE' },  // Offset from pier/station
   { name: 'Coleraine Marina', lat: 55.1333, lon: -6.6667, country: 'IE' },
   { name: 'Ardglass Harbour', lat: 54.2630, lon: -5.6030, country: 'IE' },  // Offset from pier
   { name: 'Portavogie Harbour', lat: 54.4600, lon: -5.4335, country: 'IE' }, // Offset from pier/slipway
@@ -733,7 +733,7 @@ window.showPage = (pageId, skipHistory = false) => {
     if (searchInput) searchInput.value = '';
     if (!state.communityMap) {
       if (typeof window.initCommunityMap === 'function') {
-         window.initCommunityMap();
+        window.initCommunityMap();
       }
     } else {
       setTimeout(() => state.communityMap.invalidateSize(), 50);
@@ -748,7 +748,7 @@ window.showPage = (pageId, skipHistory = false) => {
   if (pageId === 'depth') {
     if (!state.depthMap) {
       if (typeof window.initDepthMap === 'function') {
-         window.initDepthMap();
+        window.initDepthMap();
       }
     } else {
       setTimeout(() => state.depthMap.invalidateSize(), 50);
@@ -924,7 +924,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Dismiss loading screen after animation
   const appAlreadyLoaded = sessionStorage.getItem('appLoaded');
   const loader = document.getElementById('loading-screen');
-  
+
   if (appAlreadyLoaded && loader) {
     loader.style.display = 'none';
     checkLegalConsent();
@@ -1045,60 +1045,60 @@ window.setRegion = (region) => {
 
   // Clear and reload all markers for the new region
   if (state.map) {
-      // Clear groups
-      state.shopMarkers.clearLayers();
-      state.pierMarkers.clearLayers();
-      state.rampMarkers.clearLayers();
-      state.harbourMarkers.clearLayers();
-      
-      // CRITICAL: Clear and remove old station markers
-      Object.values(state.markers).forEach(m => state.map.removeLayer(m));
-      state.markers = {};
-      
-      // Re-initialize markers
-      CONFIG.stations.filter(s => s.country === state.currentRegion).forEach(station => addStationMarker(station));
-      PIERS.filter(p => p.country === state.currentRegion).forEach(p => addPierMarker(p));
-      BOAT_RAMPS.filter(r => r.country === state.currentRegion).forEach(r => addRampMarker(r));
-      HARBOURS.filter(h => h.country === state.currentRegion).forEach(h => addHarbourMarker(h));
-      
-      loadShopsToMainMap();
-      renderFreshwaterSpots();
-      renderFreshwaterParks();
-      renderFreshwaterRamps();
-      renderFreshwaterPiers();
-      
-      // Refresh the station list sidebar
-      loadStationList();
-      
-      // Ensure dashboard shows the first station of the new region
-      const firstStation = CONFIG.stations.find(s => s.country === state.currentRegion);
-      if (firstStation) {
-          selectStation(firstStation);
-      }
-      
-      // Re-apply the correct mode's markers — DO NOT mix sea + freshwater on region switch
-      updateMapForFishingMode();
+    // Clear groups
+    state.shopMarkers.clearLayers();
+    state.pierMarkers.clearLayers();
+    state.rampMarkers.clearLayers();
+    state.harbourMarkers.clearLayers();
+
+    // CRITICAL: Clear and remove old station markers
+    Object.values(state.markers).forEach(m => state.map.removeLayer(m));
+    state.markers = {};
+
+    // Re-initialize markers
+    CONFIG.stations.filter(s => s.country === state.currentRegion).forEach(station => addStationMarker(station));
+    PIERS.filter(p => p.country === state.currentRegion).forEach(p => addPierMarker(p));
+    BOAT_RAMPS.filter(r => r.country === state.currentRegion).forEach(r => addRampMarker(r));
+    HARBOURS.filter(h => h.country === state.currentRegion).forEach(h => addHarbourMarker(h));
+
+    loadShopsToMainMap();
+    renderFreshwaterSpots();
+    renderFreshwaterParks();
+    renderFreshwaterRamps();
+    renderFreshwaterPiers();
+
+    // Refresh the station list sidebar
+    loadStationList();
+
+    // Ensure dashboard shows the first station of the new region
+    const firstStation = CONFIG.stations.find(s => s.country === state.currentRegion);
+    if (firstStation) {
+      selectStation(firstStation);
+    }
+
+    // Re-apply the correct mode's markers — DO NOT mix sea + freshwater on region switch
+    updateMapForFishingMode();
   }
 
   updateRegionUI();
-  
+
   // Close any open menus
   if (window.innerWidth < 768) {
-      closeMobileMenu();
+    closeMobileMenu();
   }
 };
 
 function updateRegionUI() {
   const btnIE = document.getElementById('region-btn-ie');
   const btnUK = document.getElementById('region-btn-uk');
-  
+
   if (btnIE) btnIE.classList.toggle('active', state.currentRegion === 'IE');
   if (btnUK) btnUK.classList.toggle('active', state.currentRegion === 'UK');
-  
+
   // Also update header title or subtitle if needed
   const subTitle = document.querySelector('.header-subtitle');
   if (subTitle) {
-      subTitle.textContent = state.currentRegion === 'IE' ? 'Irish Tide & Fishing Data' : 'UK Tide & Fishing Data';
+    subTitle.textContent = state.currentRegion === 'IE' ? 'Irish Tide & Fishing Data' : 'UK Tide & Fishing Data';
   }
 }
 
@@ -1236,7 +1236,7 @@ function repopulateMapLayers() {
   if (typeof state.activeFilters !== 'undefined') {
     applyFilters(false);
   }
-  
+
   // Only show freshwater layers if we're actually in freshwater mode
   const fwSidebar = document.getElementById('freshwater-filter-sidebar');
   if (fwSidebar && state.fishingMode === 'freshwater') {
@@ -2219,12 +2219,12 @@ async function fetchWeatherData(station) {
 
   const parseWttrData = (wttr) => {
     const wttrToWmo = {
-      113:0, 116:2, 119:3, 122:3, 143:45, 176:61, 179:71, 182:66,
-      185:56, 200:95, 227:75, 230:75, 248:45, 260:48, 263:51, 266:51,
-      281:56, 284:57, 293:61, 296:61, 299:63, 302:63, 305:65, 308:65,
-      311:66, 314:67, 317:66, 320:67, 323:71, 326:71, 329:73, 332:73,
-      335:75, 338:75, 350:77, 353:80, 356:81, 359:82, 362:85, 365:85,
-      368:85, 371:86, 374:85, 377:86, 386:95, 389:95, 392:95, 395:95
+      113: 0, 116: 2, 119: 3, 122: 3, 143: 45, 176: 61, 179: 71, 182: 66,
+      185: 56, 200: 95, 227: 75, 230: 75, 248: 45, 260: 48, 263: 51, 266: 51,
+      281: 56, 284: 57, 293: 61, 296: 61, 299: 63, 302: 63, 305: 65, 308: 65,
+      311: 66, 314: 67, 317: 66, 320: 67, 323: 71, 326: 71, 329: 73, 332: 73,
+      335: 75, 338: 75, 350: 77, 353: 80, 356: 81, 359: 82, 362: 85, 365: 85,
+      368: 85, 371: 86, 374: 85, 377: 86, 386: 95, 389: 95, 392: 95, 395: 95
     };
     const mapCode = c => wttrToWmo[parseInt(c)] ?? 0;
 
@@ -2235,7 +2235,7 @@ async function fetchWeatherData(station) {
       const pm = match[3].toUpperCase() === 'PM';
       if (pm && h !== 12) h += 12;
       if (!pm && h === 12) h = 0;
-      return `${dateStr}T${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+      return `${dateStr}T${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
     };
 
     const cur = wttr.current_condition[0];
@@ -2243,20 +2243,20 @@ async function fetchWeatherData(station) {
 
     return {
       current: {
-        temperature_2m:       parseFloat(cur.temp_C),
+        temperature_2m: parseFloat(cur.temp_C),
         apparent_temperature: parseFloat(cur.FeelsLikeC),
-        weather_code:         mapCode(cur.weatherCode),
-        wind_speed_10m:       parseFloat(cur.windspeedKmph),
-        wind_direction_10m:   parseFloat(cur.winddirDegree),
+        weather_code: mapCode(cur.weatherCode),
+        wind_speed_10m: parseFloat(cur.windspeedKmph),
+        wind_direction_10m: parseFloat(cur.winddirDegree),
         relative_humidity_2m: parseFloat(cur.humidity)
       },
       daily: {
-        time:               days.map(d => d.date),
-        weather_code:       days.map(d => mapCode(d.hourly[4]?.weatherCode ?? 113)),
+        time: days.map(d => d.date),
+        weather_code: days.map(d => mapCode(d.hourly[4]?.weatherCode ?? 113)),
         temperature_2m_max: days.map(d => parseFloat(d.maxtempC)),
         temperature_2m_min: days.map(d => parseFloat(d.mintempC)),
-        sunrise:            days.map(d => parseTime(d.date, d.astronomy[0].sunrise)),
-        sunset:             days.map(d => parseTime(d.date, d.astronomy[0].sunset))
+        sunrise: days.map(d => parseTime(d.date, d.astronomy[0].sunrise)),
+        sunset: days.map(d => parseTime(d.date, d.astronomy[0].sunset))
       }
     };
   };
@@ -2265,9 +2265,9 @@ async function fetchWeatherData(station) {
     const timeseries = metNo.properties.timeseries;
     const currentItem = timeseries[0];
     const curDetails = currentItem.data.instant.details;
-    const curSymbol = currentItem.data.next_1_hours?.summary?.symbol_code || 
-                      currentItem.data.next_6_hours?.summary?.symbol_code || 'clearsky';
-                      
+    const curSymbol = currentItem.data.next_1_hours?.summary?.symbol_code ||
+      currentItem.data.next_6_hours?.summary?.symbol_code || 'clearsky';
+
     const metNoSymbolToWmo = (sym) => {
       const s = sym.toLowerCase();
       if (s.includes('thunder')) return 95;
@@ -2296,8 +2296,8 @@ async function fetchWeatherData(station) {
       if (temp !== undefined && temp !== null) {
         daysMap[dateStr].temps.push(temp);
       }
-      const sym = item.data.next_1_hours?.summary?.symbol_code || 
-                  item.data.next_6_hours?.summary?.symbol_code;
+      const sym = item.data.next_1_hours?.summary?.symbol_code ||
+        item.data.next_6_hours?.summary?.symbol_code;
       if (sym) {
         daysMap[dateStr].symbols.push(sym);
       }
@@ -2342,20 +2342,20 @@ async function fetchWeatherData(station) {
 
     return {
       current: {
-        temperature_2m:       curDetails.air_temperature,
+        temperature_2m: curDetails.air_temperature,
         apparent_temperature: curDetails.air_temperature,
-        weather_code:         currentWeatherCode,
-        wind_speed_10m:       (curDetails.wind_speed || 0) * 3.6, // m/s to km/h
-        wind_direction_10m:   curDetails.wind_from_direction || 0,
+        weather_code: currentWeatherCode,
+        wind_speed_10m: (curDetails.wind_speed || 0) * 3.6, // m/s to km/h
+        wind_direction_10m: curDetails.wind_from_direction || 0,
         relative_humidity_2m: curDetails.relative_humidity || 80
       },
       daily: {
-        time:               dailyDates,
-        weather_code:       dailyWeatherCode,
+        time: dailyDates,
+        weather_code: dailyWeatherCode,
         temperature_2m_max: dailyTempMax,
         temperature_2m_min: dailyTempMin,
-        sunrise:            dailySunrise,
-        sunset:             dailySunset
+        sunrise: dailySunrise,
+        sunset: dailySunset
       }
     };
   };
@@ -2588,10 +2588,10 @@ function displaySwellData(data) {
   if (currentIdx === -1) currentIdx = 0;
 
   // Current readings
-  const waveH  = hourly.wave_height[currentIdx];
+  const waveH = hourly.wave_height[currentIdx];
   const wavePer = hourly.wave_period?.[currentIdx];
   const waveDir = hourly.wave_direction?.[currentIdx];
-  const swellH  = hourly.swell_wave_height?.[currentIdx];
+  const swellH = hourly.swell_wave_height?.[currentIdx];
   const swellPer = hourly.swell_wave_period?.[currentIdx];
   const swellDir = hourly.swell_wave_direction?.[currentIdx];
   const windWave = hourly.wind_wave_height?.[currentIdx];
@@ -2617,7 +2617,7 @@ function displaySwellData(data) {
   // Compass direction helper
   function bearingToCompass(deg) {
     if (deg === null || deg === undefined) return '—';
-    const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+    const dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
     return dirs[Math.round(deg / 22.5) % 16];
   }
 
@@ -2898,13 +2898,13 @@ window.previewImage = (input) => {
     }
     let html = '';
     const maxFiles = Math.min(input.files.length, 5);
-    for(let i=0; i<maxFiles; i++) {
-        html += `<div style="width: 60px; height: 60px; flex-shrink: 0;">
+    for (let i = 0; i < maxFiles; i++) {
+      html += `<div style="width: 60px; height: 60px; flex-shrink: 0;">
                    <img src="${URL.createObjectURL(input.files[i])}" style="width:100%; height:100%; object-fit:cover; border-radius:4px;">
                  </div>`;
     }
     html += `<button class="remove-image" style="position:relative; background:rgba(255,0,0,0.8); color:white; border:none; padding:4px 8px; border-radius:4px; font-size:0.8rem; cursor:pointer;" onclick="removeImage()">✕ Remove</button>`;
-    
+
     preview.innerHTML = html;
     preview.style.display = 'flex';
   }
@@ -2977,24 +2977,24 @@ window.submitCatch = async () => {
   if (photoInput.files && photoInput.files.length > 0) {
     const maxFiles = Math.min(photoInput.files.length, 5);
     const promises = [];
-    for(let i=0; i<maxFiles; i++) {
-        promises.push(new Promise(async (resolve, reject) => {
-            try {
-                const file = photoInput.files[i];
-                const compressed = await compressImage(file, 800);
-                resolve(compressed);
-            } catch (err) {
-                console.error("Compression entirely failed for file", i, err);
-                reject('Error compressing image limit reached or unsupported format.');
-            }
-        }));
+    for (let i = 0; i < maxFiles; i++) {
+      promises.push(new Promise(async (resolve, reject) => {
+        try {
+          const file = photoInput.files[i];
+          const compressed = await compressImage(file, 800);
+          resolve(compressed);
+        } catch (err) {
+          console.error("Compression entirely failed for file", i, err);
+          reject('Error compressing image limit reached or unsupported format.');
+        }
+      }));
     }
     try {
-        const photoDataArray = await Promise.all(promises);
-        processCatch(photoDataArray);
-    } catch(err) {
-        isSubmittingCatch = false;
-        alert(err);
+      const photoDataArray = await Promise.all(promises);
+      processCatch(photoDataArray);
+    } catch (err) {
+      isSubmittingCatch = false;
+      alert(err);
     }
   } else {
     processCatch([]);
@@ -3151,7 +3151,7 @@ function renderCatchFeed() {
 
   // Calculate top baits (Accurate Dictionary Matcher)
   const baitCounts = {};
-  
+
   // Maps multiple regex variations to a single canonical standard name
   const baitDictionary = {
     'mackerel': /\bmackerel\b/g,
@@ -3180,56 +3180,56 @@ function renderCatchFeed() {
     'maddies': /\bmaddies?\b/g,
     'fiish minnow': /\bfiish\b/g
   };
-  
+
   publicCatches.forEach(c => {
     const text = (c.details || c.notes || '').toLowerCase();
     const foundInThisPost = new Set();
 
     // Items that are rarely the target catch (pure baits/lures)
     const unambiguousBaits = [
-      'lugworm', 'ragworm', 'sandeel', 'soft plastic', 'spinner', 'dexter wedge', 
-      'jig', 'popper', 'sweetcorn', 'maggot', 'boilie', 'pellet', 'pike deadbait', 
+      'lugworm', 'ragworm', 'sandeel', 'soft plastic', 'spinner', 'dexter wedge',
+      'jig', 'popper', 'sweetcorn', 'maggot', 'boilie', 'pellet', 'pike deadbait',
       'black lug', 'maddies', 'fiish minnow'
     ];
 
     Object.keys(baitDictionary).forEach(canonicalName => {
       const regex = baitDictionary[canonicalName];
       // Reset regex index because we are using the 'g' flag
-      regex.lastIndex = 0; 
-      
+      regex.lastIndex = 0;
+
       let match;
       while ((match = regex.exec(text)) !== null) {
         const precedingText = text.substring(Math.max(0, match.index - 35), match.index);
         const followingText = text.substring(match.index + match[0].length, match.index + match[0].length + 35);
-        
+
         const catchVerbs = /\b(caught|landed|got|hooked|bagged|had|lost)\b/i;
         // The [^\.\?!]*$ ensures the preposition is in the same sentence
         const baitIndicatorsBefore = /\b(on|with|using|used|bait|lure|took|hit|chuck|cast|throwing|tried)\b[^\.\?!]*$/i;
         const baitIndicatorsAfter = /^(?:\s+strip)?\s+(?:did the trick|worked|was the bait|was my bait|as bait|for bait|produced)/i;
-        
+
         const isCatchVerbDirectlyBefore = catchVerbs.test(precedingText) && !baitIndicatorsBefore.test(precedingText);
         const hasBaitContext = baitIndicatorsBefore.test(precedingText) || baitIndicatorsAfter.test(followingText);
 
         if (unambiguousBaits.includes(canonicalName)) {
-           // For dedicated baits (like Spinners, Lugworm), accept unless explicitly stated as the catch
-           if (!isCatchVerbDirectlyBefore) {
-             foundInThisPost.add(canonicalName);
-           }
+          // For dedicated baits (like Spinners, Lugworm), accept unless explicitly stated as the catch
+          if (!isCatchVerbDirectlyBefore) {
+            foundInThisPost.add(canonicalName);
+          }
         } else {
-           // For ambiguous things (Mackerel, Crab, Squid), demand strict grammar bait context
-           if (hasBaitContext && !isCatchVerbDirectlyBefore) {
-             foundInThisPost.add(canonicalName);
-           }
+          // For ambiguous things (Mackerel, Crab, Squid), demand strict grammar bait context
+          if (hasBaitContext && !isCatchVerbDirectlyBefore) {
+            foundInThisPost.add(canonicalName);
+          }
         }
       }
     });
 
     if (foundInThisPost.has('peeler crab') && foundInThisPost.has('crab')) {
-        foundInThisPost.delete('crab');
+      foundInThisPost.delete('crab');
     }
 
     foundInThisPost.forEach(bait => {
-       baitCounts[bait] = (baitCounts[bait] || 0) + 1;
+      baitCounts[bait] = (baitCounts[bait] || 0) + 1;
     });
   });
 
@@ -3246,9 +3246,9 @@ function renderCatchFeed() {
         const isActive = (state.feedSearchQuery || '').toLowerCase() === b.toLowerCase();
         const baitBadge = document.createElement('span');
         baitBadge.className = `tag-badge ${isActive ? 'active' : ''}`;
-        baitBadge.style.cssText = isActive 
-           ? 'background: var(--accent-warning); color: #000; text-transform: capitalize;' 
-           : 'background: rgba(255, 165, 0, 0.1); border-color: rgba(255, 165, 0, 0.3); color: var(--accent-warning); text-transform: capitalize;';
+        baitBadge.style.cssText = isActive
+          ? 'background: var(--accent-warning); color: #000; text-transform: capitalize;'
+          : 'background: rgba(255, 165, 0, 0.1); border-color: rgba(255, 165, 0, 0.3); color: var(--accent-warning); text-transform: capitalize;';
         baitBadge.innerText = b;
         baitBadge.onclick = () => {
           if (isActive) setFeedSearch('');
@@ -3292,8 +3292,8 @@ function renderCatchFeed() {
   if (catchesToShow.length === 0) {
     const emptyMsg = document.createElement('div');
     emptyMsg.className = 'empty-state';
-    emptyMsg.innerHTML = searchQuery 
-      ? '<p>No matching catches found. Try another search term!</p>' 
+    emptyMsg.innerHTML = searchQuery
+      ? '<p>No matching catches found. Try another search term!</p>'
       : '<p>No catches to show. Be the first to share!</p>';
     feed.appendChild(emptyMsg);
     return;
@@ -3311,21 +3311,21 @@ function renderCatchFeed() {
     const displayDetails = formatPostText(c.details || c.notes || '');
     const displayUserId = c.authorId || c.userId || ''; // IDs are internal, but still keep safe
     const displayPhoto = c.photo || c.image || ''; // Base64 or URL
-    
+
     let photosHtml = '';
     if (c.photos && c.photos.length > 1) {
-        photosHtml = `<div class="catch-image-gallery">`;
-        c.photos.forEach(photoBase64 => {
-            photosHtml += `<img src="${photoBase64}" alt="Catch" class="catch-gallery-item" onclick="openImageModal('${photoBase64}')">`;
-        });
-        photosHtml += `</div>`;
+      photosHtml = `<div class="catch-image-gallery">`;
+      c.photos.forEach(photoBase64 => {
+        photosHtml += `<img src="${photoBase64}" alt="Catch" class="catch-gallery-item" onclick="openImageModal('${photoBase64}')">`;
+      });
+      photosHtml += `</div>`;
     } else if (displayPhoto) {
-        photosHtml = `<img src="${displayPhoto}" alt="Catch" class="catch-image feed-image" onclick="openImageModal('${displayPhoto}')">`;
+      photosHtml = `<img src="${displayPhoto}" alt="Catch" class="catch-image feed-image" onclick="openImageModal('${displayPhoto}')">`;
     }
 
     const userOnClick = `onclick="viewUserProfile('${displayUserId}')"`;
     const nameStyle = `style="cursor: pointer; font-weight: bold; color: var(--text-main);"`;
-    
+
     let authorBadges = [];
     if (state.allUsers && displayUserId) {
       const u = state.allUsers.find(u => u.id === displayUserId);
@@ -3338,10 +3338,10 @@ function renderCatchFeed() {
     const isLongText = rawText.length > 250 || (rawText.match(/\n/g) || []).length >= 3;
     let detailsHtml = '';
     if (displayDetails) {
-       detailsHtml = `<p class="catch-details ${isLongText ? 'collapsed-post-text' : ''}" id="post-text-${c.id}">${displayDetails}</p>`;
-       if (isLongText) {
-         detailsHtml += `<button class="show-more-post-btn" id="show-more-post-${c.id}" onclick="togglePostText(${c.id})" style="margin-top: 5px; margin-bottom: 10px; font-size: 0.8rem; padding: 4px 10px; background: transparent; border: 1px solid var(--accent-primary); color: var(--accent-primary); border-radius: 12px; cursor: pointer; display: inline-block;">Show more</button>`;
-       }
+      detailsHtml = `<p class="catch-details ${isLongText ? 'collapsed-post-text' : ''}" id="post-text-${c.id}">${displayDetails}</p>`;
+      if (isLongText) {
+        detailsHtml += `<button class="show-more-post-btn" id="show-more-post-${c.id}" onclick="togglePostText(${c.id})" style="margin-top: 5px; margin-bottom: 10px; font-size: 0.8rem; padding: 4px 10px; background: transparent; border: 1px solid var(--accent-primary); color: var(--accent-primary); border-radius: 12px; cursor: pointer; display: inline-block;">Show more</button>`;
+      }
     }
 
     const item = document.createElement('div');
@@ -3752,8 +3752,8 @@ function renderFreshwaterSpots() {
       iconAnchor: [14, 14]
     });
 
-    const speciesList = Array.isArray(spot.species) 
-      ? spot.species.join(', ') 
+    const speciesList = Array.isArray(spot.species)
+      ? spot.species.join(', ')
       : (spot.species || 'Various');
 
     const popupContent = `
@@ -3804,8 +3804,8 @@ function renderFreshwaterParks() {
       iconAnchor: [14, 14]
     });
 
-    const speciesList = Array.isArray(park.species) 
-      ? park.species.join(', ') 
+    const speciesList = Array.isArray(park.species)
+      ? park.species.join(', ')
       : (park.species || 'Various');
 
     const popupContent = `
@@ -3915,7 +3915,7 @@ function calculateMoonState(date) {
   const diffDays = diffMs / (1000 * 60 * 60 * 24);
   const cycle = 29.530588853;
   const rawAge = (diffDays % cycle + cycle) % cycle;
-  
+
   let phaseName = "";
   let illumination = 0;
   let phaseKey = "";
@@ -4884,7 +4884,7 @@ window.handleAuthSubmit = async () => {
   const username = document.getElementById('auth-username').value;
   const password = document.getElementById('auth-password').value;
   if (!email) return alert('Please enter your email address.');
-  
+
   if (state.authMode === 'signup') {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -5242,12 +5242,12 @@ window.saveProfile = () => {
 window.renderProfileLoadouts = () => {
   const container = document.getElementById('profile-loadouts-container');
   if (!container) return;
-  
+
   if (!state.user || !state.user.loadouts || state.user.loadouts.length === 0) {
     container.innerHTML = '<p style="color: var(--text-muted); font-size: 0.8rem;">No loadouts saved.</p>';
     return;
   }
-  
+
   container.innerHTML = state.user.loadouts.map(l => `
     <div style="background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
       <div>
@@ -5265,7 +5265,7 @@ window.addProfileLoadout = () => {
   if (!name) return;
   const details = prompt("Enter gear details (e.g. 9ft Penn Rod, 20lb Braid):");
   if (!details) return;
-  
+
   if (!state.user.loadouts) state.user.loadouts = [];
   state.user.loadouts.push({ id: Date.now(), name, details });
   renderProfileLoadouts();
@@ -5707,7 +5707,7 @@ function loadStationInsights() {
 
 function loadUsersTable() {
   const searchTerm = (document.getElementById('admin-user-search')?.value || '').toLowerCase();
-  
+
   // Create a copy of users and sort by joinDate descending (newest first)
   const sortedUsers = [...state.allUsers].sort((a, b) => {
     const timeA = a.joinDate || 0;
@@ -5754,14 +5754,14 @@ function loadUsersTable() {
               ⚙️ Utilities ▾
             </button>
             <div class="util-dropdown-content">
-              ${hasFishBadge ? 
-                `<button style="color: #ff4d4d; font-weight: bold;" onclick="removeBadgeFromList('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}')">❌ Remove Fish of Month</button>` :
-                `<button style="color: #FFD700; font-weight: bold;" onclick="awardBadgeFromList('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}')">🏆 Award Fish of Month</button>`
-              }
-              ${hasAmbassadorBadge ? 
-                `<button style="color: #ff4d4d; font-weight: bold;" onclick="removeAmbassadorBadge('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}')">❌ Remove Ambassador</button>` :
-                `<button style="color: #10b981; font-weight: bold;" onclick="awardAmbassadorBadge('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}')">🌟 Award Ambassador</button>`
-              }
+              ${hasFishBadge ?
+        `<button style="color: #ff4d4d; font-weight: bold;" onclick="removeBadgeFromList('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}')">❌ Remove Fish of Month</button>` :
+        `<button style="color: #FFD700; font-weight: bold;" onclick="awardBadgeFromList('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}')">🏆 Award Fish of Month</button>`
+      }
+              ${hasAmbassadorBadge ?
+        `<button style="color: #ff4d4d; font-weight: bold;" onclick="removeAmbassadorBadge('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}')">❌ Remove Ambassador</button>` :
+        `<button style="color: #10b981; font-weight: bold;" onclick="awardAmbassadorBadge('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}')">🌟 Award Ambassador</button>`
+      }
               <button onclick="openEmailCenter('${u.email}')">📧 Email Member</button>
               <button onclick="openUsernameEditor('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}', '${u.email}')">✏️ Edit Username</button>
               <button onclick="changeUserPassword('${u.id}')">🔑 Change Password</button>
@@ -5916,7 +5916,7 @@ window.changeUserPassword = (userId) => {
 // ============================================
 // GDPR Cookie Consent Logic
 // ============================================
-window.acceptCookies = function() {
+window.acceptCookies = function () {
   localStorage.setItem('cookieConsentAccepted', 'true');
   const banner = document.getElementById('cookie-banner');
   if (banner) {
@@ -7598,16 +7598,16 @@ async function compressImage(file, maxWidth = 1024) {
       useWebWorker: true,
       fileType: 'image/jpeg'
     };
-    
+
     // Fallback if browser-image-compression script somehow failed to load
     if (typeof imageCompression === 'undefined') {
-       console.warn('browser-image-compression not loaded, falling back to FileReader');
-       return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = (e) => resolve(e.target.result);
-          reader.onerror = () => reject(new Error('FileReader fallback failed.'));
-          reader.readAsDataURL(file);
-       });
+      console.warn('browser-image-compression not loaded, falling back to FileReader');
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = () => reject(new Error('FileReader fallback failed.'));
+        reader.readAsDataURL(file);
+      });
     }
 
     const compressedFile = await imageCompression(file, options);
@@ -7888,7 +7888,7 @@ window.handleSocialLogin = async function (provider) {
       const googleProvider = new firebase.auth.GoogleAuthProvider();
       // Optional: Add scopes if needed
       // googleProvider.addScope('https://www.googleapis.com/auth/contacts.readonly');
-      
+
       const result = await firebase.auth().signInWithPopup(googleProvider);
       credential = result.credential;
     }
@@ -7920,7 +7920,7 @@ window.handleSocialLogin = async function (provider) {
   }
 };
 
-window.openRateModal = function() {
+window.openRateModal = function () {
   const modal = document.getElementById('rate-modal');
   if (modal) {
     modal.style.display = 'flex';
@@ -7928,7 +7928,7 @@ window.openRateModal = function() {
   }
 };
 
-window.closeRateModal = function() {
+window.closeRateModal = function () {
   const modal = document.getElementById('rate-modal');
   if (modal) {
     modal.classList.remove('active');
@@ -7941,9 +7941,9 @@ window.closeRateModal = function() {
 // ============================================
 window.addEventListener('popstate', (event) => {
   // 1. Close any open modals first before navigating pages
-  const activeModals = Array.from(document.querySelectorAll('.modal')).filter(m => 
-    m.classList.contains('active') || 
-    m.style.display === 'block' || 
+  const activeModals = Array.from(document.querySelectorAll('.modal')).filter(m =>
+    m.classList.contains('active') ||
+    m.style.display === 'block' ||
     m.style.display === 'flex'
   );
 
@@ -7952,20 +7952,20 @@ window.addEventListener('popstate', (event) => {
       m.classList.remove('active');
       m.style.display = 'none';
     });
-    
+
     // Fallback handlers if they have specific close functions
     if (typeof window.closeAuthModal === 'function' && document.getElementById('auth-modal')) window.closeAuthModal();
     if (typeof window.closePremiumModal === 'function' && document.getElementById('premium-modal')) window.closePremiumModal();
     if (typeof window.closeRateModal === 'function' && document.getElementById('rate-modal')) window.closeRateModal();
     if (typeof window.closeModal === 'function') window.closeModal();
-    
+
     // Re-push the current page state to prevent the actual page changing next time
     const activePage = document.querySelector('.page.active');
     const pageId = activePage ? activePage.id.replace('page-', '') : 'home';
     window.history.pushState({ page: pageId }, '', '#' + pageId);
     return;
   }
-  
+
   // 2. If no modals are open, navigate to the previous page
   if (event.state && event.state.page) {
     window.showPage(event.state.page, true);
@@ -7977,7 +7977,7 @@ window.addEventListener('popstate', (event) => {
 // ============================================
 // Depth Charts Map Functions
 // ============================================
-window.initDepthMap = function() {
+window.initDepthMap = function () {
   const container = document.getElementById('depth-map');
   if (!container || state.depthMap) return;
 
@@ -8024,9 +8024,9 @@ function renderInlandDepths() {
     { lat: 52.8833, lon: -8.3833, d: '10m' },
     { lat: 52.9900, lon: -8.2800, d: '8m' },
     // Lough Corrib
-    { lat: 53.5000, lon: -9.3100, d: '42m' }, 
+    { lat: 53.5000, lon: -9.3100, d: '42m' },
     { lat: 53.4500, lon: -9.2333, d: '20m' },
-    { lat: 53.4000, lon: -9.1833, d: '3m' }, 
+    { lat: 53.4000, lon: -9.1833, d: '3m' },
     { lat: 53.4300, lon: -9.2500, d: '15m' },
     // Lough Ree
     { lat: 53.5600, lon: -7.9500, d: '31m' },
@@ -8054,14 +8054,14 @@ function renderInlandDepths() {
 // ============================================
 window.publishBlogPost = () => {
   if (!state.user || !state.user.isAdmin) return alert('Only admins can publish blog posts.');
-  
+
   const title = document.getElementById('admin-blog-title').value;
   const snippet = document.getElementById('admin-blog-snippet').value;
   const content = document.getElementById('admin-blog-content').value;
   const image = document.getElementById('admin-blog-image').value;
-  
+
   if (!title || !content) return alert('Title and Content are required!');
-  
+
   const newPost = {
     id: 'blog_' + Date.now(),
     title: title,
@@ -8071,7 +8071,7 @@ window.publishBlogPost = () => {
     author: state.user.name,
     date: Date.now()
   };
-  
+
   if (typeof firebaseDB !== 'undefined') {
     firebaseDB.ref('blogPosts/' + newPost.id).set(newPost)
       .then(() => {
@@ -8092,20 +8092,20 @@ window.loadAdminBlogPosts = () => {
   if (!state.user || !state.user.isAdmin) return;
   const listEl = document.getElementById('admin-blog-posts-list');
   if (!listEl) return;
-  
+
   listEl.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">Loading posts...</p>';
-  
+
   if (typeof firebaseDB !== 'undefined') {
     firebaseDB.ref('blogPosts').once('value').then(snapshot => {
       const posts = [];
       snapshot.forEach(child => posts.push(child.val()));
-      
+
       if (posts.length === 0) {
         listEl.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">No published posts found.</p>';
         return;
       }
-      
-      posts.sort((a,b) => b.date - a.date);
+
+      posts.sort((a, b) => b.date - a.date);
       let html = '';
       posts.forEach(post => {
         const dateStr = new Date(post.date).toLocaleDateString();
@@ -8129,7 +8129,7 @@ window.loadAdminBlogPosts = () => {
 window.deleteBlogPost = (id) => {
   if (!state.user || !state.user.isAdmin) return;
   if (!confirm('Are you sure you want to delete this blog post?')) return;
-  
+
   if (typeof firebaseDB !== 'undefined') {
     firebaseDB.ref('blogPosts/' + id).remove()
       .then(() => {
@@ -8152,7 +8152,7 @@ function initConnectionMonitoring() {
       toast.classList.add('online-state');
       icon.textContent = '💚';
       text.textContent = 'Back Online - Syncing live weather & community data!';
-      
+
       // Show online state
       toast.classList.add('active');
 
@@ -8160,7 +8160,7 @@ function initConnectionMonitoring() {
       setTimeout(() => {
         toast.classList.remove('active');
       }, 3500);
-      
+
       // Sync weather & station data on back online
       if (typeof fetchAllLiveStationData === 'function') {
         fetchAllLiveStationData();
@@ -8188,13 +8188,13 @@ function initConnectionMonitoring() {
 // ============================================
 window.openLogbookModal = () => {
   if (!state.user) return;
-  
+
   // Close profile modal if open
   closeProfileModal();
-  
+
   const modal = document.getElementById('logbook-modal');
   if (modal) modal.classList.add('active');
-  
+
   if (!state.logbookMap) {
     // Initialize map
     const defaultCenter = [53.3498, -6.2603]; // Dublin
@@ -8207,11 +8207,11 @@ window.openLogbookModal = () => {
       maxZoom: 18,
       className: 'dark-map-layer'
     }).addTo(state.logbookMap);
-    
+
     // Add custom zoom control
     L.control.zoom({ position: 'bottomright' }).addTo(state.logbookMap);
   }
-  
+
   // Invalidate size after modal transition completes to prevent grey tiles
   setTimeout(() => {
     state.logbookMap.invalidateSize();
@@ -8231,11 +8231,11 @@ function renderLogbookMarkers() {
   if (state.logbookLayerGroup) {
     state.logbookMap.removeLayer(state.logbookLayerGroup);
   }
-  
+
   state.logbookLayerGroup = L.layerGroup().addTo(state.logbookMap);
-  
+
   const myCatches = state.catches.filter(c => c.authorId === state.user.id && c.lat && c.lng);
-  
+
   if (myCatches.length === 0) return;
 
   const bounds = L.latLngBounds();
@@ -8243,7 +8243,7 @@ function renderLogbookMarkers() {
   myCatches.forEach(c => {
     const latlng = [c.lat, c.lng];
     bounds.extend(latlng);
-    
+
     const marker = L.marker(latlng, {
       icon: L.divIcon({
         className: 'custom-community-marker',
@@ -8253,10 +8253,10 @@ function renderLogbookMarkers() {
         popupAnchor: [0, -24]
       })
     });
-    
+
     const displayPhoto = c.photo || c.image || '';
     const displayDetails = sanitizeHTML(c.details || c.notes || '');
-    
+
     let popupContent = `<div class="catch-popup">`;
     if (displayPhoto) {
       popupContent += `<img src="${displayPhoto}" style="width:100%; height:120px; object-fit:cover; border-radius:4px; margin-bottom:8px;">`;
@@ -8265,7 +8265,7 @@ function renderLogbookMarkers() {
       <h4 style="margin:0 0 5px 0; color:var(--text-main); font-size:1rem;">🎣 ${sanitizeHTML(c.species || 'Catch')}</h4>
       <p style="margin:0 0 5px 0; font-size:0.8rem; color:var(--text-secondary);">${c.date || getTimeAgo(c.id)}</p>
     `;
-    
+
     if (c.loadout) {
       popupContent += `
         <div style="margin-bottom: 5px; padding: 4px; background: rgba(0, 212, 255, 0.05); border: 1px solid rgba(0, 212, 255, 0.15); border-radius: 4px; font-size: 0.75rem;">
@@ -8273,21 +8273,21 @@ function renderLogbookMarkers() {
         </div>
       `;
     }
-    
+
     if (displayDetails) {
       popupContent += `<p style="margin:0; font-size:0.85rem; color:var(--text-main);">${displayDetails}</p>`;
     }
     popupContent += `</div>`;
-    
+
     marker.bindPopup(popupContent, {
       maxWidth: 250,
       minWidth: 200,
       className: 'dark-popup'
     });
-    
+
     marker.addTo(state.logbookLayerGroup);
   });
-  
+
   if (myCatches.length > 0) {
     state.logbookMap.fitBounds(bounds, { padding: [30, 30] });
   }
@@ -8307,19 +8307,19 @@ window.adminAwardBadge = async () => {
   try {
     const userRef = firebaseDB.ref('users/' + targetId);
     const snapshot = await userRef.once('value');
-    
+
     if (!snapshot.exists()) {
       return alert('User not found!');
     }
-    
+
     const userData = snapshot.val();
     let badges = userData.badges ? (Array.isArray(userData.badges) ? userData.badges : (typeof userData.badges === 'string' ? [userData.badges] : Object.values(userData.badges))) : [];
-    
+
     if (!badges.includes(badgeType)) {
       badges.push(badgeType);
       await userRef.update({ badges });
       alert('Successfully awarded "' + badgeType + '" to ' + (userData.name || targetId));
-      
+
       // Update local state.allUsers if loaded
       const userIdx = state.allUsers.findIndex(u => u.id === targetId);
       if (userIdx !== -1) {
@@ -8339,23 +8339,23 @@ window.adminAwardBadge = async () => {
 window.removeBadgeFromList = async (userId, userName) => {
   if (!state.user || !state.user.isAdmin) return;
   const badgeType = 'Fish of the Month';
-  
+
   if (!confirm('Are you sure you want to remove "Fish of the Month" from ' + userName + '?')) return;
 
   try {
     const userRef = firebaseDB.ref('users/' + userId);
     const snapshot = await userRef.once('value');
-    
+
     if (!snapshot.exists()) return alert('User not found!');
-    
+
     const userData = snapshot.val();
     let badges = userData.badges ? (Array.isArray(userData.badges) ? userData.badges : (typeof userData.badges === 'string' ? [userData.badges] : Object.values(userData.badges))) : [];
-    
+
     if (badges.includes(badgeType)) {
       badges = badges.filter(b => b !== badgeType);
       await userRef.update({ badges });
       alert('Successfully removed "' + badgeType + '" from ' + userName);
-      
+
       const userIdx = state.allUsers.findIndex(u => u.id === userId);
       if (userIdx !== -1) {
         state.allUsers[userIdx].badges = badges;
@@ -8373,25 +8373,25 @@ window.removeBadgeFromList = async (userId, userName) => {
 window.awardBadgeFromList = async (userId, userName) => {
   if (!state.user || !state.user.isAdmin) return;
   const badgeType = 'Fish of the Month';
-  
+
   if (!confirm('Are you sure you want to award "Fish of the Month" to ' + userName + '?')) return;
 
   try {
     const userRef = firebaseDB.ref('users/' + userId);
     const snapshot = await userRef.once('value');
-    
+
     if (!snapshot.exists()) {
       return alert('User not found!');
     }
-    
+
     const userData = snapshot.val();
     let badges = userData.badges ? (Array.isArray(userData.badges) ? userData.badges : (typeof userData.badges === 'string' ? [userData.badges] : Object.values(userData.badges))) : [];
-    
+
     if (!badges.includes(badgeType)) {
       badges.push(badgeType);
       await userRef.update({ badges });
       alert('Successfully awarded "' + badgeType + '" to ' + userName);
-      
+
       const userIdx = state.allUsers.findIndex(u => u.id === userId);
       if (userIdx !== -1) {
         state.allUsers[userIdx].badges = badges;
@@ -8409,23 +8409,23 @@ window.awardBadgeFromList = async (userId, userName) => {
 window.removeAmbassadorBadge = async (userId, userName) => {
   if (!state.user || !state.user.isAdmin) return;
   const badgeType = 'Ambassador';
-  
+
   if (!confirm('Are you sure you want to remove "Ambassador" from ' + userName + '?')) return;
 
   try {
     const userRef = firebaseDB.ref('users/' + userId);
     const snapshot = await userRef.once('value');
-    
+
     if (!snapshot.exists()) return alert('User not found!');
-    
+
     const userData = snapshot.val();
     let badges = userData.badges ? (Array.isArray(userData.badges) ? userData.badges : (typeof userData.badges === 'string' ? [userData.badges] : Object.values(userData.badges))) : [];
-    
+
     if (badges.includes(badgeType)) {
       badges = badges.filter(b => b !== badgeType);
       await userRef.update({ badges });
       alert('Successfully removed "' + badgeType + '" from ' + userName);
-      
+
       const userIdx = state.allUsers.findIndex(u => u.id === userId);
       if (userIdx !== -1) {
         state.allUsers[userIdx].badges = badges;
@@ -8443,25 +8443,25 @@ window.removeAmbassadorBadge = async (userId, userName) => {
 window.awardAmbassadorBadge = async (userId, userName) => {
   if (!state.user || !state.user.isAdmin) return;
   const badgeType = 'Ambassador';
-  
+
   if (!confirm('Are you sure you want to award "Ambassador" to ' + userName + '?')) return;
 
   try {
     const userRef = firebaseDB.ref('users/' + userId);
     const snapshot = await userRef.once('value');
-    
+
     if (!snapshot.exists()) {
       return alert('User not found!');
     }
-    
+
     const userData = snapshot.val();
     let badges = userData.badges ? (Array.isArray(userData.badges) ? userData.badges : (typeof userData.badges === 'string' ? [userData.badges] : Object.values(userData.badges))) : [];
-    
+
     if (!badges.includes(badgeType)) {
       badges.push(badgeType);
       await userRef.update({ badges });
       alert('Successfully awarded "' + badgeType + '" to ' + userName);
-      
+
       const userIdx = state.allUsers.findIndex(u => u.id === userId);
       if (userIdx !== -1) {
         state.allUsers[userIdx].badges = badges;
@@ -8483,7 +8483,7 @@ window.renderLeaderboard = () => {
 
   // Aggregate user stats from all catches
   const userStats = {};
-  
+
   (state.catches || []).forEach(c => {
     if (c.isPrivate) return;
     const authorId = c.authorId || c.userId;
@@ -8530,7 +8530,7 @@ window.renderLeaderboard = () => {
         }
         let badges = dbUser.badges || [];
         if (!Array.isArray(badges)) {
-            badges = typeof badges === 'string' ? [badges] : Object.values(badges);
+          badges = typeof badges === 'string' ? [badges] : Object.values(badges);
         }
         u.badges = badges;
       }
@@ -8539,7 +8539,7 @@ window.renderLeaderboard = () => {
 
   // Render Podium (Top 3)
   const top3 = rankedUsers.slice(0, 3);
-  
+
   // Reorder for Podium: 2nd, 1st, 3rd visually
   let podiumHtml = '';
   const getAvatarStyle = (u) => u && u.avatarUrl ? `background-image: url('${u.avatarUrl}'); color: transparent;` : '';
@@ -8584,12 +8584,12 @@ window.renderLeaderboard = () => {
   } else {
     podiumHtml += `<div class="podium-place third" style="opacity:0.3;"><div class="podium-rank">3</div></div>`;
   }
-  
+
   podiumEl.innerHTML = podiumHtml;
 
   // Render List (4th onwards)
   const restList = rankedUsers.slice(3, 50); // Limit to top 50
-  
+
   if (restList.length > 0) {
     listEl.innerHTML = restList.map((u, index) => {
       const rank = index + 4;

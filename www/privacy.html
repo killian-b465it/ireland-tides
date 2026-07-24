@@ -12,7 +12,8 @@
     h1 { margin-bottom: 20px; color: var(--text-primary); }
     p, li { margin-bottom: 12px; color: var(--text-secondary); line-height: 1.6; }
     h2 { margin-top: 30px; margin-bottom: 15px; color: var(--text-primary); font-size: 1.4rem; }
-    h3 { margin-top: 20px; margin-bottom: 10px; color: #fff; font-size: 1.1rem; }
+    h3 { margin-top: 25px; margin-bottom: 10px; color: var(--accent-primary); font-size: 1.2rem; }
+    h4 { margin-top: 20px; margin-bottom: 8px; color: #fff; font-size: 1.05rem; }
   </style>
 </head>
 <body>
@@ -33,43 +34,87 @@
   <main style="max-width: 800px; margin: 0 auto; padding: 0 20px; min-height: calc(100vh - 100px); padding-bottom: 50px;">
     <div class="content-card">
       <h1>Privacy Policy</h1>
-      <p><strong>Last Updated:</strong> March 2026</p>
+      <p><strong>Last Updated: July 24, 2026 (Version 2.2 - Up to Date)</strong></p>
       
       <p>At Irish Fishing Hub, we are committed to protecting your privacy and ensuring the security of your personal data. This Privacy Policy outlines how we collect, use, and safeguard your information when you access our application and website.</p>
 
-      <h2>1. Information We Collect</h2>
-      <p>We collect information to provide better services to our community:</p>
-      <ul>
-        <li><strong>Account Information:</strong> When you register for our Community or Premium features, we collect your email address, username, and encrypted password.</li>
-        <li><strong>User-Generated Content:</strong> Catch photos, descriptions, and location pins you voluntarily share on the Community map.</li>
-        <li><strong>Location Data:</strong> With your permission, we may access your device's imprecise location to center the map on nearby tide stations. We do not track your exact movements.</li>
-        <li><strong>Usage Data & Cookies:</strong> Standard analytics (via cookies) to understand how you interact with our tide charts and tools, allowing us to improve performance.</li>
+      <h3>1. Introduction & Scope</h3>
+      <p>The Irish Fishing Hub ("we", "our", or "us") is deeply committed to protecting your privacy. This
+        comprehensive Privacy Policy defines exactly how we collect, process, share, and retain your data when you
+        interact with our web application, mobile views, APIs, and associated services (including the V2 AI Identifier
+        and Community Feed).</p>
+
+      <h3>2. Explicit Data Collection & Usage</h3>
+
+      <h4>2.1 Mandatory Authentication & Profiling Data</h4>
+      <p><strong>Data Points:</strong> Email address, cryptographically hashed passwords, usernames, and profile
+        avatars.</p>
+      <p><strong>Purpose & Justification:</strong> Required to establish your unique identity, issue JSON Web Tokens
+        (JWT) for secure session management, provision access to Pro-tier features, and allow cross-device
+        synchronization.</p>
+      <p><strong>Storage Vendor:</strong> Google Firebase Authentication. Data is encrypted at rest and in transit.</p>
+
+      <h4>2.2 User-Generated Content & Community Sharing</h4>
+      <p><strong>Data Points:</strong> Catch photos, text logs, declared species, bait details, timestamps, reported
+        weights, and user interactions (likes, reports).</p>
+      <p><strong>Purpose & Justification:</strong> This data forms the core of the Community Feed. By uploading it,
+        you explicitly consent to its public display across the application.</p>
+      <p><strong>Exposed Metadata:</strong> When you upload photos to the community feed, Exif data (camera details,
+        embedded GPS) is computationally stripped on the client-side before upload to Firebase Storage to protect your
+        exact "secret" fishing spots unless you manually declare the location.</p>
+
+      <h4>2.3 AI Machine Vision Processing</h4>
+      <p><strong>Data Points:</strong> Images uploaded specifically to the "AI Species Identifier" tool.</p>
+      <p><strong>Purpose & Justification:</strong> Images are transmitted to our backend AI processing model to
+        execute inference and return a species prediction array.</p>
+      <p><strong>Retention Guarantee:</strong> Images uploaded solely for AI identification (and not posted to the
+        community feed) are processed purely in-memory or in ephemeral storage. They are permanently deleted upon
+        completion of the inference task. We do not use your private AI queries to train future machine learning
+        models.</p>
+
+      <h4>2.4 Financial & Payment Ledger Data</h4>
+      <p><strong>Data Points:</strong> Billing email, active subscription status, payment history identifiers.</p>
+      <p><strong>Purpose & Justification:</strong> To manage Pro subscriptions.</p>
+      <p><strong>Security Isolation:</strong> We do NOT collect, store, or transmit your credit card numbers, CVV, or
+        bank details. All financial transactions are handed off entirely to Stripe Inc. via highly secure iframe
+        segregation. Their privacy standards apply to the financial data.</p>
+
+      <h4>2.5 Telemetry, Analytics & Advertising Profiles</h4>
+      <p><strong>Data Points:</strong> IP addresses, browser user-agent strings, device viewport sizing, operating
+        system versions, and page navigation flows.</p>
+      <p><strong>Purpose & Justification:</strong> This telemetry is utilized inherently by secure web servers to
+        return data. It is also utilized by analytics and Google AdSense to classify application health and serve
+        personalized advertising banners.</p>
+
+      <h3>3. Third-Party Data Processors & Sub-processors</h3>
+      <p>We leverage industry-standard third-party sub-processors to run the service. We hold them to strict data
+        protection standards:</p>
+      <ul style="margin-left:20px;">
+        <li><strong>Google Cloud & Firebase:</strong> For real-time NoSQL database hosting, asset storage, and
+          authentication.</li>
+        <li><strong>Stripe:</strong> For PCI-DSS compliant payment processing.</li>
+        <li><strong>Google AdSense:</strong> Advertising network. Third party vendors, including Google, use tracking
+          cookies to serve ads based on a user's prior web history. You may opt out of personalized advertising by
+          visiting Google's <a href="https://www.google.com/settings/ads" target="_blank">Ads Settings</a>.</li>
       </ul>
 
-      <h2>2. How We Use Your Information</h2>
-      <p>Your data is exclusively used to:</p>
-      <ul>
-        <li>Operate the core application functionalities, including auth via Firebase.</li>
-        <li>Process optional subscription payments securely via Stripe.</li>
-        <li>Deliver personalized content, such as saving your favorite tide stations.</li>
-        <li>Identify fish species via our AI tool. Note: Images processed by the AI are not permanently stored unless explicitly saved to your public catch feed.</li>
+      <h3>4. Legal Compliance, GDPR & Data Rights</h3>
+      <p>If you reside within the European Economic Area (EEA), your data is handled in strict accordance with the
+        General Data Protection Regulation (GDPR). You possess the following non-negotiable rights:</p>
+      <ul style="margin-left:20px;">
+        <li><strong>Right to be Forgotten:</strong> You may instantly delete your account via the settings menu. This
+          executes a cascading deletion script that physically wipes your profile, public community posts, uploaded
+          bucket images, and authentication tokens from our active database within 24 hours.</li>
+        <li><strong>Right to Access:</strong> You may request a raw JSON export of all associated user data held in
+          the Firebase Realtime Database.</li>
+        <li><strong>Right to Restrict Processing:</strong> You may opt out of data processing by terminating your
+          account.</li>
       </ul>
 
-      <h2>3. Advertising & Third Parties</h2>
-      <p>We use Google AdSense to display advertisements. Google uses cookies to serve ads based on your prior visits to our website or other websites. You can opt out of personalized advertising by visiting Google's Ads Settings.</p>
-      <p>We do not sell, rent, or trade your personal information to third-party data brokers under any circumstances.</p>
-
-      <h2>4. Your GDPR / Data Rights</h2>
-      <p>As an EU resident, you have the right to:</p>
-      <ul>
-        <li>Request access to the personal data we hold about you.</li>
-        <li>Request correction or deletion of your data (Right to be Forgotten).</li>
-        <li>Withdraw consent for location tracking or marketing communications at any time.</li>
-      </ul>
-      <p>To exercise these rights, simply email us at <strong style="color:var(--accent-primary);">irishfishinghub@gmail.com</strong> or use the Contact Support page.</p>
-
-      <h2>5. Security</h2>
-      <p>We implement industry-standard security measures including SSL encryption and secure cloud databases (Firebase) to protect your data from unauthorized access.</p>
+      <h3>5. Law Enforcement & Mandatory Disclosure</h3>
+      <p>We are governed by the laws of the Republic of Ireland. We will disclose your user data, without your prior
+        consent, if compelled to do so by a valid subpoena, court order, or warrant issued by An Garda Síochána or
+        relevant international authorities investigating illegal activities or immediate threats to public safety.</p>
     </div>
   </main>
 </body>

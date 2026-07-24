@@ -868,8 +868,8 @@
           style="display:none; align-items:flex-start; gap:8px; margin: 0 0 15px 0; font-size: 0.8rem; cursor: pointer;">
           <input type="checkbox" id="auth-terms">
           <span style="color: var(--text-secondary); line-height: 1.3;">I agree to the <a href="#"
-              onclick="openTermsModal()" style="color: var(--accent-primary);">Terms & Conditions</a> and <a href="#"
-              onclick="openPrivacyModal()" style="color: var(--accent-primary);">Privacy Policy</a>.</span>
+              onclick="event.preventDefault(); event.stopPropagation(); openTermsModal()" style="color: var(--accent-primary);">Terms & Conditions</a> and <a href="#"
+              onclick="event.preventDefault(); event.stopPropagation(); openPrivacyModal()" style="color: var(--accent-primary);">Privacy Policy</a>.</span>
         </label>
 
         <button class="btn btn-primary"
@@ -1086,7 +1086,30 @@
         </div>
       </div>
 
-      <div class="form-group" style="margin-top: 15px;">
+      <!-- My Stats Card -->
+      <div id="profile-stats-card" style="margin-top: 15px; background: linear-gradient(135deg, rgba(0,212,255,0.06), rgba(0,136,255,0.04)); border: 1px solid rgba(0,212,255,0.15); border-radius: 12px; padding: 14px 16px;">
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px;">📊 My Stats</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div style="text-align: center; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px 6px;">
+            <div id="stat-posts" style="font-size: 1.6rem; font-weight: 800; color: var(--accent-primary);">0</div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Posts</div>
+          </div>
+          <div style="text-align: center; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px 6px;">
+            <div id="stat-likes" style="font-size: 1.6rem; font-weight: 800; color: #ff6b9d;">0</div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Likes Received</div>
+          </div>
+          <div style="text-align: center; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px 6px;">
+            <div id="stat-rank" style="font-size: 1.6rem; font-weight: 800; color: #FFD700;">#–</div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Leaderboard Rank</div>
+          </div>
+          <div style="text-align: center; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px 6px;">
+            <div id="stat-joined" style="font-size: 1rem; font-weight: 700; color: var(--accent-success);">–</div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Member Since</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top: 12px;">
         <button class="btn btn-outline" style="width: 100%; justify-content: center; display: flex; gap: 8px; border-color: var(--accent-primary); color: var(--accent-primary);" onclick="openLogbookModal()">
            🗺️ View My Logbook Map
         </button>
@@ -1811,7 +1834,7 @@
         <button class="modal-close-btn-inline" onclick="closeTermsModal()">✕</button>
       </div>
       <div class="modal-body terms-content">
-        <p><strong>Last updated: March 15, 2026 (Version 2.1 - Comprehensive Coverage)</strong></p>
+        <p><strong>Last updated: July 24, 2026 (Version 2.2 - Up to Date)</strong></p>
 
         <h3>1. Acceptance of Terms & Binding Agreement</h3>
         <p>By accessing, browsing, or using the Irish Fishing Hub ("the App" or "the Service"), you establish a legally
@@ -1888,7 +1911,7 @@
         <button class="modal-close-btn-inline" onclick="closePrivacyModal()">✕</button>
       </div>
       <div class="modal-body terms-content">
-        <p><strong>Last updated: March 15, 2026 (Version 2.1 - Comprehensive Processing Policy)</strong></p>
+        <p><strong>Last updated: July 24, 2026 (Version 2.2 - Up to Date)</strong></p>
 
         <h3>1. Introduction & Scope</h3>
         <p>The Irish Fishing Hub ("we", "our", or "us") is deeply committed to protecting your privacy. This
@@ -1989,13 +2012,13 @@
         <label class="legal-item">
           <input type="checkbox" id="check-terms" onchange="updateLegalContinueButton()">
           <span class="custom-check"></span>
-          <span class="legal-text">I accept the <a href="#" onclick="openTermsModal()">Terms & Conditions</a></span>
+          <span class="legal-text">I accept the <a href="#" onclick="event.preventDefault(); event.stopPropagation(); openTermsModal()">Terms & Conditions</a></span>
         </label>
 
         <label class="legal-item">
           <input type="checkbox" id="check-privacy" onchange="updateLegalContinueButton()">
           <span class="custom-check"></span>
-          <span class="legal-text">I accept the <a href="#" onclick="openPrivacyModal()">Privacy Policy</a></span>
+          <span class="legal-text">I accept the <a href="#" onclick="event.preventDefault(); event.stopPropagation(); openPrivacyModal()">Privacy Policy</a></span>
         </label>
       </div>
 
