@@ -6675,3 +6675,107 @@ input:checked+.toggle-slider:before {
     .podium-avatar { width: 40px; height: 40px; }
     .podium-place.first .podium-avatar { width: 50px; height: 50px; }
 }
+
+/* ============================================
+   Fishing Conditions Score Styles
+   ============================================ */
+.conditions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+.conditions-score-wrapper {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: conic-gradient(var(--score-color) var(--score-deg), rgba(255,255,255,0.05) 0deg);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+.conditions-score-inner {
+  width: 78px;
+  height: 78px;
+  background: var(--bg-card);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.conditions-score-value {
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--score-color);
+}
+.conditions-score-text {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+.conditions-summary {
+  flex: 1;
+  padding-left: 15px;
+}
+.conditions-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.conditions-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+.conditions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 5px;
+}
+.condition-factor {
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+}
+.factor-icon {
+  font-size: 1.4rem;
+  margin-right: 10px;
+  width: 24px;
+  text-align: center;
+}
+.factor-info {
+  display: flex;
+  flex-direction: column;
+}
+.factor-name {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.factor-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+}
+.factor-status {
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-top: 2px;
+}
+.status-excellent { color: #00ff88; }
+.status-good { color: #00d4ff; }
+.status-fair { color: #ffab00; }
+.status-poor { color: #ff4444; }

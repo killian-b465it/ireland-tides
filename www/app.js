@@ -346,6 +346,8 @@ let state = {
   harbourMarkers: null,
   activeFilters: { stations: true, shops: true, piers: true, ramps: true, harbours: true },
   tideData: {},
+  currentWeatherData: null,
+  currentSwellData: null,
   currentWeatherDaily: null, // Store 7-day weather
   forecastOffset: 0, // 0 = Today, 1 = Tomorrow, etc.
   isLoading: false,
@@ -476,7 +478,36 @@ const FRESHWATER_SPOTS = [
   { id: 'bewl_water', name: 'Bewl Water', type: 'Lake', lat: 51.0775, lng: 0.3925, species: ['Trout', 'Pike'], country: 'UK', notes: 'Large reservoir.' },
   { id: 'chew_valley_lake', name: 'Chew Valley Lake', type: 'Lake', lat: 51.3415, lng: -2.6125, species: ['Trout', 'Pike'], country: 'UK', notes: 'Top pike and trout water.' },
   { id: 'bala_lake', name: 'Bala Lake', type: 'Lake', lat: 52.8945, lng: -3.6045, species: ['Trout', 'Pike'], country: 'UK', notes: 'Wales largest natural lake.' },
-  { id: 'river_wye_hereford', name: 'River Wye (Hereford)', type: 'River', lat: 52.0545, lng: -2.7155, species: ['Barbel', 'Chub'], country: 'UK', notes: 'Excellent coarse section.' }
+  { id: 'river_wye_hereford', name: 'River Wye (Hereford)', type: 'River', lat: 52.0545, lng: -2.7155, species: ['Barbel', 'Chub'], country: 'UK', notes: 'Excellent coarse section.' },
+
+  // ===== MORE IRELAND CANALS & RIVERS =====
+  { id: 'barrow_navigation', name: 'Barrow Navigation (Canal)', type: 'Canal', lat: 52.65, lng: -6.98, species: ['Bream', 'Roach', 'Perch', 'Tench', 'Pike'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Carlow to St Mullins. 69km of navigation. Excellent coarse fishing from towpath.', country: 'IE' },
+  { id: 'shannon_erne_waterway', name: 'Shannon-Erne Waterway', type: 'Canal', lat: 54.05, lng: -7.82, species: ['Bream', 'Roach', 'Perch', 'Pike', 'Tench'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Links Leitrim to Fermanagh. 60km restored canal. Excellent pike & bream.', country: 'IE' },
+  { id: 'ulster_canal', name: 'Ulster Canal (Restored Section)', type: 'Canal', lat: 54.30, lng: -7.05, species: ['Bream', 'Perch', 'Roach', 'Pike'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Monaghan/Fermanagh. Undergoing restoration. Free coarse fishing.', country: 'IE' },
+  { id: 'newry_canal', name: 'Newry Canal', type: 'Canal', lat: 54.18, lng: -6.34, species: ['Bream', 'Roach', 'Perch', 'Tench', 'Rudd'], licenseRequired: true, licenseType: 'DAERA Rod License', licenseUrl: 'https://www.nidirect.gov.uk/articles/freshwater-angling', notes: 'Oldest summit-level canal in Britain & Ireland. Good coarse fishing along towpath.', country: 'IE' },
+  { id: 'lagan_navigation', name: 'Lagan Navigation', type: 'Canal', lat: 54.50, lng: -6.05, species: ['Bream', 'Roach', 'Perch', 'Pike'], licenseRequired: true, licenseType: 'DAERA Rod License', licenseUrl: 'https://www.nidirect.gov.uk/articles/freshwater-angling', notes: 'Belfast to Lough Neagh. Good access along towpath for coarse fish.', country: 'IE' },
+  { id: 'river_erne', name: 'River Erne', type: 'River', lat: 54.25, lng: -7.65, species: ['Pike', 'Bream', 'Roach', 'Brown Trout', 'Salmon'], licenseRequired: true, licenseType: 'Loughs Agency / DAERA License', licenseUrl: 'https://www.loughs-agency.org/', notes: 'Flows through Lough Erne system. Exceptional pike. Cross-border fishery.', country: 'IE' },
+  { id: 'river_corrib', name: 'River Corrib', type: 'River', lat: 53.27, lng: -9.05, species: ['Salmon', 'Sea Trout', 'Brown Trout'], licenseRequired: true, licenseType: 'Salmon License + Corrib Permit', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Galway city. Short but prolific salmon river. Famous weir pools.', country: 'IE' },
+  { id: 'river_bann_upper', name: 'Upper River Bann', type: 'River', lat: 54.38, lng: -6.48, species: ['Salmon', 'Sea Trout', 'Brown Trout'], licenseRequired: true, licenseType: 'DAERA Rod License + Permit', licenseUrl: 'https://www.nidirect.gov.uk/articles/game-angling', notes: 'From Banbridge to Lough Neagh. Good salmon & trout water.', country: 'IE' },
+  { id: 'river_suck', name: 'River Suck', type: 'River', lat: 53.50, lng: -8.18, species: ['Bream', 'Roach', 'Pike', 'Perch', 'Tench'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Roscommon/Galway border. Excellent coarse fishing. Irish match record venue.', country: 'IE' },
+  { id: 'river_inny', name: 'River Inny', type: 'River', lat: 53.58, lng: -7.62, species: ['Pike', 'Perch', 'Bream', 'Roach'], licenseRequired: false, licenseType: null, licenseUrl: null, notes: 'Westmeath/Longford. Flows into Lough Ree. Good pike & coarse.', country: 'IE' },
+  { id: 'river_deel_limerick', name: 'River Deel', type: 'River', lat: 52.55, lng: -9.22, species: ['Salmon', 'Sea Trout', 'Brown Trout'], licenseRequired: true, licenseType: 'Salmon License', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Limerick/Mayo. Spring salmon. Spate river, best after rain.', country: 'IE' },
+  { id: 'river_mulkear', name: 'River Mulkear', type: 'River', lat: 52.60, lng: -8.48, species: ['Salmon', 'Sea Trout', 'Brown Trout'], licenseRequired: true, licenseType: 'Salmon License + Local Permit', licenseUrl: 'https://fishinginireland.info/angling-licences/', notes: 'Limerick. Spring & summer salmon. Excellent wild trout.', country: 'IE' },
+
+  // ===== MORE UK CANALS & RIVERS =====
+  { id: 'grand_union_canal', name: 'Grand Union Canal', type: 'Canal', lat: 51.97, lng: -1.04, species: ['Bream', 'Roach', 'Perch', 'Tench', 'Carp', 'Pike'], country: 'UK', notes: 'London to Birmingham. 220 miles. One of the most popular canal fishing venues in England.' },
+  { id: 'oxford_canal', name: 'Oxford Canal', type: 'Canal', lat: 52.22, lng: -1.40, species: ['Roach', 'Bream', 'Tench', 'Perch', 'Carp'], country: 'UK', notes: 'Coventry to Oxford. 77 miles. Scenic with good all-round coarse fishing.' },
+  { id: 'kennet_avon_canal', name: 'Kennet & Avon Canal', type: 'Canal', lat: 51.40, lng: -1.78, species: ['Tench', 'Bream', 'Roach', 'Carp', 'Perch', 'Pike'], country: 'UK', notes: 'Bath to Reading. 87 miles. Popular for tench & bream. Free fishing EA licence required.' },
+  { id: 'leeds_liverpool_canal', name: 'Leeds & Liverpool Canal', type: 'Canal', lat: 53.72, lng: -2.48, species: ['Bream', 'Roach', 'Perch', 'Tench', 'Carp', 'Chub'], country: 'UK', notes: 'Longest single canal in England. Great variety of coarse fish throughout.' },
+  { id: 'shropshire_union_canal', name: 'Shropshire Union Canal', type: 'Canal', lat: 52.82, lng: -2.60, species: ['Chub', 'Perch', 'Roach', 'Bream', 'Tench', 'Pike'], country: 'UK', notes: 'Chester to Wolverhampton. Known for big chub and perch. Good match venue.' },
+  { id: 'trent_mersey_canal', name: 'Trent & Mersey Canal', type: 'Canal', lat: 52.97, lng: -1.95, species: ['Bream', 'Roach', 'Perch', 'Chub', 'Carp', 'Tench'], country: 'UK', notes: 'Great Haywood to Daresbury. 93 miles. Very popular match canal. Prolific bream shoals.' },
+  { id: 'river_trent', name: 'River Trent', type: 'River', lat: 52.95, lng: -1.15, species: ['Barbel', 'Chub', 'Bream', 'Roach', 'Perch', 'Pike', 'Zander'], country: 'UK', notes: 'Third longest river in UK. Home of the English record barbel. Prolific year-round fishing.' },
+  { id: 'river_avon_warwickshire', name: 'River Avon (Warwickshire)', type: 'River', lat: 52.19, lng: -1.70, species: ['Barbel', 'Chub', 'Bream', 'Roach', 'Pike', 'Perch'], country: 'UK', notes: 'Stratford-upon-Avon to Tewkesbury. Excellent barbel & chub water. Free EA licence required.' },
+  { id: 'river_great_ouse', name: 'River Great Ouse', type: 'River', lat: 52.35, lng: -0.28, species: ['Bream', 'Roach', 'Chub', 'Barbel', 'Pike', 'Perch', 'Zander'], country: 'UK', notes: 'Northamptonshire to The Wash. Famous for bream & pike. Good zander in lower reaches.' },
+  { id: 'river_nene', name: 'River Nene', type: 'River', lat: 52.38, lng: -0.55, species: ['Bream', 'Roach', 'Perch', 'Pike', 'Zander', 'Chub'], country: 'UK', notes: 'Northampton to the Wash. Excellent coarse river. Good match fishing throughout.' },
+  { id: 'river_dee_wales', name: 'River Dee (Wales)', type: 'River', lat: 52.95, lng: -3.00, species: ['Salmon', 'Brown Trout', 'Grayling', 'Chub', 'Barbel'], country: 'UK', notes: 'North Wales & Chester. World class salmon & grayling river. Spectacular scenery.' },
+  { id: 'river_spey', name: 'River Spey', type: 'River', lat: 57.42, lng: -3.55, species: ['Salmon', 'Sea Trout', 'Brown Trout', 'Grayling'], country: 'UK', notes: 'Scotland. Fastest flowing major river in UK. Famous for Spey casting & spring salmon.' },
+  { id: 'caledonian_canal', name: 'Caledonian Canal', type: 'Canal', lat: 57.19, lng: -4.48, species: ['Salmon', 'Brown Trout', 'Pike', 'Perch'], country: 'UK', notes: 'Fort William to Inverness. Links the lochs of the Great Glen. Unique fishing experience.' }
 ];
 
 // ============================================
@@ -1868,7 +1899,7 @@ async function fetchTideData(station) {
       state.tideData[station.id] = stationData;
       displayTideData(station, stationData);
       updateChart(stationData);
-      updateFishingConditions(station, stationData);
+      updateFishingConditions(station);
     } else {
       console.warn(`No tide data found for ${station.id}, using estimate.`);
       displayCalculatedTides(station);
@@ -2183,7 +2214,7 @@ function displayCalculatedTides(station) {
 
   displayTideTimes([]);
   updateCalculatedChart(station);
-  updateFishingConditions(station, null);
+  updateFishingConditions(station);
 }
 
 // ============================================
@@ -2405,9 +2436,11 @@ async function fetchWeatherData(station) {
     }
 
     displayWeatherData(data.current);
+    state.currentWeatherData = data.current;
     state.currentWeatherDaily = data.daily;
     renderForecastView();
     renderSolunarCard();
+    updateFishingConditions(station);
 
   } catch (err) {
     const isTimeout = err.name === 'AbortError';
@@ -2562,7 +2595,9 @@ async function fetchSwellData(station) {
     if (!res.ok) throw new Error(`Marine API ${res.status}`);
     const data = await res.json();
 
+    state.currentSwellData = data.hourly;
     displaySwellData(data);
+    updateFishingConditions(station);
   } catch (err) {
     console.warn(`Swell fetch failed for ${station.id}:`, err);
     container.innerHTML = `
@@ -2734,39 +2769,167 @@ function updateCalculatedChart(station) {
   });
 }
 
-function updateFishingConditions(station, data) {
+function updateFishingConditions(station) {
+  const container = document.getElementById('conditions-card');
+  const display = document.getElementById('conditions-display');
+  if (!container || !display) return;
+  
+  if (!station) {
+    container.style.display = 'none';
+    return;
+  }
+  
+  container.style.display = 'block';
+
   const now = new Date();
-  const moon = SunCalc.getMoonIllumination(now);
-  let score = 50;
-  if (moon.phase < 0.1 || moon.phase > 0.9 || (moon.phase > 0.4 && moon.phase < 0.6)) score += 20;
-  const h = now.getHours();
-  if ((h >= 5 && h <= 8) || (h >= 17 && h <= 20)) score += 20;
-  score = Math.min(100, score);
-
-  let rating = score > 80 ? 'Excellent' : score > 60 ? 'Good' : 'Fair';
-  let rClass = rating.toLowerCase();
-
-  const scoreEl = document.getElementById('fishing-score');
-  if (scoreEl) {
-    scoreEl.innerHTML = `
-      <div class="score-circle ${rClass}">${score}</div>
-      <div class="score-details">
-        <div class="score-label">${rating} Conditions</div>
-        <div class="score-factors"><span class="factor-tag">Tidal Flow</span><span class="factor-tag">Moon Phase</span></div>
-      </div>
-    `;
+  
+  // 1. Solunar Factor
+  const moon = calculateMoonState(now);
+  const distToExtreme = Math.min(moon.age, 29.53059 - moon.age, Math.abs(moon.age - 14.76));
+  let solunarScore = 50 + 45 * (1 - (distToExtreme / 7.38));
+  solunarScore = Math.max(15, Math.min(99, Math.round(solunarScore)));
+  
+  // 2. Weather/Wind Factor
+  let windScore = 50;
+  let windDesc = "Unknown";
+  let windSpeed = null;
+  if (state.currentWeatherData) {
+    windSpeed = state.currentWeatherData.wind_speed_10m; // km/h
+    if (windSpeed < 10) { windScore = 100; windDesc = "Calm"; }
+    else if (windSpeed < 20) { windScore = 80; windDesc = "Breezy"; }
+    else if (windSpeed < 30) { windScore = 50; windDesc = "Gusty"; }
+    else if (windSpeed < 45) { windScore = 20; windDesc = "Windy"; }
+    else { windScore = 0; windDesc = "Gale Force"; }
   }
 
-  const moonEl = document.getElementById('moon-phase');
-  if (moonEl) {
-    moonEl.innerHTML = `
-      <div class="moon-icon">🌖</div>
-      <div class="moon-info">
-        <div class="moon-name">Moon Phase</div>
-        <div class="moon-detail">${Math.round(moon.fraction * 100)}% illuminated</div>
-      </div>
-    `;
+  // 3. Swell Factor (for sea fishing)
+  let swellScore = 50;
+  let swellDesc = "Unknown";
+  let isCoastal = state.fishingMode === 'sea';
+  
+  if (isCoastal && state.currentSwellData && state.currentSwellData.time) {
+    const nowIso = now.toISOString().slice(0, 13);
+    let currentIdx = state.currentSwellData.time.findIndex(t => t.startsWith(nowIso));
+    if (currentIdx === -1) currentIdx = 0;
+    
+    const waveH = state.currentSwellData.wave_height[currentIdx];
+    if (waveH !== null && waveH !== undefined) {
+      if (waveH < 0.5) { swellScore = 100; swellDesc = "Calm"; }
+      else if (waveH < 1.0) { swellScore = 85; swellDesc = "Slight"; }
+      else if (waveH < 1.5) { swellScore = 60; swellDesc = "Moderate"; }
+      else if (waveH < 2.5) { swellScore = 30; swellDesc = "Rough"; }
+      else { swellScore = 0; swellDesc = "Dangerous"; }
+    }
+  } else if (!isCoastal) {
+    swellScore = 100;
+    swellDesc = "N/A (Inland)";
   }
+
+  // 4. Tide Factor (for sea fishing)
+  let tideScore = 50;
+  let tideDesc = "Unknown";
+  if (isCoastal) {
+    let dir = 'Stable';
+    const tData = state.tideData[station.id];
+    if (tData && tData.length >= 2) {
+      const level = tData[tData.length - 1][2];
+      const prev = tData[tData.length - 2][2];
+      dir = level > prev ? 'Rising' : level < prev ? 'Falling' : 'Stable';
+      tideDesc = dir;
+      if (dir === 'Rising') tideScore = 90;
+      else if (dir === 'Falling') tideScore = 75;
+      else tideScore = 40;
+    } else {
+      const currLvl = calculateTideLevel(now, station);
+      dir = currLvl.direction;
+      tideDesc = dir === 'rising' ? 'Rising' : dir === 'falling' ? 'Falling' : 'Slack Water';
+      if (dir === 'rising') tideScore = 90;
+      else if (dir === 'falling') tideScore = 75;
+      else tideScore = 40;
+    }
+  } else {
+    tideScore = 100;
+    tideDesc = "N/A (Inland)";
+  }
+
+  // Calculate Overall Score
+  let finalScore = 0;
+  if (isCoastal) {
+    finalScore = (solunarScore * 0.3) + (windScore * 0.25) + (swellScore * 0.25) + (tideScore * 0.2);
+  } else {
+    finalScore = (solunarScore * 0.5) + (windScore * 0.5);
+  }
+  
+  finalScore = Math.max(1, Math.min(100, Math.round(finalScore)));
+  
+  let rating = 'Poor';
+  let ratingColor = '#ff4444';
+  let summaryText = 'Stay home. High winds or dangerous swells make fishing unviable today.';
+  
+  if (finalScore >= 80) {
+    rating = 'Excellent';
+    ratingColor = '#00ff88';
+    summaryText = 'Prime conditions! ' + (isCoastal ? 'Tide, wind, and swell are aligning perfectly.' : 'Great weather and solunar activity.');
+  } else if (finalScore >= 60) {
+    rating = 'Good';
+    ratingColor = '#00d4ff';
+    summaryText = 'Favorable conditions. Definitely worth heading out for a session.';
+  } else if (finalScore >= 40) {
+    rating = 'Fair';
+    ratingColor = '#ffab00';
+    summaryText = 'Tougher conditions. You might need to work hard for a bite.';
+  }
+
+  display.innerHTML = \`
+    <div class="conditions-header">
+      <div class="conditions-score-wrapper" style="--score-color: \${ratingColor}; --score-deg: \${finalScore * 3.6}deg;">
+        <div class="conditions-score-inner">
+          <div class="conditions-score-value">\${finalScore}</div>
+          <div class="conditions-score-text">\${rating}</div>
+        </div>
+      </div>
+      <div class="conditions-summary">
+        <div class="conditions-title">\${rating} Conditions</div>
+        <div class="conditions-desc">\${summaryText}</div>
+      </div>
+    </div>
+    <div class="conditions-grid">
+      <div class="condition-factor">
+        <div class="factor-icon">🌙</div>
+        <div class="factor-info">
+          <span class="factor-name">Solunar</span>
+          <span class="factor-value">\${solunarScore}% Peak</span>
+          <span class="factor-status \${solunarScore >= 70 ? 'status-good' : solunarScore >= 40 ? 'status-fair' : 'status-poor'}">\${solunarScore >= 70 ? 'High Activity' : solunarScore >= 40 ? 'Moderate' : 'Low Activity'}</span>
+        </div>
+      </div>
+      <div class="condition-factor">
+        <div class="factor-icon">💨</div>
+        <div class="factor-info">
+          <span class="factor-name">Wind</span>
+          <span class="factor-value">\${windSpeed !== null ? Math.round(windSpeed) + ' km/h' : 'Unknown'}</span>
+          <span class="factor-status \${windScore >= 70 ? 'status-good' : windScore >= 40 ? 'status-fair' : 'status-poor'}">\${windDesc}</span>
+        </div>
+      </div>
+      \${isCoastal ? \`
+      <div class="condition-factor">
+        <div class="factor-icon">🌊</div>
+        <div class="factor-info">
+          <span class="factor-name">Swell</span>
+          <span class="factor-value">\${swellDesc !== 'Unknown' && swellDesc !== 'N/A (Inland)' ? swellDesc : 'Unknown'}</span>
+          <span class="factor-status \${swellScore >= 70 ? 'status-good' : swellScore >= 40 ? 'status-fair' : 'status-poor'}">\${swellScore >= 60 ? 'Safe' : 'Caution'}</span>
+        </div>
+      </div>
+      <div class="condition-factor">
+        <div class="factor-icon">📈</div>
+        <div class="factor-info">
+          <span class="factor-name">Tide</span>
+          <span class="factor-value">\${tideDesc}</span>
+          <span class="factor-status \${tideScore >= 70 ? 'status-good' : 'status-fair'}">\${tideScore >= 70 ? 'Moving Water' : 'Slack'}</span>
+        </div>
+      </div>
+      \` : ''}
+    </div>
+  \`;
 }
 
 
