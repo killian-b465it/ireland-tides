@@ -2880,17 +2880,17 @@ function updateFishingConditions(station) {
     summaryText = 'Tougher conditions. You might need to work hard for a bite.';
   }
 
-  display.innerHTML = \`
+  display.innerHTML = `
     <div class="conditions-header">
-      <div class="conditions-score-wrapper" style="--score-color: \${ratingColor}; --score-deg: \${finalScore * 3.6}deg;">
+      <div class="conditions-score-wrapper" style="--score-color: ${ratingColor}; --score-deg: ${finalScore * 3.6}deg;">
         <div class="conditions-score-inner">
-          <div class="conditions-score-value">\${finalScore}</div>
-          <div class="conditions-score-text">\${rating}</div>
+          <div class="conditions-score-value">${finalScore}</div>
+          <div class="conditions-score-text">${rating}</div>
         </div>
       </div>
       <div class="conditions-summary">
-        <div class="conditions-title">\${rating} Conditions</div>
-        <div class="conditions-desc">\${summaryText}</div>
+        <div class="conditions-title">${rating} Conditions</div>
+        <div class="conditions-desc">${summaryText}</div>
       </div>
     </div>
     <div class="conditions-grid">
@@ -2898,38 +2898,38 @@ function updateFishingConditions(station) {
         <div class="factor-icon">🌙</div>
         <div class="factor-info">
           <span class="factor-name">Solunar</span>
-          <span class="factor-value">\${solunarScore}% Peak</span>
-          <span class="factor-status \${solunarScore >= 70 ? 'status-good' : solunarScore >= 40 ? 'status-fair' : 'status-poor'}">\${solunarScore >= 70 ? 'High Activity' : solunarScore >= 40 ? 'Moderate' : 'Low Activity'}</span>
+          <span class="factor-value">${solunarScore}% Peak</span>
+          <span class="factor-status ${solunarScore >= 70 ? 'status-good' : solunarScore >= 40 ? 'status-fair' : 'status-poor'}">${solunarScore >= 70 ? 'High Activity' : solunarScore >= 40 ? 'Moderate' : 'Low Activity'}</span>
         </div>
       </div>
       <div class="condition-factor">
         <div class="factor-icon">💨</div>
         <div class="factor-info">
           <span class="factor-name">Wind</span>
-          <span class="factor-value">\${windSpeed !== null ? Math.round(windSpeed) + ' km/h' : 'Unknown'}</span>
-          <span class="factor-status \${windScore >= 70 ? 'status-good' : windScore >= 40 ? 'status-fair' : 'status-poor'}">\${windDesc}</span>
+          <span class="factor-value">${windSpeed !== null ? Math.round(windSpeed) + ' km/h' : 'Unknown'}</span>
+          <span class="factor-status ${windScore >= 70 ? 'status-good' : windScore >= 40 ? 'status-fair' : 'status-poor'}">${windDesc}</span>
         </div>
       </div>
-      \${isCoastal ? \`
+      ${isCoastal ? `
       <div class="condition-factor">
         <div class="factor-icon">🌊</div>
         <div class="factor-info">
           <span class="factor-name">Swell</span>
-          <span class="factor-value">\${swellDesc !== 'Unknown' && swellDesc !== 'N/A (Inland)' ? swellDesc : 'Unknown'}</span>
-          <span class="factor-status \${swellScore >= 70 ? 'status-good' : swellScore >= 40 ? 'status-fair' : 'status-poor'}">\${swellScore >= 60 ? 'Safe' : 'Caution'}</span>
+          <span class="factor-value">${swellDesc !== 'Unknown' && swellDesc !== 'N/A (Inland)' ? swellDesc : 'Unknown'}</span>
+          <span class="factor-status ${swellScore >= 70 ? 'status-good' : swellScore >= 40 ? 'status-fair' : 'status-poor'}">${swellScore >= 60 ? 'Safe' : 'Caution'}</span>
         </div>
       </div>
       <div class="condition-factor">
         <div class="factor-icon">📈</div>
         <div class="factor-info">
           <span class="factor-name">Tide</span>
-          <span class="factor-value">\${tideDesc}</span>
-          <span class="factor-status \${tideScore >= 70 ? 'status-good' : 'status-fair'}">\${tideScore >= 70 ? 'Moving Water' : 'Slack'}</span>
+          <span class="factor-value">${tideDesc}</span>
+          <span class="factor-status ${tideScore >= 70 ? 'status-good' : 'status-fair'}">${tideScore >= 70 ? 'Moving Water' : 'Slack'}</span>
         </div>
       </div>
-      \` : ''}
+      ` : ''}
     </div>
-  \`;
+  `;
 }
 
 
