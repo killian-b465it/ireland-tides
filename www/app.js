@@ -8773,3 +8773,24 @@ window.renderLeaderboard = () => {
     listEl.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding: 20px;">Keep fishing to climb the ranks!</div>';
   }
 };
+
+window.switchRegRegion = (region) => {
+  const ieBtn = document.getElementById('btn-reg-ie');
+  const ukBtn = document.getElementById('btn-reg-uk');
+  const ieContent = document.getElementById('reg-ie-content');
+  const ukContent = document.getElementById('reg-uk-content');
+  
+  if (!ieBtn || !ukBtn || !ieContent || !ukContent) return;
+
+  if (region === 'ie') {
+    ieBtn.classList.replace('btn-outline', 'btn-primary');
+    ukBtn.classList.replace('btn-primary', 'btn-outline');
+    ieContent.style.display = 'block';
+    ukContent.style.display = 'none';
+  } else {
+    ukBtn.classList.replace('btn-outline', 'btn-primary');
+    ieBtn.classList.replace('btn-primary', 'btn-outline');
+    ukContent.style.display = 'block';
+    ieContent.style.display = 'none';
+  }
+};

@@ -148,6 +148,7 @@
         <a href="javascript:void(0)" class="nav-link" id="nav-community" onclick="showPage('community')">👥 Community</a>
         <a href="javascript:void(0)" class="nav-link" id="nav-leaderboard" onclick="showPage('leaderboard')">🏆 Leaderboard</a>
         <a href="javascript:void(0)" class="nav-link" id="nav-guide" onclick="showPage('guide')">🎣 Beginner Guide</a>
+        <a href="javascript:void(0)" class="nav-link" id="nav-regulations" onclick="showPage('regulations')">⚖️ Regulations</a>
         <a href="javascript:void(0)" class="nav-link" id="nav-sponsors" onclick="showPage('sponsors')">⭐ Sponsors</a>
         <a href="javascript:void(0)" class="nav-link" id="nav-directory" onclick="showPage('directory')">🏪 Shop Directory</a>
         <a href="javascript:void(0)" class="nav-link" id="nav-species" onclick="showPage('species')">🐟 Species Guide</a>
@@ -198,6 +199,7 @@
       <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('community'); closeMobileMenu()">👥 Community</a>
       <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('leaderboard'); closeMobileMenu()">🏆 Leaderboard</a>
       <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('guide'); closeMobileMenu()">🎣 Beginner Guide</a>
+      <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('regulations'); closeMobileMenu()">⚖️ Regulations</a>
       <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('sponsors'); closeMobileMenu()">⭐ Sponsors</a>
       <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('directory'); closeMobileMenu()">🏪 Shop Directory</a>
       <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('species'); closeMobileMenu()">🐟 Species Guide</a>
@@ -2174,6 +2176,135 @@
       </div>
     </div>
   </div>
+
+  <!-- Regulations Page -->
+  <main class="page" id="page-regulations" style="display: none;">
+    <div style="max-width: 900px; margin: 0 auto; padding: 20px;">
+      <div class="glass-panel" style="padding: 30px; margin-bottom: 20px;">
+        <h1 style="color: white; margin-bottom: 10px; font-size: 2rem;">⚖️ Fishing Regulations & Limits</h1>
+        <p style="color: var(--text-secondary); line-height: 1.6;">Always stay on the right side of the law. Here is your quick reference guide to size limits, bag limits, and licensing requirements for both Ireland and the UK. Regulations change, so always double-check with local authorities.</p>
+      </div>
+
+      <div class="regulations-tabs">
+        <button class="btn btn-primary" id="btn-reg-ie" onclick="switchRegRegion('ie')">🇮🇪 Republic of Ireland</button>
+        <button class="btn btn-outline" id="btn-reg-uk" onclick="switchRegRegion('uk')">🇬🇧 United Kingdom (NI & GB)</button>
+      </div>
+
+      <!-- Ireland Regulations -->
+      <div id="reg-ie-content" class="reg-content fade-in">
+        <h2 style="color: #00ff88; margin: 20px 0 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">Sea Fishing (IFI)</h2>
+        <div class="reg-grid">
+          <div class="reg-card">
+            <div class="reg-icon">🐟</div>
+            <div class="reg-details">
+              <h4>European Seabass</h4>
+              <p><strong>Bag Limit:</strong> 2 fish per day</p>
+              <p><strong>Size Limit:</strong> Minimum 42cm</p>
+              <p class="reg-note">Catch and release only during closed periods (check current IFI updates).</p>
+            </div>
+          </div>
+          <div class="reg-card">
+            <div class="reg-icon">🦈</div>
+            <div class="reg-details">
+              <h4>Sharks & Rays</h4>
+              <p><strong>Bag Limit:</strong> Catch & Release</p>
+              <p class="reg-note">Strictly catch and release for all elasmobranchs (sharks, skates, rays).</p>
+            </div>
+          </div>
+          <div class="reg-card">
+            <div class="reg-icon">🎣</div>
+            <div class="reg-details">
+              <h4>General Sea Fishing</h4>
+              <p>No license required for sea angling.</p>
+            </div>
+          </div>
+        </div>
+
+        <h2 style="color: #00ff88; margin: 30px 0 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">Freshwater Fishing (IFI)</h2>
+        <div class="reg-grid">
+          <div class="reg-card">
+            <div class="reg-icon">🦈</div>
+            <div class="reg-details">
+              <h4>Pike</h4>
+              <p><strong>Bag Limit:</strong> 1 fish per day</p>
+              <p><strong>Size Limit:</strong> Maximum 50cm</p>
+              <p class="reg-note">Any pike over 50cm must be returned alive.</p>
+            </div>
+          </div>
+          <div class="reg-card">
+            <div class="reg-icon">🐟</div>
+            <div class="reg-details">
+              <h4>Salmon & Sea Trout</h4>
+              <p><strong>License Required:</strong> State License</p>
+              <p><strong>Tagging:</strong> Mandatory carcass tags</p>
+              <p class="reg-note">Rivers are strictly regulated. Check specific river status (Open/C&R/Closed).</p>
+            </div>
+          </div>
+          <div class="reg-card">
+            <div class="reg-icon">🎫</div>
+            <div class="reg-details">
+              <h4>Brown Trout & Coarse</h4>
+              <p><strong>Bag Limit (Trout):</strong> Varies by region</p>
+              <p><strong>Coarse Bag:</strong> Max 4 coarse fish per day</p>
+              <p class="reg-note">Permits may be required for specific clubs or state-managed fisheries.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- UK Regulations -->
+      <div id="reg-uk-content" class="reg-content fade-in" style="display: none;">
+        <h2 style="color: #00d4ff; margin: 20px 0 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">Sea Fishing (EA/DAERA)</h2>
+        <div class="reg-grid">
+          <div class="reg-card">
+            <div class="reg-icon">🐟</div>
+            <div class="reg-details">
+              <h4>European Seabass (UK)</h4>
+              <p><strong>Bag Limit:</strong> 2 fish per day</p>
+              <p><strong>Size Limit:</strong> Minimum 42cm</p>
+              <p class="reg-note">Catch and release only during February & March.</p>
+            </div>
+          </div>
+          <div class="reg-card">
+            <div class="reg-icon">🎣</div>
+            <div class="reg-details">
+              <h4>General Sea Angling</h4>
+              <p>No license required for sea angling in the UK, but local bylaws on size limits apply.</p>
+            </div>
+          </div>
+        </div>
+
+        <h2 style="color: #00d4ff; margin: 30px 0 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">Freshwater Fishing (EA/DAERA)</h2>
+        <div class="reg-grid">
+          <div class="reg-card">
+            <div class="reg-icon">🎫</div>
+            <div class="reg-details">
+              <h4>Rod License (England/Wales)</h4>
+              <p>Mandatory Environment Agency Rod License required for all freshwater fishing.</p>
+            </div>
+          </div>
+          <div class="reg-card">
+            <div class="reg-icon">🎫</div>
+            <div class="reg-details">
+              <h4>Licensing (Northern Ireland)</h4>
+              <p>DAERA Rod License + Fishery Permit required for freshwater.</p>
+            </div>
+          </div>
+          <div class="reg-card">
+            <div class="reg-icon">🐟</div>
+            <div class="reg-details">
+              <h4>Freshwater Limits</h4>
+              <p>Generally catch and release for coarse fish. Strict local club limits apply for trout/salmon.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="margin-top: 30px; text-align: center;">
+        <p style="color: var(--text-secondary); font-size: 0.85rem;">For official updates, visit <a href="https://fishinginireland.info" target="_blank" style="color: var(--accent-primary);">Inland Fisheries Ireland</a> or the <a href="https://www.gov.uk/government/organisations/environment-agency" target="_blank" style="color: var(--accent-primary);">UK Environment Agency</a>.</p>
+      </div>
+    </div>
+  </main>
 
   <!-- SEO and Content Optimization Footer (For AdSense / Search Crawlers) -->
   <footer class="app-footer" style="background: var(--bg-card); border-top: 1px solid rgba(255,255,255,0.05); padding: 40px 20px; font-size: 0.9rem; margin-top: auto; position: relative; z-index: 100; width: 100%;">

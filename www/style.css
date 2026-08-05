@@ -6779,3 +6779,60 @@ input:checked+.toggle-slider:before {
 .status-good { color: #00d4ff; }
 .status-fair { color: #ffab00; }
 .status-poor { color: #ff4444; }
+
+/* ============================================
+   Regulations Page Styles
+   ============================================ */
+.regulations-tabs {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+  justify-content: center;
+}
+.reg-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 15px;
+}
+.reg-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 15px;
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.reg-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  border-color: rgba(255,255,255,0.1);
+}
+.reg-icon {
+  font-size: 2rem;
+  background: rgba(0,0,0,0.3);
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.reg-details h4 {
+  margin: 0 0 5px 0;
+  color: #fff;
+  font-size: 1.1rem;
+}
+.reg-details p {
+  margin: 0 0 4px 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+.reg-details .reg-note {
+  font-size: 0.75rem;
+  color: #ffab00;
+  margin-top: 8px;
+  font-style: italic;
+}
