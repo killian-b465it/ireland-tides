@@ -1018,7 +1018,7 @@ function initMap() {
   state.map.setView(regionConfig.center, regionConfig.zoom);
 
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+    attribution: '',
     maxZoom: 19
   }).addTo(state.map);
 
@@ -2969,7 +2969,7 @@ function initCommunityMap() {
     wheelPxPerZoomLevel: 60
   }).setView([53.5, -8], 7);
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+    attribution: '',
     maxZoom: 19
   }).addTo(state.communityMap);
   state.communityMap.on('click', e => {
@@ -7066,7 +7066,7 @@ function initAdminMap() {
     wheelPxPerZoomLevel: 60
   }).setView([53.5, -8.0], 7);
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    attribution: ''
   }).addTo(adminMap);
 
   adminMarkers.addTo(adminMap);
@@ -8365,7 +8365,7 @@ window.openLogbookModal = () => {
     }).setView(defaultCenter, 6);
 
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      attribution: 'Tiles &copy; Esri',
+      attribution: '',
       maxZoom: 18,
       className: 'satellite-map-layer'
     }).addTo(state.logbookMap);
