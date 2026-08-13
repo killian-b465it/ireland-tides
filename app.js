@@ -1017,9 +1017,8 @@ function initMap() {
   const regionConfig = CONFIG.regions[state.currentRegion] || CONFIG;
   state.map.setView(regionConfig.center, regionConfig.zoom);
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-    subdomains: 'abcd',
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
     maxZoom: 19
   }).addTo(state.map);
 
@@ -2969,9 +2968,8 @@ function initCommunityMap() {
     zoomDelta: 0.25,
     wheelPxPerZoomLevel: 60
   }).setView([53.5, -8], 7);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; CARTO',
-    subdomains: 'abcd',
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
     maxZoom: 19
   }).addTo(state.communityMap);
   state.communityMap.on('click', e => {
@@ -7067,8 +7065,8 @@ function initAdminMap() {
     zoomDelta: 0.25,
     wheelPxPerZoomLevel: 60
   }).setView([53.5, -8.0], 7);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
   }).addTo(adminMap);
 
   adminMarkers.addTo(adminMap);
@@ -8366,9 +8364,10 @@ window.openLogbookModal = () => {
       attributionControl: false
     }).setView(defaultCenter, 6);
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri',
       maxZoom: 18,
-      className: 'dark-map-layer'
+      className: 'satellite-map-layer'
     }).addTo(state.logbookMap);
 
     // Add custom zoom control
