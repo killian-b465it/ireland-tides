@@ -1711,24 +1711,39 @@
 
   <!-- Public User Profile Modal -->
   <div class="modal" id="public-profile-modal">
-    <div class="modal-content profile-modal-content">
-      <div class="modal-header">
-        <h2>👤 User Profile</h2>
-        <button class="modal-close-btn-inline" onclick="closePublicProfileModal()">✕</button>
+    <div class="modal-content profile-modal-content" style="padding: 0; overflow: hidden; max-width: 450px;">
+      
+      <!-- Banner & Close Button -->
+      <div class="profile-banner">
+        <button class="modal-close-btn-float" onclick="closePublicProfileModal()">✕</button>
       </div>
+      
       <div class="public-profile-view">
-        <div class="profile-avatar-large" id="public-profile-avatar">👤</div>
-        <h3 id="public-profile-name">User Name</h3>
-        <span class="badge" id="public-profile-badge">Pro Angler</span>
-        <p class="profile-bio" id="public-profile-bio">No bio available.</p>
-        <div class="profile-stats-row">
-          <div class="profile-stat">
+        <div class="profile-header-container">
+          <div class="profile-avatar-premium" id="public-profile-avatar">👤</div>
+          <div class="profile-title-area">
+            <h3 id="public-profile-name">User Name</h3>
+            <span class="badge premium-badge" id="public-profile-badge">Pro Angler</span>
+          </div>
+        </div>
+        
+        <p class="profile-bio-premium" id="public-profile-bio">No bio available.</p>
+        
+        <div class="profile-stats-grid">
+          <div class="stat-box">
+            <span class="stat-value" id="public-profile-catches">0</span>
+            <span class="stat-label">Catches</span>
+          </div>
+          <div class="stat-box">
             <span class="stat-value" id="public-profile-joined">-</span>
             <span class="stat-label">Joined</span>
           </div>
-          <div class="profile-stat">
-            <span class="stat-value" id="public-profile-catches">0</span>
-            <span class="stat-label">Catches</span>
+        </div>
+
+        <div class="profile-badges-section" id="public-profile-badges-container" style="display: none;">
+          <h4 class="section-title">Earned Badges</h4>
+          <div class="badges-flex" id="public-profile-badges">
+            <!-- Badges injected here -->
           </div>
         </div>
       </div>

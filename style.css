@@ -6836,3 +6836,153 @@ input:checked+.toggle-slider:before {
   margin-top: 8px;
   font-style: italic;
 }
+
+/* ============================================   Premium Public Profile Modal   ============================================ */
+.profile-modal-content {
+    background: var(--bg-card);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+.profile-banner {
+    height: 120px;
+    background: linear-gradient(135deg, var(--accent-primary) 0%, #005bb5 100%);
+    position: relative;
+    border-radius: 16px 16px 0 0;
+}
+
+.modal-close-btn-float {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    transition: 0.2s;
+}
+
+.modal-close-btn-float:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.public-profile-view {
+    padding: 0 25px 30px 25px;
+}
+
+.profile-header-container {
+    display: flex;
+    align-items: flex-end;
+    margin-top: -50px;
+    margin-bottom: 20px;
+}
+
+.profile-avatar-premium {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: var(--bg-dark);
+    border: 4px solid var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.profile-title-area {
+    margin-left: 15px;
+    padding-bottom: 5px;
+}
+
+#public-profile-name {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0 0 5px 0;
+    color: var(--text-primary);
+}
+
+.premium-badge {
+    background: rgba(0, 212, 255, 0.15) !important;
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    color: var(--accent-primary) !important;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.profile-bio-premium {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 25px;
+    background: rgba(0,0,0,0.2);
+    padding: 15px;
+    border-radius: 12px;
+    border-left: 3px solid var(--accent-primary);
+}
+
+.profile-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.stat-box {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    transition: 0.2s;
+}
+
+.stat-box:hover {
+    background: rgba(255, 255, 255, 0.06);
+    transform: translateY(-2px);
+}
+
+.stat-box .stat-value {
+    display: block;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 5px;
+}
+
+.stat-box .stat-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+}
+
+.profile-badges-section {
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding-top: 20px;
+}
+
+.section-title {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+}
+
+.badges-flex {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}

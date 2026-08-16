@@ -3799,9 +3799,29 @@ window.viewUserProfile = (userId) => {
     document.getElementById('public-profile-catches').textContent = catchCount;
 
     if (user.joinDate) {
-      document.getElementById('public-profile-joined').textContent = new Date(user.joinDate).toLocaleDateString();
+      document.getElementById('public-profile-joined').textContent = new Date(user.joinDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short' });
     } else {
       document.getElementById('public-profile-joined').textContent = 'N/A';
+    }
+
+    // Render Badges
+    const badgesContainer = document.getElementById('public-profile-badges-container');
+    const badgesFlex = document.getElementById('public-profile-badges');
+    badgesFlex.innerHTML = '';
+    
+    if (user.badges && user.badges.length > 0) {
+      badgesContainer.style.display = 'block';
+      user.badges.forEach(badge => {
+        const b = document.createElement('span');
+        b.className = 'badge premium-badge';
+        b.style.background = 'rgba(255, 171, 0, 0.15)';
+        b.style.border = '1px solid rgba(255, 171, 0, 0.3)';
+        b.style.color = 'var(--accent-warning)';
+        b.textContent = badge;
+        badgesFlex.appendChild(b);
+      });
+    } else {
+      badgesContainer.style.display = 'none';
     }
 
     modal.classList.add('active');
