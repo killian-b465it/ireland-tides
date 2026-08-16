@@ -933,10 +933,26 @@ document.addEventListener('DOMContentLoaded', () => {
     persistUserData();
   }
 
-  // Sync current user to Firebase on load
-  if (state.user) {
+  // Fetch latest user data from Firebase to keep devices in sync
+  if (state.user && firebaseDB) {
+    firebaseDB.ref('users/' + state.user.id).once('value', (snapshot) => {
+      const fbUser = snapshot.val();
+      if (fbUser) {
+        state.user = { ...state.user, ...fbUser };
+        persistUserData();
+        updateAuthUI();
+      }
+      syncUserToFirebase(state.user);
+    });
+  } else if (state.user) {
     syncUserToFirebase(state.user);
   }
+
+  // Ensure all users are loaded so community profiles work for everyone
+  loadUsersFromFirebase((users) => {
+    state.allUsers = users;
+    localStorage.setItem('fishing_all_users', JSON.stringify(users));
+  });
 
   // Verify Pro subscription status on app load (runs once daily)
   verifySubscriptionStatus();
@@ -5157,15 +5173,11 @@ window.handleAuthSubmit = async () => {
         }
 
         state.user = {
+          ...userData,
           id: userId,
-          name: userData.name,
-          email: userData.email,
-          plan: userData.plan || 'pro',
           remember: remember,
-          betaProUser: userData.betaProUser || true,
-          joinDate: userData.joinDate,
-          avatar: userData.avatar || null,
-          bio: userData.bio || ''
+          plan: userData.plan || 'pro',
+          betaProUser: userData.betaProUser !== undefined ? userData.betaProUser : true
         };
 
       } else {
