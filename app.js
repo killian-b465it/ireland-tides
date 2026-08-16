@@ -3791,12 +3791,14 @@ window.viewUserProfile = (userId) => {
       avatarEl.style.border = '2px solid var(--accent-primary)';
     }
 
-    const userCatches = state.catches.filter(c => c.userId === userId);
-    // Prefer user-set totalCatches, fall back to community post count
-    const catchCount = (user.totalCatches !== undefined && user.totalCatches !== null)
-      ? user.totalCatches
-      : userCatches.length;
-    document.getElementById('public-profile-catches').textContent = catchCount;
+    const statusEl = document.getElementById('public-profile-status');
+    if (user.active === false) {
+      statusEl.textContent = 'Inactive';
+      statusEl.style.color = 'var(--accent-danger)';
+    } else {
+      statusEl.textContent = 'Active';
+      statusEl.style.color = 'var(--accent-success)';
+    }
 
     if (user.joinDate) {
       document.getElementById('public-profile-joined').textContent = new Date(user.joinDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short' });

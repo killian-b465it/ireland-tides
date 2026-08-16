@@ -6845,10 +6845,11 @@ input:checked+.toggle-slider:before {
 }
 
 .profile-banner {
-    height: 120px;
-    background: linear-gradient(135deg, var(--accent-primary) 0%, #005bb5 100%);
+    height: 90px;
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 91, 181, 0.2) 100%);
     position: relative;
     border-radius: 16px 16px 0 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .modal-close-btn-float {
@@ -6880,13 +6881,15 @@ input:checked+.toggle-slider:before {
 .profile-header-container {
     display: flex;
     align-items: flex-end;
-    margin-top: -50px;
+    margin-top: -45px;
     margin-bottom: 20px;
+    position: relative;
+    z-index: 10;
 }
 
 .profile-avatar-premium {
-    width: 100px;
-    height: 100px;
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
     background: var(--bg-dark);
     border: 4px solid var(--bg-card);
@@ -6898,6 +6901,8 @@ input:checked+.toggle-slider:before {
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     flex-shrink: 0;
     overflow: hidden;
+    position: relative;
+    z-index: 11;
 }
 
 .profile-title-area {
