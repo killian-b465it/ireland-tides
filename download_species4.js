@@ -25,7 +25,7 @@ function getThumbUrl(fileName, width = 400) {
   return new Promise((resolve) => {
     const encoded = encodeURIComponent(fileName);
     const url = `https://en.wikipedia.org/w/api.php?action=query&titles=File:${encoded}&prop=imageinfo&iiprop=url&iiurlwidth=${width}&format=json`;
-    const req = https.get(url, { headers: { 'User-Agent': 'IrelandTidesApp/1.0 (irishfishinghub@gmail.com)' } }, (res) => {
+    const req = https.get(url, { headers: { 'User-Agent': 'IrelandTidesApp/1.0 (info@irishfishinghub.com)' } }, (res) => {
       let data = '';
       res.on('data', c => data += c);
       res.on('end', () => {
@@ -47,7 +47,7 @@ function getThumbUrl(fileName, width = 400) {
 
 function downloadUrl(url, dest) {
   return new Promise((resolve) => {
-    const req = https.get(url, { headers: { 'User-Agent': 'IrelandTidesApp/1.0 (irishfishinghub@gmail.com)', 'Referer': 'https://en.wikipedia.org/' } }, (res) => {
+    const req = https.get(url, { headers: { 'User-Agent': 'IrelandTidesApp/1.0 (info@irishfishinghub.com)', 'Referer': 'https://en.wikipedia.org/' } }, (res) => {
       if (res.statusCode === 301 || res.statusCode === 302) {
         return downloadUrl(res.headers.location, dest).then(resolve);
       }

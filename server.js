@@ -13,7 +13,7 @@ app.use(express.static('www'));
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'irishfishinghub@gmail.com',
+        user: 'info@irishfishinghub.com',
         pass: process.env.EMAIL_PASS // Secure App Password from .env
     }
 });
@@ -88,7 +88,7 @@ app.post('/send-broadcast-email', async (req, res) => {
         }
 
         const mailOptions = {
-            from: '"Irish Fishing Hub" <irishfishinghub@gmail.com>',
+            from: '"Irish Fishing Hub" <info@irishfishinghub.com>',
             to: to, // Can be a single email or a comma-separated list
             subject: subject,
             text: body,

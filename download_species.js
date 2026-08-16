@@ -44,7 +44,7 @@ if (!fs.existsSync(targetDir)) {
 function fetchImage(id, title) {
   return new Promise((resolve, reject) => {
     const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${title}&prop=pageimages&format=json&pithumbsize=400`;
-    https.get(url, { headers: { 'User-Agent': 'IrelandTidesBot/1.0 (irishfishinghub@gmail.com)' } }, res => {
+    https.get(url, { headers: { 'User-Agent': 'IrelandTidesBot/1.0 (info@irishfishinghub.com)' } }, res => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
