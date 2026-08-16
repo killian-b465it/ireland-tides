@@ -7703,177 +7703,8 @@ window.openSpeciesDetail = function (speciesId) {
 };
 
 // ============================================
-// Species Guide - Photo Upload & AI
+// Species Guide - Photo Upload (removed AI)
 // ============================================
-
-// Open camera on mobile
-window.openSpeciesCamera = function () {
-  document.getElementById('species-camera-input').click();
-};
-
-// Handle photo upload/capture
-window.handleSpeciesPhotoUpload = async function (input) {
-  if (!input.files || !input.files[0]) return;
-
-  const file = input.files[0];
-
-  try {
-    const compressed = await compressImage(file, 800);
-    const preview = document.getElementById('species-preview');
-    const previewImg = document.getElementById('species-preview-img');
-    const uploadContent = document.getElementById('species-upload-content');
-
-    previewImg.src = compressed;
-    preview.style.display = 'block';
-    uploadContent.style.display = 'none';
-
-    // Auto-trigger AI identification
-    identifyFishSpecies(compressed);
-  } catch (err) {
-    console.error('Error processing species image:', err);
-  }
-};
-
-// Clear photo and reset
-window.clearSpeciesPhoto = function () {
-  document.getElementById('species-preview').style.display = 'none';
-  document.getElementById('species-upload-content').style.display = 'flex';
-  document.getElementById('species-preview-img').src = '';
-  document.getElementById('species-ai-loading').style.display = 'none';
-  document.getElementById('species-ai-result').style.display = 'none';
-  document.getElementById('species-ai-error').style.display = 'none';
-
-  // Reset file inputs
-  document.getElementById('species-photo-input').value = '';
-  document.getElementById('species-camera-input').value = '';
-};
-
-// AI Fish Identification - via Vercel serverless function
-
-// Compress image before sending to API using browser-image-compression
-async function compressImage(file, maxWidth = 1024) {
-  try {
-    const options = {
-      maxSizeMB: 0.8,
-      maxWidthOrHeight: maxWidth,
-      useWebWorker: true,
-      fileType: 'image/jpeg'
-    };
-
-    // Fallback if browser-image-compression script somehow failed to load
-    if (typeof imageCompression === 'undefined') {
-      console.warn('browser-image-compression not loaded, falling back to FileReader');
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target.result);
-        reader.onerror = () => reject(new Error('FileReader fallback failed.'));
-        reader.readAsDataURL(file);
-      });
-    }
-
-    const compressedFile = await imageCompression(file, options);
-    return await imageCompression.getDataUrlFromFile(compressedFile);
-  } catch (error) {
-    console.error('Image compression failed:', error);
-    throw error;
-  }
-}
-
-async function identifyFishSpecies(imageDataUrl) {
-  const loadingEl = document.getElementById('species-ai-loading');
-  const resultEl = document.getElementById('species-ai-result');
-  const errorEl = document.getElementById('species-ai-error');
-
-  loadingEl.style.display = 'flex';
-  resultEl.style.display = 'none';
-  errorEl.style.display = 'none';
-
-  try {
-    // Compress image first
-    const compressedImage = await compressImage(imageDataUrl);
-
-    // Call our server backend (API key is stored server-side)
-    const baseUrl = window.Capacitor ? 'https://irishfishinghub.com' : '';
-    const response = await fetch(`${baseUrl}/api/identify-fish`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image: compressedImage })
-    });
-
-    if (!response.ok) {
-      const errData = await response.json().catch(() => ({}));
-      console.error('API error:', response.status, errData);
-      throw new Error(errData.error || `Server error ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    // Display result
-    loadingEl.style.display = 'none';
-    resultEl.style.display = 'block';
-
-    document.getElementById('species-result-name').textContent = data.name || 'Unknown Species';
-    document.getElementById('species-result-scientific').textContent = data.scientific || '';
-
-    // Confidence
-    const confidenceEl = document.getElementById('species-result-confidence');
-    if (data.confidence) {
-      const pct = Math.round(data.confidence * 100);
-      confidenceEl.innerHTML = `
-        <span style="font-size:0.85rem;color:var(--text-secondary);">Confidence: <strong style="color:var(--accent-success);">${pct}%</strong></span>
-        <div class="confidence-bar">
-          <div class="confidence-fill" style="width:${pct}%"></div>
-        </div>
-      `;
-    } else {
-      confidenceEl.innerHTML = '';
-    }
-
-    // Details
-    const detailsEl = document.getElementById('species-result-details');
-    detailsEl.innerHTML = '';
-    if (data.habitat) detailsEl.innerHTML += `<div class="species-detail-item"><div class="detail-label">🏠 Habitat</div><div class="detail-value">${data.habitat}</div></div>`;
-    if (data.size) detailsEl.innerHTML += `<div class="species-detail-item"><div class="detail-label">📏 Size</div><div class="detail-value">${data.size}</div></div>`;
-    if (data.description) detailsEl.innerHTML += `<div class="species-detail-item" style="grid-column:1/-1;"><div class="detail-label">📝 About</div><div class="detail-value">${data.description}</div></div>`;
-    if (data.edible !== undefined) detailsEl.innerHTML += `<div class="species-detail-item"><div class="detail-label">🍽️ Edible</div><div class="detail-value">${data.edible ? 'Yes' : 'No'}</div></div>`;
-    if (data.conservation) detailsEl.innerHTML += `<div class="species-detail-item"><div class="detail-label">🛡️ Conservation</div><div class="detail-value">${data.conservation}</div></div>`;
-
-  } catch (err) {
-    console.warn('AI identification failed:', err.message);
-    loadingEl.style.display = 'none';
-    errorEl.style.display = 'block';
-    document.getElementById('species-error-message').textContent =
-      'Error: ' + err.message;
-  }
-}
-
-// Drag and drop support
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-    const dropZone = document.getElementById('species-upload-zone');
-    if (!dropZone) return;
-
-    dropZone.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      dropZone.classList.add('dragover');
-    });
-
-    dropZone.addEventListener('dragleave', () => {
-      dropZone.classList.remove('dragover');
-    });
-
-    dropZone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropZone.classList.remove('dragover');
-
-      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-        const input = document.getElementById('species-photo-input');
-        input.files = e.dataTransfer.files;
-        handleSpeciesPhotoUpload(input);
-      }
-    });
-  }, 1000);
-});
 
 // Integrate with showPage
 (function patchShowPageForSpecies() {
@@ -7938,8 +7769,8 @@ function startWalkthrough() {
         intro: "Check out the Community tab to see what other anglers are catching right now, or share your own catches!"
       },
       {
-        title: "AI Fish Identifier 🤖🐟",
-        intro: "Not sure what you caught? Upload a photo in the Species Guide and our AI will identify the fish for you instantly. Tight lines!"
+        title: "Species Guide 🐟",
+        intro: "Browse Ireland's sea fish, freshwater fish, and shellfish in the Species Guide. Tap any species to see habitat, size, season, and Irish records!"
       }
     ];
   } else {
@@ -7990,8 +7821,8 @@ function startWalkthrough() {
       },
       {
         element: document.getElementById('nav-species'),
-        title: "AI Fish Identifier 🤖🐟",
-        intro: "Not sure what you caught? Upload a photo in the Species Guide and our AI will identify the fish for you instantly. Tight lines!",
+        title: "Species Guide 🐟",
+        intro: "Browse Ireland's sea fish, freshwater fish, and shellfish in the Species Guide. Tap any species to see habitat, size, season, and Irish records! Tight lines!",
         position: "top"
       }
     ];

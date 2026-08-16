@@ -654,7 +654,7 @@
     <div class="species-container">
       <div class="species-hero">
         <h1>🐟 Species Guide</h1>
-        <p>Identify fish with AI or browse common Irish species</p>
+        <p>Browse common Irish species</p>
       </div>
 
 
@@ -1237,75 +1237,10 @@
     <div class="species-container">
       <div class="species-hero">
         <h1>🐟 Species Guide</h1>
-        <p>Identify fish species with AI or browse Ireland's marine & freshwater life</p>
+        <p>Browse Ireland's marine & freshwater life</p>
       </div>
 
-      <!-- AI Fish Identifier -->
-      <div class="species-identifier-section">
-        <div class="species-identifier-card">
-          <div class="admin-card-header">
-            <h3>🤖 AI Fish Identifier</h3>
-            <span class="badge" style="background:rgba(0,255,136,0.15);color:var(--accent-success);">AI Powered</span>
-          </div>
-          <div class="species-identifier-body">
-            <div class="species-upload-zone" id="species-upload-zone">
-              <!-- Upload content (default) -->
-              <div class="species-upload-content" id="species-upload-content">
-                <div class="species-upload-icon">📸</div>
-                <h3>Upload or Take a Photo</h3>
-                <p>Our AI will identify the fish species from your photo</p>
-                <div class="species-upload-buttons">
-                  <label class="btn btn-primary species-upload-btn">
-                    📁 Upload Photo
-                    <input type="file" accept="image/*" id="species-photo-input"
-                      onchange="handleSpeciesPhotoUpload(this)" style="display:none;">
-                  </label>
-                  <button class="btn btn-outline species-camera-btn" onclick="openSpeciesCamera()">
-                    📷 Take Photo
-                  </button>
-                  <input type="file" accept="image/*" capture="environment" id="species-camera-input"
-                    onchange="handleSpeciesPhotoUpload(this)" style="display:none;">
-                </div>
-                <p style="font-size:0.8rem;color:var(--text-muted);margin-top:8px;">
-                  Supports JPG, PNG • Drag & drop also works
-                </p>
-              </div>
 
-              <!-- Photo preview (hidden initially) -->
-              <div class="species-preview" id="species-preview" style="display:none;">
-                <img id="species-preview-img" src="" alt="Fish photo">
-                <button class="species-preview-remove" onclick="clearSpeciesPhoto()">✕</button>
-              </div>
-            </div>
-
-            <!-- AI Loading -->
-            <div class="species-ai-loading" id="species-ai-loading" style="display:none;">
-              <div class="loading-spinner"></div>
-              <p>Analysing your photo with AI...</p>
-              <p style="font-size:0.8rem;color:var(--text-muted);">This may take a few seconds</p>
-            </div>
-
-            <!-- AI Result -->
-            <div class="species-ai-result" id="species-ai-result" style="display:none;">
-              <div class="species-result-header">
-                <span class="species-result-badge">🤖 AI Identified</span>
-              </div>
-              <div class="species-result-body">
-                <h2 id="species-result-name">Unknown Species</h2>
-                <p class="species-result-scientific" id="species-result-scientific"></p>
-                <div class="species-result-confidence" id="species-result-confidence"></div>
-                <div class="species-result-details" id="species-result-details"></div>
-              </div>
-            </div>
-
-            <!-- AI Error -->
-            <div class="species-ai-error" id="species-ai-error" style="display:none;">
-              <div style="font-size:2rem;margin-bottom:8px;">⚠️</div>
-              <p id="species-error-message">AI identification is not available right now.</p>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <!-- Species Gallery -->
       <div class="species-gallery-section">
@@ -1875,15 +1810,8 @@
           location shown on the map. It is the sole responsibility of the user to verify public access rights and adhere
           to all local trespass laws before entering any property.</p>
 
-        <h3>4. AI Fish Identifier & Fishing Regulations</h3>
-        <p>The "AI Species Guide" and "Fish Scanner" features utilize experimental machine learning image recognition to
-          suggest potential fish species. This tool is provided for entertainment and educational purposes only.</p>
-        <p><strong>No Legal Reliance:</strong> The AI tool is absolutely not a substitute for knowing local and national
-          fishing regulations. We make zero warranties regarding the accuracy of the AI analysis. If the AI
-          misidentifies a protected, restricted, or undersized species, Irish Fishing Hub and its developers assume zero
-          liability for any fines, confiscations, or legal action taken against you by fisheries protection authorities
-          (e.g., Inland Fisheries Ireland). You are solely responsible for accurately identifying your catch and
-          adhering to all quotas and size limits.</p>
+        <h3>4. Fishing Regulations</h3>
+        <p>You are absolutely and solely responsible for knowing local and national fishing regulations. We make zero warranties regarding any legal guidelines you interpret from this app. If you catch a protected, restricted, or undersized species, Irish Fishing Hub and its developers assume zero liability for any fines, confiscations, or legal action taken against you by fisheries protection authorities (e.g., Inland Fisheries Ireland). You are solely responsible for accurately identifying your catch and adhering to all quotas and size limits.</p>
 
         <h3>5. User-Generated Content & Community Feed License</h3>
         <p>By uploading, posting, or submitting content (including but not limited to photos, catch logs, location
@@ -1931,8 +1859,7 @@
         <h3>1. Introduction & Scope</h3>
         <p>The Irish Fishing Hub ("we", "our", or "us") is deeply committed to protecting your privacy. This
           comprehensive Privacy Policy defines exactly how we collect, process, share, and retain your data when you
-          interact with our web application, mobile views, APIs, and associated services (including the V2 AI Identifier
-          and Community Feed).</p>
+          interact with our web application, mobile views, APIs, and associated services (including the Community Feed).</p>
 
         <h3>2. Explicit Data Collection & Usage</h3>
 
@@ -1954,23 +1881,14 @@
           embedded GPS) is computationally stripped on the client-side before upload to Firebase Storage to protect your
           exact "secret" fishing spots unless you manually declare the location.</p>
 
-        <h4>2.3 AI Machine Vision Processing</h4>
-        <p><strong>Data Points:</strong> Images uploaded specifically to the "AI Species Identifier" tool.</p>
-        <p><strong>Purpose & Justification:</strong> Images are transmitted to our backend AI processing model to
-          execute inference and return a species prediction array.</p>
-        <p><strong>Retention Guarantee:</strong> Images uploaded solely for AI identification (and not posted to the
-          community feed) are processed purely in-memory or in ephemeral storage. They are permanently deleted upon
-          completion of the inference task. We do not use your private AI queries to train future machine learning
-          models.</p>
-
-        <h4>2.4 Financial & Payment Ledger Data</h4>
+        <h4>2.3 Financial & Payment Ledger Data</h4>
         <p><strong>Data Points:</strong> Billing email, active subscription status, payment history identifiers.</p>
         <p><strong>Purpose & Justification:</strong> To manage Pro subscriptions.</p>
         <p><strong>Security Isolation:</strong> We do NOT collect, store, or transmit your credit card numbers, CVV, or
           bank details. All financial transactions are handed off entirely to Stripe Inc. via highly secure iframe
           segregation. Their privacy standards apply to the financial data.</p>
 
-        <h4>2.5 Telemetry, Analytics & Advertising Profiles</h4>
+        <h4>2.4 Telemetry, Analytics & Advertising Profiles</h4>
         <p><strong>Data Points:</strong> IP addresses, browser user-agent strings, device viewport sizing, operating
           system versions, and page navigation flows.</p>
         <p><strong>Purpose & Justification:</strong> This telemetry is utilized inherently by secure web servers to
@@ -2326,8 +2244,7 @@
         <ul style="list-style-type: none; padding: 0; line-height: 1.8;">
           <li><strong>Live Tides:</strong> Accurate water level telemetry, moon phases, and real-time station graphs.
           </li>
-          <li><strong>AI Fish Identifier:</strong> Upload a photo of your catch and let our custom-trained Artificial
-            Intelligence immediately identify the Irish fish species.</li>
+
           <li><strong>Community Catch Feed:</strong> Join thousands of local Irish anglers sharing bait tips, catch
             logs, and real-time success stories.</li>
           <li><strong>Tackle & Ramp Directory:</strong> Locate nearby tackle shops, boat slips, and marine facilities
