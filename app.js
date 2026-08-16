@@ -124,7 +124,7 @@ const CONFIG = {
     stripePublishable: 'pk_live_51PWJQERsc2tHXy0gV05ejlWaH6mwy4Xfqvfa7cSqUTdZaK6eFr4oEFYlXsZyeutnrlKzOmsRW7VDZkAQ4yO0XVu7004MBj4h9Q'
   },
   // Admin emails - users with these emails get admin access
-  ADMIN_EMAILS: ['info@irishfishinghub.com'],
+  ADMIN_EMAILS: ['info@irishfishinghub.com', 'irishfishinghub@gmail.com'],
   // Admin password - required for admin accounts
   // [SECURITY WARNING] In a production environment, this should never be hardcoded on the client-side.
   // Use Firebase Authentication's custom claims or a secure backend for admin verification.
@@ -3049,6 +3049,35 @@ window.closeModal = () => {
   document.getElementById('catch-photo').value = '';
   removeImage();
 };
+
+// Compress image before upload using browser-image-compression
+async function compressImage(file, maxWidth = 1024) {
+  try {
+    const options = {
+      maxSizeMB: 0.8,
+      maxWidthOrHeight: maxWidth,
+      useWebWorker: true,
+      fileType: 'image/jpeg'
+    };
+
+    // Fallback if browser-image-compression script somehow failed to load
+    if (typeof imageCompression === 'undefined') {
+      console.warn('browser-image-compression not loaded, falling back to FileReader');
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = () => reject(new Error('FileReader fallback failed.'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    const compressedFile = await imageCompression(file, options);
+    return await imageCompression.getDataUrlFromFile(compressedFile);
+  } catch (error) {
+    console.error('Image compression failed:', error);
+    throw error;
+  }
+}
 
 window.previewImage = (input) => {
   const preview = document.getElementById('image-preview');
