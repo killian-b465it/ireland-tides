@@ -37,6 +37,10 @@
     "blogPosts": {
       ".read": true,
       ".write": true
+    },
+    "clubs": {
+      ".read": true,
+      ".write": true
     }
   }
 }
