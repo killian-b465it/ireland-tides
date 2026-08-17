@@ -1375,6 +1375,78 @@
     </div>
   </div>
 
+  <!-- Club Hub Modal (Member Interaction) -->
+  <div class="modal" id="club-hub-modal">
+    <div class="modal-content" style="max-width: 800px; height: 85vh; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <h2 id="club-hub-title">Club Hub</h2>
+        <button class="modal-close-btn-inline" onclick="closeClubHubModal()">✕</button>
+      </div>
+      
+      <!-- Tabs -->
+      <div style="display: flex; border-bottom: 1px solid var(--border-glass); margin-bottom: 15px; padding: 0 20px;">
+        <button id="club-tab-feed" class="club-tab active" onclick="switchClubTab('feed')" style="background: none; border: none; color: var(--text-main); padding: 10px 20px; cursor: pointer; border-bottom: 2px solid var(--accent-primary);">💬 Wall</button>
+        <button id="club-tab-catches" class="club-tab" onclick="switchClubTab('catches')" style="background: none; border: none; color: var(--text-muted); padding: 10px 20px; cursor: pointer;">🎣 Catches</button>
+        <button id="club-tab-events" class="club-tab" onclick="switchClubTab('events')" style="background: none; border: none; color: var(--text-muted); padding: 10px 20px; cursor: pointer;">🏆 Events/Hunts</button>
+      </div>
+
+      <div class="modal-body" style="flex: 1; overflow-y: auto; padding: 0 20px 20px 20px;">
+        
+        <!-- Feed Tab -->
+        <div id="club-view-feed" class="club-view">
+          <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <input type="text" id="club-chat-input" class="auth-input" placeholder="Say something to your club..." style="flex: 1;">
+            <button class="btn btn-primary" onclick="postClubChat()">Post</button>
+          </div>
+          <div id="club-chat-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
+        </div>
+
+        <!-- Catches Tab -->
+        <div id="club-view-catches" class="club-view" style="display: none;">
+          <div style="text-align: center; margin-bottom: 15px;">
+            <button class="btn btn-primary" onclick="openClubCatchModal()">+ Log a Club Catch</button>
+          </div>
+          <div id="club-catches-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;"></div>
+        </div>
+
+        <!-- Events Tab -->
+        <div id="club-view-events" class="club-view" style="display: none;">
+          <div id="club-events-admin" style="text-align: center; margin-bottom: 15px; display: none;">
+            <button class="btn btn-primary" onclick="openCreateClubEventModal()">+ Create Event/Hunt</button>
+          </div>
+          <div id="club-events-list" style="display: flex; flex-direction: column; gap: 15px;"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Club Specific Modals -->
+  <div class="modal" id="club-catch-modal" style="z-index: 10000;">
+    <div class="modal-content" style="max-width: 400px;">
+      <h3 style="margin-top:0;">Log Club Catch</h3>
+      <input type="text" id="club-catch-species" class="auth-input" placeholder="Species (e.g. Bass)" style="margin-bottom:10px;">
+      <input type="text" id="club-catch-weight" class="auth-input" placeholder="Weight/Size" style="margin-bottom:10px;">
+      <input type="file" id="club-catch-photo" accept="image/*" class="auth-input" style="margin-bottom:10px;">
+      <div style="display:flex; justify-content:space-between; margin-top: 15px;">
+        <button class="btn btn-outline" onclick="document.getElementById('club-catch-modal').classList.remove('active')">Cancel</button>
+        <button class="btn btn-primary" onclick="submitClubCatch()">Post Catch</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="club-event-modal" style="z-index: 10000;">
+    <div class="modal-content" style="max-width: 400px;">
+      <h3 style="margin-top:0;">Create Club Event</h3>
+      <input type="text" id="club-event-title" class="auth-input" placeholder="Event Title (e.g. Summer Species Hunt)" style="margin-bottom:10px;">
+      <textarea id="club-event-desc" class="auth-input" placeholder="Event rules, dates, or details..." rows="3" style="margin-bottom:10px;"></textarea>
+      <div style="display:flex; justify-content:space-between; margin-top: 15px;">
+        <button class="btn btn-outline" onclick="document.getElementById('club-event-modal').classList.remove('active')">Cancel</button>
+        <button class="btn btn-primary" onclick="submitClubEvent()">Create</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Species Guide Page -->
   <main class="page" id="page-species" style="display: none;">
     <div class="species-container">
