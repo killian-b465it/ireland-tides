@@ -5986,6 +5986,7 @@ function loadUsersTable() {
         `<button style="color: #ff4d4d; font-weight: bold;" onclick="removeAmbassadorBadge('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}')">❌ Remove Ambassador</button>` :
         `<button style="color: #10b981; font-weight: bold;" onclick="awardAmbassadorBadge('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}')">🌟 Award Ambassador</button>`
       }
+              <button onclick="adminOpenSupportTicket('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}')">💬 Open Support Ticket</button>
               <button onclick="openEmailCenter('${u.email}')">📧 Email Member</button>
               <button onclick="openUsernameEditor('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}', '${u.email}')">✏️ Edit Username</button>
               <button onclick="changeUserPassword('${u.id}')">🔑 Change Password</button>
@@ -6381,6 +6382,14 @@ window.sendAdminReply = () => {
   syncMessageToFirebase(msg);
 
   input.value = '';
+  
+  if (firebaseDB && typeof sendNotification === 'function') {
+    firebaseDB.ref('users/' + state.currentReplyUserId).once('value', snap => {
+      if (snap.exists() && snap.val().email) {
+        sendNotification(snap.val().email, "Support Update 💬", "An admin has replied to your support ticket.");
+      }
+    });
+  }
 };
 
 window.deleteSupportThread = (userId) => {
@@ -7560,6 +7569,23 @@ window.broadcastEmailToAll = async () => {
   }
 };
 
+window.copyAllEmails = async () => {
+  const statusEl = document.getElementById('email-status-text');
+  try {
+    if (emailTarget) {
+      await navigator.clipboard.writeText(emailTarget);
+      statusEl.textContent = `📋 Copied 1 email to clipboard`;
+    } else {
+      const allEmails = state.allUsers.map(u => u.email).join(', ');
+      await navigator.clipboard.writeText(allEmails);
+      statusEl.textContent = `📋 Copied ${state.allUsers.length} emails to clipboard`;
+    }
+  } catch (err) {
+    console.error('Failed to copy emails: ', err);
+    alert('Failed to copy emails to clipboard.');
+  }
+};
+
 window.testEmailPreview = () => {
   const subject = document.getElementById('email-subject').value;
   const body = document.getElementById('email-body').value;
@@ -8665,6 +8691,637 @@ window.renderLeaderboard = () => {
   } else {
     listEl.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding: 20px;">Keep fishing to climb the ranks!</div>';
   }
+};
+
+// ==========================================
+// CATCH ANALYTICS & INSIGHTS
+// ==========================================
+window.openAnalyticsModal = () => {
+  const modal = document.getElementById('analytics-modal');
+  if (modal) modal.classList.add('active');
+
+  if (!state.user) return;
+  const userEmail = state.user.email;
+  
+  let posts = (state.communityPosts || []).filter(p => p.email === userEmail);
+  
+  if (posts.length === 0) {
+    document.getElementById('analytics-best-bait').textContent = 'No catches yet';
+    document.getElementById('analytics-best-time').textContent = 'No catches yet';
+    document.getElementById('analytics-top-species').textContent = 'No catches yet';
+    return;
+  }
+
+  let baits = {};
+  let hours = {};
+  let speciesCount = {};
+
+  posts.forEach(p => {
+    const text = (p.text || '').toLowerCase();
+    
+    if (text.includes('lure') || text.includes('spinner')) baits['Lure/Spinner'] = (baits['Lure/Spinner'] || 0) + 1;
+    else if (text.includes('mackerel') || text.includes('squid')) baits['Natural Bait'] = (baits['Natural Bait'] || 0) + 1;
+    else if (text.includes('fly')) baits['Fly'] = (baits['Fly'] || 0) + 1;
+    else baits['Unknown'] = (baits['Unknown'] || 0) + 1;
+
+    if (text.includes('bass')) speciesCount['Sea Bass'] = (speciesCount['Sea Bass'] || 0) + 1;
+    else if (text.includes('pike')) speciesCount['Pike'] = (speciesCount['Pike'] || 0) + 1;
+    else if (text.includes('mackerel')) speciesCount['Mackerel'] = (speciesCount['Mackerel'] || 0) + 1;
+    else if (text.includes('trout')) speciesCount['Trout'] = (speciesCount['Trout'] || 0) + 1;
+    else speciesCount['Various'] = (speciesCount['Various'] || 0) + 1;
+
+    if (p.timestamp) {
+      const h = new Date(p.timestamp).getHours();
+      if (h >= 5 && h < 12) hours['Morning'] = (hours['Morning'] || 0) + 1;
+      else if (h >= 12 && h < 17) hours['Afternoon'] = (hours['Afternoon'] || 0) + 1;
+      else if (h >= 17 && h < 21) hours['Evening'] = (hours['Evening'] || 0) + 1;
+      else hours['Night'] = (hours['Night'] || 0) + 1;
+    }
+  });
+
+  const getTop = (dict) => {
+    let top = 'Not enough data';
+    let max = 0;
+    for (const [k, v] of Object.entries(dict)) {
+      if (v > max && k !== 'Unknown' && k !== 'Various') { max = v; top = k; }
+    }
+    return max > 0 ? top : 'Not enough data';
+  };
+
+  document.getElementById('analytics-best-bait').textContent = getTop(baits);
+  document.getElementById('analytics-best-time').textContent = getTop(hours);
+  document.getElementById('analytics-top-species').textContent = getTop(speciesCount);
+};
+
+window.closeAnalyticsModal = () => {
+  const modal = document.getElementById('analytics-modal');
+  if (modal) modal.classList.remove('active');
+};
+
+// ==========================================
+// FISHING CLUBS
+// ==========================================
+let allClubs = [];
+let currentClubFilter = 'all';
+
+window.openCreateClubModal = () => {
+  if (!state.user) {
+    alert("Please log in to create a club.");
+    return openAuthModal();
+  }
+  document.getElementById('create-club-modal').classList.add('active');
+};
+
+window.closeCreateClubModal = () => {
+  document.getElementById('create-club-modal').classList.remove('active');
+};
+
+window.createClub = async () => {
+  if (!state.user) return;
+  const name = document.getElementById('club-name-input').value.trim();
+  const location = document.getElementById('club-location-input').value.trim();
+  const desc = document.getElementById('club-desc-input').value.trim();
+  const type = document.getElementById('club-type-input').value;
+
+  if (!name || !location) {
+    alert("Name and Location are required.");
+    return;
+  }
+
+  const clubId = 'club_' + Date.now();
+  const newClub = {
+    id: clubId,
+    name,
+    location,
+    type,
+    description: desc,
+    ownerEmail: state.user.email,
+    ownerName: state.user.displayName || 'Angler',
+    members: [state.user.email],
+    createdAt: new Date().toISOString(),
+    status: 'pending' // Admin approval required
+  };
+
+  try {
+    await firebaseDB.ref('clubs/' + clubId).set(newClub);
+    alert("Club creation requested! Waiting for admin approval.");
+    closeCreateClubModal();
+    document.getElementById('club-name-input').value = '';
+    document.getElementById('club-location-input').value = '';
+    document.getElementById('club-desc-input').value = '';
+    loadClubsFromFirebase();
+  } catch (err) {
+    console.error("Error creating club:", err);
+    alert("Failed to create club.");
+  }
+};
+
+window.joinClub = async (clubId) => {
+  if (!state.user) {
+    alert("Please log in to join a club.");
+    return openAuthModal();
+  }
+  const club = allClubs.find(c => c.id === clubId);
+  if (!club) return;
+
+  if (!club.members) club.members = [];
+  if (club.members.includes(state.user.email)) {
+    alert("You are already in this club!");
+    return;
+  }
+
+  club.members.push(state.user.email);
+  try {
+    await firebaseDB.ref('clubs/' + clubId + '/members').set(club.members);
+    alert("Joined club!");
+    loadClubsFromFirebase();
+  } catch (err) {
+    console.error("Error joining club:", err);
+    alert("Failed to join.");
+  }
+};
+
+window.filterClubs = (filter) => {
+  currentClubFilter = filter;
+  document.getElementById('btn-all-clubs').classList.toggle('btn-outline', filter !== 'all');
+  document.getElementById('btn-my-clubs').classList.toggle('btn-outline', filter !== 'my');
+  renderClubs();
+};
+
+function renderClubs() {
+  const grid = document.getElementById('clubs-grid');
+  if (!grid) return;
+
+  let approvedClubs = allClubs.filter(c => c.status === 'approved' || (state.user && state.user.isAdmin) || (state.user && c.ownerEmail === state.user.email));
+  let filtered = approvedClubs;
+  if (currentClubFilter === 'my' && state.user) {
+    filtered = approvedClubs.filter(c => c.members && c.members.includes(state.user.email));
+  } else if (currentClubFilter === 'my') {
+    filtered = []; // Not logged in
+  }
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<p style="text-align: center; color: var(--text-muted); width: 100%;">No clubs found.</p>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(c => {
+    const isMember = state.user && c.members && c.members.includes(state.user.email);
+    const isOwner = state.user && c.ownerEmail === state.user.email;
+    const memberCount = c.members ? c.members.length : 1;
+    const latestAnn = (c.announcements && c.announcements.length > 0) ? c.announcements[c.announcements.length - 1] : null;
+
+    return `
+      <div style="background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: 12px; padding: 20px; display: flex; flex-direction: column;">
+        <h3 style="margin: 0 0 5px 0;">${sanitizeHTML(c.name)} ${c.status === 'pending' ? '<span style="font-size:0.7rem;color:var(--accent-warning);border:1px solid var(--accent-warning);padding:2px 5px;border-radius:4px;vertical-align:middle;">PENDING</span>' : ''}</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0 0 10px 0;">📍 ${sanitizeHTML(c.location)} • ${sanitizeHTML(c.type || 'Fishing')}</p>
+        <p style="font-size: 0.9rem; flex: 1;">${sanitizeHTML(c.description || 'No description')}</p>
+        ${isMember && latestAnn ? `<div style="margin: 10px 0; padding: 10px; background: rgba(255,171,0,0.1); border-left: 3px solid #ffab00; border-radius: 4px;"><strong style="color:#ffab00; font-size:0.8rem; display:block; margin-bottom:3px;">📢 Latest Announcement</strong><span style="font-size:0.85rem;">${sanitizeHTML(latestAnn.text)}</span></div>` : ''}
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+          <span style="font-size: 0.85rem; color: var(--text-muted);">👥 ${memberCount} Members</span>
+          <div style="display: flex; gap: 5px; align-items: center;">
+            ${isOwner ? `<button class="btn btn-sm btn-outline" onclick="openManageClubModal('${c.id}')" style="border-color:var(--accent-primary); color:var(--accent-primary);">⚙️ Manage</button>` : ''}
+            ${isMember ? 
+              '<span style="color: var(--accent-success); font-weight: bold; margin-left:5px;">Joined ✓</span>' : 
+              `<button class="btn btn-sm btn-primary" onclick="joinClub('${c.id}')">Join Club</button>`
+            }
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function loadClubsFromFirebase() {
+  try {
+    const snap = await firebaseDB.ref('clubs').once('value');
+    const data = snap.val();
+    if (data) {
+      allClubs = Object.values(data).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+    } else {
+      allClubs = [];
+    }
+    renderClubs();
+  } catch (err) {
+    console.error("Error loading clubs:", err);
+  }
+}
+
+(function patchShowPageForClubs() {
+  const origShowPage = window.showPage;
+  window.showPage = function (pageId) {
+    if (origShowPage) origShowPage(pageId);
+    if (pageId === 'clubs') {
+      loadClubsFromFirebase();
+    }
+  };
+})();
+
+// ==========================================
+// ADMIN CLUB APPROVALS
+// ==========================================
+window.loadAdminPendingClubs = () => {
+  const list = document.getElementById('admin-pending-clubs-list');
+  const nameList = document.getElementById('admin-pending-name-changes-list');
+  
+  if (list) {
+    const pending = allClubs.filter(c => c.status === 'pending');
+    if (pending.length === 0) {
+      list.innerHTML = '<p style="color: var(--text-muted);">No pending clubs.</p>';
+    } else {
+      list.innerHTML = pending.map(c => `
+        <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 8px; padding: 15px; margin-bottom: 10px;">
+          <strong style="font-size: 1.1rem; color: #ffab00;">\${sanitizeHTML(c.name)}</strong><br>
+          <small style="color: var(--text-muted);">📍 \${sanitizeHTML(c.location)} • 🎣 \${sanitizeHTML(c.type || 'Unknown')} • 👤 \${sanitizeHTML(c.ownerEmail)}</small><br>
+          <p style="font-size: 0.9rem; margin: 10px 0;">\${sanitizeHTML(c.description || 'No description')}</p>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn btn-sm btn-primary" onclick="approveClub('\${c.id}')">✅ Approve</button>
+            <button class="btn btn-sm btn-danger" onclick="denyClub('\${c.id}')">❌ Deny</button>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+  
+  if (nameList) {
+    const nameChanges = allClubs.filter(c => c.status === 'approved' && c.pendingNameChange);
+    if (nameChanges.length === 0) {
+      nameList.innerHTML = '<p style="color: var(--text-muted);">No pending name changes.</p>';
+    } else {
+      nameList.innerHTML = nameChanges.map(c => `
+        <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 8px; padding: 15px; margin-bottom: 10px;">
+          <strong style="font-size: 1rem; color: var(--text-main);"><span style="text-decoration: line-through; opacity: 0.7;">\${sanitizeHTML(c.name)}</span> ➡️ <span style="color: #ffab00;">\${sanitizeHTML(c.pendingNameChange)}</span></strong><br>
+          <small style="color: var(--text-muted);">👤 Requested by \${sanitizeHTML(c.ownerEmail)}</small>
+          <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button class="btn btn-sm btn-primary" onclick="approveClubNameChange('\${c.id}')">✅ Approve Change</button>
+            <button class="btn btn-sm btn-danger" onclick="denyClubNameChange('\${c.id}')">❌ Deny Change</button>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+  
+  const activeList = document.getElementById('admin-active-clubs-list');
+  if (activeList) {
+    const active = allClubs.filter(c => c.status === 'approved');
+    if (active.length === 0) {
+      activeList.innerHTML = '<p style="color: var(--text-muted);">No active clubs.</p>';
+    } else {
+      activeList.innerHTML = active.map(c => `
+        <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 8px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <strong style="font-size: 1.1rem; color: var(--text-main);">\${sanitizeHTML(c.name)}</strong><br>
+            <small style="color: var(--text-muted);">📍 \${sanitizeHTML(c.location)} • 👥 \${c.members ? c.members.length : 1} Members • 👤 \${sanitizeHTML(c.ownerEmail)}</small>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn btn-sm btn-outline" style="border-color:var(--accent-primary); color:var(--accent-primary);" onclick="openManageClubModal('\${c.id}')">⚙️ Manage</button>
+            <button class="btn btn-sm btn-danger" onclick="adminDeleteClub('\${c.id}')">🗑️ Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+};
+
+window.adminDeleteClub = async (id) => {
+  const club = allClubs.find(c => c.id === id);
+  if (!club) return;
+  const reason = prompt('Are you sure you want to completely DELETE this active club?\\n\\nIf yes, please provide a reason for the owner (optional):');
+  if (reason === null) return;
+  try {
+    await firebaseDB.ref('clubs/' + id).remove();
+    const reasonText = reason.trim() ? \` Reason: \${reason.trim()}\` : '';
+    sendNotification(club.ownerEmail, 'Club Deleted ❌', \`Your club "\${club.name}" was removed by an admin.\${reasonText}\`);
+    loadClubsFromFirebase();
+  } catch (err) { console.error(err); }
+};
+
+window.approveClub = async (id) => {
+  const club = allClubs.find(c => c.id === id);
+  if (!club) return;
+  try {
+    await firebaseDB.ref('clubs/' + id + '/status').set('approved');
+    sendNotification(club.ownerEmail, 'Club Approved! 🎉', \`Your club "\${club.name}" has been approved and is now live.\`);
+    loadClubsFromFirebase();
+  } catch (err) { console.error(err); }
+};
+
+window.denyClub = async (id) => {
+  const club = allClubs.find(c => c.id === id);
+  if (!club) return;
+  const reason = prompt('Are you sure you want to deny and delete this club request?\\n\\nIf yes, please provide a reason (optional):');
+  if (reason === null) return;
+  try {
+    await firebaseDB.ref('clubs/' + id).remove();
+    const reasonText = reason.trim() ? ` Reason: ${reason.trim()}` : '';
+    sendNotification(club.ownerEmail, 'Club Denied ❌', `Your club request for "${club.name}" was denied by an admin.${reasonText}`);
+    loadClubsFromFirebase();
+  } catch (err) { console.error(err); }
+};
+
+window.approveClubNameChange = async (id) => {
+  const club = allClubs.find(c => c.id === id);
+  if (!club || !club.pendingNameChange) return;
+  try {
+    await firebaseDB.ref(\`clubs/\${id}\`).update({
+      name: club.pendingNameChange,
+      pendingNameChange: null
+    });
+    sendNotification(club.ownerEmail, 'Name Change Approved! 🎉', \`Your club is now named "\${club.pendingNameChange}".\`);
+    loadClubsFromFirebase();
+  } catch (err) { console.error(err); }
+};
+
+window.denyClubNameChange = async (id) => {
+  const club = allClubs.find(c => c.id === id);
+  if (!club || !club.pendingNameChange) return;
+  const reason = prompt('Are you sure you want to deny this name change request?\\n\\nIf yes, please provide a reason (optional):');
+  if (reason === null) return;
+  try {
+    await firebaseDB.ref(`clubs/${id}`).update({
+      pendingNameChange: null
+    });
+    const reasonText = reason.trim() ? ` Reason: ${reason.trim()}` : '';
+    sendNotification(club.ownerEmail, 'Name Change Denied ❌', `Your request to change your club name to "${club.pendingNameChange}" was denied.${reasonText}`);
+    loadClubsFromFirebase();
+  } catch (err) { console.error(err); }
+};
+
+// Hook into existing showPage to load admin pending clubs when admin tab is opened
+(function patchShowPageForAdminClubs() {
+  const origShowPage = window.showPage;
+  window.showPage = function (pageId) {
+    if (origShowPage) origShowPage(pageId);
+    if (pageId === 'admin') {
+      loadAdminPendingClubs();
+    }
+  };
+})();
+
+// ==========================================
+// NOTIFICATIONS SYSTEM
+// ==========================================
+window.sendNotification = async (email, title, message) => {
+  if (!firebaseDB) return;
+  try {
+    const snap = await firebaseDB.ref('users').orderByChild('email').equalTo(email).once('value');
+    if (snap.exists()) {
+      const uid = Object.keys(snap.val())[0];
+      const notifId = 'notif_' + Date.now();
+      await firebaseDB.ref(\`users/\${uid}/notifications/\${notifId}\`).set({
+        title,
+        message,
+        timestamp: Date.now(),
+        read: false
+      });
+    }
+  } catch(e) { console.error("Error sending notification:", e); }
+};
+
+window.listenForNotifications = (userId) => {
+  if (!userId || !firebaseDB) return;
+  firebaseDB.ref(\`users/\${userId}/notifications\`).on('value', (snap) => {
+    const data = snap.val();
+    let unreadCount = 0;
+    const listEl = document.getElementById('notification-list');
+    const containerEl = document.getElementById('profile-notifications');
+    const badgeEl = document.getElementById('notification-badge');
+    
+    if (data) {
+      const notifs = Object.entries(data).map(([id, val]) => ({id, ...val})).sort((a,b) => b.timestamp - a.timestamp);
+      unreadCount = notifs.filter(n => !n.read).length;
+      
+      if (notifs.length > 0) {
+        if(containerEl) containerEl.style.display = 'block';
+        if(listEl) listEl.innerHTML = notifs.map(n => \`
+          <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; border-left: 3px solid \${n.read ? 'rgba(255,255,255,0.1)' : '#ffab00'}; margin-bottom: 5px;">
+            <strong style="font-size: 0.95rem; display: block; margin-bottom: 3px; color: \${n.read ? 'var(--text-main)' : '#ffab00'};">\${sanitizeHTML(n.title)}</strong>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">\${sanitizeHTML(n.message)}</span>
+          </div>
+        \`).join('');
+      } else {
+        if(containerEl) containerEl.style.display = 'none';
+      }
+    } else {
+      if(containerEl) containerEl.style.display = 'none';
+    }
+    
+    if (badgeEl) {
+      if (unreadCount > 0) {
+        badgeEl.textContent = unreadCount;
+        badgeEl.style.display = 'flex';
+      } else {
+        badgeEl.style.display = 'none';
+      }
+    }
+  });
+};
+
+window.clearNotifications = async () => {
+  if (!state.user || !state.user.id) return;
+  try {
+    await firebaseDB.ref(\`users/\${state.user.id}/notifications\`).remove();
+  } catch(e) {}
+};
+
+// Hook into openProfileModal to mark notifications as read when viewed
+(function patchProfileModalForNotifications() {
+  const origOpenProfileModal = window.openProfileModal;
+  window.openProfileModal = function() {
+    if (origOpenProfileModal) origOpenProfileModal();
+    if (state.user && state.user.id && firebaseDB) {
+      firebaseDB.ref(\`users/\${state.user.id}/notifications\`).once('value', (snap) => {
+        const data = snap.val();
+        if (data) {
+          let updates = {};
+          Object.keys(data).forEach(k => {
+            if (!data[k].read) updates[\`\${k}/read\`] = true;
+          });
+          if (Object.keys(updates).length > 0) {
+            firebaseDB.ref(\`users/\${state.user.id}/notifications\`).update(updates);
+          }
+        }
+      });
+    }
+  };
+})();
+
+// Initialize listener when user state changes
+let _notifListenerAttached = false;
+setInterval(() => {
+  if (state.user && state.user.id && !_notifListenerAttached) {
+    _notifListenerAttached = true;
+    listenForNotifications(state.user.id);
+  } else if (!state.user && _notifListenerAttached) {
+    _notifListenerAttached = false;
+  }
+}, 3000);
+
+// ==========================================
+// ADMIN SUPPORT TICKET
+// ==========================================
+window.adminOpenSupportTicket = (userId, userName) => {
+  state.currentReplyUserId = userId;
+  document.getElementById('reply-to-user').textContent = sanitizeHTML(userName);
+  
+  const threadEl = document.getElementById('admin-reply-thread');
+  const userMessages = state.supportMessages.filter(m => m.userId === userId);
+  
+  if (userMessages.length === 0) {
+    threadEl.innerHTML = '<div class="empty-state"><p>No previous messages. Start a new ticket.</p></div>';
+  } else {
+    threadEl.innerHTML = userMessages.map(m => {
+      const time = new Date(m.timestamp).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+      return \`
+        <div class="thread-message \${m.from === 'admin' ? 'admin' : 'user'}">
+          \${sanitizeHTML(m.text)}
+          <span class="time">\${time}</span>
+        </div>
+      \`;
+    }).join('');
+    threadEl.scrollTop = threadEl.scrollHeight;
+  }
+  
+  document.getElementById('admin-reply-modal').classList.add('active');
+};
+
+// ==========================================
+// CLUB MANAGEMENT (OWNER)
+// ==========================================
+let currentManageClubId = null;
+
+window.openManageClubModal = (clubId) => {
+  const club = allClubs.find(c => c.id === clubId);
+  const isAdmin = state.user && state.user.isAdmin;
+  if (!club || !state.user || (club.ownerEmail !== state.user.email && !isAdmin)) return;
+
+  currentManageClubId = clubId;
+  document.getElementById('manage-club-title').textContent = '⚙️ Manage ' + sanitizeHTML(club.name);
+  const nameInput = document.getElementById('manage-club-name');
+  if (nameInput) nameInput.value = club.pendingNameChange || club.name || '';
+  document.getElementById('manage-club-desc').value = club.description || '';
+  
+  renderManageClubAnnouncements();
+  renderManageClubMembers();
+
+  document.getElementById('manage-club-modal').classList.add('active');
+};
+
+window.closeManageClubModal = () => {
+  currentManageClubId = null;
+  document.getElementById('manage-club-modal').classList.remove('active');
+};
+
+window.updateClubDetails = async () => {
+  if (!currentManageClubId) return;
+  const club = allClubs.find(c => c.id === currentManageClubId);
+  if (!club) return;
+  const desc = document.getElementById('manage-club-desc').value.trim();
+  const nameInput = document.getElementById('manage-club-name');
+  const newName = nameInput ? nameInput.value.trim() : null;
+
+  try {
+    let updates = {};
+    if (desc !== club.description) updates['description'] = desc;
+    
+    if (newName && newName !== club.name && newName !== club.pendingNameChange) {
+      updates['pendingNameChange'] = newName;
+    }
+
+    if (Object.keys(updates).length > 0) {
+      await firebaseDB.ref(`clubs/${currentManageClubId}`).update(updates);
+      if (updates.pendingNameChange) {
+        alert('Details updated. Your club name change request has been submitted for admin approval.');
+      } else {
+        alert('Club details updated!');
+      }
+      loadClubsFromFirebase();
+    }
+  } catch (err) { console.error(err); }
+};
+
+window.postClubAnnouncement = async () => {
+  if (!currentManageClubId) return;
+  const club = allClubs.find(c => c.id === currentManageClubId);
+  const input = document.getElementById('manage-club-announcement');
+  const text = input.value.trim();
+  if (!text || !club) return;
+
+  const annId = 'ann_' + Date.now();
+  const announcement = { id: annId, text, timestamp: Date.now() };
+
+  try {
+    if (!club.announcements) club.announcements = [];
+    club.announcements.push(announcement);
+    await firebaseDB.ref(`clubs/${currentManageClubId}/announcements`).set(club.announcements);
+    
+    if (club.members) {
+      club.members.forEach(memberEmail => {
+        if (memberEmail !== state.user.email) {
+          sendNotification(memberEmail, `📢 ${club.name}`, text);
+        }
+      });
+    }
+
+    input.value = '';
+    renderManageClubAnnouncements();
+    loadClubsFromFirebase();
+  } catch (err) { console.error(err); }
+};
+
+function renderManageClubAnnouncements() {
+  const list = document.getElementById('manage-club-announcements-list');
+  const club = allClubs.find(c => c.id === currentManageClubId);
+  if (!club || !list) return;
+
+  const anns = club.announcements || [];
+  if (anns.length === 0) {
+    list.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem;">No announcements yet.</p>';
+    return;
+  }
+  
+  list.innerHTML = [...anns].reverse().map(a => {
+    const d = new Date(a.timestamp).toLocaleString('en-GB', { day: '2-digit', month: 'short' });
+    return `
+      <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px; display: flex; justify-content: space-between; align-items: flex-start;">
+        <span style="font-size:0.9rem;">${sanitizeHTML(a.text)}</span>
+        <span style="font-size:0.75rem; color:var(--text-muted); margin-left:10px; white-space: nowrap;">${d}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderManageClubMembers() {
+  const list = document.getElementById('manage-club-members-list');
+  const club = allClubs.find(c => c.id === currentManageClubId);
+  if (!club || !list) return;
+
+  const members = club.members || [];
+  list.innerHTML = members.map(mEmail => {
+    const isOwner = mEmail === club.ownerEmail;
+    return `
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+        <span style="font-size: 0.9rem;">${sanitizeHTML(mEmail)} ${isOwner ? '<span style="font-size:0.7rem;color:var(--accent-primary);border:1px solid var(--accent-primary);padding:1px 4px;border-radius:4px;margin-left:5px;">OWNER</span>' : ''}</span>
+        ${!isOwner ? `<button class="btn btn-xs btn-outline" style="color:var(--accent-danger);border-color:var(--accent-danger);" onclick="kickClubMember('${mEmail}')">Kick</button>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+window.kickClubMember = async (memberEmail) => {
+  if (!currentManageClubId) return;
+  if (!confirm(`Are you sure you want to remove ${memberEmail} from the club?`)) return;
+
+  const club = allClubs.find(c => c.id === currentManageClubId);
+  if (!club) return;
+
+  club.members = club.members.filter(m => m !== memberEmail);
+  try {
+    await firebaseDB.ref(`clubs/${currentManageClubId}/members`).set(club.members);
+    sendNotification(memberEmail, 'Club Update', `You have been removed from ${club.name}.`);
+    renderManageClubMembers();
+    loadClubsFromFirebase();
+  } catch (err) { console.error(err); }
 };
 
 window.switchRegRegion = (region) => {
