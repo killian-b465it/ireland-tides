@@ -8796,7 +8796,7 @@ window.createClub = async () => {
     type,
     description: desc,
     ownerEmail: state.user.email,
-    ownerName: state.user.displayName || 'Angler',
+    ownerName: state.user.name || 'Angler',
     members: [state.user.email],
     createdAt: new Date().toISOString(),
     status: 'pending' // Admin approval required
@@ -9479,7 +9479,7 @@ window.postClubChat = async () => {
   const chatRef = firebaseDB.ref('clubs/' + currentClubId + '/chat').push();
   await chatRef.set({
     text,
-    authorName: state.user.displayName || 'Angler',
+    authorName: state.user.name || 'Angler',
     authorEmail: state.user.email,
     timestamp: new Date().toISOString()
   });
@@ -9518,7 +9518,7 @@ window.submitClubCatch = async () => {
     species,
     weight,
     photo: currentCatchPhotoData,
-    authorName: state.user.displayName || 'Angler',
+    authorName: state.user.name || 'Angler',
     authorEmail: state.user.email,
     timestamp: new Date().toISOString()
   });
@@ -9543,7 +9543,7 @@ window.submitClubEvent = async () => {
   await eventRef.set({
     title,
     description: desc,
-    authorName: state.user.displayName || 'Angler',
+    authorName: state.user.name || 'Angler',
     authorEmail: state.user.email,
     timestamp: new Date().toISOString()
   });
