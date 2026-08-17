@@ -6993,3 +6993,4 @@ input:checked+.toggle-slider:before {
     flex-wrap: wrap;
     gap: 10px;
 }
+\n\n/* Scrollbar overrides */\n.mobile-menu::-webkit-scrollbar { width: 8px; }\n.mobile-menu::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 4px; }\n.mobile-menu::-webkit-scrollbar-thumb { background: var(--accent-primary); border-radius: 4px; }\n\n.catch-image-gallery::-webkit-scrollbar { height: 8px; }\n.catch-image-gallery::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 4px; }\n.catch-image-gallery::-webkit-scrollbar-thumb { background: var(--accent-primary); border-radius: 4px; }\n
