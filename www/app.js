@@ -8876,7 +8876,6 @@ function renderClubs() {
         <h3 style="margin: 0 0 5px 0;">${sanitizeHTML(c.name)} ${c.status === 'pending' ? '<span style="font-size:0.7rem;color:var(--accent-warning);border:1px solid var(--accent-warning);padding:2px 5px;border-radius:4px;vertical-align:middle;">PENDING</span>' : ''}</h3>
         <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0 0 10px 0;">📍 ${sanitizeHTML(c.location)} • ${sanitizeHTML(c.type || 'Fishing')}</p>
         <p style="font-size: 0.9rem; flex: 1;">${sanitizeHTML(c.description || 'No description')}</p>
-        ${isMember && latestAnn ? `<div style="margin: 10px 0; padding: 10px; background: rgba(255,171,0,0.1); border-left: 3px solid #ffab00; border-radius: 4px;"><strong style="color:#ffab00; font-size:0.8rem; display:block; margin-bottom:3px;">📢 Latest Announcement</strong><span style="font-size:0.85rem;">${sanitizeHTML(latestAnn.text)}</span></div>` : ''}
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
           <span style="font-size: 0.85rem; color: var(--text-muted);">👥 ${memberCount} Members</span>
           <div style="display: flex; gap: 5px; align-items: center;">
@@ -9358,8 +9357,17 @@ window.openClubHubModal = (clubId) => {
   if (!club) return;
   
   document.getElementById('club-hub-title').innerText = club.name + ' Hub';
-  document.getElementById('club-hub-modal').classList.add('active');
   
+  const annDiv = document.getElementById('club-hub-announcement');
+  if (club.announcements && club.announcements.length > 0) {
+    const latestAnn = club.announcements[club.announcements.length - 1];
+    annDiv.innerHTML = `<strong style="color:#ffab00; font-size:0.8rem; display:block; margin-bottom:3px;">📢 Latest Announcement</strong><span style="font-size:0.85rem; color:var(--text-main);">${sanitizeHTML(latestAnn.text)}</span>`;
+    annDiv.style.display = 'block';
+  } else {
+    annDiv.style.display = 'none';
+  }
+
+  document.getElementById('club-hub-modal').classList.add('active');
   // Show Feed by default
   switchClubTab('feed');
   
