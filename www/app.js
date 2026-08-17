@@ -8931,12 +8931,12 @@ window.loadAdminPendingClubs = () => {
     } else {
       list.innerHTML = pending.map(c => `
         <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 8px; padding: 15px; margin-bottom: 10px;">
-          <strong style="font-size: 1.1rem; color: #ffab00;">\${sanitizeHTML(c.name)}</strong><br>
-          <small style="color: var(--text-muted);">📍 \${sanitizeHTML(c.location)} • 🎣 \${sanitizeHTML(c.type || 'Unknown')} • 👤 \${sanitizeHTML(c.ownerEmail)}</small><br>
-          <p style="font-size: 0.9rem; margin: 10px 0;">\${sanitizeHTML(c.description || 'No description')}</p>
+          <strong style="font-size: 1.1rem; color: #ffab00;">${sanitizeHTML(c.name)}</strong><br>
+          <small style="color: var(--text-muted);">📍 ${sanitizeHTML(c.location)} • 🎣 ${sanitizeHTML(c.type || 'Unknown')} • 👤 ${sanitizeHTML(c.ownerEmail)}</small><br>
+          <p style="font-size: 0.9rem; margin: 10px 0;">${sanitizeHTML(c.description || 'No description')}</p>
           <div style="display: flex; gap: 10px;">
-            <button class="btn btn-sm btn-primary" onclick="approveClub('\${c.id}')">✅ Approve</button>
-            <button class="btn btn-sm btn-danger" onclick="denyClub('\${c.id}')">❌ Deny</button>
+            <button class="btn btn-sm btn-primary" onclick="approveClub('${c.id}')">✅ Approve</button>
+            <button class="btn btn-sm btn-danger" onclick="denyClub('${c.id}')">❌ Deny</button>
           </div>
         </div>
       `).join('');
@@ -8950,11 +8950,11 @@ window.loadAdminPendingClubs = () => {
     } else {
       nameList.innerHTML = nameChanges.map(c => `
         <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 8px; padding: 15px; margin-bottom: 10px;">
-          <strong style="font-size: 1rem; color: var(--text-main);"><span style="text-decoration: line-through; opacity: 0.7;">\${sanitizeHTML(c.name)}</span> ➡️ <span style="color: #ffab00;">\${sanitizeHTML(c.pendingNameChange)}</span></strong><br>
-          <small style="color: var(--text-muted);">👤 Requested by \${sanitizeHTML(c.ownerEmail)}</small>
+          <strong style="font-size: 1rem; color: var(--text-main);"><span style="text-decoration: line-through; opacity: 0.7;">${sanitizeHTML(c.name)}</span> ➡️ <span style="color: #ffab00;">${sanitizeHTML(c.pendingNameChange)}</span></strong><br>
+          <small style="color: var(--text-muted);">👤 Requested by ${sanitizeHTML(c.ownerEmail)}</small>
           <div style="display: flex; gap: 10px; margin-top: 10px;">
-            <button class="btn btn-sm btn-primary" onclick="approveClubNameChange('\${c.id}')">✅ Approve Change</button>
-            <button class="btn btn-sm btn-danger" onclick="denyClubNameChange('\${c.id}')">❌ Deny Change</button>
+            <button class="btn btn-sm btn-primary" onclick="approveClubNameChange('${c.id}')">✅ Approve Change</button>
+            <button class="btn btn-sm btn-danger" onclick="denyClubNameChange('${c.id}')">❌ Deny Change</button>
           </div>
         </div>
       `).join('');
@@ -8970,12 +8970,12 @@ window.loadAdminPendingClubs = () => {
       activeList.innerHTML = active.map(c => `
         <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-glass); border-radius: 8px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
           <div>
-            <strong style="font-size: 1.1rem; color: var(--text-main);">\${sanitizeHTML(c.name)}</strong><br>
-            <small style="color: var(--text-muted);">📍 \${sanitizeHTML(c.location)} • 👥 \${c.members ? c.members.length : 1} Members • 👤 \${sanitizeHTML(c.ownerEmail)}</small>
+            <strong style="font-size: 1.1rem; color: var(--text-main);">${sanitizeHTML(c.name)}</strong><br>
+            <small style="color: var(--text-muted);">📍 ${sanitizeHTML(c.location)} • 👥 ${c.members ? c.members.length : 1} Members • 👤 ${sanitizeHTML(c.ownerEmail)}</small>
           </div>
           <div style="display: flex; gap: 10px;">
-            <button class="btn btn-sm btn-outline" style="border-color:var(--accent-primary); color:var(--accent-primary);" onclick="openManageClubModal('\${c.id}')">⚙️ Manage</button>
-            <button class="btn btn-sm btn-danger" onclick="adminDeleteClub('\${c.id}')">🗑️ Delete</button>
+            <button class="btn btn-sm btn-outline" style="border-color:var(--accent-primary); color:var(--accent-primary);" onclick="openManageClubModal('${c.id}')">⚙️ Manage</button>
+            <button class="btn btn-sm btn-danger" onclick="adminDeleteClub('${c.id}')">🗑️ Delete</button>
           </div>
         </div>
       `).join('');
@@ -8990,8 +8990,8 @@ window.adminDeleteClub = async (id) => {
   if (reason === null) return;
   try {
     await firebaseDB.ref('clubs/' + id).remove();
-    const reasonText = reason.trim() ? \` Reason: \${reason.trim()}\` : '';
-    sendNotification(club.ownerEmail, 'Club Deleted ❌', \`Your club "\${club.name}" was removed by an admin.\${reasonText}\`);
+    const reasonText = reason.trim() ? ` Reason: ${reason.trim()}` : '';
+    sendNotification(club.ownerEmail, 'Club Deleted ❌', `Your club "${club.name}" was removed by an admin.${reasonText}`);
     loadClubsFromFirebase();
   } catch (err) { console.error(err); }
 };
@@ -9001,7 +9001,7 @@ window.approveClub = async (id) => {
   if (!club) return;
   try {
     await firebaseDB.ref('clubs/' + id + '/status').set('approved');
-    sendNotification(club.ownerEmail, 'Club Approved! 🎉', \`Your club "\${club.name}" has been approved and is now live.\`);
+    sendNotification(club.ownerEmail, 'Club Approved! 🎉', `Your club "${club.name}" has been approved and is now live.`);
     loadClubsFromFirebase();
   } catch (err) { console.error(err); }
 };
@@ -9023,11 +9023,11 @@ window.approveClubNameChange = async (id) => {
   const club = allClubs.find(c => c.id === id);
   if (!club || !club.pendingNameChange) return;
   try {
-    await firebaseDB.ref(\`clubs/\${id}\`).update({
+    await firebaseDB.ref(`clubs/${id}`).update({
       name: club.pendingNameChange,
       pendingNameChange: null
     });
-    sendNotification(club.ownerEmail, 'Name Change Approved! 🎉', \`Your club is now named "\${club.pendingNameChange}".\`);
+    sendNotification(club.ownerEmail, 'Name Change Approved! 🎉', `Your club is now named "${club.pendingNameChange}".`);
     loadClubsFromFirebase();
   } catch (err) { console.error(err); }
 };
@@ -9068,7 +9068,7 @@ window.sendNotification = async (email, title, message) => {
     if (snap.exists()) {
       const uid = Object.keys(snap.val())[0];
       const notifId = 'notif_' + Date.now();
-      await firebaseDB.ref(\`users/\${uid}/notifications/\${notifId}\`).set({
+      await firebaseDB.ref(`users/${uid}/notifications/${notifId}`).set({
         title,
         message,
         timestamp: Date.now(),
@@ -9080,7 +9080,7 @@ window.sendNotification = async (email, title, message) => {
 
 window.listenForNotifications = (userId) => {
   if (!userId || !firebaseDB) return;
-  firebaseDB.ref(\`users/\${userId}/notifications\`).on('value', (snap) => {
+  firebaseDB.ref(`users/${userId}/notifications`).on('value', (snap) => {
     const data = snap.val();
     let unreadCount = 0;
     const listEl = document.getElementById('notification-list');
@@ -9093,12 +9093,12 @@ window.listenForNotifications = (userId) => {
       
       if (notifs.length > 0) {
         if(containerEl) containerEl.style.display = 'block';
-        if(listEl) listEl.innerHTML = notifs.map(n => \`
-          <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; border-left: 3px solid \${n.read ? 'rgba(255,255,255,0.1)' : '#ffab00'}; margin-bottom: 5px;">
-            <strong style="font-size: 0.95rem; display: block; margin-bottom: 3px; color: \${n.read ? 'var(--text-main)' : '#ffab00'};">\${sanitizeHTML(n.title)}</strong>
-            <span style="font-size: 0.85rem; color: var(--text-muted);">\${sanitizeHTML(n.message)}</span>
+        if(listEl) listEl.innerHTML = notifs.map(n => `
+          <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; border-left: 3px solid ${n.read ? 'rgba(255,255,255,0.1)' : '#ffab00'}; margin-bottom: 5px;">
+            <strong style="font-size: 0.95rem; display: block; margin-bottom: 3px; color: ${n.read ? 'var(--text-main)' : '#ffab00'};">${sanitizeHTML(n.title)}</strong>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">${sanitizeHTML(n.message)}</span>
           </div>
-        \`).join('');
+        `).join('');
       } else {
         if(containerEl) containerEl.style.display = 'none';
       }
@@ -9120,7 +9120,7 @@ window.listenForNotifications = (userId) => {
 window.clearNotifications = async () => {
   if (!state.user || !state.user.id) return;
   try {
-    await firebaseDB.ref(\`users/\${state.user.id}/notifications\`).remove();
+    await firebaseDB.ref(`users/${state.user.id}/notifications`).remove();
   } catch(e) {}
 };
 
@@ -9130,15 +9130,15 @@ window.clearNotifications = async () => {
   window.openProfileModal = function() {
     if (origOpenProfileModal) origOpenProfileModal();
     if (state.user && state.user.id && firebaseDB) {
-      firebaseDB.ref(\`users/\${state.user.id}/notifications\`).once('value', (snap) => {
+      firebaseDB.ref(`users/${state.user.id}/notifications`).once('value', (snap) => {
         const data = snap.val();
         if (data) {
           let updates = {};
           Object.keys(data).forEach(k => {
-            if (!data[k].read) updates[\`\${k}/read\`] = true;
+            if (!data[k].read) updates[`${k}/read`] = true;
           });
           if (Object.keys(updates).length > 0) {
-            firebaseDB.ref(\`users/\${state.user.id}/notifications\`).update(updates);
+            firebaseDB.ref(`users/${state.user.id}/notifications`).update(updates);
           }
         }
       });
@@ -9172,12 +9172,12 @@ window.adminOpenSupportTicket = (userId, userName) => {
   } else {
     threadEl.innerHTML = userMessages.map(m => {
       const time = new Date(m.timestamp).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
-      return \`
-        <div class="thread-message \${m.from === 'admin' ? 'admin' : 'user'}">
-          \${sanitizeHTML(m.text)}
-          <span class="time">\${time}</span>
+      return `
+        <div class="thread-message ${m.from === 'admin' ? 'admin' : 'user'}">
+          ${sanitizeHTML(m.text)}
+          <span class="time">${time}</span>
         </div>
-      \`;
+      `;
     }).join('');
     threadEl.scrollTop = threadEl.scrollHeight;
   }
