@@ -9735,7 +9735,7 @@ window.renderMarketplace = () => {
                 </select>
                 <button class="btn btn-outline" style="border-color: #ff4d4d; color: #ff4d4d; padding: 6px 12px;" onclick="deleteListing('${item.id}')">Delete</button>
               ` : ''}
-              <a href="mailto:${item.sellerEmail}?subject=Irish Fishing Hub Marketplace: ${encodeURIComponent(item.title)}" class="btn btn-primary" style="padding: 6px 12px; text-decoration: none;">Contact</a>
+              <button class="btn btn-primary" style="padding: 6px 12px;" onclick="openContactSellerModal('${encodeURIComponent(item.sellerEmail)}', '${encodeURIComponent(item.title)}')">Contact</button>
             </div>
           </div>
         </div>
@@ -9829,4 +9829,37 @@ window.updateListingStatus = async (id, status) => {
     console.error("Failed to update status:", err);
     alert("Failed to update status. Please try again.");
   }
+};
+
+window.openContactSellerModal = (emailSafe, titleSafe) => {
+  if (!state.user) return openAuthModal();
+  if (state.user.email === decodeURIComponent(emailSafe)) {
+    return alert("This is your own listing!");
+  }
+  document.getElementById('contact-seller-email').value = decodeURIComponent(emailSafe);
+  document.getElementById('contact-seller-title').value = decodeURIComponent(titleSafe);
+  document.getElementById('contact-seller-msg').value = '';
+  document.getElementById('contact-seller-modal').classList.add('active');
+};
+
+window.closeContactSellerModal = () => {
+  document.getElementById('contact-seller-modal').classList.remove('active');
+};
+
+window.submitContactSeller = async () => {
+  if (!state.user) return;
+  const email = document.getElementById('contact-seller-email').value;
+  const title = document.getElementById('contact-seller-title').value;
+  const msg = document.getElementById('contact-seller-msg').value.trim();
+
+  if (!msg) {
+    return alert("Please enter a message!");
+  }
+
+  const notificationTitle = "Marketplace: " + title;
+  const notificationBody = `Message from ${state.user.name || state.user.email}:\n\n${msg}`;
+  
+  await window.sendNotification(email, notificationTitle, notificationBody);
+  alert("Message sent! The seller has received your notification.");
+  closeContactSellerModal();
 };

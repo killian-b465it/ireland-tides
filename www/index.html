@@ -2605,6 +2605,26 @@
     </div>
   </div>
 
+  <!-- Contact Seller Modal -->
+  <div class="modal" id="contact-seller-modal" style="z-index: 10006 !important;">
+    <div class="modal-content" style="max-width: 400px;">
+      <div class="modal-header">
+        <h2>Contact Seller</h2>
+        <button class="modal-close-btn-inline" onclick="closeContactSellerModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="color: var(--text-muted); margin-bottom: 15px;">Send a message directly to the seller. They will receive it in their in-app Notifications tab!</p>
+        <textarea id="contact-seller-msg" class="auth-input" placeholder="Hi, I'm interested in this item. My phone number is..." rows="4" style="margin-bottom:15px; resize:vertical;"></textarea>
+        <input type="hidden" id="contact-seller-email">
+        <input type="hidden" id="contact-seller-title">
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+          <button class="btn btn-outline" onclick="closeContactSellerModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="submitContactSeller()">Send Message</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.min.js"></script>
