@@ -9634,8 +9634,11 @@ let allMarketplaceListings = [];
 let currentMarketplaceFilter = 'all';
 let currentListingPhotoData = null;
 
-// Listen to marketplace node
-if (window.firebaseDB) {
+let marketplaceListenerAttached = false;
+window.loadMarketplaceFromFirebase = () => {
+  if (!firebaseDB) return;
+  if (marketplaceListenerAttached) return;
+  marketplaceListenerAttached = true;
   firebaseDB.ref('marketplace').on('value', (snap) => {
     const data = snap.val();
     if (data) {
@@ -9645,7 +9648,17 @@ if (window.firebaseDB) {
     }
     renderMarketplace();
   });
-}
+};
+
+(function patchShowPageForMarketplace() {
+  const origShowPage = window.showPage;
+  window.showPage = function (pageId) {
+    if (origShowPage) origShowPage(pageId);
+    if (pageId === 'marketplace') {
+      loadMarketplaceFromFirebase();
+    }
+  };
+})();
 
 window.filterMarketplace = (category) => {
   currentMarketplaceFilter = category;
@@ -9689,8 +9702,14 @@ window.renderMarketplace = () => {
 
   grid.innerHTML = filtered.map(item => {
     const canDelete = state.user && (state.user.email === item.sellerEmail || state.user.isAdmin);
+    const isSold = item.status === 'sold';
+    const isPending = item.status === 'pending';
+    const statusBanner = isSold ? `<div style="position:absolute; top:10px; right:10px; background:rgba(255,50,50,0.9); color:white; padding:4px 10px; border-radius:4px; font-weight:bold; z-index:10; font-size:0.8rem; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">SOLD</div>` :
+                         isPending ? `<div style="position:absolute; top:10px; right:10px; background:rgba(255,171,0,0.9); color:white; padding:4px 10px; border-radius:4px; font-weight:bold; z-index:10; font-size:0.8rem; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">IN TALKS</div>` : '';
+                         
     return `
-      <div class="club-card" style="display: flex; flex-direction: column; overflow: hidden; background: var(--bg-card); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 1px solid var(--border-glass);">
+      <div class="club-card" style="display: flex; flex-direction: column; overflow: hidden; background: var(--bg-card); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 1px solid var(--border-glass); position: relative; ${isSold ? 'opacity: 0.6;' : ''}">
+        ${statusBanner}
         ${item.photo ? `<img src="${item.photo}" style="width: 100%; height: 200px; object-fit: cover;" alt="${sanitizeHTML(item.title)}">` : '<div style="width:100%; height:200px; background:var(--bg-main); display:flex; align-items:center; justify-content:center; color:var(--text-muted);">No Image</div>'}
         <div style="padding: 15px; display: flex; flex-direction: column; flex: 1;">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
@@ -9707,8 +9726,15 @@ window.renderMarketplace = () => {
               <div>Sold by: ${sanitizeHTML(item.sellerName)}</div>
               <div>${new Date(item.createdAt).toLocaleDateString()}</div>
             </div>
-            <div style="display: flex; gap: 10px;">
-              ${canDelete ? `<button class="btn btn-outline" style="border-color: #ff4d4d; color: #ff4d4d; padding: 6px 12px;" onclick="deleteListing('${item.id}')">Delete</button>` : ''}
+            <div style="display: flex; gap: 10px; align-items: center;">
+              ${canDelete ? `
+                <select onchange="updateListingStatus('${item.id}', this.value)" style="padding: 6px; border-radius: 6px; background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border-glass); font-size: 0.8rem;">
+                  <option value="available" ${!item.status || item.status === 'available' ? 'selected' : ''}>Available</option>
+                  <option value="pending" ${item.status === 'pending' ? 'selected' : ''}>In Talks</option>
+                  <option value="sold" ${item.status === 'sold' ? 'selected' : ''}>Sold</option>
+                </select>
+                <button class="btn btn-outline" style="border-color: #ff4d4d; color: #ff4d4d; padding: 6px 12px;" onclick="deleteListing('${item.id}')">Delete</button>
+              ` : ''}
               <a href="mailto:${item.sellerEmail}?subject=Irish Fishing Hub Marketplace: ${encodeURIComponent(item.title)}" class="btn btn-primary" style="padding: 6px 12px; text-decoration: none;">Contact</a>
             </div>
           </div>
@@ -9771,6 +9797,7 @@ window.submitListing = async () => {
       category,
       condition,
       description,
+      status: 'available',
       photo: currentListingPhotoData,
       sellerName: state.user.name || 'Angler',
       sellerEmail: state.user.email || 'unknown@example.com',
@@ -9791,5 +9818,15 @@ window.deleteListing = async (id) => {
   } catch (err) {
     console.error("Failed to delete listing:", err);
     alert("Failed to delete listing.");
+  }
+};
+
+window.updateListingStatus = async (id, status) => {
+  if (!state.user) return;
+  try {
+    await firebaseDB.ref('marketplace/' + id).update({ status });
+  } catch (err) {
+    console.error("Failed to update status:", err);
+    alert("Failed to update status. Please try again.");
   }
 };
