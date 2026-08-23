@@ -149,6 +149,7 @@
         <a href="javascript:void(0)" class="nav-link" id="nav-leaderboard" onclick="showPage('leaderboard')">🏆 Leaderboard</a>
         <a href="javascript:void(0)" class="nav-link" id="nav-guide" onclick="showPage('guide')">🎣 Beginner Guide</a>
         <a href="javascript:void(0)" class="nav-link" id="nav-clubs" onclick="showPage('clubs')">🤝 Clubs</a>
+        <a href="javascript:void(0)" class="nav-link" id="nav-marketplace" onclick="showPage('marketplace')">🛒 Marketplace</a>
         <a href="javascript:void(0)" class="nav-link" id="nav-regulations" onclick="showPage('regulations')">⚖️ Regulations</a>
         <a href="javascript:void(0)" class="nav-link" id="nav-sponsors" onclick="showPage('sponsors')">⭐ Sponsors</a>
         <a href="javascript:void(0)" class="nav-link" id="nav-directory" onclick="showPage('directory')">🏪 Shop Directory</a>
@@ -200,6 +201,7 @@
       <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('community'); closeMobileMenu()">👥 Community</a>
       <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('leaderboard'); closeMobileMenu()">🏆 Leaderboard</a>
       <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('clubs'); closeMobileMenu()">🤝 Clubs</a>
+      <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('marketplace'); closeMobileMenu()">🛒 Marketplace</a>
       <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('guide'); closeMobileMenu()">🎣 Beginner Guide</a>
       <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('regulations'); closeMobileMenu()">⚖️ Regulations</a>
       <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('sponsors'); closeMobileMenu()">⭐ Sponsors</a>
@@ -1271,6 +1273,29 @@
       </div>
     </div>
   </div>
+
+  <!-- Marketplace Page -->
+  <main class="page" id="page-marketplace" style="display: none;">
+    <div class="marketplace-container" style="padding: 20px; max-width: 1200px; margin: 0 auto; padding-top: 80px;">
+      <div class="hero" style="text-align: center; margin-bottom: 30px;">
+        <h1 style="font-size: 2rem; margin-bottom: 10px;">🛒 Tackle Marketplace</h1>
+        <p style="color: var(--text-muted);">Buy, sell, and trade fishing gear with other anglers in your area.</p>
+        <button class="btn btn-primary" style="margin: 20px auto 0;" onclick="openCreateListingModal()">+ Create Listing</button>
+      </div>
+
+      <div class="marketplace-filters" style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap;">
+        <button class="btn active" id="btn-market-all" onclick="filterMarketplace('all')" style="border-radius: 20px;">All</button>
+        <button class="btn btn-outline" id="btn-market-rods" onclick="filterMarketplace('Rods')" style="border-radius: 20px;">Rods</button>
+        <button class="btn btn-outline" id="btn-market-reels" onclick="filterMarketplace('Reels')" style="border-radius: 20px;">Reels</button>
+        <button class="btn btn-outline" id="btn-market-lures" onclick="filterMarketplace('Lures & Tackle')" style="border-radius: 20px;">Lures & Tackle</button>
+        <button class="btn btn-outline" id="btn-market-other" onclick="filterMarketplace('Other')" style="border-radius: 20px;">Other</button>
+      </div>
+
+      <div class="marketplace-grid" id="marketplace-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+        <p style="text-align: center; color: var(--text-muted); width: 100%;">Loading marketplace...</p>
+      </div>
+    </div>
+  </main>
 
   <!-- Clubs Page -->
   <main class="page" id="page-clubs" style="display: none;">
@@ -2531,6 +2556,51 @@
       <div style="display: flex; gap: 10px;">
         <button class="btn btn-outline" onclick="document.getElementById('cookie-banner').style.display='none'">Decline</button>
         <button class="btn btn-primary" onclick="acceptCookies()">Accept All</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Listing Modal -->
+  <div class="modal" id="create-listing-modal" style="z-index: 10005 !important;">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header">
+        <h2>Create Marketplace Listing</h2>
+        <button class="modal-close-btn-inline" onclick="closeCreateListingModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <label style="display:block; margin-bottom: 5px; font-weight: bold; color: var(--text-muted);">Item Name</label>
+        <input type="text" id="listing-title" class="auth-input" placeholder="e.g. Penn Spinfisher VI 4500" style="margin-bottom:15px;">
+        
+        <label style="display:block; margin-bottom: 5px; font-weight: bold; color: var(--text-muted);">Price (€)</label>
+        <input type="number" id="listing-price" class="auth-input" placeholder="e.g. 120" style="margin-bottom:15px;">
+        
+        <label style="display:block; margin-bottom: 5px; font-weight: bold; color: var(--text-muted);">Category</label>
+        <select id="listing-category" class="auth-input" style="margin-bottom: 15px;">
+          <option value="Rods">Rods</option>
+          <option value="Reels">Reels</option>
+          <option value="Lures & Tackle">Lures & Tackle</option>
+          <option value="Clothing">Clothing</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <label style="display:block; margin-bottom: 5px; font-weight: bold; color: var(--text-muted);">Condition</label>
+        <select id="listing-condition" class="auth-input" style="margin-bottom: 15px;">
+          <option value="Brand New">Brand New</option>
+          <option value="Like New">Like New</option>
+          <option value="Used - Good">Used - Good</option>
+          <option value="Used - Fair">Used - Fair</option>
+        </select>
+        
+        <label style="display:block; margin-bottom: 5px; font-weight: bold; color: var(--text-muted);">Description & Location</label>
+        <textarea id="listing-desc" class="auth-input" placeholder="Describe the item, condition, and your general location for pickup/postage..." rows="4" style="margin-bottom:15px; resize:vertical;"></textarea>
+        
+        <label style="display:block; margin-bottom: 5px; font-weight: bold; color: var(--text-muted);">Photo (Required)</label>
+        <input type="file" id="listing-photo" accept="image/*" class="auth-input" style="margin-bottom:20px;">
+        
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+          <button class="btn btn-outline" onclick="closeCreateListingModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="submitListing()">Post Listing</button>
+        </div>
       </div>
     </div>
   </div>

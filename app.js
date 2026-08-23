@@ -9529,14 +9529,19 @@ window.postClubChat = async () => {
   const text = input.value.trim();
   if (!text) return;
 
-  const chatRef = firebaseDB.ref('clubs/' + currentClubId + '/chat').push();
-  await chatRef.set({
-    text,
-    authorName: state.user.name || 'Angler',
-    authorEmail: state.user.email,
-    timestamp: new Date().toISOString()
-  });
-  input.value = '';
+  try {
+    const chatRef = firebaseDB.ref('clubs/' + currentClubId + '/chat').push();
+    await chatRef.set({
+      text,
+      authorName: state.user.name || 'Angler',
+      authorEmail: state.user.email,
+      timestamp: new Date().toISOString()
+    });
+    input.value = '';
+  } catch (err) {
+    console.error("Firebase write failed:", err);
+    alert("Failed to post message. If this persists, there may be a Firebase permissions issue.");
+  }
 };
 
 let currentCatchPhotoData = null;
@@ -9549,14 +9554,21 @@ window.openClubCatchModal = () => {
   document.getElementById('club-catch-modal').classList.add('active');
 };
 
-document.getElementById('club-catch-photo').addEventListener('change', function(e) {
+document.getElementById('club-catch-photo').addEventListener('change', async function(e) {
   const file = e.target.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(event) {
-    currentCatchPhotoData = event.target.result;
-  };
-  reader.readAsDataURL(file);
+  
+  try {
+    currentCatchPhotoData = await compressImage(file, 800);
+  } catch (err) {
+    console.error("Compression failed:", err);
+    // Fallback to raw if compression fails
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      currentCatchPhotoData = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
 });
 
 window.submitClubCatch = async () => {
@@ -9566,17 +9578,22 @@ window.submitClubCatch = async () => {
   
   if (!species) return alert("Please enter the species!");
 
-  const catchRef = firebaseDB.ref('clubs/' + currentClubId + '/catches').push();
-  await catchRef.set({
-    species,
-    weight,
-    photo: currentCatchPhotoData,
-    authorName: state.user.name || 'Angler',
-    authorEmail: state.user.email,
-    timestamp: new Date().toISOString()
-  });
-  
-  document.getElementById('club-catch-modal').classList.remove('active');
+  try {
+    const catchRef = firebaseDB.ref('clubs/' + currentClubId + '/catches').push();
+    await catchRef.set({
+      species,
+      weight,
+      photo: currentCatchPhotoData,
+      authorName: state.user.name || 'Angler',
+      authorEmail: state.user.email,
+      timestamp: new Date().toISOString()
+    });
+    
+    document.getElementById('club-catch-modal').classList.remove('active');
+  } catch (err) {
+    console.error("Firebase write failed:", err);
+    alert("Failed to post catch. If this persists, the photo may be too large or there may be a permissions issue.");
+  }
 };
 
 window.openCreateClubEventModal = () => {
@@ -9592,14 +9609,187 @@ window.submitClubEvent = async () => {
   
   if (!title) return alert("Please enter an event title!");
 
-  const eventRef = firebaseDB.ref('clubs/' + currentClubId + '/events').push();
-  await eventRef.set({
-    title,
-    description: desc,
-    authorName: state.user.name || 'Angler',
-    authorEmail: state.user.email,
-    timestamp: new Date().toISOString()
+  try {
+    const eventRef = firebaseDB.ref('clubs/' + currentClubId + '/events').push();
+    await eventRef.set({
+      title,
+      description: desc,
+      authorName: state.user.name || 'Angler',
+      authorEmail: state.user.email,
+      timestamp: new Date().toISOString()
+    });
+    
+    document.getElementById('club-event-modal').classList.remove('active');
+    } catch (err) {
+    console.error("Firebase write failed:", err);
+    alert("Failed to create event. If this persists, there may be a permissions issue.");
+  }
+};
+
+// ==========================================
+// TACKLE MARKETPLACE
+// ==========================================
+
+let allMarketplaceListings = [];
+let currentMarketplaceFilter = 'all';
+let currentListingPhotoData = null;
+
+// Listen to marketplace node
+if (window.firebaseDB) {
+  firebaseDB.ref('marketplace').on('value', (snap) => {
+    const data = snap.val();
+    if (data) {
+      allMarketplaceListings = Object.values(data).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    } else {
+      allMarketplaceListings = [];
+    }
+    renderMarketplace();
   });
+}
+
+window.filterMarketplace = (category) => {
+  currentMarketplaceFilter = category;
+  const btns = ['btn-market-all', 'btn-market-rods', 'btn-market-reels', 'btn-market-lures', 'btn-market-other'];
+  btns.forEach(btn => {
+    const el = document.getElementById(btn);
+    if(el) {
+      el.classList.remove('active');
+      el.classList.add('btn-outline');
+    }
+  });
+
+  let activeBtnId = 'btn-market-all';
+  if(category === 'Rods') activeBtnId = 'btn-market-rods';
+  if(category === 'Reels') activeBtnId = 'btn-market-reels';
+  if(category === 'Lures & Tackle') activeBtnId = 'btn-market-lures';
+  if(category === 'Other') activeBtnId = 'btn-market-other';
   
-  document.getElementById('club-event-modal').classList.remove('active');
+  const activeEl = document.getElementById(activeBtnId);
+  if (activeEl) {
+    activeEl.classList.add('active');
+    activeEl.classList.remove('btn-outline');
+  }
+  
+  renderMarketplace();
+};
+
+window.renderMarketplace = () => {
+  const grid = document.getElementById('marketplace-grid');
+  if (!grid) return;
+
+  let filtered = allMarketplaceListings;
+  if (currentMarketplaceFilter !== 'all') {
+    filtered = filtered.filter(item => item.category === currentMarketplaceFilter);
+  }
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<p style="text-align: center; color: var(--text-muted); width: 100%;">No listings found in this category. Be the first to post!</p>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(item => {
+    const canDelete = state.user && (state.user.email === item.sellerEmail || state.user.isAdmin);
+    return `
+      <div class="club-card" style="display: flex; flex-direction: column; overflow: hidden; background: var(--bg-card); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 1px solid var(--border-glass);">
+        ${item.photo ? `<img src="${item.photo}" style="width: 100%; height: 200px; object-fit: cover;" alt="${sanitizeHTML(item.title)}">` : '<div style="width:100%; height:200px; background:var(--bg-main); display:flex; align-items:center; justify-content:center; color:var(--text-muted);">No Image</div>'}
+        <div style="padding: 15px; display: flex; flex-direction: column; flex: 1;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+            <h3 style="margin: 0; font-size: 1.2rem; color: #fff;">${sanitizeHTML(item.title)}</h3>
+            <span style="font-weight: bold; color: var(--accent-primary); font-size: 1.2rem;">€${item.price}</span>
+          </div>
+          <div style="display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;">
+            <span class="badge" style="background: rgba(0,212,255,0.2); color: #00d4ff; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem;">${sanitizeHTML(item.category)}</span>
+            <span class="badge" style="background: rgba(255,255,255,0.1); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem;">${sanitizeHTML(item.condition)}</span>
+          </div>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px; flex: 1;">${sanitizeHTML(item.description)}</p>
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-glass); padding-top: 15px; margin-top: auto;">
+            <div style="font-size: 0.8rem; color: var(--text-muted);">
+              <div>Sold by: ${sanitizeHTML(item.sellerName)}</div>
+              <div>${new Date(item.createdAt).toLocaleDateString()}</div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              ${canDelete ? `<button class="btn btn-outline" style="border-color: #ff4d4d; color: #ff4d4d; padding: 6px 12px;" onclick="deleteListing('${item.id}')">Delete</button>` : ''}
+              <a href="mailto:${item.sellerEmail}?subject=Irish Fishing Hub Marketplace: ${encodeURIComponent(item.title)}" class="btn btn-primary" style="padding: 6px 12px; text-decoration: none;">Contact</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+};
+
+window.openCreateListingModal = () => {
+  if (!state.user) return openAuthModal(); // Require login
+  document.getElementById('listing-title').value = '';
+  document.getElementById('listing-price').value = '';
+  document.getElementById('listing-desc').value = '';
+  document.getElementById('listing-photo').value = '';
+  currentListingPhotoData = null;
+  document.getElementById('create-listing-modal').classList.add('active');
+};
+
+window.closeCreateListingModal = () => {
+  document.getElementById('create-listing-modal').classList.remove('active');
+};
+
+const listingPhotoInput = document.getElementById('listing-photo');
+if (listingPhotoInput) {
+  listingPhotoInput.addEventListener('change', async function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      currentListingPhotoData = await compressImage(file, 800);
+    } catch (err) {
+      console.error("Compression failed:", err);
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        currentListingPhotoData = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+}
+
+window.submitListing = async () => {
+  if (!state.user) return;
+  const title = document.getElementById('listing-title').value.trim();
+  const price = document.getElementById('listing-price').value.trim();
+  const category = document.getElementById('listing-category').value;
+  const condition = document.getElementById('listing-condition').value;
+  const description = document.getElementById('listing-desc').value.trim();
+
+  if (!title || !price || !description || !currentListingPhotoData) {
+    return alert("Please fill out all fields and upload a photo.");
+  }
+
+  try {
+    const listingId = 'listing_' + Date.now();
+    await firebaseDB.ref('marketplace/' + listingId).set({
+      id: listingId,
+      title,
+      price: parseFloat(price),
+      category,
+      condition,
+      description,
+      photo: currentListingPhotoData,
+      sellerName: state.user.name || 'Angler',
+      sellerEmail: state.user.email,
+      createdAt: new Date().toISOString()
+    });
+    
+    closeCreateListingModal();
+  } catch (err) {
+    console.error("Failed to submit listing:", err);
+    alert("Failed to submit listing. Please try again.");
+  }
+};
+
+window.deleteListing = async (id) => {
+  if (!confirm("Are you sure you want to delete this listing?")) return;
+  try {
+    await firebaseDB.ref('marketplace/' + id).remove();
+  } catch (err) {
+    console.error("Failed to delete listing:", err);
+    alert("Failed to delete listing.");
+  }
 };
