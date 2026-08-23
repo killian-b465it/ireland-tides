@@ -2633,6 +2633,23 @@
     </div>
   </div>
 
+  <!-- Private Chat Modal -->
+  <div class="modal" id="private-chat-modal" style="z-index: 10006 !important;">
+    <div class="modal-content" style="max-width: 500px; height: 80vh; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <h2 id="private-chat-header">Chat</h2>
+        <button class="modal-close-btn-inline" onclick="closePrivateChatModal()">✕</button>
+      </div>
+      <div class="modal-body" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 15px; background: rgba(0,0,0,0.2);" id="private-chat-list">
+        <!-- Messages go here -->
+      </div>
+      <div style="padding: 15px; border-top: 1px solid var(--border-glass); display: flex; gap: 10px; background: var(--bg-card);">
+        <input type="text" id="private-chat-input" class="auth-input" placeholder="Type a message..." style="flex: 1; margin: 0;" onkeypress="if(event.key === 'Enter') submitPrivateChatMessage()">
+        <button class="btn btn-primary" onclick="submitPrivateChatMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.min.js"></script>

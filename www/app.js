@@ -9061,7 +9061,7 @@ window.denyClubNameChange = async (id) => {
 // ==========================================
 // NOTIFICATIONS SYSTEM
 // ==========================================
-window.sendNotification = async (target, title, message, senderId = null, isMessage = false) => {
+window.sendNotification = async (target, title, message, senderId = null) => {
   if (!firebaseDB || !target) return false;
   try {
     let uid = target;
@@ -9076,9 +9076,8 @@ window.sendNotification = async (target, title, message, senderId = null, isMess
     }
     
     if (uid) {
-      const dbNode = isMessage ? 'messages' : 'notifications';
-      const notifId = (isMessage ? 'msg_' : 'notif_') + Date.now();
-      await firebaseDB.ref(`users/${uid}/${dbNode}/${notifId}`).set({
+      const notifId = 'notif_' + Date.now();
+      await firebaseDB.ref(`users/${uid}/notifications/${notifId}`).set({
         title,
         message,
         timestamp: Date.now(),
@@ -9094,6 +9093,20 @@ window.sendNotification = async (target, title, message, senderId = null, isMess
   }
 };
 
+let unreadNotifs = 0;
+let unreadMsgs = 0;
+function updateUnreadBadge() {
+  const badgeEl = document.getElementById('notification-badge');
+  if (!badgeEl) return;
+  const total = unreadNotifs + unreadMsgs;
+  if (total > 0) {
+    badgeEl.textContent = total;
+    badgeEl.style.display = 'flex';
+  } else {
+    badgeEl.style.display = 'none';
+  }
+}
+
 window.listenForNotifications = (userId) => {
   if (!userId || !firebaseDB) return;
   firebaseDB.ref(`users/${userId}/notifications`).on('value', (snap) => {
@@ -9105,7 +9118,8 @@ window.listenForNotifications = (userId) => {
     
     if (data) {
       const notifs = Object.entries(data).map(([id, val]) => ({id, ...val})).sort((a,b) => b.timestamp - a.timestamp);
-      unreadCount = notifs.filter(n => !n.read).length;
+      unreadNotifs = notifs.filter(n => !n.read).length;
+      updateUnreadBadge();
       
       if (notifs.length > 0) {
         if(containerEl) containerEl.style.display = 'block';
@@ -9119,16 +9133,9 @@ window.listenForNotifications = (userId) => {
         if(containerEl) containerEl.style.display = 'none';
       }
     } else {
+      unreadNotifs = 0;
+      updateUnreadBadge();
       if(containerEl) containerEl.style.display = 'none';
-    }
-    
-    if (badgeEl) {
-      if (unreadCount > 0) {
-        badgeEl.textContent = unreadCount;
-        badgeEl.style.display = 'flex';
-      } else {
-        badgeEl.style.display = 'none';
-      }
     }
   });
 };
@@ -9142,25 +9149,25 @@ window.listenForMessages = (userId) => {
     
     if (data) {
       const msgs = Object.entries(data).map(([id, val]) => ({id, ...val})).sort((a,b) => b.timestamp - a.timestamp);
+      unreadMsgs = msgs.filter(m => !m.read).length;
+      updateUnreadBadge();
       
       if (msgs.length > 0) {
         if(containerEl) containerEl.style.display = 'block';
         if(listEl) listEl.innerHTML = msgs.map(n => `
-          <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; border-left: 3px solid ${n.read ? 'rgba(255,255,255,0.1)' : '#00d4ff'}; margin-bottom: 5px; position: relative;">
-            <button class="btn btn-xs" style="position: absolute; top: 10px; right: 10px; padding: 2px 6px; background: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; font-size: 0.7rem;" onclick="deleteMessage('${n.id}')">✕</button>
+          <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; border-left: 3px solid ${n.read ? 'rgba(255,255,255,0.1)' : '#00d4ff'}; margin-bottom: 5px; position: relative; cursor: pointer;" onclick="openPrivateChatModal('${n.id}', '${n.otherUserId}', '${encodeURIComponent(n.title)}')">
+            <button class="btn btn-xs" style="position: absolute; top: 10px; right: 10px; padding: 2px 6px; background: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; font-size: 0.7rem;" onclick="event.stopPropagation(); deleteMessage('${n.id}')">✕</button>
             <strong style="font-size: 0.95rem; display: block; margin-bottom: 3px; color: ${n.read ? 'var(--text-main)' : '#00d4ff'}; padding-right: 25px;">${sanitizeHTML(n.title)}</strong>
-            <span style="font-size: 0.85rem; color: var(--text-muted);">${sanitizeHTML(n.message).replace(/\n/g, '<br>')}</span>
-            ${n.senderId ? `
-            <div style="margin-top: 8px;">
-              <button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.8rem;" onclick="openContactSellerModal('${encodeURIComponent(n.title.startsWith('Reply:') ? n.title : 'Reply: ' + n.title)}', '${n.senderId}')">Reply</button>
-            </div>
-            ` : ''}
+            <span style="font-size: 0.85rem; color: var(--text-muted);">${sanitizeHTML(n.lastMessage || '').replace(/\n/g, '<br>')}</span>
+            <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 5px;">${new Date(n.timestamp).toLocaleDateString()}</div>
           </div>
         `).join('');
       } else {
         if(containerEl) containerEl.style.display = 'none';
       }
     } else {
+      unreadMsgs = 0;
+      updateUnreadBadge();
       if(containerEl) containerEl.style.display = 'none';
     }
   });
@@ -9904,7 +9911,7 @@ window.closeContactSellerModal = () => {
 };
 
 window.submitContactSeller = async () => {
-  if (!state.user) return;
+  if (!state.user || !firebaseDB) return;
   const title = document.getElementById('contact-seller-title').value;
   const sellerId = document.getElementById('contact-seller-id').value;
   const msg = document.getElementById('contact-seller-msg').value.trim();
@@ -9916,14 +9923,129 @@ window.submitContactSeller = async () => {
     return alert("This listing is missing a seller ID. It may be too old.");
   }
 
-  const notificationTitle = title;
-  const notificationBody = `Message from ${state.user.name || 'a user'}:\n\n${msg}`;
+  const chatId = [state.user.id, sellerId].sort().join('_');
+  const msgId = 'msg_' + Date.now();
+  const chatMsg = {
+    senderId: state.user.id,
+    text: msg,
+    timestamp: Date.now()
+  };
   
-  const success = await window.sendNotification(sellerId, notificationTitle, notificationBody, state.user.id, true);
-  if (success) {
-    alert("Message sent! The seller has received your notification.");
-    closeContactSellerModal();
-  } else {
-    alert("Could not send message. The seller's account was not found in the database. Try again later.");
+  // Save to shared thread
+  await firebaseDB.ref(`chats/${chatId}/messages/${msgId}`).set(chatMsg);
+  
+  // Update both inboxes
+  const inboxData = {
+    id: chatId,
+    title,
+    lastMessage: msg,
+    timestamp: Date.now(),
+  };
+  
+  await firebaseDB.ref(`users/${state.user.id}/messages/${chatId}`).set({
+    ...inboxData,
+    read: true,
+    otherUserId: sellerId 
+  });
+  
+  await firebaseDB.ref(`users/${sellerId}/messages/${chatId}`).set({
+    ...inboxData,
+    read: false,
+    otherUserId: state.user.id 
+  });
+  
+  alert("Message sent! You can continue the conversation in your Profile Inbox.");
+  closeContactSellerModal();
+};
+
+let currentPrivateChatListenerRef = null;
+let currentPrivateChatId = null;
+let currentPrivateChatOtherId = null;
+let currentPrivateChatTitle = '';
+
+window.openPrivateChatModal = (chatId, otherUserId, chatTitle) => {
+  if (!state.user || !firebaseDB) return;
+  currentPrivateChatId = chatId;
+  currentPrivateChatOtherId = otherUserId;
+  currentPrivateChatTitle = decodeURIComponent(chatTitle);
+  document.getElementById('private-chat-header').innerText = currentPrivateChatTitle;
+  document.getElementById('private-chat-input').value = '';
+  document.getElementById('private-chat-modal').classList.add('active');
+
+  // Mark as read in inbox
+  firebaseDB.ref(`users/${state.user.id}/messages/${chatId}`).update({ read: true });
+
+  const listEl = document.getElementById('private-chat-list');
+  listEl.innerHTML = '<div style="text-align:center; color:var(--text-muted); width: 100%;">Loading history...</div>';
+
+  if (currentPrivateChatListenerRef) {
+    currentPrivateChatListenerRef.off();
   }
+  
+  currentPrivateChatListenerRef = firebaseDB.ref(`chats/${chatId}/messages`);
+  currentPrivateChatListenerRef.on('value', snap => {
+    const data = snap.val();
+    if (data) {
+      const msgs = Object.values(data).sort((a,b) => a.timestamp - b.timestamp);
+      listEl.innerHTML = msgs.map(m => {
+        const isMe = m.senderId === state.user.id;
+        return `
+          <div style="display: flex; flex-direction: column; align-items: ${isMe ? 'flex-end' : 'flex-start'}; margin-bottom: 10px;">
+            <div style="background: ${isMe ? 'var(--accent-primary)' : 'rgba(255,255,255,0.1)'}; color: ${isMe ? '#000' : 'var(--text-main)'}; padding: 8px 14px; border-radius: 12px; max-width: 80%; word-break: break-word;">
+              ${sanitizeHTML(m.text).replace(/\n/g, '<br>')}
+            </div>
+            <span style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">${new Date(m.timestamp).toLocaleTimeString()}</span>
+          </div>
+        `;
+      }).join('');
+      setTimeout(() => listEl.scrollTop = listEl.scrollHeight, 50);
+    } else {
+      listEl.innerHTML = '<div style="text-align:center; color:var(--text-muted); width: 100%;">No messages yet.</div>';
+    }
+  });
+};
+
+window.closePrivateChatModal = () => {
+  document.getElementById('private-chat-modal').classList.remove('active');
+  if (currentPrivateChatListenerRef) {
+    currentPrivateChatListenerRef.off();
+    currentPrivateChatListenerRef = null;
+  }
+};
+
+window.submitPrivateChatMessage = async () => {
+  if (!state.user || !firebaseDB || !currentPrivateChatId || !currentPrivateChatOtherId) return;
+  const inputEl = document.getElementById('private-chat-input');
+  const text = inputEl.value.trim();
+  if (!text) return;
+  
+  inputEl.value = '';
+  
+  const msgId = 'msg_' + Date.now();
+  const msg = {
+    senderId: state.user.id,
+    text,
+    timestamp: Date.now()
+  };
+  
+  await firebaseDB.ref(`chats/${currentPrivateChatId}/messages/${msgId}`).set(msg);
+  
+  const inboxData = {
+    id: currentPrivateChatId,
+    title: currentPrivateChatTitle,
+    lastMessage: text,
+    timestamp: Date.now()
+  };
+  
+  await firebaseDB.ref(`users/${state.user.id}/messages/${currentPrivateChatId}`).set({
+    ...inboxData,
+    read: true,
+    otherUserId: currentPrivateChatOtherId 
+  });
+  
+  await firebaseDB.ref(`users/${currentPrivateChatOtherId}/messages/${currentPrivateChatId}`).set({
+    ...inboxData,
+    read: false,
+    otherUserId: state.user.id 
+  });
 };
