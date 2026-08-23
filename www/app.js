@@ -9061,18 +9061,33 @@ window.denyClubNameChange = async (id) => {
 // ==========================================
 // NOTIFICATIONS SYSTEM
 // ==========================================
-window.sendNotification = async (title, message, targetUserId, senderId = null) => {
-  if (!firebaseDB || !targetUserId) return false;
+window.sendNotification = async (target, title, message, senderId = null, isMessage = false) => {
+  if (!firebaseDB || !target) return false;
   try {
-    const notifId = 'notif_' + Date.now();
-    await firebaseDB.ref(`users/${targetUserId}/notifications/${notifId}`).set({
-      title,
-      message,
-      timestamp: Date.now(),
-      read: false,
-      senderId: senderId || null
-    });
-    return true;
+    let uid = target;
+    // Legacy support: if target contains @, look up the email
+    if (target.includes && target.includes('@')) {
+      const snap = await firebaseDB.ref('users').orderByChild('email').equalTo(target).once('value');
+      if (snap.exists()) {
+        uid = Object.keys(snap.val())[0];
+      } else {
+        return false;
+      }
+    }
+    
+    if (uid) {
+      const dbNode = isMessage ? 'messages' : 'notifications';
+      const notifId = (isMessage ? 'msg_' : 'notif_') + Date.now();
+      await firebaseDB.ref(`users/${uid}/${dbNode}/${notifId}`).set({
+        title,
+        message,
+        timestamp: Date.now(),
+        read: false,
+        senderId: senderId || null
+      });
+      return true;
+    }
+    return false;
   } catch(e) { 
     console.error("Error sending notification:", e); 
     return false;
@@ -9098,11 +9113,6 @@ window.listenForNotifications = (userId) => {
           <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; border-left: 3px solid ${n.read ? 'rgba(255,255,255,0.1)' : '#ffab00'}; margin-bottom: 5px;">
             <strong style="font-size: 0.95rem; display: block; margin-bottom: 3px; color: ${n.read ? 'var(--text-main)' : '#ffab00'};">${sanitizeHTML(n.title)}</strong>
             <span style="font-size: 0.85rem; color: var(--text-muted);">${sanitizeHTML(n.message).replace(/\n/g, '<br>')}</span>
-            ${n.senderId ? `
-            <div style="margin-top: 8px;">
-              <button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.8rem;" onclick="openContactSellerModal('${encodeURIComponent(n.title.startsWith('Reply:') ? n.title : 'Reply: ' + n.title)}', '${n.senderId}')">Reply</button>
-            </div>
-            ` : ''}
           </div>
         `).join('');
       } else {
@@ -9121,6 +9131,46 @@ window.listenForNotifications = (userId) => {
       }
     }
   });
+};
+
+window.listenForMessages = (userId) => {
+  if (!userId || !firebaseDB) return;
+  firebaseDB.ref(`users/${userId}/messages`).on('value', (snap) => {
+    const data = snap.val();
+    const listEl = document.getElementById('messages-list');
+    const containerEl = document.getElementById('profile-messages');
+    
+    if (data) {
+      const msgs = Object.entries(data).map(([id, val]) => ({id, ...val})).sort((a,b) => b.timestamp - a.timestamp);
+      
+      if (msgs.length > 0) {
+        if(containerEl) containerEl.style.display = 'block';
+        if(listEl) listEl.innerHTML = msgs.map(n => `
+          <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; border-left: 3px solid ${n.read ? 'rgba(255,255,255,0.1)' : '#00d4ff'}; margin-bottom: 5px; position: relative;">
+            <button class="btn btn-xs" style="position: absolute; top: 10px; right: 10px; padding: 2px 6px; background: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; font-size: 0.7rem;" onclick="deleteMessage('${n.id}')">✕</button>
+            <strong style="font-size: 0.95rem; display: block; margin-bottom: 3px; color: ${n.read ? 'var(--text-main)' : '#00d4ff'}; padding-right: 25px;">${sanitizeHTML(n.title)}</strong>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">${sanitizeHTML(n.message).replace(/\n/g, '<br>')}</span>
+            ${n.senderId ? `
+            <div style="margin-top: 8px;">
+              <button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.8rem;" onclick="openContactSellerModal('${encodeURIComponent(n.title.startsWith('Reply:') ? n.title : 'Reply: ' + n.title)}', '${n.senderId}')">Reply</button>
+            </div>
+            ` : ''}
+          </div>
+        `).join('');
+      } else {
+        if(containerEl) containerEl.style.display = 'none';
+      }
+    } else {
+      if(containerEl) containerEl.style.display = 'none';
+    }
+  });
+};
+
+window.deleteMessage = async (msgId) => {
+  if (!state.user || !firebaseDB) return;
+  try {
+    await firebaseDB.ref(`users/${state.user.id}/messages/${msgId}`).remove();
+  } catch(e) {}
 };
 
 window.clearNotifications = async () => {
@@ -9158,6 +9208,7 @@ setInterval(() => {
   if (state.user && state.user.id && !_notifListenerAttached) {
     _notifListenerAttached = true;
     listenForNotifications(state.user.id);
+    listenForMessages(state.user.id);
   } else if (!state.user && _notifListenerAttached) {
     _notifListenerAttached = false;
   }
@@ -9868,7 +9919,7 @@ window.submitContactSeller = async () => {
   const notificationTitle = title;
   const notificationBody = `Message from ${state.user.name || 'a user'}:\n\n${msg}`;
   
-  const success = await window.sendNotification(notificationTitle, notificationBody, sellerId, state.user.id);
+  const success = await window.sendNotification(sellerId, notificationTitle, notificationBody, state.user.id, true);
   if (success) {
     alert("Message sent! The seller has received your notification.");
     closeContactSellerModal();
