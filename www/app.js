@@ -9062,7 +9062,7 @@ window.denyClubNameChange = async (id) => {
 // NOTIFICATIONS SYSTEM
 // ==========================================
 window.sendNotification = async (email, title, message) => {
-  if (!firebaseDB) return;
+  if (!firebaseDB) return false;
   try {
     const snap = await firebaseDB.ref('users').orderByChild('email').equalTo(email).once('value');
     if (snap.exists()) {
@@ -9074,8 +9074,15 @@ window.sendNotification = async (email, title, message) => {
         timestamp: Date.now(),
         read: false
       });
+      return true;
+    } else {
+      console.warn("sendNotification: No user found with email " + email);
+      return false;
     }
-  } catch(e) { console.error("Error sending notification:", e); }
+  } catch(e) { 
+    console.error("Error sending notification:", e); 
+    return false;
+  }
 };
 
 window.listenForNotifications = (userId) => {
@@ -9859,7 +9866,11 @@ window.submitContactSeller = async () => {
   const notificationTitle = "Marketplace: " + title;
   const notificationBody = `Message from ${state.user.name || state.user.email}:\n\n${msg}`;
   
-  await window.sendNotification(email, notificationTitle, notificationBody);
-  alert("Message sent! The seller has received your notification.");
-  closeContactSellerModal();
+  const success = await window.sendNotification(email, notificationTitle, notificationBody);
+  if (success) {
+    alert("Message sent! The seller has received your notification.");
+    closeContactSellerModal();
+  } else {
+    alert("Could not send message. The seller's account was not found in the database. Try again later.");
+  }
 };
