@@ -9061,7 +9061,7 @@ window.denyClubNameChange = async (id) => {
 // ==========================================
 // NOTIFICATIONS SYSTEM
 // ==========================================
-window.sendNotification = async (email, title, message, targetUserId = null) => {
+window.sendNotification = async (email, title, message, targetUserId = null, senderId = null, senderEmail = null) => {
   if (!firebaseDB) return false;
   try {
     let uid = targetUserId;
@@ -9078,7 +9078,9 @@ window.sendNotification = async (email, title, message, targetUserId = null) => 
         title,
         message,
         timestamp: Date.now(),
-        read: false
+        read: false,
+        senderId: senderId || null,
+        senderEmail: senderEmail || null
       });
       return true;
     } else {
@@ -9109,7 +9111,12 @@ window.listenForNotifications = (userId) => {
         if(listEl) listEl.innerHTML = notifs.map(n => `
           <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; border-left: 3px solid ${n.read ? 'rgba(255,255,255,0.1)' : '#ffab00'}; margin-bottom: 5px;">
             <strong style="font-size: 0.95rem; display: block; margin-bottom: 3px; color: ${n.read ? 'var(--text-main)' : '#ffab00'};">${sanitizeHTML(n.title)}</strong>
-            <span style="font-size: 0.85rem; color: var(--text-muted);">${sanitizeHTML(n.message)}</span>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">${sanitizeHTML(n.message).replace(/\n/g, '<br>')}</span>
+            ${n.senderId ? `
+            <div style="margin-top: 8px;">
+              <button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.8rem;" onclick="openContactSellerModal('${encodeURIComponent(n.senderEmail || '')}', '${encodeURIComponent(n.title.startsWith('Reply:') ? n.title : 'Reply: ' + n.title)}', '${n.senderId}')">Reply</button>
+            </div>
+            ` : ''}
           </div>
         `).join('');
       } else {
@@ -9748,7 +9755,7 @@ window.renderMarketplace = () => {
                 </select>
                 <button class="btn btn-outline" style="border-color: #ff4d4d; color: #ff4d4d; padding: 6px 12px;" onclick="deleteListing('${item.id}')">Delete</button>
               ` : ''}
-              <button class="btn btn-primary" style="padding: 6px 12px;" onclick="openContactSellerModal('${encodeURIComponent(item.sellerEmail)}', '${encodeURIComponent(item.title)}', '${item.sellerId || ''}')">Contact</button>
+              <button class="btn btn-primary" style="padding: 6px 12px;" onclick="openContactSellerModal('${encodeURIComponent(item.sellerEmail)}', 'Marketplace: ${encodeURIComponent(item.title)}', '${item.sellerId || ''}')">Contact</button>
             </div>
           </div>
         </div>
@@ -9847,10 +9854,11 @@ window.updateListingStatus = async (id, status) => {
 
 window.openContactSellerModal = (emailSafe, titleSafe, sellerId) => {
   if (!state.user) return openAuthModal();
-  if (state.user.email === decodeURIComponent(emailSafe)) {
+  const decodedEmail = decodeURIComponent(emailSafe);
+  if (state.user.email === decodedEmail && !titleSafe.includes('Reply')) {
     return alert("This is your own listing!");
   }
-  document.getElementById('contact-seller-email').value = decodeURIComponent(emailSafe);
+  document.getElementById('contact-seller-email').value = decodedEmail;
   document.getElementById('contact-seller-title').value = decodeURIComponent(titleSafe);
   document.getElementById('contact-seller-id').value = (sellerId && sellerId !== 'undefined') ? sellerId : '';
   document.getElementById('contact-seller-msg').value = '';
@@ -9872,10 +9880,10 @@ window.submitContactSeller = async () => {
     return alert("Please enter a message!");
   }
 
-  const notificationTitle = "Marketplace: " + title;
+  const notificationTitle = title;
   const notificationBody = `Message from ${state.user.name || state.user.email}:\n\n${msg}`;
   
-  const success = await window.sendNotification(email, notificationTitle, notificationBody, sellerId);
+  const success = await window.sendNotification(email, notificationTitle, notificationBody, sellerId, state.user.id, state.user.email);
   if (success) {
     alert("Message sent! The seller has received your notification.");
     closeContactSellerModal();
