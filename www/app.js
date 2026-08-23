@@ -9061,12 +9061,18 @@ window.denyClubNameChange = async (id) => {
 // ==========================================
 // NOTIFICATIONS SYSTEM
 // ==========================================
-window.sendNotification = async (email, title, message) => {
+window.sendNotification = async (email, title, message, targetUserId = null) => {
   if (!firebaseDB) return false;
   try {
-    const snap = await firebaseDB.ref('users').orderByChild('email').equalTo(email).once('value');
-    if (snap.exists()) {
-      const uid = Object.keys(snap.val())[0];
+    let uid = targetUserId;
+    if (!uid) {
+      const snap = await firebaseDB.ref('users').orderByChild('email').equalTo(email).once('value');
+      if (snap.exists()) {
+        uid = Object.keys(snap.val())[0];
+      }
+    }
+    
+    if (uid) {
       const notifId = 'notif_' + Date.now();
       await firebaseDB.ref(`users/${uid}/notifications/${notifId}`).set({
         title,
@@ -9742,7 +9748,7 @@ window.renderMarketplace = () => {
                 </select>
                 <button class="btn btn-outline" style="border-color: #ff4d4d; color: #ff4d4d; padding: 6px 12px;" onclick="deleteListing('${item.id}')">Delete</button>
               ` : ''}
-              <button class="btn btn-primary" style="padding: 6px 12px;" onclick="openContactSellerModal('${encodeURIComponent(item.sellerEmail)}', '${encodeURIComponent(item.title)}')">Contact</button>
+              <button class="btn btn-primary" style="padding: 6px 12px;" onclick="openContactSellerModal('${encodeURIComponent(item.sellerEmail)}', '${encodeURIComponent(item.title)}', '${item.sellerId || ''}')">Contact</button>
             </div>
           </div>
         </div>
@@ -9808,6 +9814,7 @@ window.submitListing = async () => {
       photo: currentListingPhotoData,
       sellerName: state.user.name || 'Angler',
       sellerEmail: state.user.email || 'unknown@example.com',
+      sellerId: state.user.id,
       createdAt: new Date().toISOString()
     });
     
@@ -9838,13 +9845,14 @@ window.updateListingStatus = async (id, status) => {
   }
 };
 
-window.openContactSellerModal = (emailSafe, titleSafe) => {
+window.openContactSellerModal = (emailSafe, titleSafe, sellerId) => {
   if (!state.user) return openAuthModal();
   if (state.user.email === decodeURIComponent(emailSafe)) {
     return alert("This is your own listing!");
   }
   document.getElementById('contact-seller-email').value = decodeURIComponent(emailSafe);
   document.getElementById('contact-seller-title').value = decodeURIComponent(titleSafe);
+  document.getElementById('contact-seller-id').value = (sellerId && sellerId !== 'undefined') ? sellerId : '';
   document.getElementById('contact-seller-msg').value = '';
   document.getElementById('contact-seller-modal').classList.add('active');
 };
@@ -9857,6 +9865,7 @@ window.submitContactSeller = async () => {
   if (!state.user) return;
   const email = document.getElementById('contact-seller-email').value;
   const title = document.getElementById('contact-seller-title').value;
+  const sellerId = document.getElementById('contact-seller-id').value;
   const msg = document.getElementById('contact-seller-msg').value.trim();
 
   if (!msg) {
@@ -9866,7 +9875,7 @@ window.submitContactSeller = async () => {
   const notificationTitle = "Marketplace: " + title;
   const notificationBody = `Message from ${state.user.name || state.user.email}:\n\n${msg}`;
   
-  const success = await window.sendNotification(email, notificationTitle, notificationBody);
+  const success = await window.sendNotification(email, notificationTitle, notificationBody, sellerId);
   if (success) {
     alert("Message sent! The seller has received your notification.");
     closeContactSellerModal();
