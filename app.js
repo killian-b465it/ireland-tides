@@ -9767,20 +9767,20 @@ window.submitListing = async () => {
     await firebaseDB.ref('marketplace/' + listingId).set({
       id: listingId,
       title,
-      price: parseFloat(price),
+      price: parseFloat(price) || 0,
       category,
       condition,
       description,
       photo: currentListingPhotoData,
       sellerName: state.user.name || 'Angler',
-      sellerEmail: state.user.email,
+      sellerEmail: state.user.email || 'unknown@example.com',
       createdAt: new Date().toISOString()
     });
     
     closeCreateListingModal();
   } catch (err) {
     console.error("Failed to submit listing:", err);
-    alert("Failed to submit listing. Please try again.");
+    alert("Failed to submit listing. Error: " + err.message);
   }
 };
 
