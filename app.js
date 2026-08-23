@@ -9931,31 +9931,36 @@ window.submitContactSeller = async () => {
     timestamp: Date.now()
   };
   
-  // Save to shared thread
-  await firebaseDB.ref(`chats/${chatId}/messages/${msgId}`).set(chatMsg);
-  
-  // Update both inboxes
-  const inboxData = {
-    id: chatId,
-    title,
-    lastMessage: msg,
-    timestamp: Date.now(),
-  };
-  
-  await firebaseDB.ref(`users/${state.user.id}/messages/${chatId}`).set({
-    ...inboxData,
-    read: true,
-    otherUserId: sellerId 
-  });
-  
-  await firebaseDB.ref(`users/${sellerId}/messages/${chatId}`).set({
-    ...inboxData,
-    read: false,
-    otherUserId: state.user.id 
-  });
-  
-  alert("Message sent! You can continue the conversation in your Profile Inbox.");
-  closeContactSellerModal();
+  try {
+    // Save to shared thread
+    await firebaseDB.ref(`chats/${chatId}/messages/${msgId}`).set(chatMsg);
+    
+    // Update both inboxes
+    const inboxData = {
+      id: chatId,
+      title,
+      lastMessage: msg,
+      timestamp: Date.now(),
+    };
+    
+    await firebaseDB.ref(`users/${state.user.id}/messages/${chatId}`).set({
+      ...inboxData,
+      read: true,
+      otherUserId: sellerId 
+    });
+    
+    await firebaseDB.ref(`users/${sellerId}/messages/${chatId}`).set({
+      ...inboxData,
+      read: false,
+      otherUserId: state.user.id 
+    });
+    
+    alert("Message sent! You can continue the conversation in your Profile Inbox.");
+    closeContactSellerModal();
+  } catch (err) {
+    console.error("Error sending message:", err);
+    alert("Failed to send message: " + err.message);
+  }
 };
 
 let currentPrivateChatListenerRef = null;
@@ -10028,24 +10033,29 @@ window.submitPrivateChatMessage = async () => {
     timestamp: Date.now()
   };
   
-  await firebaseDB.ref(`chats/${currentPrivateChatId}/messages/${msgId}`).set(msg);
-  
-  const inboxData = {
-    id: currentPrivateChatId,
-    title: currentPrivateChatTitle,
-    lastMessage: text,
-    timestamp: Date.now()
-  };
-  
-  await firebaseDB.ref(`users/${state.user.id}/messages/${currentPrivateChatId}`).set({
-    ...inboxData,
-    read: true,
-    otherUserId: currentPrivateChatOtherId 
-  });
-  
-  await firebaseDB.ref(`users/${currentPrivateChatOtherId}/messages/${currentPrivateChatId}`).set({
-    ...inboxData,
-    read: false,
-    otherUserId: state.user.id 
-  });
+  try {
+    await firebaseDB.ref(`chats/${currentPrivateChatId}/messages/${msgId}`).set(msg);
+    
+    const inboxData = {
+      id: currentPrivateChatId,
+      title: currentPrivateChatTitle,
+      lastMessage: text,
+      timestamp: Date.now()
+    };
+    
+    await firebaseDB.ref(`users/${state.user.id}/messages/${currentPrivateChatId}`).set({
+      ...inboxData,
+      read: true,
+      otherUserId: currentPrivateChatOtherId 
+    });
+    
+    await firebaseDB.ref(`users/${currentPrivateChatOtherId}/messages/${currentPrivateChatId}`).set({
+      ...inboxData,
+      read: false,
+      otherUserId: state.user.id 
+    });
+  } catch (err) {
+    console.error("Error replying to chat:", err);
+    alert("Failed to send message: " + err.message);
+  }
 };
