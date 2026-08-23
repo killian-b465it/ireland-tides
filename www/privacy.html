@@ -74,7 +74,7 @@
     style="max-width: 800px; margin: 0 auto; padding: 0 20px; min-height: calc(100vh - 100px); padding-bottom: 50px;">
     <div class="content-card">
       <h1>Privacy Policy</h1>
-      <p><strong>Last Updated: July 24, 2026 (Version 2.2 - Up to Date)</strong></p>
+      <p><strong>Last Updated: August 23, 2026 (Version 3.0)</strong></p>
 
       <p>At Irish Fishing Hub, we are committed to protecting your privacy and ensuring the security of your personal
         data. This Privacy Policy outlines how we collect, use, and safeguard your information when you access our
@@ -95,23 +95,28 @@
         synchronization.</p>
       <p><strong>Storage Vendor:</strong> Google Firebase Authentication. Data is encrypted at rest and in transit.</p>
 
-      <h4>2.2 User-Generated Content & Community Sharing</h4>
+      <h4>2.2 User-Generated Content, Clubs, & Marketplace</h4>
       <p><strong>Data Points:</strong> Catch photos, text logs, declared species, bait details, timestamps, reported
-        weights, and user interactions (likes, reports).</p>
-      <p><strong>Purpose & Justification:</strong> This data forms the core of the Community Feed. By uploading it,
+        weights, user interactions (likes, reports), club details, and marketplace listing data (titles, prices, photos).</p>
+      <p><strong>Purpose & Justification:</strong> This data forms the core of the Community Feed, Clubs, and Marketplace. By uploading it,
         you explicitly consent to its public display across the application.</p>
       <p><strong>Exposed Metadata:</strong> When you upload photos to the community feed, Exif data (camera details,
         embedded GPS) is computationally stripped on the client-side before upload to Firebase Storage to protect your
         exact "secret" fishing spots unless you manually declare the location.</p>
 
-      <h4>2.3 Financial & Payment Ledger Data</h4>
+      <h4>2.3 Private Messaging & Notifications</h4>
+      <p><strong>Data Points:</strong> Direct message contents sent via the Marketplace, system notifications, sender IDs, and read statuses.</p>
+      <p><strong>Purpose & Justification:</strong> To facilitate peer-to-peer communication for marketplace listings and provide important account alerts.</p>
+      <p><strong>Security Isolation:</strong> Messages are routed exclusively using anonymous cryptographic User IDs. Email addresses are strictly hidden from direct messaging interfaces to ensure user privacy and GDPR compliance. While messages are considered private between participants, they are stored unencrypted in our database and may be reviewed by administrators solely if reported for severe Terms of Service violations.</p>
+
+      <h4>2.4 Financial & Payment Ledger Data</h4>
       <p><strong>Data Points:</strong> Billing email, active subscription status, payment history identifiers.</p>
       <p><strong>Purpose & Justification:</strong> To manage Pro subscriptions.</p>
       <p><strong>Security Isolation:</strong> We do NOT collect, store, or transmit your credit card numbers, CVV, or
         bank details. All financial transactions are handed off entirely to Stripe Inc. via highly secure iframe
         segregation. Their privacy standards apply to the financial data.</p>
 
-      <h4>2.4 Telemetry, Analytics & Advertising Profiles</h4>
+      <h4>2.5 Telemetry, Analytics & Advertising Profiles</h4>
       <p><strong>Data Points:</strong> IP addresses, browser user-agent strings, device viewport sizing, operating
         system versions, and page navigation flows.</p>
       <p><strong>Purpose & Justification:</strong> This telemetry is utilized inherently by secure web servers to
