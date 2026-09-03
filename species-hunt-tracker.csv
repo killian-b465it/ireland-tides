@@ -1,0 +1,13 @@
+Angler Name,Social Handle,Species Codes,Total Points (Count the letters),Notes
+John Doe,@johndoe_fish,"M, B, P",3,M=Mackerel, B=Bass, P=Pike
+Sarah Smith,sarah_s,"M, W",2,W=Wrasse
+Mike Jones,@mikej_fishing,"P",1,
+,,,0,
+,,,0,
+
+--- SPECIES CHEAT SHEET ---,,,,
+M = Mackerel,,,,
+B = Bass,,,,
+P = Pike,,,,
+W = Wrasse,,,,
+T = Tope,,,,
