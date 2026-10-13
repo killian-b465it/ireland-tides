@@ -7215,23 +7215,54 @@ input:checked+.toggle-slider:before {
 .team-social-link {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px 20px;
-    background: var(--glass);
+    gap: 12px;
+    padding: 10px 18px;
+    background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--border-glass);
-    border-radius: 10px;
+    border-radius: 12px;
     text-decoration: none;
     color: var(--text-main);
-    font-size: 0.9rem;
-    min-width: 200px;
-    justify-content: flex-start;
+    font-size: 0.92rem;
+    font-weight: 500;
+    min-width: 220px;
     transition: var(--transition-normal);
+}
+
+.team-social-icon-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+}
+
+.team-social-label {
+    flex: 1;
+    text-align: left;
+}
+
+.team-social-arrow {
+    font-size: 0.85rem;
+    opacity: 0.5;
+    transition: transform 0.2s, opacity 0.2s;
 }
 
 .team-social-link:hover {
     border-color: var(--accent-primary);
-    color: var(--accent-primary);
+    background: rgba(0, 212, 255, 0.08);
+    transform: translateY(-2px);
 }
+
+.team-social-link:hover .team-social-arrow {
+    opacity: 1;
+    transform: translate(2px, -2px);
+}
+
+.team-social-instagram:hover { border-color: #FF0069; }
+.team-social-facebook:hover { border-color: #1877F2; }
+.team-social-youtube:hover { border-color: #FF0000; }
+.team-social-tiktok:hover { border-color: #00f2fe; }
+.team-social-twitter:hover { border-color: #ffffff; }
 
 @media (max-width: 768px) {
     .team-grid {

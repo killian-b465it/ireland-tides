@@ -24,9 +24,7 @@ window.loadTeamMembers = async () => {
         const data = snapshot.val() || {};
         window.state.teamMembers = Object.keys(data).map(id => ({ id, ...data[id] }));
         renderTeamGrids();
-        if (window.currentUser && window.currentUser.isAdmin) {
-            loadAdminTeamMembers();
-        }
+        loadAdminTeamMembers();
     } catch (err) {
         console.error('Error loading team members:', err);
     }
@@ -59,28 +57,37 @@ function renderTeamGrid(category, emoji, emptyMsg) {
             <div class="team-member-card-body">
                 <h3 class="team-member-name">${m.name}</h3>
                 <p class="team-member-role">${m.role || ''}</p>
-                ${m.passion ? `<div class="team-member-passion"><span class="passion-tag">❤️ ${m.passion}</span></div>` : ''}
-                <div class="team-member-social-row">
-                    ${buildSocialIcons(m)}
-                </div>
             </div>
         </div>
     `).join('');
 }
 
-function buildSocialIcons(m) {
-    const socials = [
-        { key: 'instagram', icon: '📸', label: 'Instagram' },
-        { key: 'facebook', icon: '📘', label: 'Facebook' },
-        { key: 'youtube', icon: '▶️', label: 'YouTube' },
-        { key: 'tiktok', icon: '🎵', label: 'TikTok' },
-        { key: 'twitter', icon: '🐦', label: 'X/Twitter' },
-    ];
-    return socials
-        .filter(s => m[s.key])
-        .map(s => `<a href="${m[s.key]}" target="_blank" rel="noopener noreferrer" class="team-social-icon" title="${s.label}" onclick="event.stopPropagation()">${s.icon}</a>`)
-        .join('');
-}
+// Official SVG vector logos for social networks
+const SOCIAL_ICONS = {
+    instagram: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+        <rect x="2" y="2" width="20" height="20" rx="6" fill="url(#ig-grad)"/>
+        <path d="M12 7C9.24 7 7 9.24 7 12C7 14.76 9.24 17 12 17C14.76 17 17 14.76 17 12C17 9.24 14.76 7 12 7ZM12 15.2C10.23 15.2 8.8 13.77 8.8 12C8.8 10.23 10.23 8.8 12 8.8C13.77 8.8 15.2 10.23 15.2 12C15.2 13.77 13.77 15.2 12 15.2ZM17.2 7.8C17.2 8.35 16.75 8.8 16.2 8.8C15.65 8.8 15.2 8.35 15.2 7.8C15.2 7.25 15.65 6.8 16.2 6.8C16.75 6.8 17.2 7.25 17.2 7.8Z" fill="white"/>
+        <defs>
+          <linearGradient id="ig-grad" x1="2" y1="22" x2="22" y2="2" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#FFD600"/>
+            <stop offset="0.5" stop-color="#FF0069"/>
+            <stop offset="1" stop-color="#7638FA"/>
+          </linearGradient>
+        </defs>
+    </svg>`,
+    facebook: `<svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+    </svg>`,
+    youtube: `<svg width="20" height="20" viewBox="0 0 24 24" fill="#FF0000" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+    </svg>`,
+    tiktok: `<svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+        <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.25 1.2 2.23 2.44 2.5 1.05.24 2.21-.03 2.99-.78.7-.63 1.11-1.57 1.12-2.52.01-4.74-.01-9.48.01-14.22z"/>
+    </svg>`,
+    twitter: `<svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+    </svg>`
+};
 
 // ---- Open public team member modal ----
 window.openTeamMemberModal = (id) => {
@@ -128,17 +135,19 @@ window.openTeamMemberModal = (id) => {
 
     const socials = document.getElementById('team-member-modal-socials');
     const links = [
-        { key: 'instagram', icon: '📸', label: 'Instagram' },
-        { key: 'facebook', icon: '📘', label: 'Facebook' },
-        { key: 'youtube', icon: '▶️', label: 'YouTube' },
-        { key: 'tiktok', icon: '🎵', label: 'TikTok' },
-        { key: 'twitter', icon: '🐦', label: 'X/Twitter' },
+        { key: 'instagram', label: 'Instagram' },
+        { key: 'facebook', label: 'Facebook' },
+        { key: 'youtube', label: 'YouTube' },
+        { key: 'tiktok', label: 'TikTok' },
+        { key: 'twitter', label: 'X (Twitter)' },
     ].filter(s => m[s.key]);
 
     if (links.length) {
         socials.innerHTML = links.map(s => `
-            <a href="${m[s.key]}" target="_blank" rel="noopener noreferrer" class="team-social-link">
-                <span>${s.icon}</span><span>${s.label}</span>
+            <a href="${m[s.key]}" target="_blank" rel="noopener noreferrer" class="team-social-link team-social-${s.key}">
+                <span class="team-social-icon-box">${SOCIAL_ICONS[s.key] || '🔗'}</span>
+                <span class="team-social-label">${s.label}</span>
+                <span class="team-social-arrow">↗</span>
             </a>
         `).join('');
         socials.style.display = 'flex';

@@ -745,9 +745,10 @@ window.showPage = (pageId, skipHistory = false) => {
   const activePage = document.getElementById(`page-${pageId}`);
   activePage.style.display = 'block';
 
-  // Refresh admin sponsor table on tab switch
-  if (pageId === 'admin' && isAdmin() && window.loadAdminSponsors) {
-    window.loadAdminSponsors();
+  // Refresh admin sponsor and team tables on tab switch
+  if (pageId === 'admin' && isAdmin()) {
+    if (window.loadAdminSponsors) window.loadAdminSponsors();
+    if (window.loadAdminTeamMembers) window.loadAdminTeamMembers();
   }
 
   // Guide page specific initialization could go here in the future
