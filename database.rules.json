@@ -41,6 +41,10 @@
     "clubs": {
       ".read": true,
       ".write": true
+    },
+    "teamMembers": {
+      ".read": true,
+      ".write": true
     }
   }
 }
