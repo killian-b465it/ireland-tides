@@ -6,23 +6,24 @@
   <meta name="description" content="Contact the Irish Fishing Hub team. Get in touch for support, business inquiries, or general questions about our fishing app.">
   <title>Contact Us - Irish Fishing Hub</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=3.5.1">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4749246157404876" crossorigin="anonymous"></script>
   <style>
     .content-card { padding: 3rem; margin-top: 100px; background: rgba(21, 34, 56, 0.95); border-radius: var(--radius-lg); border: 1px solid rgba(255, 255, 255, 0.05); }
     h1 { margin-bottom: 20px; color: var(--text-primary); }
     p { margin-bottom: 15px; color: var(--text-secondary); line-height: 1.8; font-size: 1.05rem; }
     .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 30px; }
-    @media (max-width: 768px) { .contact-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { .contact-grid { grid-template-columns: 1fr; } .content-card { padding: 1.5rem; margin-top: 80px; } }
     .contact-info { background: rgba(0,0,0,0.2); padding: 25px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
     .contact-info h3 { margin-top: 0; color: var(--accent-primary); }
     .contact-info p { margin-bottom: 10px; font-size: 0.95rem; }
     .form-group { margin-bottom: 20px; }
     .form-group label { display: block; margin-bottom: 8px; color: var(--text-primary); font-weight: 500; }
-    .form-group input, .form-group textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; font-family: inherit; }
+    .form-group input, .form-group textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; font-family: inherit; font-size: 0.95rem; box-sizing: border-box; }
     .form-group textarea { min-height: 150px; resize: vertical; }
     .submit-btn { width: 100%; padding: 14px; background: var(--accent-primary); color: #000; border: none; border-radius: 8px; font-weight: 600; font-size: 1.1rem; cursor: pointer; transition: 0.2s; }
     .submit-btn:hover { background: #00bfff; transform: translateY(-2px); }
+    .status-box { display: none; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.95rem; }
   </style>
 </head>
 <body>
@@ -47,24 +48,25 @@
 
       <div class="contact-grid">
         <div>
-          <form onsubmit="alert('Thank you for your message! We will get back to you shortly.'); return false;">
+          <div id="contact-status-box" class="status-box"></div>
+          <form id="contact-form" onsubmit="handleContactSubmit(event)">
             <div class="form-group">
-              <label for="name">Your Name</label>
+              <label for="name">Your Name *</label>
               <input type="text" id="name" required placeholder="John Doe">
             </div>
             <div class="form-group">
-              <label for="email">Email Address</label>
+              <label for="email">Email Address *</label>
               <input type="email" id="email" required placeholder="john@example.com">
             </div>
             <div class="form-group">
               <label for="subject">Subject</label>
-              <input type="text" id="subject" required placeholder="How can we help?">
+              <input type="text" id="subject" placeholder="e.g. Bug report, Sponsorship, Feedback">
             </div>
             <div class="form-group">
-              <label for="message">Message</label>
-              <textarea id="message" required placeholder="Please describe your issue or inquiry in detail..."></textarea>
+              <label for="message">Message *</label>
+              <textarea id="message" required placeholder="Please describe your inquiry in detail..."></textarea>
             </div>
-            <button type="submit" class="submit-btn">Send Message</button>
+            <button type="submit" id="contact-submit-btn" class="submit-btn">Send Message</button>
           </form>
         </div>
         
@@ -75,8 +77,8 @@
             <p><strong>Response Time:</strong> We aim to respond to all inquiries within 24-48 hours during business days.</p>
             
             <h3 style="margin-top: 30px;">Business & Advertising</h3>
-            <p>Are you a local fishing shop, charter boat operator, or outdoor brand? We offer highly targeted advertising placements directly on the main dashboard of the app, reaching thousands of active local anglers.</p>
-            <p>Contact us at the email above with the subject line <strong>"Sponsorship"</strong> for our media kit and pricing details.</p>
+            <p>Are you a local fishing shop, charter boat operator, or outdoor brand? We offer targeted advertising placements directly on the app, reaching thousands of active local anglers.</p>
+            <p>Contact us at the email above with the subject line <strong>"Sponsorship"</strong> for our media kit and partnership details.</p>
 
             <h3 style="margin-top: 30px;">Address</h3>
             <p>Irish Fishing Hub<br>
@@ -87,5 +89,84 @@
       </div>
     </div>
   </main>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB1dhBLpKJdlkFVQ3R9lajHyuU2L_z_2b0",
+      authDomain: "irish-fishing-hub.firebaseapp.com",
+      databaseURL: "https://irish-fishing-hub-default-rtdb.firebaseio.com",
+      projectId: "irish-fishing-hub",
+      storageBucket: "irish-fishing-hub.firebasestorage.app",
+      messagingSenderId: "975072154696",
+      appId: "1:975072154696:web:d7fc268ea7e89ece63347d"
+    };
+
+    let firebaseDB = null;
+    try {
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
+      firebaseDB = firebase.database();
+    } catch(err) {
+      console.warn('Firebase init error on contact page:', err);
+    }
+
+    async function handleContactSubmit(event) {
+      event.preventDefault();
+      const btn = document.getElementById('contact-submit-btn');
+      const statusBox = document.getElementById('contact-status-box');
+      
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const subject = document.getElementById('subject').value.trim();
+      const message = document.getElementById('message').value.trim();
+
+      if (!name || !email || !message) {
+        alert('Please fill out all required fields.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+
+      const msgId = 'contact_' + Date.now();
+      const payload = {
+        id: msgId,
+        userName: name,
+        userEmail: email,
+        text: `[Subject: ${subject || 'General Inquiry'}]\n\n${message}`,
+        timestamp: Date.now(),
+        from: 'visitor',
+        read: false,
+        source: 'contact_page'
+      };
+
+      try {
+        if (firebaseDB) {
+          await firebaseDB.ref('support_messages/' + msgId).set(payload);
+        }
+        statusBox.style.display = 'block';
+        statusBox.style.background = 'rgba(0, 212, 255, 0.15)';
+        statusBox.style.border = '1px solid var(--accent-primary)';
+        statusBox.style.color = '#fff';
+        statusBox.innerHTML = '<strong>Message sent!</strong> Thank you for reaching out. We will get back to you shortly.';
+        document.getElementById('contact-form').reset();
+      } catch (err) {
+        console.error('Failed to send contact message:', err);
+        statusBox.style.display = 'block';
+        statusBox.style.background = 'rgba(255, 59, 48, 0.15)';
+        statusBox.style.border = '1px solid #ff3b30';
+        statusBox.style.color = '#fff';
+        statusBox.innerHTML = 'Failed to send message: ' + err.message + '. You can also email us directly at <a href="mailto:info@irishfishinghub.com" style="color:#00d4ff;">info@irishfishinghub.com</a>.';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Send Message';
+      }
+    }
+  </script>
 </body>
 </html>
