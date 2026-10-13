@@ -733,6 +733,10 @@ window.showPage = (pageId, skipHistory = false) => {
     link.classList.toggle('active', link.id === `nav-${pageId}`);
   });
 
+  document.querySelectorAll('.mobile-menu-link').forEach(link => {
+    link.classList.toggle('active', link.id === `m-nav-${pageId}`);
+  });
+
   document.querySelectorAll('.page').forEach(page => {
     page.style.display = 'none';
     page.classList.remove('active');
