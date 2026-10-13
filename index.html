@@ -151,7 +151,8 @@
         <a href="javascript:void(0)" class="nav-link" id="nav-clubs" onclick="showPage('clubs')">🤝 Clubs</a>
         <a href="javascript:void(0)" class="nav-link" id="nav-marketplace" onclick="showPage('marketplace')">🛒 Marketplace</a>
         <a href="javascript:void(0)" class="nav-link" id="nav-regulations" onclick="showPage('regulations')">⚖️ Regulations</a>
-        <a href="javascript:void(0)" class="nav-link" id="nav-sponsors" onclick="showPage('sponsors')">⭐ Sponsors</a>
+        <a href="javascript:void(0)" class="nav-link" id="nav-sponsors" onclick="showPage('sponsors')">🤝 Partners</a>
+        <a href="javascript:void(0)" class="nav-link" id="nav-team" onclick="showPage('team')">⭐ IFH Team</a>
         <a href="javascript:void(0)" class="nav-link" id="nav-directory" onclick="showPage('directory')">🏪 Shop Directory</a>
         <a href="javascript:void(0)" class="nav-link" id="nav-species" onclick="showPage('species')">🐟 Species Guide</a>
         <a href="javascript:void(0)" class="nav-link" id="nav-depth" onclick="showPage('depth')">📈 Depth Charts</a>
@@ -195,29 +196,42 @@
         </button>
       </div>
     </div>
-    <!-- Mobile Dropdown Menu -->
+    <!-- Main Navigation Drawer (Mobile & Desktop Dropdown) -->
     <div class="mobile-menu" id="mobile-menu">
-      <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('home'); closeMobileMenu()">📊 Dashboard</a>
-      <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('community'); closeMobileMenu()">👥 Community</a>
-      <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('leaderboard'); closeMobileMenu()">🏆 Leaderboard</a>
-      <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('clubs'); closeMobileMenu()">🤝 Clubs</a>
-      <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('marketplace'); closeMobileMenu()">🛒 Marketplace</a>
-      <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('guide'); closeMobileMenu()">🎣 Beginner Guide</a>
-      <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('regulations'); closeMobileMenu()">⚖️ Regulations</a>
-      <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('sponsors'); closeMobileMenu()">⭐ Sponsors</a>
-      <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('directory'); closeMobileMenu()">🏪 Shop Directory</a>
-      <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('species'); closeMobileMenu()">🐟 Species Guide</a>
-      <a href="javascript:void(0)" class="mobile-menu-link" onclick="showPage('depth'); closeMobileMenu()">📈 Depth Charts</a>
-      <a href="javascript:void(0)" class="mobile-menu-link" onclick="openRateModal(); closeMobileMenu()">⭐ Rate App</a>
-      <a href="javascript:void(0)" class="mobile-menu-link admin-only" id="mobile-nav-admin"
-        onclick="showPage('admin'); closeMobileMenu()" style="display: none;">🛡️ Admin</a>
-      <a href="species-hunt.html" class="mobile-menu-link" style="color:var(--accent-primary); font-weight:bold;">🏆 Species Hunt</a>
+      <div class="menu-section-header">EXPLORE & COMMUNITY</div>
+      <a href="javascript:void(0)" class="mobile-menu-link" id="m-nav-home" onclick="showPage('home'); closeMobileMenu()">📊 Dashboard</a>
+      <a href="javascript:void(0)" class="mobile-menu-link" id="m-nav-community" onclick="showPage('community'); closeMobileMenu()">👥 Community</a>
+      <a href="javascript:void(0)" class="mobile-menu-link" id="m-nav-leaderboard" onclick="showPage('leaderboard'); closeMobileMenu()">🏆 Leaderboard</a>
+      <a href="javascript:void(0)" class="mobile-menu-link" id="m-nav-clubs" onclick="showPage('clubs'); closeMobileMenu()">🤝 Clubs</a>
+      <a href="javascript:void(0)" class="mobile-menu-link" id="m-nav-marketplace" onclick="showPage('marketplace'); closeMobileMenu()">🛒 Marketplace</a>
+
+      <div class="menu-divider"></div>
+      <div class="menu-section-header">ANGLING RESOURCES</div>
+      <a href="javascript:void(0)" class="mobile-menu-link" id="m-nav-species" onclick="showPage('species'); closeMobileMenu()">🐟 Species Guide</a>
+      <a href="javascript:void(0)" class="mobile-menu-link" id="m-nav-depth" onclick="showPage('depth'); closeMobileMenu()">📈 Depth Charts</a>
+      <a href="javascript:void(0)" class="mobile-menu-link" id="m-nav-directory" onclick="showPage('directory'); closeMobileMenu()">🏪 Shop Directory</a>
+      <a href="javascript:void(0)" class="mobile-menu-link" id="m-nav-guide" onclick="showPage('guide'); closeMobileMenu()">🎣 Beginner Guide</a>
+      <a href="javascript:void(0)" class="mobile-menu-link" id="m-nav-regulations" onclick="showPage('regulations'); closeMobileMenu()">⚖️ Regulations</a>
       <a href="articles.html" class="mobile-menu-link">📝 Fishing Blog</a>
+
+      <div class="menu-divider"></div>
+      <div class="menu-section-header">HUB & PARTNERS</div>
+      <a href="javascript:void(0)" class="mobile-menu-link" id="m-nav-team" onclick="showPage('team'); closeMobileMenu()">⭐ IFH Team</a>
+      <a href="javascript:void(0)" class="mobile-menu-link" id="m-nav-sponsors" onclick="showPage('sponsors'); closeMobileMenu()">🤝 Partners & Affiliates</a>
       <a href="about.html" class="mobile-menu-link">ℹ️ About Us</a>
-      <a href="javascript:void(0)" onclick="openSupportModal();" class="mobile-menu-link">💬 Contact Support</a>
+      <a href="javascript:void(0)" class="mobile-menu-link" onclick="openRateModal(); closeMobileMenu()">⭐ Rate App</a>
       <a href="javascript:void(0)" class="mobile-menu-link" onclick="startWalkthrough(); closeMobileMenu()">🎓 App Tour</a>
-      <a href="terms.html" class="mobile-menu-link">⚖️ Terms & Conditions</a>
-      <a href="privacy.html" class="mobile-menu-link">🛡️ Privacy Policy</a>
+      <a href="javascript:void(0)" class="mobile-menu-link" onclick="openSupportModal(); closeMobileMenu()">💬 Contact Support</a>
+
+      <a href="javascript:void(0)" class="mobile-menu-link admin-only" id="mobile-nav-admin"
+        onclick="showPage('admin'); closeMobileMenu()" style="display: none;">🛡️ Admin Dashboard</a>
+
+      <div class="menu-divider"></div>
+      <div class="menu-footer-links">
+        <a href="terms.html">Terms</a>
+        <span>•</span>
+        <a href="privacy.html">Privacy</a>
+      </div>
     </div>
   </nav>
 
@@ -424,8 +438,6 @@
         </div>
 
         <div class="sidebar-footer">
-          <a href="species-hunt.html" style="color:var(--accent-primary); font-weight:bold;">Species Hunt</a>
-          <span>•</span>
           <a href="about.html">About Us</a>
           <span>•</span>
           <a href="javascript:void(0)" onclick="openSupportModal();">Contact</a>
@@ -560,8 +572,6 @@
           </div>
         </div>
         <div class="sidebar-footer">
-          <a href="species-hunt.html" style="color:var(--accent-primary); font-weight:bold;">Species Hunt</a>
-          <span>•</span>
           <a href="about.html">About Us</a>
           <span>•</span>
           <a href="javascript:void(0)" onclick="openSupportModal();">Contact</a>
@@ -630,13 +640,51 @@
   <main class="page" id="page-sponsors" style="display: none;">
     <div class="directory-container">
       <div class="directory-hero">
-        <h1>🤝 Our Sponsors</h1>
-        <p>Supporting the Irish Fishing Hub community</p>
+        <h1>🤝 Our Partners & Affiliates</h1>
+        <p>Our valued partners supporting the Irish Fishing Hub community</p>
       </div>
 
       <div class="sponsors-grid" id="sponsors-grid">
         <div class="empty-state">
           <p>No sponsors yet. Check back soon!</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- IFH Team Page -->
+  <main class="page" id="page-team" style="display: none;">
+    <div class="directory-container">
+      <div class="directory-hero">
+        <h1>⭐ The IFH Team</h1>
+        <p>Meet the people behind Irish Fishing Hub — our core team and our sponsored athletes</p>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="team-tabs" id="team-tabs">
+        <button class="team-tab active" id="team-tab-core" onclick="switchTeamTab('core')">🧑‍💼 Core Team</button>
+        <button class="team-tab" id="team-tab-angling" onclick="switchTeamTab('angling')">🎣 Angling Sponsors</button>
+        <button class="team-tab" id="team-tab-outdoor" onclick="switchTeamTab('outdoor')">🏕️ Outdoor Sponsors</button>
+      </div>
+
+      <!-- Core Team Section -->
+      <div id="team-section-core" class="team-section active">
+        <div class="team-grid" id="team-grid-core">
+          <div class="empty-state"><p>Loading team...</p></div>
+        </div>
+      </div>
+
+      <!-- Angling Sponsors Section -->
+      <div id="team-section-angling" class="team-section" style="display:none;">
+        <div class="team-grid" id="team-grid-angling">
+          <div class="empty-state"><p>Loading angling sponsors...</p></div>
+        </div>
+      </div>
+
+      <!-- Outdoor Sponsors Section -->
+      <div id="team-section-outdoor" class="team-section" style="display:none;">
+        <div class="team-grid" id="team-grid-outdoor">
+          <div class="empty-state"><p>Loading outdoor sponsors...</p></div>
         </div>
       </div>
     </div>
@@ -1242,6 +1290,117 @@
     </div>
   </div>
 
+  <!-- Team Member Info Modal -->
+  <div class="modal" id="team-member-modal">
+    <div class="modal-content" style="max-width: 520px;">
+      <div class="modal-header">
+        <h2 id="team-member-modal-title">Team Member</h2>
+        <button class="modal-close-btn-inline" onclick="closeTeamMemberModal()">✕</button>
+      </div>
+      <div class="team-member-modal-body">
+        <div class="team-member-modal-photo-wrap">
+          <img id="team-member-modal-photo" src="" alt="" class="team-member-modal-photo" onerror="this.style.display='none'; document.getElementById('team-member-modal-fallback').style.display='flex'">
+          <div id="team-member-modal-fallback" style="display:none; font-size:4rem; align-items:center; justify-content:center; height:140px;">👤</div>
+        </div>
+        <h3 id="team-member-modal-name" class="team-member-modal-name"></h3>
+        <p id="team-member-modal-role" class="team-member-modal-role"></p>
+        <div id="team-member-modal-passion-wrap" class="team-member-modal-passion" style="display:none;">
+          <span class="passion-label">❤️ Passion:</span>
+          <span id="team-member-modal-passion"></span>
+        </div>
+        <div id="team-member-modal-bio" class="team-member-modal-bio" style="display:none;"></div>
+        <div class="team-member-modal-socials" id="team-member-modal-socials">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin: Add/Edit Team Member Modal -->
+  <div class="modal" id="team-member-admin-modal">
+    <div class="modal-content" style="max-width: 540px;">
+      <div class="modal-header">
+        <h2 id="team-member-admin-title">➕ Add Team Member</h2>
+        <button class="modal-close-btn-inline" onclick="closeTeamMemberAdminModal()">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label>Name *</label>
+        <input type="text" id="tm-name" class="auth-input" placeholder="e.g. Ciarán Murphy">
+      </div>
+
+      <div class="form-group">
+        <label>Role / Title *</label>
+        <input type="text" id="tm-role" class="auth-input" placeholder="e.g. Co-Founder & Head of Operations">
+      </div>
+
+      <div class="form-group">
+        <label>Category *</label>
+        <select id="tm-category" class="auth-input" style="appearance:auto; background-color:rgba(0,0,0,0.2); width:100%; border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px; color:var(--text-main);">
+          <option value="core">🧑‍💼 Core Team</option>
+          <option value="angling">🎣 Angling Sponsor</option>
+          <option value="outdoor">🏕️ Outdoor Sponsor</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Profile Photo</label>
+        <div class="tm-photo-upload-area" id="tm-photo-upload-area" onclick="document.getElementById('tm-photo-file').click()">
+          <div id="tm-photo-preview-wrap" style="display:none;">
+            <img id="tm-photo-preview" src="" alt="Preview" class="tm-photo-preview-img">
+            <button type="button" class="tm-photo-remove-btn" onclick="event.stopPropagation(); clearTeamPhoto()">✕ Remove</button>
+          </div>
+          <div id="tm-photo-placeholder">
+            <span style="font-size:2rem;">📷</span>
+            <span style="font-size:0.9rem; color:var(--text-secondary);">Click to upload a photo</span>
+            <span style="font-size:0.78rem; color:var(--text-muted);">JPG, PNG, WEBP — max 5MB</span>
+          </div>
+        </div>
+        <input type="file" id="tm-photo-file" accept="image/*" style="display:none;" onchange="previewTeamPhoto(this)">
+        <input type="hidden" id="tm-photo-data">
+      </div>
+
+      <div class="form-group">
+        <label>Passion</label>
+        <input type="text" id="tm-passion" class="auth-input" placeholder="e.g. Bass fishing, fly fishing, kayak angling">
+      </div>
+
+      <div class="form-group">
+        <label>Bio</label>
+        <textarea id="tm-bio" class="auth-input" rows="3" placeholder="A short bio about this person..."></textarea>
+      </div>
+
+      <div style="border-top:1px solid rgba(255,255,255,0.1); padding-top:15px; margin-top:5px;">
+        <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:10px;">🔗 Social Media Links (optional)</p>
+        <div class="form-group">
+          <label>Instagram</label>
+          <input type="text" id="tm-instagram" class="auth-input" placeholder="https://instagram.com/username">
+        </div>
+        <div class="form-group">
+          <label>Facebook</label>
+          <input type="text" id="tm-facebook" class="auth-input" placeholder="https://facebook.com/username">
+        </div>
+        <div class="form-group">
+          <label>YouTube</label>
+          <input type="text" id="tm-youtube" class="auth-input" placeholder="https://youtube.com/@channel">
+        </div>
+        <div class="form-group">
+          <label>TikTok</label>
+          <input type="text" id="tm-tiktok" class="auth-input" placeholder="https://tiktok.com/@username">
+        </div>
+        <div class="form-group">
+          <label>X / Twitter</label>
+          <input type="text" id="tm-twitter" class="auth-input" placeholder="https://x.com/username">
+        </div>
+      </div>
+
+      <div class="modal-actions" style="margin-top:20px;">
+        <button class="btn btn-outline" onclick="closeTeamMemberAdminModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveTeamMember()" id="save-team-member-btn">Add Member</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Sponsor Info Modal -->
   <div class="modal" id="sponsor-info-modal">
     <div class="modal-content">
@@ -1785,11 +1944,38 @@
           </div>
         </div>
 
+        <!-- IFH Team Management -->
+        <div class="admin-card admin-card-full">
+          <div class="admin-card-header">
+            <h3>⭐ IFH Team Management</h3>
+            <button class="btn btn-sm btn-primary" onclick="openTeamMemberAdminModal()">➕ Add Team Member</button>
+          </div>
+          <div class="admin-card-body">
+            <div class="admin-table-scroll-wrapper">
+              <table class="sponsor-table" style="width:100%;">
+                <thead>
+                  <tr>
+                    <th>Photo</th>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Category</th>
+                    <th>Passion</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="team-members-table-body">
+                  <tr><td colspan="6" class="empty-state"><p>No team members yet. Click "Add Team Member" to get started.</p></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
         <!-- Sponsor Management -->
         <div class="admin-card admin-card-full">
           <div class="admin-card-header">
-            <h3>🤝 Sponsor Management</h3>
-            <button class="btn btn-sm btn-primary" onclick="openAddSponsorModal()">➕ Add New Sponsor</button>
+            <h3>🤝 Partner Management</h3>
+            <button class="btn btn-sm btn-primary" onclick="openAddSponsorModal()">➕ Add New Partner</button>
           </div>
           <div class="admin-card-body">
             <div class="admin-table-scroll-wrapper">
@@ -2662,6 +2848,7 @@
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
   <script src="app.js"></script>
   <script src="sponsors.js"></script>
+  <script src="team.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {

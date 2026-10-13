@@ -1,10 +1,12 @@
-const CACHE_NAME = 'irish-fishing-hub-v3.1.0';
+const CACHE_NAME = 'irish-fishing-hub-v3.5.1';
 
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/style.css',
   '/app.js',
+  '/team.js',
+  '/sponsors.js',
   '/manifest.json',
   '/assets/logo.png',
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap',
